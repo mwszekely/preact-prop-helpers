@@ -141,6 +141,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
     const {
         childrenHaveFocusParameters,
+        rearrangedChildrenParameters,
         managedChildrenParameters: { onChildrenMountChange, ...mcp1 },
         context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
         linearNavigationReturn,
@@ -200,6 +201,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         context,
         props: useMergedProps(props, propsRef),
 
+        rearrangedChildrenParameters,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,

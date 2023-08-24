@@ -335,7 +335,7 @@ export { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclar
 export { usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
 export { useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/use-selection.js";
 export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/use-single-selection.js";
-export { defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/use-sortable-children.js";
+export { defaultCompare, useRearrangeableChildren, useRearrangedChildren, useSortableChildren } from "./component-detail/use-sortable-children.js";
 export { useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";

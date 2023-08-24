@@ -2,7 +2,7 @@ import { createContext } from "preact";
 import { memo } from "preact/compat";
 import { StateUpdater, useCallback, useContext } from "preact/hooks";
 import { TabbableColumnInfo } from "../../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useStableCallback, useStableGetter, useState } from "../../dist/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useRearrangedChildren, useStableCallback, useStableGetter, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -20,7 +20,7 @@ export const DemoUseGrid = memo(() => {
     const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null as number | null);
 
     // Entirely complete, fully spelt-out version:
-    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
         // `useRovingTabIndex` is a separate hook that you could call with these same parameters:
         rovingTabIndexParameters: {
             // If true, the entire grid is removed from the tab order
@@ -79,8 +79,8 @@ export const DemoUseGrid = memo(() => {
             onTabbableColumnChange: setTabbableColumn
         },
         rearrangeableChildrenParameters: {
-            // This must return a VNode's 0-based index from its props
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+            // Called whenever the children have been rearranged
+            onRearranged: null,
         },
         sortableChildrenParameters: {
             // Controls how rows compare against each other
@@ -129,8 +129,6 @@ export const DemoUseGrid = memo(() => {
             // Nothing, actually
         },
         rearrangeableChildrenReturn: {
-            // You must call this hook on your array of children to implement the sorting behavior
-            useRearrangedChildren,
             // Largely internal use only
             indexDemangler,
             // Largely internal use only
@@ -142,6 +140,12 @@ export const DemoUseGrid = memo(() => {
             // Shuffles all children
             shuffle
         },
+        // The function `useRearrangeableChildren` must be called to have sortable children.
+        // These are the parameters it takes. It is stable, and everything in it is stable.
+        // You can either call that function here, or have a child call it
+        // (a list would call it directly, a table would have its tbody call it, so whether
+        // it's in a Context object is dependent on the situation)
+        rearrangedChildrenParameters,
         sortableChildrenReturn: {
             // A table header button would probably call this function to sort all the table rows.
             sort
@@ -187,12 +191,19 @@ export const DemoUseGrid = memo(() => {
                     <GetSortableColumnContext.Provider value={getSortableColumn}>
                         <SetSortableColumnContext.Provider value={setSortableColumn}>
                             <GridRowContext.Provider value={context}>
-                                <tbody {...props}>{useRearrangedChildren(Array.from((function* () {
-                                    for (let i = 0; i < 10; ++i) {
-                                        yield <DemoUseGridRow index={i} key={i} />
+                                <tbody {...props}>{useRearrangedChildren({
+                                    managedChildrenReturn: { getChildren },
+                                    rearrangeableChildrenReturn: { indexMangler },
+                                    rearrangedChildrenParameters: {
+                                        ...rearrangedChildrenParameters,
+                                        getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+                                        children: Array.from((function* () {
+                                            for (let i = 0; i < 10; ++i) {
+                                                yield <DemoUseGridRow index={i} key={i} />
+                                            }
+                                        })())
                                     }
-                                })())
-                                )}</tbody>
+                                })}</tbody>
                             </GridRowContext.Provider>
                         </SetSortableColumnContext.Provider>
                     </GetSortableColumnContext.Provider>

@@ -37,7 +37,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
+    const { childrenHaveFocusParameters, rearrangedChildrenParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
@@ -79,6 +79,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     return {
         context,
         props: useMergedProps(props, propsRef),
+        rearrangedChildrenParameters,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,

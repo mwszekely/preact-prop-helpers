@@ -1,3 +1,4 @@
+import { RefObject } from "preact";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { Nullable, TargetedPick } from "../util/lib.js";
 import { VNode } from "../util/types.js";
@@ -6,14 +7,6 @@ export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 export interface UseRearrangeableChildrenParametersSelf {
-    /**
-     * This must return the index of this child relative to all its sortable siblings from its `VNode`.
-     *
-     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
-     *
-     * @stable
-     */
-    getIndex: GetIndex;
     /**
      * Called after the children have been rearranged.
      */
@@ -42,7 +35,7 @@ export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableCh
 export interface UseSortableChildrenParameters<M extends UseRearrangeableChildInfo> extends UseRearrangeableChildrenParameters<M> {
     sortableChildrenParameters: UseSortableChildrenParametersSelf<M>;
 }
-export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
+export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> extends TargetedPick<UseRearrangedChildrenParameters<M>, "rearrangedChildrenParameters", "forceUpdateRef"> {
     rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
 }
 export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
@@ -78,13 +71,6 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
     indexMangler: (n: number) => number;
     /** @stable */
     indexDemangler: (n: number) => number;
-    /**
-     * @stable
-     *
-     * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
-     *
-     */
-    useRearrangedChildren: (children: VNode[]) => VNode[];
     /**
      * Returns an array of each cell's `getSortValue()` result.
      */
@@ -129,8 +115,40 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
+ *
+ * @hasChild {@link useRearrangedChildren}
  */
-export declare function useRearrangeableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M>;
+export declare function useRearrangeableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M>;
+export interface UseRearrangedChildrenParametersSelf {
+    /**
+     * Provided by `useRearrangeableChildren`
+     */
+    forceUpdateRef: RefObject<() => void>;
+    /**
+     * The children to sort. Must be a flat array, no exceptions, but holes in the array will be accounted for.
+     */
+    children: VNode[];
+    /**
+     * This must return the index of this child relative to all its sortable siblings from its `VNode`.
+     *
+     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     *
+     * @stable
+     */
+    getIndex: GetIndex;
+}
+export interface UseRearrangedChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseRearrangeableChildrenReturnType<M>, "rearrangeableChildrenReturn", "indexMangler">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+    rearrangedChildrenParameters: UseRearrangedChildrenParametersSelf;
+}
+/**
+ * Complement to `useRearrangeableChildren` (and by extension, `useSortableChildren`).
+ *
+ * You **must** call this on your array of children in order to sort them.
+ *
+ * @param param0
+ * @returns
+ */
+export declare function useRearrangedChildren({ rearrangedChildrenParameters: { children, forceUpdateRef, getIndex, ...void2 }, rearrangeableChildrenReturn: { indexMangler, ...void3 }, managedChildrenReturn: { getChildren, ...void4 }, ...void1 }: UseRearrangedChildrenParameters<UseSortableChildInfo>): VNode[];
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *

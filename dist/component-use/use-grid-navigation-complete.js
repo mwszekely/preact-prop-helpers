@@ -35,7 +35,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, rearrangedChildrenParameters, ...void3 } = useGridNavigationSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -75,6 +75,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     return {
         context,
         props: useMergedProps(props, propsStable),
+        rearrangedChildrenParameters,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,

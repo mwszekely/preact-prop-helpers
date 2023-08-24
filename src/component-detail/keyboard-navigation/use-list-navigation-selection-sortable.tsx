@@ -68,7 +68,7 @@ export function useListNavigationSelectionSortable<ParentOrChildElement extends 
     ...void3
 }: UseListNavigationSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSelectionSortable);
-    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection<ParentOrChildElement, ChildElement>({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
 
     assertEmptyObject(void1);
@@ -79,6 +79,7 @@ export function useListNavigationSelectionSortable<ParentOrChildElement extends 
         props,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...restLN
     }
 }

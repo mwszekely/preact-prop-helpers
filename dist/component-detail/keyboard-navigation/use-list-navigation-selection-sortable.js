@@ -20,7 +20,7 @@ const _dummy = 0;
  */
 export function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
     monitorCallCount(useListNavigationSelectionSortable);
-    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void3);
@@ -29,6 +29,7 @@ export function useListNavigationSelectionSortable({ linearNavigationParameters,
         props,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...restLN
     };
 }

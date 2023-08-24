@@ -87,7 +87,7 @@ export function useGridNavigationSelectionSortable<ParentOrRowElement extends El
 }: UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSelectionSortableReturnType<ParentOrRowElement, RowElement, RM> {
     monitorCallCount(useGridNavigationSelectionSortable);
 
-    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void2 } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSelection<ParentOrRowElement, RowElement>({
         rearrangeableChildrenReturn,
         linearNavigationParameters,
@@ -102,10 +102,12 @@ export function useGridNavigationSelectionSortable<ParentOrRowElement extends El
         childrenHaveFocusReturn
     });
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
 
     return { 
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...gnr
      }
 }

@@ -9,7 +9,8 @@
     "browserslist": "defaults",
     "scripts": {
         "watch": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --minify-identifiers --minify-syntax --watch",
-        "build": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --minify-identifiers --minify-syntax --analyze",
+        "build": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --analyze",
+        "build:min": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --minify-identifiers --minify-syntax --analyze",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",

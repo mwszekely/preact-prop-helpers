@@ -1,10 +1,10 @@
+import { shuffle as lodashShuffle } from "lodash-es"; // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { useForceUpdate } from "../preact-extensions/use-force-update.js";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
-import { createElement, useCallback, useRef } from "../util/lib.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { createElement, useCallback, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-// TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
-import { shuffle as lodashShuffle } from "lodash-es";
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -27,10 +27,11 @@ import { shuffle as lodashShuffle } from "lodash-es";
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
+ *
+ * @hasChild {@link useRearrangedChildren}
  */
-export function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
+export function useRearrangeableChildren({ rearrangeableChildrenParameters: { onRearranged }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useRearrangeableChildren);
-    useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = useRef(new Map());
@@ -73,20 +74,6 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
         onRearrangedGetter()?.();
         forceUpdateRef.current?.();
     }, []);
-    const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
-        monitorCallCount(useRearrangedChildren);
-        console.assert(Array.isArray(children));
-        const forceUpdate = useForceUpdate();
-        console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
-        forceUpdateRef.current = forceUpdate; // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
-        return children
-            .slice()
-            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
-            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
-            .map(({ child, mangledIndex, demangledIndex }) => {
-            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
-        });
-    }, []);
     const toJsonArray = useCallback((transform) => {
         const managedRows = getChildren();
         return managedRows._arraySlice().map(child => {
@@ -105,10 +92,41 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             rearrange,
             shuffle,
             reverse,
-            useRearrangedChildren,
+            //useRearrangedChildren: makeu,
             toJsonArray
+        },
+        rearrangedChildrenParameters: {
+            forceUpdateRef
         }
     };
+}
+/**
+ * Complement to `useRearrangeableChildren` (and by extension, `useSortableChildren`).
+ *
+ * You **must** call this on your array of children in order to sort them.
+ *
+ * @param param0
+ * @returns
+ */
+export function useRearrangedChildren({ rearrangedChildrenParameters: { children, forceUpdateRef, getIndex, ...void2 }, rearrangeableChildrenReturn: { indexMangler, ...void3 }, managedChildrenReturn: { getChildren, ...void4 }, ...void1 }) {
+    monitorCallCount(useRearrangedChildren);
+    useEnsureStability("useRearrangeableChildren", getIndex);
+    console.assert(Array.isArray(children));
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    const forceUpdate = useForceUpdate();
+    console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+    forceUpdateRef.current = forceUpdate; // This mutation during render is fine, it's always the same value
+    const sortedChildren = useMemo(() => {
+        return (children
+            .slice()
+            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
+            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
+            .map(({ child, mangledIndex, demangledIndex }) => { return createElement(child.type, { ...child.props, key: demangledIndex }); }));
+    }, [children]);
+    return sortedChildren;
 }
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -136,7 +154,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
 export function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useSortableChildren);
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
+    const { rearrangeableChildrenReturn, rearrangedChildrenParameters, ...void1 } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((direction) => {
@@ -153,9 +171,11 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
         }) : managedRows._arraySlice();
         return rearrange(originalRows, sortedRows);
     }, [ /* Must remain stable */]);
+    assertEmptyObject(void1);
     return {
         sortableChildrenReturn: { sort },
-        rearrangeableChildrenReturn
+        rearrangeableChildrenReturn,
+        rearrangedChildrenParameters
     };
 }
 export function defaultCompare(lhs, rhs) {

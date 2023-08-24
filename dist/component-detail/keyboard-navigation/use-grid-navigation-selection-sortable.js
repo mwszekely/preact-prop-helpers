@@ -21,7 +21,7 @@ const _dummy = 0;
  */
 export function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }) {
     monitorCallCount(useGridNavigationSelectionSortable);
-    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void2 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSelection({
         rearrangeableChildrenReturn,
         linearNavigationParameters,
@@ -36,9 +36,11 @@ export function useGridNavigationSelectionSortable({ rearrangeableChildrenParame
         childrenHaveFocusReturn
     });
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
     return {
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...gnr
     };
 }

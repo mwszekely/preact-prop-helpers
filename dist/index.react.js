@@ -2427,10 +2427,11 @@ function useForceUpdate() {
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
+ *
+ * @hasChild {@link useRearrangedChildren}
  */
-function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
+function useRearrangeableChildren({ rearrangeableChildrenParameters: { onRearranged }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useRearrangeableChildren);
-    useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = useRef(new Map());
@@ -2473,20 +2474,6 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
         onRearrangedGetter()?.();
         forceUpdateRef.current?.();
     }, []);
-    const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
-        monitorCallCount(useRearrangedChildren);
-        console.assert(Array.isArray(children));
-        const forceUpdate = useForceUpdate();
-        console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
-        forceUpdateRef.current = forceUpdate; // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
-        return children
-            .slice()
-            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
-            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
-            .map(({ child, mangledIndex, demangledIndex }) => {
-            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
-        });
-    }, []);
     const toJsonArray = useCallback((transform) => {
         const managedRows = getChildren();
         return managedRows._arraySlice().map(child => {
@@ -2505,10 +2492,37 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
             rearrange,
             shuffle: shuffle$1,
             reverse,
-            useRearrangedChildren,
+            //useRearrangedChildren: makeu,
             toJsonArray
+        },
+        rearrangedChildrenParameters: {
+            forceUpdateRef
         }
     };
+}
+/**
+ * Complement to `useRearrangeableChildren` (and by extension, `useSortableChildren`).
+ *
+ * You **must** call this on your array of children in order to sort them.
+ *
+ * @param param0
+ * @returns
+ */
+function useRearrangedChildren({ rearrangedChildrenParameters: { children, forceUpdateRef, getIndex, ...void2 }, rearrangeableChildrenReturn: { indexMangler, ...void3 }, managedChildrenReturn: { getChildren, ...void4 }, ...void1 }) {
+    monitorCallCount(useRearrangedChildren);
+    useEnsureStability("useRearrangeableChildren", getIndex);
+    console.assert(Array.isArray(children));
+    const forceUpdate = useForceUpdate();
+    console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+    forceUpdateRef.current = forceUpdate; // This mutation during render is fine, it's always the same value
+    const sortedChildren = useMemo(() => {
+        return (children
+            .slice()
+            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
+            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
+            .map(({ child, mangledIndex, demangledIndex }) => { return createElement(child.type, { ...child.props, key: demangledIndex }); }));
+    }, [children]);
+    return sortedChildren;
 }
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -2536,7 +2550,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
 function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useSortableChildren);
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
+    const { rearrangeableChildrenReturn, rearrangedChildrenParameters, ...void1 } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((direction) => {
@@ -2555,7 +2569,8 @@ function useSortableChildren({ rearrangeableChildrenParameters, sortableChildren
     }, [ /* Must remain stable */]);
     return {
         sortableChildrenReturn: { sort },
-        rearrangeableChildrenReturn
+        rearrangeableChildrenReturn,
+        rearrangedChildrenParameters
     };
 }
 function defaultCompare(lhs, rhs) {
@@ -3136,7 +3151,7 @@ function useGridNavigationSelectionCell(p) {
  */
 function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }) {
     monitorCallCount(useGridNavigationSelectionSortable);
-    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void2 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSelection({
         rearrangeableChildrenReturn,
         linearNavigationParameters,
@@ -3153,6 +3168,7 @@ function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, s
     return {
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...gnr
     };
 }
@@ -3296,13 +3312,14 @@ function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }
  */
 function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
     monitorCallCount(useListNavigationSelectionSortable);
-    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, rearrangedChildrenParameters, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
     return {
         context,
         props,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
+        rearrangedChildrenParameters,
         ...restLN
     };
 }
@@ -4048,7 +4065,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, rearrangedChildrenParameters, ...void3 } = useGridNavigationSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -4085,6 +4102,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
     return {
         context,
         props: useMergedProps(props, propsStable),
+        rearrangedChildrenParameters,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -4263,7 +4281,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
+    const { childrenHaveFocusParameters, rearrangedChildrenParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
@@ -4303,6 +4321,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
     return {
         context,
         props: useMergedProps(props, propsRef),
+        rearrangedChildrenParameters,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -6595,5 +6614,5 @@ function useInterval({ interval, callback }) {
     }, []);
 }
 
-export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useRandomDualIds, useRandomId, useRearrangeableChildren, useRearrangedChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map
