@@ -3932,12 +3932,11 @@
       setTabbableColumn,
       setTabbableCell: setTabbableIndex
     });
-    propsLN.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
+    propsLN.tabIndex = propsLNC.tabIndex = -1;
     const props = useMergedProps(propsLN, propsLNC, {
       // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
       onFocus: useStableCallback((e5) => whenThisRowIsFocused(e5.currentTarget))
     });
-    props.tabIndex = -1;
     const contextToChildren = useMemoObject({
       gridNavigationCellContext,
       ...contextULN

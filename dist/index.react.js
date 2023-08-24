@@ -2329,15 +2329,13 @@ refElementReturn, ...void1 }) {
         setTabbableColumn,
         setTabbableCell: setTabbableIndex
     });
-    // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
-    // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
-    // but it shouldn't just be ignored wholesale like this.
-    propsLN.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
+    // These will often have conflicting values, but we always use -1 for rows no matter what,
+    // so instead of negotiating a resolution we can just give a straight answer.
+    propsLN.tabIndex = propsLNC.tabIndex = -1;
     const props = useMergedProps(propsLN, propsLNC, {
         // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
         onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
     });
-    props.tabIndex = -1;
     const contextToChildren = useMemoObject({
         gridNavigationCellContext,
         ...contextULN
