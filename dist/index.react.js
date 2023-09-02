@@ -6346,6 +6346,32 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
     return [localCopy, setValueWrapper, getValue];
 }
 
+var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
+
+var _=0;function o(o,e,n,t,f,l$1){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l$1};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l.vnode&&l.vnode(i),i}
+
+function childrenIsVnode(children) {
+    if (children && children.type && children.props)
+        return true;
+    return false;
+}
+/**
+ * Passes props onto another set of props' `children`.
+ *
+ * @details If `children` is a VNode (e.g. a `<div>` or a `<Component>`), then the props are spread to that.
+ * Otherwise, a new element is created with the `Tag` parameter, which defaults to `"span"`
+ *
+ * @param children
+ * @param props
+ * @param ref
+ * @param Tag
+ * @returns
+ */
+function usePropsOnChildren(children, props, ref, Tag = 'span') {
+    const c = (childrenIsVnode(children) ? children : o(Tag, { children: children }));
+    return createElement(c.type, useMergedProps(c.props, { ref: c.ref }, props, { ref }));
+}
+
 function parseParam(url, paramKey, fromString) {
     if (paramKey == undefined)
         return paramKey ?? undefined;
@@ -6594,5 +6620,5 @@ function useInterval({ interval, callback }) {
     }, []);
 }
 
-export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map

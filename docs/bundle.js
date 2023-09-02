@@ -24,16 +24,16 @@
     l5 && l5.removeChild(n3);
   }
   function y(l5, u5, t5) {
-    var i5, o6, r5, f5 = {};
+    var i5, o7, r5, f5 = {};
     for (r5 in u5)
-      "key" == r5 ? i5 = u5[r5] : "ref" == r5 ? o6 = u5[r5] : f5[r5] = u5[r5];
+      "key" == r5 ? i5 = u5[r5] : "ref" == r5 ? o7 = u5[r5] : f5[r5] = u5[r5];
     if (arguments.length > 2 && (f5.children = arguments.length > 3 ? n.call(arguments, 2) : t5), "function" == typeof l5 && null != l5.defaultProps)
       for (r5 in l5.defaultProps)
         void 0 === f5[r5] && (f5[r5] = l5.defaultProps[r5]);
-    return d(l5, f5, i5, o6, null);
+    return d(l5, f5, i5, o7, null);
   }
-  function d(n3, t5, i5, o6, r5) {
-    var f5 = { type: n3, props: t5, key: i5, ref: o6, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == r5 ? ++u : r5 };
+  function d(n3, t5, i5, o7, r5) {
+    var f5 = { type: n3, props: t5, key: i5, ref: o7, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == r5 ? ++u : r5 };
     return null == r5 && null != l.vnode && l.vnode(f5), f5;
   }
   function k(n3) {
@@ -65,21 +65,21 @@
     (!n3.__d && (n3.__d = true) && i.push(n3) && !x.__r++ || o !== l.debounceRendering) && ((o = l.debounceRendering) || r)(x);
   }
   function x() {
-    var n3, l5, u5, t5, o6, r5, e5, c5, s5;
+    var n3, l5, u5, t5, o7, r5, e5, c5, s5;
     for (i.sort(f); n3 = i.shift(); )
-      n3.__d && (l5 = i.length, t5 = void 0, o6 = void 0, r5 = void 0, c5 = (e5 = (u5 = n3).__v).__e, (s5 = u5.__P) && (t5 = [], o6 = [], (r5 = v({}, e5)).__v = e5.__v + 1, L(s5, e5, r5, u5.__n, void 0 !== s5.ownerSVGElement, null != e5.__h ? [c5] : null, t5, null == c5 ? g(e5) : c5, e5.__h, o6), M(t5, e5, o6), e5.__e != c5 && m(e5)), i.length > l5 && i.sort(f));
+      n3.__d && (l5 = i.length, t5 = void 0, o7 = void 0, r5 = void 0, c5 = (e5 = (u5 = n3).__v).__e, (s5 = u5.__P) && (t5 = [], o7 = [], (r5 = v({}, e5)).__v = e5.__v + 1, L(s5, e5, r5, u5.__n, void 0 !== s5.ownerSVGElement, null != e5.__h ? [c5] : null, t5, null == c5 ? g(e5) : c5, e5.__h, o7), M(t5, e5, o7), e5.__e != c5 && m(e5)), i.length > l5 && i.sort(f));
     x.__r = 0;
   }
-  function P(n3, l5, u5, t5, i5, o6, r5, f5, e5, a5, v5) {
+  function P(n3, l5, u5, t5, i5, o7, r5, f5, e5, a5, v5) {
     var p5, y5, _6, b5, g7, m5, w7, x7, P4, S3, H5 = 0, I5 = t5 && t5.__k || s, T7 = I5.length, j6 = T7, z6 = l5.length;
     for (u5.__k = [], p5 = 0; p5 < z6; p5++)
-      null != (b5 = u5.__k[p5] = null == (b5 = l5[p5]) || "boolean" == typeof b5 || "function" == typeof b5 ? null : "string" == typeof b5 || "number" == typeof b5 || "bigint" == typeof b5 ? d(null, b5, null, null, b5) : h(b5) ? d(k, { children: b5 }, null, null, null) : b5.__b > 0 ? d(b5.type, b5.props, b5.key, b5.ref ? b5.ref : null, b5.__v) : b5) && (b5.__ = u5, b5.__b = u5.__b + 1, -1 === (x7 = A(b5, I5, w7 = p5 + H5, j6)) ? _6 = c : (_6 = I5[x7] || c, I5[x7] = void 0, j6--), L(n3, b5, _6, i5, o6, r5, f5, e5, a5, v5), g7 = b5.__e, (y5 = b5.ref) && _6.ref != y5 && (_6.ref && O(_6.ref, null, b5), v5.push(y5, b5.__c || g7, b5)), null != g7 && (null == m5 && (m5 = g7), S3 = !(P4 = _6 === c || null === _6.__v) && x7 === w7, P4 ? -1 == x7 && H5-- : x7 !== w7 && (x7 === w7 + 1 ? (H5++, S3 = true) : x7 > w7 ? j6 > z6 - w7 ? (H5 += x7 - w7, S3 = true) : H5-- : H5 = x7 < w7 && x7 == w7 - 1 ? x7 - w7 : 0), w7 = p5 + H5, S3 = S3 || x7 == p5 && !P4, "function" != typeof b5.type || x7 === w7 && _6.__k !== b5.__k ? "function" == typeof b5.type || S3 ? void 0 !== b5.__d ? (e5 = b5.__d, b5.__d = void 0) : e5 = g7.nextSibling : e5 = $(n3, g7, e5) : e5 = C(b5, e5, n3), "function" == typeof u5.type && (u5.__d = e5)));
+      null != (b5 = u5.__k[p5] = null == (b5 = l5[p5]) || "boolean" == typeof b5 || "function" == typeof b5 ? null : "string" == typeof b5 || "number" == typeof b5 || "bigint" == typeof b5 ? d(null, b5, null, null, b5) : h(b5) ? d(k, { children: b5 }, null, null, null) : b5.__b > 0 ? d(b5.type, b5.props, b5.key, b5.ref ? b5.ref : null, b5.__v) : b5) && (b5.__ = u5, b5.__b = u5.__b + 1, -1 === (x7 = A(b5, I5, w7 = p5 + H5, j6)) ? _6 = c : (_6 = I5[x7] || c, I5[x7] = void 0, j6--), L(n3, b5, _6, i5, o7, r5, f5, e5, a5, v5), g7 = b5.__e, (y5 = b5.ref) && _6.ref != y5 && (_6.ref && O(_6.ref, null, b5), v5.push(y5, b5.__c || g7, b5)), null != g7 && (null == m5 && (m5 = g7), S3 = !(P4 = _6 === c || null === _6.__v) && x7 === w7, P4 ? -1 == x7 && H5-- : x7 !== w7 && (x7 === w7 + 1 ? (H5++, S3 = true) : x7 > w7 ? j6 > z6 - w7 ? (H5 += x7 - w7, S3 = true) : H5-- : H5 = x7 < w7 && x7 == w7 - 1 ? x7 - w7 : 0), w7 = p5 + H5, S3 = S3 || x7 == p5 && !P4, "function" != typeof b5.type || x7 === w7 && _6.__k !== b5.__k ? "function" == typeof b5.type || S3 ? void 0 !== b5.__d ? (e5 = b5.__d, b5.__d = void 0) : e5 = g7.nextSibling : e5 = $(n3, g7, e5) : e5 = C(b5, e5, n3), "function" == typeof u5.type && (u5.__d = e5)));
     for (u5.__e = m5, p5 = T7; p5--; )
       null != I5[p5] && ("function" == typeof u5.type && null != I5[p5].__e && I5[p5].__e == u5.__d && (u5.__d = I5[p5].__e.nextSibling), q(I5[p5], I5[p5]));
   }
   function C(n3, l5, u5) {
-    for (var t5, i5 = n3.__k, o6 = 0; i5 && o6 < i5.length; o6++)
-      (t5 = i5[o6]) && (t5.__ = n3, l5 = "function" == typeof t5.type ? C(t5, l5, u5) : $(u5, t5.__e, l5));
+    for (var t5, i5 = n3.__k, o7 = 0; i5 && o7 < i5.length; o7++)
+      (t5 = i5[o7]) && (t5.__ = n3, l5 = "function" == typeof t5.type ? C(t5, l5, u5) : $(u5, t5.__e, l5));
     return l5;
   }
   function S(n3, l5) {
@@ -91,18 +91,18 @@
     return null == u5 || u5.parentNode !== n3 ? n3.insertBefore(l5, null) : l5 == u5 && null != l5.parentNode || n3.insertBefore(l5, u5), l5.nextSibling;
   }
   function A(n3, l5, u5, t5) {
-    var i5 = n3.key, o6 = n3.type, r5 = u5 - 1, f5 = u5 + 1, e5 = l5[u5];
-    if (null === e5 || e5 && i5 == e5.key && o6 === e5.type)
+    var i5 = n3.key, o7 = n3.type, r5 = u5 - 1, f5 = u5 + 1, e5 = l5[u5];
+    if (null === e5 || e5 && i5 == e5.key && o7 === e5.type)
       return u5;
     if (t5 > (null != e5 ? 1 : 0))
       for (; r5 >= 0 || f5 < l5.length; ) {
         if (r5 >= 0) {
-          if ((e5 = l5[r5]) && i5 == e5.key && o6 === e5.type)
+          if ((e5 = l5[r5]) && i5 == e5.key && o7 === e5.type)
             return r5;
           r5--;
         }
         if (f5 < l5.length) {
-          if ((e5 = l5[f5]) && i5 == e5.key && o6 === e5.type)
+          if ((e5 = l5[f5]) && i5 == e5.key && o7 === e5.type)
             return f5;
           f5++;
         }
@@ -110,17 +110,17 @@
     return -1;
   }
   function H(n3, l5, u5, t5, i5) {
-    var o6;
-    for (o6 in u5)
-      "children" === o6 || "key" === o6 || o6 in l5 || T(n3, o6, null, u5[o6], t5);
-    for (o6 in l5)
-      i5 && "function" != typeof l5[o6] || "children" === o6 || "key" === o6 || "value" === o6 || "checked" === o6 || u5[o6] === l5[o6] || T(n3, o6, l5[o6], u5[o6], t5);
+    var o7;
+    for (o7 in u5)
+      "children" === o7 || "key" === o7 || o7 in l5 || T(n3, o7, null, u5[o7], t5);
+    for (o7 in l5)
+      i5 && "function" != typeof l5[o7] || "children" === o7 || "key" === o7 || "value" === o7 || "checked" === o7 || u5[o7] === l5[o7] || T(n3, o7, l5[o7], u5[o7], t5);
   }
   function I(n3, l5, u5) {
     "-" === l5[0] ? n3.setProperty(l5, null == u5 ? "" : u5) : n3[l5] = null == u5 ? "" : "number" != typeof u5 || a.test(l5) ? u5 : u5 + "px";
   }
   function T(n3, l5, u5, t5, i5) {
-    var o6;
+    var o7;
     n:
       if ("style" === l5)
         if ("string" == typeof u5)
@@ -134,7 +134,7 @@
               t5 && u5[l5] === t5[l5] || I(n3.style, l5, u5[l5]);
         }
       else if ("o" === l5[0] && "n" === l5[1])
-        o6 = l5 !== (l5 = l5.replace(/Capture$/, "")), l5 = l5.toLowerCase() in n3 ? l5.toLowerCase().slice(2) : l5.slice(2), n3.l || (n3.l = {}), n3.l[l5 + o6] = u5, u5 ? t5 || n3.addEventListener(l5, o6 ? z : j, o6) : n3.removeEventListener(l5, o6 ? z : j, o6);
+        o7 = l5 !== (l5 = l5.replace(/Capture$/, "")), l5 = l5.toLowerCase() in n3 ? l5.toLowerCase().slice(2) : l5.slice(2), n3.l || (n3.l = {}), n3.l[l5 + o7] = u5, u5 ? t5 || n3.addEventListener(l5, o7 ? z : j, o7) : n3.removeEventListener(l5, o7 ? z : j, o7);
       else if ("dangerouslySetInnerHTML" !== l5) {
         if (i5)
           l5 = l5.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
@@ -153,7 +153,7 @@
   function z(n3) {
     return this.l[n3.type + true](l.event ? l.event(n3) : n3);
   }
-  function L(n3, u5, t5, i5, o6, r5, f5, e5, c5, s5) {
+  function L(n3, u5, t5, i5, o7, r5, f5, e5, c5, s5) {
     var a5, p5, y5, d5, _6, g7, m5, w7, x7, C5, S3, $5, A5, H5, I5, T7 = u5.type;
     if (void 0 !== u5.constructor)
       return null;
@@ -184,9 +184,9 @@
             do {
               p5.__d = false, $5 && $5(u5), a5 = p5.render(p5.props, p5.state, p5.context), p5.state = p5.__s;
             } while (p5.__d && ++A5 < 25);
-          p5.state = p5.__s, null != p5.getChildContext && (i5 = v(v({}, i5), p5.getChildContext())), y5 || null == p5.getSnapshotBeforeUpdate || (g7 = p5.getSnapshotBeforeUpdate(d5, _6)), P(n3, h(I5 = null != a5 && a5.type === k && null == a5.key ? a5.props.children : a5) ? I5 : [I5], u5, t5, i5, o6, r5, f5, e5, c5, s5), p5.base = u5.__e, u5.__h = null, p5.__h.length && f5.push(p5), m5 && (p5.__E = p5.__ = null);
+          p5.state = p5.__s, null != p5.getChildContext && (i5 = v(v({}, i5), p5.getChildContext())), y5 || null == p5.getSnapshotBeforeUpdate || (g7 = p5.getSnapshotBeforeUpdate(d5, _6)), P(n3, h(I5 = null != a5 && a5.type === k && null == a5.key ? a5.props.children : a5) ? I5 : [I5], u5, t5, i5, o7, r5, f5, e5, c5, s5), p5.base = u5.__e, u5.__h = null, p5.__h.length && f5.push(p5), m5 && (p5.__E = p5.__ = null);
         } else
-          null == r5 && u5.__v === t5.__v ? (u5.__k = t5.__k, u5.__e = t5.__e) : u5.__e = N(t5.__e, u5, t5, i5, o6, r5, f5, c5, s5);
+          null == r5 && u5.__v === t5.__v ? (u5.__k = t5.__k, u5.__e = t5.__e) : u5.__e = N(t5.__e, u5, t5, i5, o7, r5, f5, c5, s5);
       (a5 = l.diffed) && a5(u5);
     } catch (n4) {
       u5.__v = null, (c5 || null != r5) && (u5.__e = e5, u5.__h = !!c5, r5[r5.indexOf(e5)] = null), l.__e(n4, u5, t5);
@@ -205,9 +205,9 @@
       }
     });
   }
-  function N(l5, u5, t5, i5, o6, r5, f5, e5, s5) {
+  function N(l5, u5, t5, i5, o7, r5, f5, e5, s5) {
     var a5, v5, y5, d5 = t5.props, _6 = u5.props, k6 = u5.type, b5 = 0;
-    if ("svg" === k6 && (o6 = true), null != r5) {
+    if ("svg" === k6 && (o7 = true), null != r5) {
       for (; b5 < r5.length; b5++)
         if ((a5 = r5[b5]) && "setAttribute" in a5 == !!k6 && (k6 ? a5.localName === k6 : 3 === a5.nodeType)) {
           l5 = a5, r5[b5] = null;
@@ -217,7 +217,7 @@
     if (null == l5) {
       if (null === k6)
         return document.createTextNode(_6);
-      l5 = o6 ? document.createElementNS("http://www.w3.org/2000/svg", k6) : document.createElement(k6, _6.is && _6), r5 = null, e5 = false;
+      l5 = o7 ? document.createElementNS("http://www.w3.org/2000/svg", k6) : document.createElement(k6, _6.is && _6), r5 = null, e5 = false;
     }
     if (null === k6)
       d5 === _6 || e5 && l5.data === _6 || (l5.data = _6);
@@ -228,9 +228,9 @@
             d5[l5.attributes[b5].name] = l5.attributes[b5].value;
         (y5 || v5) && (y5 && (v5 && y5.__html == v5.__html || y5.__html === l5.innerHTML) || (l5.innerHTML = y5 && y5.__html || ""));
       }
-      if (H(l5, _6, d5, o6, e5), y5)
+      if (H(l5, _6, d5, o7, e5), y5)
         u5.__k = [];
-      else if (P(l5, h(b5 = u5.props.children) ? b5 : [b5], u5, t5, i5, o6 && "foreignObject" !== k6, r5, f5, r5 ? r5[0] : t5.__k && g(t5, 0), e5, s5), null != r5)
+      else if (P(l5, h(b5 = u5.props.children) ? b5 : [b5], u5, t5, i5, o7 && "foreignObject" !== k6, r5, f5, r5 ? r5[0] : t5.__k && g(t5, 0), e5, s5), null != r5)
         for (b5 = r5.length; b5--; )
           null != r5[b5] && p(r5[b5]);
       e5 || ("value" in _6 && void 0 !== (b5 = _6.value) && (b5 !== l5.value || "progress" === k6 && !b5 || "option" === k6 && b5 !== d5.value) && T(l5, "value", b5, d5.value, false), "checked" in _6 && void 0 !== (b5 = _6.checked) && b5 !== l5.checked && T(l5, "checked", b5, d5.checked, false));
@@ -245,7 +245,7 @@
     }
   }
   function q(n3, u5, t5) {
-    var i5, o6;
+    var i5, o7;
     if (l.unmount && l.unmount(n3), (i5 = n3.ref) && (i5.current && i5.current !== n3.__e || O(i5, null, u5)), null != (i5 = n3.__c)) {
       if (i5.componentWillUnmount)
         try {
@@ -256,16 +256,16 @@
       i5.base = i5.__P = null, n3.__c = void 0;
     }
     if (i5 = n3.__k)
-      for (o6 = 0; o6 < i5.length; o6++)
-        i5[o6] && q(i5[o6], u5, t5 || "function" != typeof n3.type);
+      for (o7 = 0; o7 < i5.length; o7++)
+        i5[o7] && q(i5[o7], u5, t5 || "function" != typeof n3.type);
     t5 || null == n3.__e || p(n3.__e), n3.__ = n3.__e = n3.__d = void 0;
   }
   function B(n3, l5, u5) {
     return this.constructor(n3, u5);
   }
   function D(u5, t5, i5) {
-    var o6, r5, f5, e5;
-    l.__ && l.__(u5, t5), r5 = (o6 = "function" == typeof i5) ? null : i5 && i5.__k || t5.__k, f5 = [], e5 = [], L(t5, u5 = (!o6 && i5 || t5).__k = y(k, null, [u5]), r5 || c, c, void 0 !== t5.ownerSVGElement, !o6 && i5 ? [i5] : r5 ? null : t5.firstChild ? n.call(t5.childNodes) : null, f5, !o6 && i5 ? i5 : r5 ? r5.__e : t5.firstChild, o6, e5), M(f5, u5, e5);
+    var o7, r5, f5, e5;
+    l.__ && l.__(u5, t5), r5 = (o7 = "function" == typeof i5) ? null : i5 && i5.__k || t5.__k, f5 = [], e5 = [], L(t5, u5 = (!o7 && i5 || t5).__k = y(k, null, [u5]), r5 || c, c, void 0 !== t5.ownerSVGElement, !o7 && i5 ? [i5] : r5 ? null : t5.firstChild ? n.call(t5.childNodes) : null, f5, !o7 && i5 ? i5 : r5 ? r5.__e : t5.firstChild, o7, e5), M(f5, u5, e5);
   }
   function G(n3, l5) {
     var u5 = { __c: l5 = "__cC" + e++, __: n3, Consumer: function(n4, l6) {
@@ -289,10 +289,10 @@
     return u5.Provider.__ = u5.Consumer.contextType = u5;
   }
   n = s.slice, l = { __e: function(n3, l5, u5, t5) {
-    for (var i5, o6, r5; l5 = l5.__; )
+    for (var i5, o7, r5; l5 = l5.__; )
       if ((i5 = l5.__c) && !i5.__)
         try {
-          if ((o6 = i5.constructor) && null != o6.getDerivedStateFromError && (i5.setState(o6.getDerivedStateFromError(n3)), r5 = i5.__d), null != i5.componentDidCatch && (i5.componentDidCatch(n3, t5 || {}), r5 = i5.__d), r5)
+          if ((o7 = i5.constructor) && null != o7.getDerivedStateFromError && (i5.setState(o7.getDerivedStateFromError(n3)), r5 = i5.__d), null != i5.componentDidCatch && (i5.componentDidCatch(n3, t5 || {}), r5 = i5.__d), r5)
             return i5.__E = i5;
         } catch (l6) {
           n3 = l6;
@@ -331,15 +331,15 @@
     return o2 = 1, s2(B2, n3);
   }
   function s2(n3, u5, i5) {
-    var o6 = d2(t2++, 2);
-    if (o6.t = n3, !o6.__c && (o6.__ = [i5 ? i5(u5) : B2(void 0, u5), function(n4) {
-      var t5 = o6.__N ? o6.__N[0] : o6.__[0], r5 = o6.t(t5, n4);
-      t5 !== r5 && (o6.__N = [r5, o6.__[1]], o6.__c.setState({}));
-    }], o6.__c = r2, !r2.u)) {
+    var o7 = d2(t2++, 2);
+    if (o7.t = n3, !o7.__c && (o7.__ = [i5 ? i5(u5) : B2(void 0, u5), function(n4) {
+      var t5 = o7.__N ? o7.__N[0] : o7.__[0], r5 = o7.t(t5, n4);
+      t5 !== r5 && (o7.__N = [r5, o7.__[1]], o7.__c.setState({}));
+    }], o7.__c = r2, !r2.u)) {
       var f5 = function(n4, t5, r5) {
-        if (!o6.__c.__H)
+        if (!o7.__c.__H)
           return true;
-        var u6 = o6.__c.__H.__.filter(function(n5) {
+        var u6 = o7.__c.__H.__.filter(function(n5) {
           return n5.__c;
         });
         if (u6.every(function(n5) {
@@ -352,7 +352,7 @@
             var t6 = n5.__[0];
             n5.__ = n5.__N, n5.__N = void 0, t6 !== n5.__[0] && (i6 = true);
           }
-        }), !(!i6 && o6.__c.props === n4) && (!c5 || c5.call(this, n4, t5, r5));
+        }), !(!i6 && o7.__c.props === n4) && (!c5 || c5.call(this, n4, t5, r5));
       };
       r2.u = true;
       var c5 = r2.shouldComponentUpdate, e5 = r2.componentWillUpdate;
@@ -364,7 +364,7 @@
         e5 && e5.call(this, n4, t5, r5);
       }, r2.shouldComponentUpdate = f5;
     }
-    return o6.__N || o6.__;
+    return o7.__N || o7.__;
   }
   function _(n3) {
     return o2 = 5, F(function() {
@@ -403,8 +403,8 @@
     })) : (i5.__h.forEach(k2), i5.__h.forEach(w2), i5.__h = [], t2 = 0)), u2 = r2;
   }, l.diffed = function(t5) {
     v2 && v2(t5);
-    var o6 = t5.__c;
-    o6 && o6.__H && (o6.__H.__h.length && (1 !== f2.push(o6) && i2 === l.requestAnimationFrame || ((i2 = l.requestAnimationFrame) || j2)(b2)), o6.__H.__.forEach(function(n3) {
+    var o7 = t5.__c;
+    o7 && o7.__H && (o7.__H.__h.length && (1 !== f2.push(o7) && i2 === l.requestAnimationFrame || ((i2 = l.requestAnimationFrame) || j2)(b2)), o7.__H.__.forEach(function(n3) {
       n3.i && (n3.__H = n3.i), n3.__V !== c2 && (n3.__ = n3.__V), n3.i = void 0, n3.__V = c2;
     })), u2 = r2 = null;
   }, l.__c = function(t5, r5) {
@@ -493,8 +493,8 @@
   var T3 = l.__e;
   l.__e = function(n3, t5, e5, r5) {
     if (n3.then) {
-      for (var u5, o6 = t5; o6 = o6.__; )
-        if ((u5 = o6.__c) && u5.__c)
+      for (var u5, o7 = t5; o7 = o7.__; )
+        if ((u5 = o7.__c) && u5.__c)
           return null == t5.__e && (t5.__e = e5.__e, t5.__k = e5.__k), u5.__c(n3, t5);
     }
     T3(n3, t5, e5, r5);
@@ -528,8 +528,8 @@
   }, (D2.prototype = new b()).__c = function(n3, t5) {
     var e5 = t5.__c, r5 = this;
     null == r5.t && (r5.t = []), r5.t.push(e5);
-    var u5 = F3(r5.__v), o6 = false, i5 = function() {
-      o6 || (o6 = true, e5.__R = null, u5 ? u5(l5) : l5());
+    var u5 = F3(r5.__v), o7 = false, i5 = function() {
+      o7 || (o7 = true, e5.__R = null, u5 ? u5(l5) : l5());
     };
     e5.__R = i5;
     var l5 = function() {
@@ -549,8 +549,8 @@
   }, D2.prototype.render = function(n3, e5) {
     if (this.__b) {
       if (this.__v.__k) {
-        var r5 = document.createElement("div"), o6 = this.__v.__k[0].__c;
-        this.__v.__k[0] = L2(this.__b, r5, o6.__O = o6.__P);
+        var r5 = document.createElement("div"), o7 = this.__v.__k[0].__c;
+        this.__v.__k[0] = L2(this.__b, r5, o7.__O = o7.__P);
       }
       this.__b = null;
     }
@@ -570,10 +570,10 @@
   (V2.prototype = new b()).__a = function(n3) {
     var t5 = this, e5 = F3(t5.__v), r5 = t5.o.get(n3);
     return r5[0]++, function(u5) {
-      var o6 = function() {
+      var o7 = function() {
         t5.props.revealOrder ? (r5.push(u5), W(t5, n3, r5)) : u5();
       };
-      e5 ? e5(o6) : o6();
+      e5 ? e5(o7) : o7();
     };
   }, V2.prototype.render = function(n3) {
     this.u = null, this.o = /* @__PURE__ */ new Map();
@@ -623,11 +623,11 @@
   l.vnode = function(n3) {
     "string" == typeof n3.type && function(n4) {
       var t5 = n4.props, e5 = n4.type, u5 = {};
-      for (var o6 in t5) {
-        var i5 = t5[o6];
-        if (!("value" === o6 && "defaultValue" in t5 && null == i5 || $2 && "children" === o6 && "noscript" === e5 || "class" === o6 || "className" === o6)) {
-          var l5 = o6.toLowerCase();
-          "defaultValue" === o6 && "value" in t5 && null == t5.value ? o6 = "value" : "download" === o6 && true === i5 ? i5 = "" : "ondoubleclick" === l5 ? o6 = "ondblclick" : "onchange" !== l5 || "input" !== e5 && "textarea" !== e5 || q3(t5.type) ? "onfocus" === l5 ? o6 = "onfocusin" : "onblur" === l5 ? o6 = "onfocusout" : Z.test(o6) ? o6 = l5 : -1 === e5.indexOf("-") && H2.test(o6) ? o6 = o6.replace(Y, "-$&").toLowerCase() : null === i5 && (i5 = void 0) : l5 = o6 = "oninput", "oninput" === l5 && u5[o6 = l5] && (o6 = "oninputCapture"), u5[o6] = i5;
+      for (var o7 in t5) {
+        var i5 = t5[o7];
+        if (!("value" === o7 && "defaultValue" in t5 && null == i5 || $2 && "children" === o7 && "noscript" === e5 || "class" === o7 || "className" === o7)) {
+          var l5 = o7.toLowerCase();
+          "defaultValue" === o7 && "value" in t5 && null == t5.value ? o7 = "value" : "download" === o7 && true === i5 ? i5 = "" : "ondoubleclick" === l5 ? o7 = "ondblclick" : "onchange" !== l5 || "input" !== e5 && "textarea" !== e5 || q3(t5.type) ? "onfocus" === l5 ? o7 = "onfocusin" : "onblur" === l5 ? o7 = "onfocusout" : Z.test(o7) ? o7 = l5 : -1 === e5.indexOf("-") && H2.test(o7) ? o7 = o7.replace(Y, "-$&").toLowerCase() : null === i5 && (i5 = void 0) : l5 = o7 = "oninput", "oninput" === l5 && u5[o7 = l5] && (o7 = "oninputCapture"), u5[o7] = i5;
         }
       }
       "select" == e5 && u5.multiple && Array.isArray(u5.value) && (u5.value = S(t5.children).forEach(function(n5) {
@@ -671,17 +671,17 @@
     l5 && l5.removeChild(n3);
   }
   function y3(l5, u5, i5) {
-    var t5, r5, o6, f5 = {};
-    for (o6 in u5)
-      "key" == o6 ? t5 = u5[o6] : "ref" == o6 ? r5 = u5[o6] : f5[o6] = u5[o6];
+    var t5, r5, o7, f5 = {};
+    for (o7 in u5)
+      "key" == o7 ? t5 = u5[o7] : "ref" == o7 ? r5 = u5[o7] : f5[o7] = u5[o7];
     if (arguments.length > 2 && (f5.children = arguments.length > 3 ? n2.call(arguments, 2) : i5), "function" == typeof l5 && null != l5.defaultProps)
-      for (o6 in l5.defaultProps)
-        void 0 === f5[o6] && (f5[o6] = l5.defaultProps[o6]);
+      for (o7 in l5.defaultProps)
+        void 0 === f5[o7] && (f5[o7] = l5.defaultProps[o7]);
     return p3(l5, f5, t5, r5, null);
   }
-  function p3(n3, i5, t5, r5, o6) {
-    var f5 = { type: n3, props: i5, key: t5, ref: r5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == o6 ? ++u3 : o6 };
-    return null == o6 && null != l3.vnode && l3.vnode(f5), f5;
+  function p3(n3, i5, t5, r5, o7) {
+    var f5 = { type: n3, props: i5, key: t5, ref: r5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == o7 ? ++u3 : o7 };
+    return null == o7 && null != l3.vnode && l3.vnode(f5), f5;
   }
   function _3(n3) {
     return n3.children;
@@ -712,12 +712,12 @@
     (!n3.__d && (n3.__d = true) && t3.push(n3) && !w4.__r++ || r3 !== l3.debounceRendering) && ((r3 = l3.debounceRendering) || o3)(w4);
   }
   function w4() {
-    var n3, l5, u5, i5, r5, o6, e5, c5;
+    var n3, l5, u5, i5, r5, o7, e5, c5;
     for (t3.sort(f3); n3 = t3.shift(); )
-      n3.__d && (l5 = t3.length, i5 = void 0, r5 = void 0, e5 = (o6 = (u5 = n3).__v).__e, (c5 = u5.__P) && (i5 = [], (r5 = h3({}, o6)).__v = o6.__v + 1, L3(c5, o6, r5, u5.__n, void 0 !== c5.ownerSVGElement, null != o6.__h ? [e5] : null, i5, null == e5 ? b3(o6) : e5, o6.__h), M2(i5, o6), o6.__e != e5 && g4(o6)), t3.length > l5 && t3.sort(f3));
+      n3.__d && (l5 = t3.length, i5 = void 0, r5 = void 0, e5 = (o7 = (u5 = n3).__v).__e, (c5 = u5.__P) && (i5 = [], (r5 = h3({}, o7)).__v = o7.__v + 1, L3(c5, o7, r5, u5.__n, void 0 !== c5.ownerSVGElement, null != o7.__h ? [e5] : null, i5, null == e5 ? b3(o7) : e5, o7.__h), M2(i5, o7), o7.__e != e5 && g4(o7)), t3.length > l5 && t3.sort(f3));
     w4.__r = 0;
   }
-  function x4(n3, l5, u5, i5, t5, r5, o6, f5, e5, a5) {
+  function x4(n3, l5, u5, i5, t5, r5, o7, f5, e5, a5) {
     var h5, v5, y5, d5, k6, g7, m5, w7 = i5 && i5.__k || s3, x7 = w7.length;
     for (u5.__k = [], h5 = 0; h5 < l5.length; h5++)
       if (null != (d5 = u5.__k[h5] = null == (d5 = l5[h5]) || "boolean" == typeof d5 || "function" == typeof d5 ? null : "string" == typeof d5 || "number" == typeof d5 || "bigint" == typeof d5 ? p3(null, d5, null, null, d5) : Array.isArray(d5) ? p3(_3, { children: d5 }, null, null, null) : d5.__b > 0 ? p3(d5.type, d5.props, d5.key, d5.ref ? d5.ref : null, d5.__v) : d5)) {
@@ -731,7 +731,7 @@
             }
             y5 = null;
           }
-        L3(n3, d5, y5 = y5 || c3, t5, r5, o6, f5, e5, a5), k6 = d5.__e, (v5 = d5.ref) && y5.ref != v5 && (m5 || (m5 = []), y5.ref && m5.push(y5.ref, null, d5), m5.push(v5, d5.__c || k6, d5)), null != k6 ? (null == g7 && (g7 = k6), "function" == typeof d5.type && d5.__k === y5.__k ? d5.__d = e5 = A3(d5, e5, n3) : e5 = C3(n3, d5, y5, w7, k6, e5), "function" == typeof u5.type && (u5.__d = e5)) : e5 && y5.__e == e5 && e5.parentNode != n3 && (e5 = b3(y5));
+        L3(n3, d5, y5 = y5 || c3, t5, r5, o7, f5, e5, a5), k6 = d5.__e, (v5 = d5.ref) && y5.ref != v5 && (m5 || (m5 = []), y5.ref && m5.push(y5.ref, null, d5), m5.push(v5, d5.__c || k6, d5)), null != k6 ? (null == g7 && (g7 = k6), "function" == typeof d5.type && d5.__k === y5.__k ? d5.__d = e5 = A3(d5, e5, n3) : e5 = C3(n3, d5, y5, w7, k6, e5), "function" == typeof u5.type && (u5.__d = e5)) : e5 && y5.__e == e5 && e5.parentNode != n3 && (e5 = b3(y5));
       }
     for (u5.__e = g7, h5 = x7; h5--; )
       null != w7[h5] && ("function" == typeof u5.type && null != w7[h5].__e && w7[h5].__e == u5.__d && (u5.__d = $3(i5).nextSibling), S2(w7[h5], w7[h5]));
@@ -750,20 +750,20 @@
     }) : l5.push(n3)), l5;
   }
   function C3(n3, l5, u5, i5, t5, r5) {
-    var o6, f5, e5;
+    var o7, f5, e5;
     if (void 0 !== l5.__d)
-      o6 = l5.__d, l5.__d = void 0;
+      o7 = l5.__d, l5.__d = void 0;
     else if (null == u5 || t5 != r5 || null == t5.parentNode)
       n:
         if (null == r5 || r5.parentNode !== n3)
-          n3.appendChild(t5), o6 = null;
+          n3.appendChild(t5), o7 = null;
         else {
           for (f5 = r5, e5 = 0; (f5 = f5.nextSibling) && e5 < i5.length; e5 += 1)
             if (f5 == t5)
               break n;
-          n3.insertBefore(t5, r5), o6 = r5;
+          n3.insertBefore(t5, r5), o7 = r5;
         }
-    return void 0 !== o6 ? o6 : t5.nextSibling;
+    return void 0 !== o7 ? o7 : t5.nextSibling;
   }
   function $3(n3) {
     var l5, u5, i5;
@@ -820,11 +820,11 @@
   function z3(n3) {
     return this.l[n3.type + true](l3.event ? l3.event(n3) : n3);
   }
-  function L3(n3, u5, i5, t5, r5, o6, f5, e5, c5) {
+  function L3(n3, u5, i5, t5, r5, o7, f5, e5, c5) {
     var s5, a5, v5, y5, p5, d5, b5, g7, m5, w7, A5, P4, C5, $5, H5, I5 = u5.type;
     if (void 0 !== u5.constructor)
       return null;
-    null != i5.__h && (c5 = i5.__h, e5 = u5.__e = i5.__e, u5.__h = null, o6 = [e5]), (s5 = l3.__b) && s5(u5);
+    null != i5.__h && (c5 = i5.__h, e5 = u5.__e = i5.__e, u5.__h = null, o7 = [e5]), (s5 = l3.__b) && s5(u5);
     try {
       n:
         if ("function" == typeof I5) {
@@ -851,12 +851,12 @@
             do {
               a5.__d = false, P4 && P4(u5), s5 = a5.render(a5.props, a5.state, a5.context), a5.state = a5.__s;
             } while (a5.__d && ++C5 < 25);
-          a5.state = a5.__s, null != a5.getChildContext && (t5 = h3(h3({}, t5), a5.getChildContext())), v5 || null == a5.getSnapshotBeforeUpdate || (d5 = a5.getSnapshotBeforeUpdate(y5, p5)), H5 = null != s5 && s5.type === _3 && null == s5.key ? s5.props.children : s5, x4(n3, Array.isArray(H5) ? H5 : [H5], u5, i5, t5, r5, o6, f5, e5, c5), a5.base = u5.__e, u5.__h = null, a5.__h.length && f5.push(a5), b5 && (a5.__E = a5.__ = null), a5.__e = false;
+          a5.state = a5.__s, null != a5.getChildContext && (t5 = h3(h3({}, t5), a5.getChildContext())), v5 || null == a5.getSnapshotBeforeUpdate || (d5 = a5.getSnapshotBeforeUpdate(y5, p5)), H5 = null != s5 && s5.type === _3 && null == s5.key ? s5.props.children : s5, x4(n3, Array.isArray(H5) ? H5 : [H5], u5, i5, t5, r5, o7, f5, e5, c5), a5.base = u5.__e, u5.__h = null, a5.__h.length && f5.push(a5), b5 && (a5.__E = a5.__ = null), a5.__e = false;
         } else
-          null == o6 && u5.__v === i5.__v ? (u5.__k = i5.__k, u5.__e = i5.__e) : u5.__e = N3(i5.__e, u5, i5, t5, r5, o6, f5, c5);
+          null == o7 && u5.__v === i5.__v ? (u5.__k = i5.__k, u5.__e = i5.__e) : u5.__e = N3(i5.__e, u5, i5, t5, r5, o7, f5, c5);
       (s5 = l3.diffed) && s5(u5);
     } catch (n4) {
-      u5.__v = null, (c5 || null != o6) && (u5.__e = e5, u5.__h = !!c5, o6[o6.indexOf(e5)] = null), l3.__e(n4, u5, i5);
+      u5.__v = null, (c5 || null != o7) && (u5.__e = e5, u5.__h = !!c5, o7[o7.indexOf(e5)] = null), l3.__e(n4, u5, i5);
     }
   }
   function M2(n3, u5) {
@@ -870,34 +870,34 @@
       }
     });
   }
-  function N3(l5, u5, i5, t5, r5, o6, f5, e5) {
+  function N3(l5, u5, i5, t5, r5, o7, f5, e5) {
     var s5, a5, h5, y5 = i5.props, p5 = u5.props, d5 = u5.type, _6 = 0;
-    if ("svg" === d5 && (r5 = true), null != o6) {
-      for (; _6 < o6.length; _6++)
-        if ((s5 = o6[_6]) && "setAttribute" in s5 == !!d5 && (d5 ? s5.localName === d5 : 3 === s5.nodeType)) {
-          l5 = s5, o6[_6] = null;
+    if ("svg" === d5 && (r5 = true), null != o7) {
+      for (; _6 < o7.length; _6++)
+        if ((s5 = o7[_6]) && "setAttribute" in s5 == !!d5 && (d5 ? s5.localName === d5 : 3 === s5.nodeType)) {
+          l5 = s5, o7[_6] = null;
           break;
         }
     }
     if (null == l5) {
       if (null === d5)
         return document.createTextNode(p5);
-      l5 = r5 ? document.createElementNS("http://www.w3.org/2000/svg", d5) : document.createElement(d5, p5.is && p5), o6 = null, e5 = false;
+      l5 = r5 ? document.createElementNS("http://www.w3.org/2000/svg", d5) : document.createElement(d5, p5.is && p5), o7 = null, e5 = false;
     }
     if (null === d5)
       y5 === p5 || e5 && l5.data === p5 || (l5.data = p5);
     else {
-      if (o6 = o6 && n2.call(l5.childNodes), a5 = (y5 = i5.props || c3).dangerouslySetInnerHTML, h5 = p5.dangerouslySetInnerHTML, !e5) {
-        if (null != o6)
+      if (o7 = o7 && n2.call(l5.childNodes), a5 = (y5 = i5.props || c3).dangerouslySetInnerHTML, h5 = p5.dangerouslySetInnerHTML, !e5) {
+        if (null != o7)
           for (y5 = {}, _6 = 0; _6 < l5.attributes.length; _6++)
             y5[l5.attributes[_6].name] = l5.attributes[_6].value;
         (h5 || a5) && (h5 && (a5 && h5.__html == a5.__html || h5.__html === l5.innerHTML) || (l5.innerHTML = h5 && h5.__html || ""));
       }
       if (H3(l5, p5, y5, r5, e5), h5)
         u5.__k = [];
-      else if (_6 = u5.props.children, x4(l5, Array.isArray(_6) ? _6 : [_6], u5, i5, t5, r5 && "foreignObject" !== d5, o6, f5, o6 ? o6[0] : i5.__k && b3(i5, 0), e5), null != o6)
-        for (_6 = o6.length; _6--; )
-          null != o6[_6] && v3(o6[_6]);
+      else if (_6 = u5.props.children, x4(l5, Array.isArray(_6) ? _6 : [_6], u5, i5, t5, r5 && "foreignObject" !== d5, o7, f5, o7 ? o7[0] : i5.__k && b3(i5, 0), e5), null != o7)
+        for (_6 = o7.length; _6--; )
+          null != o7[_6] && v3(o7[_6]);
       e5 || ("value" in p5 && void 0 !== (_6 = p5.value) && (_6 !== l5.value || "progress" === d5 && !_6 || "option" === d5 && _6 !== y5.value) && T4(l5, "value", _6, y5.value, false), "checked" in p5 && void 0 !== (_6 = p5.checked) && _6 !== l5.checked && T4(l5, "checked", _6, y5.checked, false));
     }
     return l5;
@@ -929,13 +929,13 @@
     return this.constructor(n3, u5);
   }
   function B4(u5, i5, t5) {
-    var r5, o6, f5;
-    l3.__ && l3.__(u5, i5), o6 = (r5 = "function" == typeof t5) ? null : t5 && t5.__k || i5.__k, f5 = [], L3(i5, u5 = (!r5 && t5 || i5).__k = y3(_3, null, [u5]), o6 || c3, c3, void 0 !== i5.ownerSVGElement, !r5 && t5 ? [t5] : o6 ? null : i5.firstChild ? n2.call(i5.childNodes) : null, f5, !r5 && t5 ? t5 : o6 ? o6.__e : i5.firstChild, r5), M2(f5, u5);
+    var r5, o7, f5;
+    l3.__ && l3.__(u5, i5), o7 = (r5 = "function" == typeof t5) ? null : t5 && t5.__k || i5.__k, f5 = [], L3(i5, u5 = (!r5 && t5 || i5).__k = y3(_3, null, [u5]), o7 || c3, c3, void 0 !== i5.ownerSVGElement, !r5 && t5 ? [t5] : o7 ? null : i5.firstChild ? n2.call(i5.childNodes) : null, f5, !r5 && t5 ? t5 : o7 ? o7.__e : i5.firstChild, r5), M2(f5, u5);
   }
   function E2(l5, u5, i5) {
-    var t5, r5, o6, f5 = h3({}, l5.props);
-    for (o6 in u5)
-      "key" == o6 ? t5 = u5[o6] : "ref" == o6 ? r5 = u5[o6] : f5[o6] = u5[o6];
+    var t5, r5, o7, f5 = h3({}, l5.props);
+    for (o7 in u5)
+      "key" == o7 ? t5 = u5[o7] : "ref" == o7 ? r5 = u5[o7] : f5[o7] = u5[o7];
     return arguments.length > 2 && (f5.children = arguments.length > 3 ? n2.call(arguments, 2) : i5), p3(l5.type, f5, t5 || l5.key, r5 || l5.ref, null);
   }
   function F4(n3, l5) {
@@ -960,10 +960,10 @@
     return u5.Provider.__ = u5.Consumer.contextType = u5;
   }
   n2 = s3.slice, l3 = { __e: function(n3, l5, u5, i5) {
-    for (var t5, r5, o6; l5 = l5.__; )
+    for (var t5, r5, o7; l5 = l5.__; )
       if ((t5 = l5.__c) && !t5.__)
         try {
-          if ((r5 = t5.constructor) && null != r5.getDerivedStateFromError && (t5.setState(r5.getDerivedStateFromError(n3)), o6 = t5.__d), null != t5.componentDidCatch && (t5.componentDidCatch(n3, i5 || {}), o6 = t5.__d), o6)
+          if ((r5 = t5.constructor) && null != r5.getDerivedStateFromError && (t5.setState(r5.getDerivedStateFromError(n3)), o7 = t5.__d), null != t5.componentDidCatch && (t5.componentDidCatch(n3, i5 || {}), o7 = t5.__d), o7)
             return t5.__E = t5;
         } catch (l6) {
           n3 = l6;
@@ -1002,15 +1002,15 @@
     return o4 = 1, s4(B5, n3);
   }
   function s4(n3, u5, i5) {
-    var o6 = d3(t4++, 2);
-    if (o6.t = n3, !o6.__c && (o6.__ = [i5 ? i5(u5) : B5(void 0, u5), function(n4) {
-      var t5 = o6.__N ? o6.__N[0] : o6.__[0], r5 = o6.t(t5, n4);
-      t5 !== r5 && (o6.__N = [r5, o6.__[1]], o6.__c.setState({}));
-    }], o6.__c = r4, !r4.u)) {
+    var o7 = d3(t4++, 2);
+    if (o7.t = n3, !o7.__c && (o7.__ = [i5 ? i5(u5) : B5(void 0, u5), function(n4) {
+      var t5 = o7.__N ? o7.__N[0] : o7.__[0], r5 = o7.t(t5, n4);
+      t5 !== r5 && (o7.__N = [r5, o7.__[1]], o7.__c.setState({}));
+    }], o7.__c = r4, !r4.u)) {
       var f5 = function(n4, t5, r5) {
-        if (!o6.__c.__H)
+        if (!o7.__c.__H)
           return true;
-        var u6 = o6.__c.__H.__.filter(function(n5) {
+        var u6 = o7.__c.__H.__.filter(function(n5) {
           return n5.__c;
         });
         if (u6.every(function(n5) {
@@ -1023,7 +1023,7 @@
             var t6 = n5.__[0];
             n5.__ = n5.__N, n5.__N = void 0, t6 !== n5.__[0] && (i6 = true);
           }
-        }), !(!i6 && o6.__c.props === n4) && (!c5 || c5.call(this, n4, t5, r5));
+        }), !(!i6 && o7.__c.props === n4) && (!c5 || c5.call(this, n4, t5, r5));
       };
       r4.u = true;
       var c5 = r4.shouldComponentUpdate, e5 = r4.componentWillUpdate;
@@ -1035,15 +1035,15 @@
         e5 && e5.call(this, n4, t5, r5);
       }, r4.shouldComponentUpdate = f5;
     }
-    return o6.__N || o6.__;
+    return o7.__N || o7.__;
   }
   function p4(u5, i5) {
-    var o6 = d3(t4++, 3);
-    !l3.__s && z4(o6.__H, i5) && (o6.__ = u5, o6.i = i5, r4.__H.__h.push(o6));
+    var o7 = d3(t4++, 3);
+    !l3.__s && z4(o7.__H, i5) && (o7.__ = u5, o7.i = i5, r4.__H.__h.push(o7));
   }
   function y4(u5, i5) {
-    var o6 = d3(t4++, 4);
-    !l3.__s && z4(o6.__H, i5) && (o6.__ = u5, o6.i = i5, r4.__h.push(o6));
+    var o7 = d3(t4++, 4);
+    !l3.__s && z4(o7.__H, i5) && (o7.__ = u5, o7.i = i5, r4.__h.push(o7));
   }
   function _4(n3) {
     return o4 = 5, F5(function() {
@@ -1097,8 +1097,8 @@
     })) : (i5.__h.forEach(k4), i5.__h.forEach(w5), i5.__h = [])), u4 = r4;
   }, l3.diffed = function(t5) {
     v4 && v4(t5);
-    var o6 = t5.__c;
-    o6 && o6.__H && (o6.__H.__h.length && (1 !== f4.push(o6) && i4 === l3.requestAnimationFrame || ((i4 = l3.requestAnimationFrame) || j4)(b4)), o6.__H.__.forEach(function(n3) {
+    var o7 = t5.__c;
+    o7 && o7.__H && (o7.__H.__h.length && (1 !== f4.push(o7) && i4 === l3.requestAnimationFrame || ((i4 = l3.requestAnimationFrame) || j4)(b4)), o7.__H.__.forEach(function(n3) {
       n3.i && (n3.__H = n3.i), n3.__V !== c4 && (n3.__ = n3.__V), n3.i = void 0, n3.__V = c4;
     })), u4 = r4 = null;
   }, l3.__c = function(t5, r5) {
@@ -1194,8 +1194,8 @@
   var T6 = l3.__e;
   l3.__e = function(n3, t5, e5, r5) {
     if (n3.then) {
-      for (var u5, o6 = t5; o6 = o6.__; )
-        if ((u5 = o6.__c) && u5.__c)
+      for (var u5, o7 = t5; o7 = o7.__; )
+        if ((u5 = o7.__c) && u5.__c)
           return null == t5.__e && (t5.__e = e5.__e, t5.__k = e5.__k), u5.__c(n3, t5);
     }
     T6(n3, t5, e5, r5);
@@ -1229,8 +1229,8 @@
   }, (D4.prototype = new k3()).__c = function(n3, t5) {
     var e5 = t5.__c, r5 = this;
     null == r5.t && (r5.t = []), r5.t.push(e5);
-    var u5 = F6(r5.__v), o6 = false, i5 = function() {
-      o6 || (o6 = true, e5.__R = null, u5 ? u5(l5) : l5());
+    var u5 = F6(r5.__v), o7 = false, i5 = function() {
+      o7 || (o7 = true, e5.__R = null, u5 ? u5(l5) : l5());
     };
     e5.__R = i5;
     var l5 = function() {
@@ -1250,8 +1250,8 @@
   }, D4.prototype.render = function(n3, e5) {
     if (this.__b) {
       if (this.__v.__k) {
-        var r5 = document.createElement("div"), o6 = this.__v.__k[0].__c;
-        this.__v.__k[0] = L4(this.__b, r5, o6.__O = o6.__P);
+        var r5 = document.createElement("div"), o7 = this.__v.__k[0].__c;
+        this.__v.__k[0] = L4(this.__b, r5, o7.__O = o7.__P);
       }
       this.__b = null;
     }
@@ -1292,10 +1292,10 @@
   (V4.prototype = new k3()).__a = function(n3) {
     var t5 = this, e5 = F6(t5.__v), r5 = t5.o.get(n3);
     return r5[0]++, function(u5) {
-      var o6 = function() {
+      var o7 = function() {
         t5.props.revealOrder ? (r5.push(u5), W2(t5, n3, r5)) : u5();
       };
-      e5 ? e5(o6) : o6();
+      e5 ? e5(o7) : o7();
     };
   }, V4.prototype.render = function(n3) {
     this.u = null, this.o = /* @__PURE__ */ new Map();
@@ -1345,11 +1345,11 @@
   l3.vnode = function(n3) {
     "string" == typeof n3.type && function(n4) {
       var t5 = n4.props, e5 = n4.type, u5 = {};
-      for (var o6 in t5) {
-        var i5 = t5[o6];
-        if (!("value" === o6 && "defaultValue" in t5 && null == i5 || $4 && "children" === o6 && "noscript" === e5 || "class" === o6 || "className" === o6)) {
-          var l5 = o6.toLowerCase();
-          "defaultValue" === o6 && "value" in t5 && null == t5.value ? o6 = "value" : "download" === o6 && true === i5 ? i5 = "" : "ondoubleclick" === l5 ? o6 = "ondblclick" : "onchange" !== l5 || "input" !== e5 && "textarea" !== e5 || q6(t5.type) ? "onfocus" === l5 ? o6 = "onfocusin" : "onblur" === l5 ? o6 = "onfocusout" : Z2.test(o6) ? o6 = l5 : -1 === e5.indexOf("-") && H4.test(o6) ? o6 = o6.replace(Y2, "-$&").toLowerCase() : null === i5 && (i5 = void 0) : l5 = o6 = "oninput", "oninput" === l5 && u5[o6 = l5] && (o6 = "oninputCapture"), u5[o6] = i5;
+      for (var o7 in t5) {
+        var i5 = t5[o7];
+        if (!("value" === o7 && "defaultValue" in t5 && null == i5 || $4 && "children" === o7 && "noscript" === e5 || "class" === o7 || "className" === o7)) {
+          var l5 = o7.toLowerCase();
+          "defaultValue" === o7 && "value" in t5 && null == t5.value ? o7 = "value" : "download" === o7 && true === i5 ? i5 = "" : "ondoubleclick" === l5 ? o7 = "ondblclick" : "onchange" !== l5 || "input" !== e5 && "textarea" !== e5 || q6(t5.type) ? "onfocus" === l5 ? o7 = "onfocusin" : "onblur" === l5 ? o7 = "onfocusout" : Z2.test(o7) ? o7 = l5 : -1 === e5.indexOf("-") && H4.test(o7) ? o7 = o7.replace(Y2, "-$&").toLowerCase() : null === i5 && (i5 = void 0) : l5 = o7 = "oninput", "oninput" === l5 && u5[o7 = l5] && (o7 = "oninputCapture"), u5[o7] = i5;
         }
       }
       "select" == e5 && u5.multiple && Array.isArray(u5.value) && (u5.value = P2(t5.children).forEach(function(n5) {
@@ -1498,7 +1498,7 @@
     window._hookCallCount.callCounts[name].total += 1;
     if (timeoutHandle == null) {
       timeoutHandle = requestIdleCallback(() => {
-        const o6 = Object.entries(window._hookCallCount.callCounts).map(([hook2, counts]) => {
+        const o7 = Object.entries(window._hookCallCount.callCounts).map(([hook2, counts]) => {
           return { Hook: hook2 || "?", Now: counts?.moment || 0, Total: counts?.total || 0 };
         }).filter(({ Now }) => {
           return !!Now;
@@ -1509,7 +1509,7 @@
           rhsM ||= Infinity;
           return lhsM - rhsM;
         });
-        console.table(o6, ["Hook", "Now", "Total"]);
+        console.table(o7, ["Hook", "Now", "Total"]);
         Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => {
           counts.moment = 0;
         });
@@ -7613,12 +7613,12 @@
 
   // node_modules/.pnpm/preact@10.16.0/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var _5 = 0;
-  function o5(o6, e5, n3, t5, f5, l5) {
+  function o6(o7, e5, n3, t5, f5, l5) {
     var s5, u5, a5 = {};
     for (u5 in e5)
       "ref" == u5 ? s5 = e5[u5] : a5[u5] = e5[u5];
-    var i5 = { type: o6, props: a5, key: n3, ref: s5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_5, __source: f5, __self: l5 };
-    if ("function" == typeof o6 && (s5 = o6.defaultProps))
+    var i5 = { type: o7, props: a5, key: n3, ref: s5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_5, __source: f5, __self: l5 };
+    if ("function" == typeof o7 && (s5 = o7.defaultProps))
       for (u5 in s5)
         void 0 === a5[u5] && (a5[u5] = s5[u5]);
     return l.vnode && l.vnode(i5), i5;
@@ -7778,33 +7778,33 @@
         getAnyFocused
       }
     } = allReturnInfo;
-    return /* @__PURE__ */ o5("div", { class: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "useGridNavigationComplete" }),
-      /* @__PURE__ */ o5("p", { children: [
+    return /* @__PURE__ */ o6("div", { class: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "useGridNavigationComplete" }),
+      /* @__PURE__ */ o6("p", { children: [
         "Like ",
-        /* @__PURE__ */ o5("code", { children: "useCompleteListNavigation" }),
+        /* @__PURE__ */ o6("code", { children: "useCompleteListNavigation" }),
         " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Current row: ",
         tabbableRow
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Current column: ",
         tabbableColumn?.actual,
         tabbableColumn?.ideal != tabbableColumn?.actual ? ` (wanted: ${tabbableColumn?.ideal})` : ""
       ] }),
-      /* @__PURE__ */ o5("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [
-        /* @__PURE__ */ o5("thead", { children: /* @__PURE__ */ o5("tr", { children: [
-          /* @__PURE__ */ o5("th", { children: "Row is tabbable?" }),
-          /* @__PURE__ */ o5("th", { children: "Column 1" }),
-          /* @__PURE__ */ o5("th", { children: "Column 2" }),
-          /* @__PURE__ */ o5("th", { children: "Column 3" })
+      /* @__PURE__ */ o6("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [
+        /* @__PURE__ */ o6("thead", { children: /* @__PURE__ */ o6("tr", { children: [
+          /* @__PURE__ */ o6("th", { children: "Row is tabbable?" }),
+          /* @__PURE__ */ o6("th", { children: "Column 1" }),
+          /* @__PURE__ */ o6("th", { children: "Column 2" }),
+          /* @__PURE__ */ o6("th", { children: "Column 3" })
         ] }) }),
-        /* @__PURE__ */ o5(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ o5(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ o5(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ o5(GridRowContext.Provider, { value: context, children: /* @__PURE__ */ o5("tbody", { ...props, children: useRearrangedChildren(
+        /* @__PURE__ */ o6(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ o6(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ o6(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ o6(GridRowContext.Provider, { value: context, children: /* @__PURE__ */ o6("tbody", { ...props, children: useRearrangedChildren(
           Array.from(function* () {
             for (let i5 = 0; i5 < 10; ++i5) {
-              yield /* @__PURE__ */ o5(DemoUseGridRow, { index: i5 }, i5);
+              yield /* @__PURE__ */ o6(DemoUseGridRow, { index: i5 }, i5);
             }
           }())
         ) }) }) }) }) })
@@ -7844,15 +7844,15 @@
       context: contextToChild,
       rovingTabIndexChildReturn: { tabbable }
     } = ret;
-    return /* @__PURE__ */ o5("tr", { ...props, "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ o5(GridCellContext.Provider, { value: contextToChild, children: [
-      /* @__PURE__ */ o5("td", { children: [
+    return /* @__PURE__ */ o6("tr", { ...props, "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ o6(GridCellContext.Provider, { value: contextToChild, children: [
+      /* @__PURE__ */ o6("td", { children: [
         _tabbableColumn,
         ", ",
         tabbable.toString()
       ] }),
       Array.from(function* () {
         for (let i5 = 0; i5 < 3; ++i5) {
-          yield /* @__PURE__ */ o5(DemoUseGridCell, { index: i5, row: index, rowIsTabbable: tabbable }, i5);
+          yield /* @__PURE__ */ o6(DemoUseGridCell, { index: i5, row: index, rowIsTabbable: tabbable }, i5);
         }
       }())
     ] }) });
@@ -7875,11 +7875,11 @@
     });
     const t5 = tabbable ? "(Tabbable)" : "(Not tabbable)";
     if (index === 0)
-      return /* @__PURE__ */ o5("td", { ...props, children: rowIsTabbable.toString() });
+      return /* @__PURE__ */ o6("td", { ...props, children: rowIsTabbable.toString() });
     else {
       if (row < 6 || row % 2 != 0) {
         if (index === 1)
-          return /* @__PURE__ */ o5("td", { ...props, children: [
+          return /* @__PURE__ */ o6("td", { ...props, children: [
             "Grid cell #",
             index + 1,
             " ",
@@ -7887,15 +7887,15 @@
             hiddenText
           ] });
         else
-          return /* @__PURE__ */ o5("td", { children: /* @__PURE__ */ o5("label", { children: [
-            /* @__PURE__ */ o5("button", { ...props, type: "button", children: "Select row" }),
+          return /* @__PURE__ */ o6("td", { children: /* @__PURE__ */ o6("label", { children: [
+            /* @__PURE__ */ o6("button", { ...props, type: "button", children: "Select row" }),
             " ",
             t5,
             hiddenText
           ] }) });
       } else {
         if (index === 1)
-          return /* @__PURE__ */ o5("td", { ...props, colSpan: 2, children: [
+          return /* @__PURE__ */ o6("td", { ...props, colSpan: 2, children: [
             "Grid cell #",
             index + 1,
             ", span 2 ",
@@ -7949,50 +7949,50 @@
       refElementParameters: {},
       activeElementParameters: { getDocument: getDocument2, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null }
     });
-    return /* @__PURE__ */ o5("div", { style: { border: `${depth}px solid black` }, children: [
-      /* @__PURE__ */ o5("div", { children: "useModal demo:" }),
-      /* @__PURE__ */ o5("div", { style: "display: flex; flex-direction: column", children: [
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", disabled: true, checked: true }),
+    return /* @__PURE__ */ o6("div", { style: { border: `${depth}px solid black` }, children: [
+      /* @__PURE__ */ o6("div", { children: "useModal demo:" }),
+      /* @__PURE__ */ o6("div", { style: "display: flex; flex-direction: column", children: [
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", disabled: true, checked: true }),
           " Close by setting open to false"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", checked: closeOnBackdrop, onInput: (e5) => setCloseOnBackdrop(e5.currentTarget.checked) }),
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", checked: closeOnBackdrop, onInput: (e5) => setCloseOnBackdrop(e5.currentTarget.checked) }),
           " Close on backdrop click"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", checked: closeOnEscape, onInput: (e5) => setCloseOnEscape(e5.currentTarget.checked) }),
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", checked: closeOnEscape, onInput: (e5) => setCloseOnEscape(e5.currentTarget.checked) }),
           " Close on Escape key press"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", checked: closeOnLostFocus, onInput: (e5) => setCloseOnLostFocus(e5.currentTarget.checked) }),
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", checked: closeOnLostFocus, onInput: (e5) => setCloseOnLostFocus(e5.currentTarget.checked) }),
           " Close on focus lost"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", checked: focusTrapActive, onInput: (e5) => setFocusTrapActive(e5.currentTarget.checked) }),
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", checked: focusTrapActive, onInput: (e5) => setFocusTrapActive(e5.currentTarget.checked) }),
           " Trap focus"
         ] }),
-        /* @__PURE__ */ o5("br", {})
+        /* @__PURE__ */ o6("br", {})
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Last reason for closing: ",
         closeReason ?? "(hasn't been closed yet)"
       ] }),
-      /* @__PURE__ */ o5("button", { ...propsStableSource, onClick: () => setOpen(true), children: "Open Modal" }),
-      /* @__PURE__ */ o5("div", { ...useMergedProps(propsFocusContainer, propsStablePopup), style: `border: ${depth}px dotted red; background: #ccc`, children: /* @__PURE__ */ o5("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [
-        /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("button", { ...propsStableSource, onClick: () => setOpen(true), children: "Open Modal" }),
+      /* @__PURE__ */ o6("div", { ...useMergedProps(propsFocusContainer, propsStablePopup), style: `border: ${depth}px dotted red; background: #ccc`, children: /* @__PURE__ */ o6("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [
+        /* @__PURE__ */ o6("div", { children: [
           "Modal element at depth ",
           depth,
           " with ",
           hasChild ? "a" : "no",
           " child"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { type: "checkbox", checked: hasChild, onInput: (e5) => setHasChild(e5.currentTarget.checked), ref: buttonRef }),
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { type: "checkbox", checked: hasChild, onInput: (e5) => setHasChild(e5.currentTarget.checked), ref: buttonRef }),
           " Add a child modal"
         ] }),
-        hasChild && /* @__PURE__ */ o5(DemoUseModal, { parentDepth: depth }),
-        /* @__PURE__ */ o5("button", { ...propsStableSource, onClick: () => setOpen(false), children: "Close modal programmatically" })
+        hasChild && /* @__PURE__ */ o6(DemoUseModal, { parentDepth: depth }),
+        /* @__PURE__ */ o6("button", { ...propsStableSource, onClick: () => setOpen(false), children: "Close modal programmatically" })
       ] }) })
     ] });
   }
@@ -8050,72 +8050,72 @@
     } = r5;
     const jsxChildren = Array.from(function* () {
       for (let i5 = 0; i5 < count; ++i5) {
-        yield /* @__PURE__ */ o5(DemoUseRovingTabIndexChild, { index: i5 }, i5);
+        yield /* @__PURE__ */ o6(DemoUseRovingTabIndexChild, { index: i5 }, i5);
       }
     }());
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "Keyboard & List Navigation" }),
-      /* @__PURE__ */ o5("h3", { children: /* @__PURE__ */ o5("code", { children: "useCompleteListNavigation" }) }),
-      /* @__PURE__ */ o5("p", { children: "This hook accomplishes a few things:" }),
-      /* @__PURE__ */ o5("ul", { children: [
-        /* @__PURE__ */ o5("li", { children: [
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "Keyboard & List Navigation" }),
+      /* @__PURE__ */ o6("h3", { children: /* @__PURE__ */ o6("code", { children: "useCompleteListNavigation" }) }),
+      /* @__PURE__ */ o6("p", { children: "This hook accomplishes a few things:" }),
+      /* @__PURE__ */ o6("ul", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Turns a group of widgets into one singular composite widget with only ",
-          /* @__PURE__ */ o5("strong", { children: "a single tab stop" }),
+          /* @__PURE__ */ o6("strong", { children: "a single tab stop" }),
           ' shared between them (a "roving" tab stop, because it wanders back and forth).'
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Navigation within this composite widget is done via:",
-          /* @__PURE__ */ o5("ul", { children: [
-            /* @__PURE__ */ o5("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }),
-            /* @__PURE__ */ o5("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }),
-            /* @__PURE__ */ o5("li", { children: "Home/End to jump to the first or last item" })
+          /* @__PURE__ */ o6("ul", { children: [
+            /* @__PURE__ */ o6("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }),
+            /* @__PURE__ */ o6("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }),
+            /* @__PURE__ */ o6("li", { children: "Home/End to jump to the first or last item" })
           ] })
         ] }),
-        /* @__PURE__ */ o5("li", { children: 'Items can be marked as "hidden", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead.' }),
-        /* @__PURE__ */ o5("li", { children: 'Items can be marked as "disabled" to prevent selection (with or without also marking them as "hidden", though "hidden" implies "disabled").' }),
-        /* @__PURE__ */ o5("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: 'Items can be marked as "hidden", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead.' }),
+        /* @__PURE__ */ o6("li", { children: 'Items can be marked as "disabled" to prevent selection (with or without also marking them as "hidden", though "hidden" implies "disabled").' }),
+        /* @__PURE__ */ o6("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }),
+        /* @__PURE__ */ o6("li", { children: [
           "The parent's selected index is ",
-          /* @__PURE__ */ o5("strong", { children: "uncontrolled" }),
+          /* @__PURE__ */ o6("strong", { children: "uncontrolled" }),
           " and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See ",
-          /* @__PURE__ */ o5("code", { children: "useSingleSelectionDeclarative" }),
+          /* @__PURE__ */ o6("code", { children: "useSingleSelectionDeclarative" }),
           " for a shortcut to do exactly that)"
         ] }),
-        /* @__PURE__ */ o5("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }),
+        /* @__PURE__ */ o6("li", { children: [
           "Lists can be nested, and there is no strict requirement on DOM structure (except for sorting/rearranging children, if you use that).",
-          /* @__PURE__ */ o5("ul", { children: /* @__PURE__ */ o5("li", { children: [
+          /* @__PURE__ */ o6("ul", { children: /* @__PURE__ */ o6("li", { children: [
             "If you don't need sorting/rearranging this DOM requirement is ",
-            /* @__PURE__ */ o5("strong", { children: "optional" }),
+            /* @__PURE__ */ o6("strong", { children: "optional" }),
             "; rearranging requires all children be in one contiguous array of VNodes so that their ",
-            /* @__PURE__ */ o5("code", { children: "key" }),
+            /* @__PURE__ */ o6("code", { children: "key" }),
             " props can be manipulated."
           ] }) })
         ] })
       ] }),
-      /* @__PURE__ */ o5("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }),
+      /* @__PURE__ */ o6("label", { children: [
         "# of items",
-        /* @__PURE__ */ o5("input", { type: "number", value: count, min: 0, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", value: count, min: 0, onInput: (e5) => {
           e5.preventDefault();
           setCount(e5.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o5("button", { onClick: () => shuffle2(), children: "Shuffle" }),
-      /* @__PURE__ */ o5("button", { onClick: () => {
+      /* @__PURE__ */ o6("button", { onClick: () => shuffle2(), children: "Shuffle" }),
+      /* @__PURE__ */ o6("button", { onClick: () => {
         debugger;
         reverse();
       }, children: "Reverse" }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Imperatively set the tabbable index to: ",
-        /* @__PURE__ */ o5("input", { type: "number", onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", onInput: (e5) => {
           e5.preventDefault();
           setTabbableIndex(e5.currentTarget.valueAsNumber, e5, false);
         } })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Imperatively set the selected index to: ",
-        /* @__PURE__ */ o5("input", { type: "number", onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", onInput: (e5) => {
           e5.preventDefault();
           setSingleSelectedIndex(e5.currentTarget.valueAsNumber);
         } }),
@@ -8123,94 +8123,94 @@
         singleSelectedIndex,
         ")"
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Pagination window starts at: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: min ?? void 0, min: 0, max: max ?? void 0, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", value: min ?? void 0, min: 0, max: max ?? void 0, onInput: (e5) => {
           e5.preventDefault();
           setMin(e5.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Pagination window ends at: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: max ?? void 0, min: min ?? void 0, max: count, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", value: max ?? void 0, min: min ?? void 0, max: count, onInput: (e5) => {
           e5.preventDefault();
           setMax(e5.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Stagger delay: ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: staggered, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: staggered, onInput: (e5) => {
           e5.preventDefault();
           setStaggered(e5.currentTarget.checked);
         } })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Single-Selection mode:",
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "disabled", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "disabled", onInput: (e5) => {
             e5.preventDefault();
             setSingleSelectionMode("disabled");
           } }),
           " Off"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "focus", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "focus", onInput: (e5) => {
             e5.preventDefault();
             setSingleSelectionMode("focus");
           } }),
           " On focus"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "activation", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "activation", onInput: (e5) => {
             e5.preventDefault();
             setSingleSelectionMode("activation");
           } }),
           " On activation (click, tap, Enter, Space, etc.)"
         ] })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Multi-Selection mode:",
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "disabled", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "disabled", onInput: (e5) => {
             e5.preventDefault();
             setMultiSelectionMode("disabled");
           } }),
           " Off"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "focus", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "focus", onInput: (e5) => {
             e5.preventDefault();
             setMultiSelectionMode("focus");
           } }),
           " On focus"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "activation", onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "activation", onInput: (e5) => {
             e5.preventDefault();
             setMultiSelectionMode("activation");
           } }),
           " On activation (click, tap, Enter, Space, etc.)"
         ] })
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Typeahead status: ",
         typeaheadStatus
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Multi-select: ",
         Math.round(multiSelectPercent * 100 * 10) / 10,
         "%"
       ] }),
-      /* @__PURE__ */ o5(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o5(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o5(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o5(ListNavigationSingleSelectionChildContext.Provider, { value: context, children: /* @__PURE__ */ o5("ol", { start: 0, ...props, children: useRearrangedChildren(jsxChildren) }) }) }) }) })
+      /* @__PURE__ */ o6(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o6(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o6(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o6(ListNavigationSingleSelectionChildContext.Provider, { value: context, children: /* @__PURE__ */ o6("ol", { start: 0, ...props, children: useRearrangedChildren(jsxChildren) }) }) }) }) })
     ] });
   });
   var DemoUseRovingTabIndexChild = x3(({ index }) => {
     if (index == 1)
-      return /* @__PURE__ */ o5("li", { children: [
+      return /* @__PURE__ */ o6("li", { children: [
         "(Item ",
         index,
         " is a ",
-        /* @__PURE__ */ o5("strong", { children: "hole in the array" }),
+        /* @__PURE__ */ o6("strong", { children: "hole in the array" }),
         " and does not exist)"
       ] });
     let disabled = index == 6;
@@ -8253,9 +8253,9 @@
     const { pressReturn, props: p22 } = usePress({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn });
     let s5 = singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "";
     const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s5} (${tabbable ? "Tabbable" : "Not tabbable"})`;
-    return /* @__PURE__ */ o5("li", { ...useMergedProps(propsChild, propsTabbable, p22), style: { opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }, children: [
+    return /* @__PURE__ */ o6("li", { ...useMergedProps(propsChild, propsTabbable, p22), style: { opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }, children: [
       text,
-      /* @__PURE__ */ o5("input", { ...useMergedProps(propsTabbable, { type: "number" }), style: { width: "5ch" } })
+      /* @__PURE__ */ o6("input", { ...useMergedProps(propsTabbable, { type: "number" }), style: { width: "5ch" } })
     ] });
   });
 
@@ -8265,21 +8265,21 @@
     const [triggerIndex, setTriggerIndex] = h2("");
     const [fireCount, setFireCount] = h2(0);
     useTimeout({ timeout, triggerIndex, callback: () => setFireCount((i5) => ++i5) });
-    return /* @__PURE__ */ o5("div", { class: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "useTimeout" }),
-      /* @__PURE__ */ o5("p", { children: [
-        /* @__PURE__ */ o5("code", { children: "useEffect" }),
+    return /* @__PURE__ */ o6("div", { class: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "useTimeout" }),
+      /* @__PURE__ */ o6("p", { children: [
+        /* @__PURE__ */ o6("code", { children: "useEffect" }),
         " but on a timer"
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Timeout duration: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Refresh key: ",
-        /* @__PURE__ */ o5("input", { type: "text", value: triggerIndex, onInput: (e5) => setTriggerIndex(e5.currentTarget.value) })
+        /* @__PURE__ */ o6("input", { type: "text", value: triggerIndex, onInput: (e5) => setTriggerIndex(e5.currentTarget.value) })
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "The callback has been called ",
         fireCount,
         " time",
@@ -8295,48 +8295,48 @@
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable({ effect: "copy" });
     const { ref: _ref } = useMergedProps({}, { ref: _(null) });
     const p5 = useMergedProps(props, { className: "demo droppable" });
-    return /* @__PURE__ */ o5("div", { ...p5, children: [
-      droppedStrings != null && /* @__PURE__ */ o5("div", { children: [
+    return /* @__PURE__ */ o6("div", { ...p5, children: [
+      droppedStrings != null && /* @__PURE__ */ o6("div", { children: [
         "Data dropped: ",
-        /* @__PURE__ */ o5("ul", { children: Object.entries(droppedStrings).map(([type, value]) => /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("ul", { children: Object.entries(droppedStrings).map(([type, value]) => /* @__PURE__ */ o6("li", { children: [
           type,
           ": ",
           value
         ] })) })
       ] }),
-      droppedFiles != null && /* @__PURE__ */ o5("div", { children: [
+      droppedFiles != null && /* @__PURE__ */ o6("div", { children: [
         "Files dropped: ",
-        /* @__PURE__ */ o5("table", { children: [
-          /* @__PURE__ */ o5("thead", { children: /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("th", { children: "Name" }),
-            /* @__PURE__ */ o5("th", { children: "Size" }),
-            /* @__PURE__ */ o5("th", { children: "Type" }),
-            /* @__PURE__ */ o5("th", { children: "Last modified" })
+        /* @__PURE__ */ o6("table", { children: [
+          /* @__PURE__ */ o6("thead", { children: /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("th", { children: "Name" }),
+            /* @__PURE__ */ o6("th", { children: "Size" }),
+            /* @__PURE__ */ o6("th", { children: "Type" }),
+            /* @__PURE__ */ o6("th", { children: "Last modified" })
           ] }) }),
-          /* @__PURE__ */ o5("tbody", { children: droppedFiles.map((f5) => /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: f5.name }),
+          /* @__PURE__ */ o6("tbody", { children: droppedFiles.map((f5) => /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: f5.name }),
             f5.data.byteLength,
-            /* @__PURE__ */ o5("td", { children: f5.type }),
-            /* @__PURE__ */ o5("td", { children: new Date(f5.lastModified ?? 0) })
+            /* @__PURE__ */ o6("td", { children: f5.type }),
+            /* @__PURE__ */ o6("td", { children: new Date(f5.lastModified ?? 0) })
           ] })) })
         ] })
       ] }),
-      /* @__PURE__ */ o5("hr", {}),
-      stringsForConsideration != null && /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("hr", {}),
+      stringsForConsideration != null && /* @__PURE__ */ o6("div", { children: [
         "Data being considered: ",
-        /* @__PURE__ */ o5("ul", { children: Array.from(stringsForConsideration).map((type) => /* @__PURE__ */ o5("li", { children: type })) })
+        /* @__PURE__ */ o6("ul", { children: Array.from(stringsForConsideration).map((type) => /* @__PURE__ */ o6("li", { children: type })) })
       ] }),
-      filesForConsideration != null && /* @__PURE__ */ o5("div", { children: [
+      filesForConsideration != null && /* @__PURE__ */ o6("div", { children: [
         "Files being considered: ",
-        /* @__PURE__ */ o5("ul", { children: filesForConsideration.map((f5) => /* @__PURE__ */ o5("li", { children: JSON.stringify(f5) })) })
+        /* @__PURE__ */ o6("ul", { children: filesForConsideration.map((f5) => /* @__PURE__ */ o6("li", { children: JSON.stringify(f5) })) })
       ] }),
-      /* @__PURE__ */ o5("hr", {}),
-      dropError ? /* @__PURE__ */ o5("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) }) : null
+      /* @__PURE__ */ o6("hr", {}),
+      dropError ? /* @__PURE__ */ o6("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) }) : null
     ] });
   };
   var DemoUseDraggable = () => {
     const { propsUnstable: props } = useDraggable({ data: { "text/plain": "This is custom draggable content of type text/plain." }, dragImage: null, dragImageXOffset: null, dragImageYOffset: null, effectAllowed: null });
-    return /* @__PURE__ */ o5("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" });
+    return /* @__PURE__ */ o6("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" });
   };
   var ChildrenHaveFocusContext = G(null);
   var DemoUseChildrenHaveFocus = () => {
@@ -8357,43 +8357,43 @@
     });
     const [anyFocused, setAnyFocused] = useState(false);
     const { context } = useChildrenHaveFocus({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
-    return /* @__PURE__ */ o5("div", { ...useMergedProps({}, { className: "demo" }), children: [
-      /* @__PURE__ */ o5("h2", { children: "useChildrenHaveFocus" }),
-      /* @__PURE__ */ o5("p", { children: [
+    return /* @__PURE__ */ o6("div", { ...useMergedProps({}, { className: "demo" }), children: [
+      /* @__PURE__ */ o6("h2", { children: "useChildrenHaveFocus" }),
+      /* @__PURE__ */ o6("p", { children: [
         "If you want to see if any of your children have focus, the easiest way is to just attach a ",
-        /* @__PURE__ */ o5("code", { children: "focusIn" }),
+        /* @__PURE__ */ o6("code", { children: "focusIn" }),
         " handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route."
       ] }),
-      /* @__PURE__ */ o5("div", { children: /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "number", min: 0, value: minChildCount, onInput: (e5) => {
+      /* @__PURE__ */ o6("div", { children: /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "number", min: 0, value: minChildCount, onInput: (e5) => {
           e5.preventDefault();
           setMinChildCount(e5.currentTarget.valueAsNumber);
         } }),
         " Min # of children"
       ] }) }),
-      /* @__PURE__ */ o5("div", { children: /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "number", min: minChildCount, value: maxChildCount, onInput: (e5) => {
+      /* @__PURE__ */ o6("div", { children: /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "number", min: minChildCount, value: maxChildCount, onInput: (e5) => {
           e5.preventDefault();
           setMaxChildCount(e5.currentTarget.valueAsNumber);
         } }),
         " Max # of children"
       ] }) }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Current # of children: ",
         currentChildCount
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "checkbox", onInput: (e5) => setAnimate(e5.currentTarget.checked) }),
+      /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "checkbox", onInput: (e5) => setAnimate(e5.currentTarget.checked) }),
         " Mount & unmount children on a cycle"
       ] }),
-      /* @__PURE__ */ o5(ChildrenHaveFocusContext.Provider, { value: context, children: [
-        /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6(ChildrenHaveFocusContext.Provider, { value: context, children: [
+        /* @__PURE__ */ o6("div", { children: [
           "Any children focused: ",
           anyFocused.toString()
         ] }),
-        /* @__PURE__ */ o5("div", { children: Array.from(function* () {
+        /* @__PURE__ */ o6("div", { children: Array.from(function* () {
           for (let i5 = 0; i5 < currentChildCount; ++i5) {
-            yield /* @__PURE__ */ o5(DemoUseChildrenHaveFocusChild, { index: i5 }, i5);
+            yield /* @__PURE__ */ o6(DemoUseChildrenHaveFocusChild, { index: i5 }, i5);
           }
         }()) })
       ] })
@@ -8403,11 +8403,11 @@
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild({ context: q2(ChildrenHaveFocusContext) });
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
-    return /* @__PURE__ */ o5("div", { tabIndex: 0, ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable), children: [
+    return /* @__PURE__ */ o6("div", { tabIndex: 0, ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable), children: [
       "Focusable child #",
       index,
-      /* @__PURE__ */ o5("input", {}),
-      /* @__PURE__ */ o5("input", {})
+      /* @__PURE__ */ o6("input", {}),
+      /* @__PURE__ */ o6("input", {})
     ] });
   };
   var DemoUseFocusTrap = x3(({ depth }) => {
@@ -8425,26 +8425,26 @@
     });
     const divProps = useMergedProps(props, propsStable, { ref: void 0, className: "focus-trap-demo" });
     if (depth == 2)
-      return /* @__PURE__ */ o5("div", {});
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("label", { children: [
+      return /* @__PURE__ */ o6("div", {});
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Active: ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: active, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: active, onInput: (e5) => {
           e5.preventDefault();
           setActive(e5.currentTarget.checked);
         } })
       ] }),
-      /* @__PURE__ */ o5("div", { ...divProps, children: /* @__PURE__ */ o5(DemoUseFocusTrapChild, { active, setActive, depth: depth ?? 0 }) })
+      /* @__PURE__ */ o6("div", { ...divProps, children: /* @__PURE__ */ o6(DemoUseFocusTrapChild, { active, setActive, depth: depth ?? 0 }) })
     ] });
   });
   var DemoUseFocusTrapChild = x3(({ setActive, active }) => {
-    return /* @__PURE__ */ o5(k, { children: [
-      /* @__PURE__ */ o5("button", { children: "Button 1" }),
-      /* @__PURE__ */ o5("button", { children: "Button 2" }),
-      /* @__PURE__ */ o5("button", { children: "Button 3" }),
-      /* @__PURE__ */ o5("label", { children: [
+    return /* @__PURE__ */ o6(k, { children: [
+      /* @__PURE__ */ o6("button", { children: "Button 1" }),
+      /* @__PURE__ */ o6("button", { children: "Button 2" }),
+      /* @__PURE__ */ o6("button", { children: "Button 3" }),
+      /* @__PURE__ */ o6("label", { children: [
         "Active: ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: active, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: active, onInput: (e5) => {
           e5.preventDefault();
           setActive(e5.currentTarget.checked);
         } })
@@ -8474,53 +8474,53 @@
       throttle: null
     });
     const onClick = pending ? void 0 : syncHandler;
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("button", { disabled: pending && disableConsecutive, onClick, children: "Click me!" }),
-      /* @__PURE__ */ o5("label", { children: [
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("button", { disabled: pending && disableConsecutive, onClick, children: "Click me!" }),
+      /* @__PURE__ */ o6("label", { children: [
         "Sleep for: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Throw an error ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: shouldThrow, onInput: (e5) => setShouldThrow(e5.currentTarget.checked) })
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: shouldThrow, onInput: (e5) => setShouldThrow(e5.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Disabled while pending ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: disableConsecutive, onInput: (e5) => setDisableConsecutive(e5.currentTarget.checked) })
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: disableConsecutive, onInput: (e5) => setDisableConsecutive(e5.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Debounce: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: debounce2, onInput: (e5) => setDebounce(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: debounce2, onInput: (e5) => setDebounce(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("table", { children: [
-        /* @__PURE__ */ o5("thead", { children: /* @__PURE__ */ o5("tr", { children: [
-          /* @__PURE__ */ o5("th", { children: "Field" }),
-          /* @__PURE__ */ o5("th", { children: "Value" })
+      /* @__PURE__ */ o6("table", { children: [
+        /* @__PURE__ */ o6("thead", { children: /* @__PURE__ */ o6("tr", { children: [
+          /* @__PURE__ */ o6("th", { children: "Field" }),
+          /* @__PURE__ */ o6("th", { children: "Value" })
         ] }) }),
-        /* @__PURE__ */ o5("tbody", { children: [
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "callCount" }),
-            /* @__PURE__ */ o5("td", { children: callCount })
+        /* @__PURE__ */ o6("tbody", { children: [
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "callCount" }),
+            /* @__PURE__ */ o6("td", { children: callCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "settleCount" }),
-            /* @__PURE__ */ o5("td", { children: settleCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "settleCount" }),
+            /* @__PURE__ */ o6("td", { children: settleCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "resolveCount" }),
-            /* @__PURE__ */ o5("td", { children: resolveCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "resolveCount" }),
+            /* @__PURE__ */ o6("td", { children: resolveCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "rejectCount" }),
-            /* @__PURE__ */ o5("td", { children: rejectCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "rejectCount" }),
+            /* @__PURE__ */ o6("td", { children: rejectCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "hasError" }),
-            /* @__PURE__ */ o5("td", { children: hasError.toString() })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "hasError" }),
+            /* @__PURE__ */ o6("td", { children: hasError.toString() })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "hasCapture" }),
-            /* @__PURE__ */ o5("td", { children: hasCapture.toString() })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "hasCapture" }),
+            /* @__PURE__ */ o6("td", { children: hasCapture.toString() })
           ] })
         ] })
       ] })
@@ -8563,81 +8563,81 @@
       throttle: throttle == 0 ? void 0 : throttle
     });
     let anyWaiting = pending || debouncingAsync || debouncingSync;
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("label", { children: [
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Demo text: ",
-        /* @__PURE__ */ o5("input", { value: hasCapture ? currentCapture : text, disabled: pending && disableConsecutive, onInput: syncHandler })
+        /* @__PURE__ */ o6("input", { value: hasCapture ? currentCapture : text, disabled: pending && disableConsecutive, onInput: syncHandler })
       ] }),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6("label", { children: [
         "# of milliseconds the async handler takes to run: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: timeout, onInput: (e5) => setTimeout2(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Throw an error ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: shouldThrow, onInput: (e5) => setShouldThrow(e5.currentTarget.checked) })
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: shouldThrow, onInput: (e5) => setShouldThrow(e5.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Disabled while pending ",
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: disableConsecutive, onInput: (e5) => setDisableConsecutive(e5.currentTarget.checked) })
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: disableConsecutive, onInput: (e5) => setDisableConsecutive(e5.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Debounce: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: debounce2, onInput: (e5) => setDebounce(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: debounce2, onInput: (e5) => setDebounce(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
+      /* @__PURE__ */ o6("label", { children: [
         "Throttle: ",
-        /* @__PURE__ */ o5("input", { type: "number", value: throttle, onInput: (e5) => setThrottle(e5.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ o6("input", { type: "number", value: throttle, onInput: (e5) => setThrottle(e5.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o5("table", { children: [
-        /* @__PURE__ */ o5("thead", { children: /* @__PURE__ */ o5("tr", { children: [
-          /* @__PURE__ */ o5("th", { children: "Field" }),
-          /* @__PURE__ */ o5("th", { children: "Value" })
+      /* @__PURE__ */ o6("table", { children: [
+        /* @__PURE__ */ o6("thead", { children: /* @__PURE__ */ o6("tr", { children: [
+          /* @__PURE__ */ o6("th", { children: "Field" }),
+          /* @__PURE__ */ o6("th", { children: "Value" })
         ] }) }),
-        /* @__PURE__ */ o5("tbody", { children: [
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "showSpinner" }),
-            /* @__PURE__ */ o5("td", { children: `${anyWaiting}` })
+        /* @__PURE__ */ o6("tbody", { children: [
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "showSpinner" }),
+            /* @__PURE__ */ o6("td", { children: `${anyWaiting}` })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "pending" }),
-            /* @__PURE__ */ o5("td", { children: `${pending}` })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "pending" }),
+            /* @__PURE__ */ o6("td", { children: `${pending}` })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "debouncingSync" }),
-            /* @__PURE__ */ o5("td", { children: `${debouncingSync}` })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "debouncingSync" }),
+            /* @__PURE__ */ o6("td", { children: `${debouncingSync}` })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "debouncingAsync" }),
-            /* @__PURE__ */ o5("td", { children: `${debouncingAsync}` })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "debouncingAsync" }),
+            /* @__PURE__ */ o6("td", { children: `${debouncingAsync}` })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "callCount" }),
-            /* @__PURE__ */ o5("td", { children: callCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "callCount" }),
+            /* @__PURE__ */ o6("td", { children: callCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "settleCount" }),
-            /* @__PURE__ */ o5("td", { children: settleCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "settleCount" }),
+            /* @__PURE__ */ o6("td", { children: settleCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "resolveCount" }),
-            /* @__PURE__ */ o5("td", { children: resolveCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "resolveCount" }),
+            /* @__PURE__ */ o6("td", { children: resolveCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "rejectCount" }),
-            /* @__PURE__ */ o5("td", { children: rejectCount })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "rejectCount" }),
+            /* @__PURE__ */ o6("td", { children: rejectCount })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "hasError" }),
-            /* @__PURE__ */ o5("td", { children: hasError.toString() })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "hasError" }),
+            /* @__PURE__ */ o6("td", { children: hasError.toString() })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: "currentCapture" }),
-            /* @__PURE__ */ o5("td", { children: currentCapture })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: "currentCapture" }),
+            /* @__PURE__ */ o6("td", { children: currentCapture })
           ] }),
-          /* @__PURE__ */ o5("tr", { children: [
-            /* @__PURE__ */ o5("td", { children: '"Saved" input' }),
-            /* @__PURE__ */ o5("td", { children: text })
+          /* @__PURE__ */ o6("tr", { children: [
+            /* @__PURE__ */ o6("td", { children: '"Saved" input' }),
+            /* @__PURE__ */ o6("td", { children: text })
           ] })
         ] })
       ] })
@@ -8687,60 +8687,60 @@
         onLastFocusedInnerChanged: setLastFocusedInner
       }
     });
-    return /* @__PURE__ */ o5("div", { class: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "useHasFocus" }),
-      /* @__PURE__ */ o5("p", { children: "Tracks focus related to the component:" }),
-      /* @__PURE__ */ o5("ul", { children: [
-        /* @__PURE__ */ o5("li", { children: "Is this element (or, optionally, any element within it) focused?" }),
-        /* @__PURE__ */ o5("li", { children: [
+    return /* @__PURE__ */ o6("div", { class: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "useHasFocus" }),
+      /* @__PURE__ */ o6("p", { children: "Tracks focus related to the component:" }),
+      /* @__PURE__ */ o6("ul", { children: [
+        /* @__PURE__ */ o6("li", { children: "Is this element (or, optionally, any element within it) focused?" }),
+        /* @__PURE__ */ o6("li", { children: [
           "Regardless of if focus was lost because the ",
-          /* @__PURE__ */ o5("code", { children: "body" }),
+          /* @__PURE__ */ o6("code", { children: "body" }),
           " was clicked, was this element (or, optionally, any element within it), the last to be actually focused?"
         ] }),
-        /* @__PURE__ */ o5("li", { children: "Does the window have focus?" })
+        /* @__PURE__ */ o6("li", { children: "Does the window have focus?" })
       ] }),
-      /* @__PURE__ */ o5("div", { ...useMergedProps(p22, p1, { style: { border: "1px solid black" }, tabIndex: 0 }), children: [
-        /* @__PURE__ */ o5("span", { children: "Outer element" }),
-        /* @__PURE__ */ o5("input", {}),
-        /* @__PURE__ */ o5("input", {}),
-        /* @__PURE__ */ o5("div", { tabIndex: 0, style: { border: "1px solid black" }, children: [
-          /* @__PURE__ */ o5("span", { children: "Inner element" }),
-          /* @__PURE__ */ o5("input", {}),
-          /* @__PURE__ */ o5("input", {})
+      /* @__PURE__ */ o6("div", { ...useMergedProps(p22, p1, { style: { border: "1px solid black" }, tabIndex: 0 }), children: [
+        /* @__PURE__ */ o6("span", { children: "Outer element" }),
+        /* @__PURE__ */ o6("input", {}),
+        /* @__PURE__ */ o6("input", {}),
+        /* @__PURE__ */ o6("div", { tabIndex: 0, style: { border: "1px solid black" }, children: [
+          /* @__PURE__ */ o6("span", { children: "Inner element" }),
+          /* @__PURE__ */ o6("input", {}),
+          /* @__PURE__ */ o6("input", {})
         ] })
       ] }),
-      /* @__PURE__ */ o5("div", { children: /* @__PURE__ */ o5("ul", { children: [
-        /* @__PURE__ */ o5("li", { children: [
+      /* @__PURE__ */ o6("div", { children: /* @__PURE__ */ o6("ul", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Focus count: ",
           focusCount
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Inner focus count: ",
           innerFocusCount
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Strictly focused: ",
           focused.toString(),
           ", ",
           lastFocused.toString(),
           " (focused, lastFocused)"
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Inner focused: ",
           focusedInner.toString(),
           ", ",
           lastFocusedInner.toString(),
           " (focusedInner, lastFocusedInner)"
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "Window focused: ",
           windowFocused.toString()
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "activeElement: ",
           activeElement?.textContent
         ] }),
-        /* @__PURE__ */ o5("li", { children: [
+        /* @__PURE__ */ o6("li", { children: [
           "lastActiveElement: ",
           lastActiveElement?.textContent
         ] })
@@ -8749,10 +8749,10 @@
   });
   function DemoLabel() {
     const { propsInput, propsLabel } = useRandomDualIds({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" } });
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "Labels" }),
-      /* @__PURE__ */ o5("input", { ...propsInput }),
-      /* @__PURE__ */ o5("label", { ...propsLabel, children: "Label" })
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "Labels" }),
+      /* @__PURE__ */ o6("input", { ...propsInput }),
+      /* @__PURE__ */ o6("label", { ...propsLabel, children: "Label" })
     ] });
   }
   function DemoPress({ remaining }) {
@@ -8775,72 +8775,72 @@
       },
       refElementReturn
     });
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "Press" }),
-      /* @__PURE__ */ o5("div", { children: [
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "Press" }),
+      /* @__PURE__ */ o6("div", { children: [
         "Press count: ",
         count
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Active: ",
         pressing.toString()
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
         "Long press: ",
         (longPress ?? "null").toString()
       ] }),
-      /* @__PURE__ */ o5("div", { style: { border: "1px solid black", touchAction: "none" }, tabIndex: 0, ...useMergedProps(p1, p22), children: [
-        /* @__PURE__ */ o5("div", { children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child." }),
-        /* @__PURE__ */ o5("div", { children: remaining > 0 && /* @__PURE__ */ o5(DemoPress, { remaining: remaining - 1 }) })
+      /* @__PURE__ */ o6("div", { style: { border: "1px solid black", touchAction: "none" }, tabIndex: 0, ...useMergedProps(p1, p22), children: [
+        /* @__PURE__ */ o6("div", { children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child." }),
+        /* @__PURE__ */ o6("div", { children: remaining > 0 && /* @__PURE__ */ o6(DemoPress, { remaining: remaining - 1 }) })
       ] })
     ] });
   }
   function DemoPortalChildrenChild() {
     console.log("Render portal child");
-    return /* @__PURE__ */ o5("p", { children: "Portal child" });
+    return /* @__PURE__ */ o6("p", { children: "Portal child" });
   }
   function DemoPortalChildren() {
     const [element, setElement] = useState(null);
     const { children, pushChild, removeChild, updateChild } = usePortalChildren({ target: element });
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("h2", { children: "Portal children" }),
-      /* @__PURE__ */ o5("button", { onClick: () => pushChild(/* @__PURE__ */ o5(DemoPortalChildrenChild, {})), children: "Push child" }),
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("h2", { children: "Portal children" }),
+      /* @__PURE__ */ o6("button", { onClick: () => pushChild(/* @__PURE__ */ o6(DemoPortalChildrenChild, {})), children: "Push child" }),
       children,
-      /* @__PURE__ */ o5("div", { id: "demo-portal-target", ref: setElement })
+      /* @__PURE__ */ o6("div", { id: "demo-portal-target", ref: setElement })
     ] });
   }
   function DemoGlobalHandler() {
     const [count, setCount] = useState(10);
     const [mode, setMode] = useState("single");
     const [testTime, setTestTime] = useState("");
-    return /* @__PURE__ */ o5("div", { className: "demo", children: [
-      /* @__PURE__ */ o5("div", { children: "Global event handlers:" }),
-      /* @__PURE__ */ o5("label", { children: [
+    return /* @__PURE__ */ o6("div", { className: "demo", children: [
+      /* @__PURE__ */ o6("div", { children: "Global event handlers:" }),
+      /* @__PURE__ */ o6("label", { children: [
         "# of event handlers",
-        /* @__PURE__ */ o5("input", { type: "number", value: count, min: 0, onInput: (e5) => {
+        /* @__PURE__ */ o6("input", { type: "number", value: count, min: 0, onInput: (e5) => {
           e5.preventDefault();
           setCount(e5.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { onInput: (e5) => {
+      /* @__PURE__ */ o6("div", { children: [
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { onInput: (e5) => {
             e5.preventDefault();
             if (e5.currentTarget.checked)
               setMode("grouped");
           }, type: "radio", name: "global-handler-mode" }),
           " Grouped"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { onInput: (e5) => {
             e5.preventDefault();
             if (e5.currentTarget.checked)
               setMode("single");
           }, type: "radio", name: "global-handler-mode" }),
           " Single"
         ] }),
-        /* @__PURE__ */ o5("label", { children: [
-          /* @__PURE__ */ o5("input", { onInput: (e5) => {
+        /* @__PURE__ */ o6("label", { children: [
+          /* @__PURE__ */ o6("input", { onInput: (e5) => {
             e5.preventDefault();
             if (e5.currentTarget.checked)
               setMode(null);
@@ -8848,21 +8848,21 @@
           " Off"
         ] })
       ] }),
-      /* @__PURE__ */ o5("button", { id: "global-handler-test", onClick: () => {
+      /* @__PURE__ */ o6("button", { id: "global-handler-test", onClick: () => {
         const now2 = /* @__PURE__ */ new Date();
         document.getElementById("global-handler-test2")?.click();
         const then = /* @__PURE__ */ new Date();
         setTestTime((+then - +now2) / 1e3 + "s passed");
       }, children: "Run test" }),
-      /* @__PURE__ */ o5("button", { id: "global-handler-test2", children: "Run test 2" }),
-      /* @__PURE__ */ o5("div", { children: testTime }),
-      /* @__PURE__ */ o5(DemoGlobalHandlerChildren, { count, mode }, mode)
+      /* @__PURE__ */ o6("button", { id: "global-handler-test2", children: "Run test 2" }),
+      /* @__PURE__ */ o6("div", { children: testTime }),
+      /* @__PURE__ */ o6(DemoGlobalHandlerChildren, { count, mode }, mode)
     ] });
   }
   var DemoGlobalHandlerChildren = x3(function DemoGlobalHandlerChildren2({ count, mode }) {
-    return /* @__PURE__ */ o5(k, { children: [...function* () {
+    return /* @__PURE__ */ o6(k, { children: [...function* () {
       for (let i5 = 0; i5 < count; ++i5) {
-        yield /* @__PURE__ */ o5(DemoGlobalHandlerChild, { mode, target: window }, i5);
+        yield /* @__PURE__ */ o6(DemoGlobalHandlerChild, { mode, target: window }, i5);
       }
     }()] });
   });
@@ -8872,7 +8872,7 @@
         return;
       window._demo_event = (window._demo_event || 0) + 1;
     }, {}, mode || "grouped");
-    return /* @__PURE__ */ o5("div", { hidden: true });
+    return /* @__PURE__ */ o6("div", { hidden: true });
   });
   var StaggeredContext = G(null);
   var DemoStaggered = x3(() => {
@@ -8881,41 +8881,41 @@
     const [childCount, setChildCount] = useState(100);
     const { context: mcc, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: {} });
     const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } });
-    return /* @__PURE__ */ o5(StaggeredContext.Provider, { value: { ...mcc, ...scc }, children: /* @__PURE__ */ o5("div", { class: "demo", children: [
-      /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked, onInput: (e5) => {
+    return /* @__PURE__ */ o6(StaggeredContext.Provider, { value: { ...mcc, ...scc }, children: /* @__PURE__ */ o6("div", { class: "demo", children: [
+      /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked, onInput: (e5) => {
           e5.preventDefault();
           setChecked(e5.currentTarget.checked);
         } }),
         " Children mounted"
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "checkbox", checked: staggered, onInput: (e5) => {
+      /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "checkbox", checked: staggered, onInput: (e5) => {
           e5.preventDefault();
           setStaggered(e5.currentTarget.checked);
         } }),
         " Children Staggered"
       ] }),
-      /* @__PURE__ */ o5("label", { children: [
-        /* @__PURE__ */ o5("input", { type: "number", value: childCount, onInput: (e5) => {
+      /* @__PURE__ */ o6("label", { children: [
+        /* @__PURE__ */ o6("input", { type: "number", value: childCount, onInput: (e5) => {
           e5.preventDefault();
           setChildCount(e5.currentTarget.valueAsNumber);
         } }),
         " # of children"
       ] }),
-      /* @__PURE__ */ o5("div", { children: [
-        /* @__PURE__ */ o5("div", { children: [
+      /* @__PURE__ */ o6("div", { children: [
+        /* @__PURE__ */ o6("div", { children: [
           "Status: ",
           staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"
         ] }),
-        /* @__PURE__ */ o5("div", { style: "display:flex;flex-wrap: wrap;", children: checked && /* @__PURE__ */ o5(DemoStaggeredChildren, { childCount }) })
+        /* @__PURE__ */ o6("div", { style: "display:flex;flex-wrap: wrap;", children: checked && /* @__PURE__ */ o6(DemoStaggeredChildren, { childCount }) })
       ] })
     ] }) });
   });
   var DemoStaggeredChildren = x3(({ childCount }) => {
-    return /* @__PURE__ */ o5(k, { children: Array.from(function* () {
+    return /* @__PURE__ */ o6(k, { children: Array.from(function* () {
       for (let i5 = 0; i5 < childCount; ++i5) {
-        yield /* @__PURE__ */ o5(DemoStaggeredChild, { index: i5 }, i5);
+        yield /* @__PURE__ */ o6(DemoStaggeredChild, { index: i5 }, i5);
       }
     }()) });
   });
@@ -8923,7 +8923,7 @@
     const context = q2(StaggeredContext);
     const { info, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useStaggeredChild({ context, info: { index } });
     const { managedChildReturn } = useManagedChild({ context, info: { ...info, index } });
-    return /* @__PURE__ */ o5("div", { ...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} }), children: [
+    return /* @__PURE__ */ o6("div", { ...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} }), children: [
       "Child #",
       index,
       parentIsStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"
@@ -8931,46 +8931,46 @@
   });
   l.debounceRendering = (f5) => f5();
   var Component = () => {
-    return /* @__PURE__ */ o5("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
-      /* @__PURE__ */ o5(DemoPress, { remaining: 2 }),
-      /* @__PURE__ */ o5("input", {}),
-      /* @__PURE__ */ o5("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [
-        /* @__PURE__ */ o5(DemoUseModal, {}),
-        /* @__PURE__ */ o5(DemoUseModal, {})
+    return /* @__PURE__ */ o6("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
+      /* @__PURE__ */ o6(DemoPress, { remaining: 2 }),
+      /* @__PURE__ */ o6("input", {}),
+      /* @__PURE__ */ o6("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [
+        /* @__PURE__ */ o6(DemoUseModal, {}),
+        /* @__PURE__ */ o6(DemoUseModal, {})
       ] }),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoLabel, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoGlobalHandler, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoPortalChildren, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoFocus, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseChildrenHaveFocus, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseGrid, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseTimeout, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoStaggered, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseRovingTabIndex, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseFocusTrap, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseAsyncHandler1, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseAsyncHandler2, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseDroppable, {}),
-      /* @__PURE__ */ o5("hr", {}),
-      /* @__PURE__ */ o5(DemoUseDraggable, {}),
-      /* @__PURE__ */ o5("hr", {})
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoLabel, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoGlobalHandler, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoPortalChildren, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoFocus, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseChildrenHaveFocus, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseGrid, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseTimeout, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoStaggered, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseRovingTabIndex, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseFocusTrap, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseAsyncHandler1, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseAsyncHandler2, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseDroppable, {}),
+      /* @__PURE__ */ o6("hr", {}),
+      /* @__PURE__ */ o6(DemoUseDraggable, {}),
+      /* @__PURE__ */ o6("hr", {})
     ] });
   };
   requestAnimationFrame(() => {
-    D(/* @__PURE__ */ o5(Component, {}), document.getElementById("root"));
+    D(/* @__PURE__ */ o6(Component, {}), document.getElementById("root"));
   });
 })();
 /*! Bundled license information:

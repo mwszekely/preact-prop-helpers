@@ -377,6 +377,7 @@ export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debu
 export { ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildReturnTypeSelf, UseManagedChildrenContext, UseManagedChildrenContextSelf, UseManagedChildrenParameters, UseManagedChildrenParametersSelf, UseManagedChildrenReturnType, UseManagedChildrenReturnTypeSelf, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
+export { usePropsOnChildren } from "./preact-extensions/use-props-on-children.js";
 export { OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
 export { useMemoObject, useStableGetter } from "./preact-extensions/use-stable-getter.js";
