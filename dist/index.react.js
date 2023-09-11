@@ -817,12 +817,12 @@ const useMergedProps = monitored(function useMergedProps(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
-        useMergedProps2(ret, nextProps);
+        useMergedPropsHelper(ret, nextProps);
     }
     return ret;
 });
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
-function mergeUnknown(key, lhsValue, rhsValue) {
+const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
         // They're both functions that can be merged (or one's a function and the other's null).
         // Not an *easy* case, but a well-defined one.
@@ -854,14 +854,14 @@ function mergeUnknown(key, lhsValue, rhsValue) {
             return rhsValue;
         }
     }
-}
+});
 /**
  * Helper function.
  *
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2(target, mods) {
+const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -882,8 +882,8 @@ function useMergedProps2(target, mods) {
             continue;
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
-}
-function mergeFunctions(lhs, rhs) {
+});
+const mergeFunctions = monitored(function mergeFunctions(lhs, rhs) {
     if (!lhs)
         return rhs;
     if (!rhs)
@@ -894,7 +894,7 @@ function mergeFunctions(lhs, rhs) {
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);
     };
-}
+});
 
 function generateStack() {
     if (process.env.NODE_ENV === 'development' && window._generate_setState_stacks) {

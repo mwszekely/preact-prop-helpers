@@ -40,7 +40,7 @@ export const useMergedProps = monitored(function useMergedProps<E extends EventT
     useEnsureStability("useMergedProps", allProps.length);
     let ret: ElementProps<E> = {};
     for (let nextProps of allProps) {
-        useMergedProps2<E>(ret, nextProps);
+        useMergedPropsHelper<E>(ret, nextProps);
     }
 
     return ret;
@@ -48,7 +48,7 @@ export const useMergedProps = monitored(function useMergedProps<E extends EventT
 
 const knowns = new Set<string>(["children", "ref", "className", "class", "style"])
 
-function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
+const mergeUnknown = monitored( function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
 
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
 
@@ -82,7 +82,7 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
             return rhsValue as never
         }
     }
-}
+})
 
 /**
  * Helper function.
@@ -90,7 +90,7 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
+const useMergedPropsHelper = monitored(function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
 
 
     target.ref = useMergedRefs<E>(target.ref, mods.ref);
@@ -112,9 +112,9 @@ function useMergedProps2<E extends EventTarget>(target: ElementProps<E>, mods: E
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
 
-}
+})
 
-export function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
+export const mergeFunctions = monitored(function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
 
     if (!lhs)
         return rhs;
@@ -128,4 +128,4 @@ export function mergeFunctions<T extends (...args: any[]) => (void | Promise<voi
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);
     };
-}
+})

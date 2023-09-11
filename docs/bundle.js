@@ -1887,12 +1887,12 @@
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
-      useMergedProps22(ret, nextProps);
+      useMergedPropsHelper(ret, nextProps);
     }
     return ret;
   });
   var knowns = /* @__PURE__ */ new Set(["children", "ref", "className", "class", "style"]);
-  function mergeUnknown(key, lhsValue, rhsValue) {
+  var mergeUnknown = monitored(function mergeUnknown2(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
       const merged = mergeFunctions(lhsValue, rhsValue);
       return merged;
@@ -1914,8 +1914,8 @@
         return rhsValue;
       }
     }
-  }
-  function useMergedProps22(target, mods) {
+  });
+  var useMergedPropsHelper = monitored(function useMergedPropsHelper2(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -1936,8 +1936,8 @@
         continue;
       target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
-  }
-  function mergeFunctions(lhs, rhs) {
+  });
+  var mergeFunctions = monitored(function mergeFunctions2(lhs, rhs) {
     if (!lhs)
       return rhs;
     if (!rhs)
@@ -1948,7 +1948,7 @@
       if (lv instanceof Promise || rv instanceof Promise)
         return Promise.all([lv, rv]);
     };
-  }
+  });
 
   // ../node_modules/.pnpm/tabbable@6.2.0/node_modules/tabbable/dist/index.esm.js
   var candidateSelectors = ["input:not([inert])", "select:not([inert])", "textarea:not([inert])", "a[href]:not([inert])", "button:not([inert])", "[tabindex]:not(slot):not([inert])", "audio[controls]:not([inert])", "video[controls]:not([inert])", '[contenteditable]:not([contenteditable="false"]):not([inert])', "details>summary:first-of-type:not([inert])", "details:not([inert])"];
@@ -4140,7 +4140,7 @@
     };
   });
 
-  // ../node_modules/.pnpm/github.com+mwszekely+map-and-set-extensions@f0a9758a5dbccc8fe88f4bfc928166c84d86ac6b/node_modules/map-and-set-extensions/dist/map-of-sets.js
+  // ../node_modules/.pnpm/github.com+mwszekely+map-and-set-extensions@2e76da9cceee046d57d83eaacf46e602a97a9f63/node_modules/map-and-set-extensions/dist/map-of-sets.js
   var MapOfSets = {
     add: (map2, key, value) => {
       let set = map2.get(key) ?? /* @__PURE__ */ new Set();

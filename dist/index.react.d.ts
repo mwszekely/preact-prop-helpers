@@ -3113,7 +3113,7 @@ declare function enableLoggingPropConflicts(log2: (typeof console)["log"]): void
  * @returns A single object with all the provided props merged into one.
  */
 declare const useMergedProps: <E extends EventTarget>(...allProps: ElementProps<E>[]) => ElementProps<E>;
-declare function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined): T | U | ((...args: Parameters<T>) => Promise<[
+declare const mergeFunctions: <T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) => T | U | ((...args: Parameters<T>) => Promise<[
     void,
     void
 ]> | undefined) | null | undefined;
