@@ -37,6 +37,6 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export declare function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void;
+export declare const useGlobalHandler: <T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: ((e: H) => void) | null, options?: FirstOverloadParameters<T["addEventListener"]>[2] | undefined, mode?: "grouped" | "single") => void;
 export {};
 //# sourceMappingURL=use-event-handler.d.ts.map

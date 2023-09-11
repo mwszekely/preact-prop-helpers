@@ -4,7 +4,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseModalParametersSelf {
     /**
@@ -33,7 +33,7 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  * 
  * @compositeParams
  */
-export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
+export const useModal = monitored (function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void2 },
     escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 },
     focusTrapParameters: { trapActive, ...focusTrapParameters },
@@ -44,8 +44,6 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
     modalParameters: { active: modalActive, ...void8 },
     ...void1
 }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
-    monitorCallCount(useModal);
-
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({
         dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
         escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
@@ -75,4 +73,4 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
         propsStablePopup,
         propsStableSource
     }
-}
+})

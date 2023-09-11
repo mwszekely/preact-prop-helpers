@@ -38,5 +38,5 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  *
  * @compositeParams
  */
-export declare function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType;
+export declare const useHasLastFocus: <T extends Node>(args: UseHasLastFocusParameters<T>) => UseHasLastFocusReturnType;
 //# sourceMappingURL=use-has-last-focus.d.ts.map

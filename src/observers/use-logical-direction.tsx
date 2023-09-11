@@ -1,5 +1,6 @@
+
 import { useCallback } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { ElementSize } from "./use-element-size.js";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
@@ -18,7 +19,7 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
 }
 
 export interface UseLogicalDirectionParameters {
-   // logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
+    // logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
 }
 
 export interface LogicalElementSize {
@@ -54,10 +55,9 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection({  }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
-    monitorCallCount(useLogicalDirection);
+export const useLogicalDirection = monitored(function useLogicalDirection({ }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
 
-//    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
+    //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
 
@@ -229,7 +229,7 @@ export function useLogicalDirection({  }: UseLogicalDirectionParameters): UseLog
             convertToPhysicalSide
         }
     };
-}
+})
 
 // Position requires us to sometimes use one property (like `left`)
 // or sometimes two (like `left` + `width`)
@@ -246,7 +246,7 @@ const M = {
 
 
 export interface UseLogicalDirectionReturnType {
-    
+
     /** @stable */
     logicalDirectionReturn: {
         getLogicalDirectionInfo: (computedStyles: CSSStyleDeclaration) => LogicalDirectionInfo | null;

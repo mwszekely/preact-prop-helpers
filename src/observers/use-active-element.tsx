@@ -1,8 +1,9 @@
 
 import { MapOfSets } from "map-and-set-extensions";
+
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 
 /**
@@ -182,9 +183,7 @@ export interface UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
-    monitorCallCount(useActiveElement);
-
+export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
 
     useEffect(() => {
@@ -225,4 +224,4 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
     const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
 
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-}
+})

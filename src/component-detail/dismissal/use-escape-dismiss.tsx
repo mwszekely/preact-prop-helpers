@@ -4,7 +4,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { KeyboardEventType, Nullable, useEffect } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 
 
 export interface UseEscapeDismissParametersSelf<B extends boolean> {
@@ -70,8 +70,7 @@ function getElementDepth(element: Element) {
  * 
  * @compositeParams 
  */
-export function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void {
-    monitorCallCount(useEscapeDismiss);
+export const useEscapeDismiss = monitored(function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
@@ -165,4 +164,4 @@ export function useEscapeDismiss<PopupElement extends Element, B extends boolean
             }
         }
     }, [open]);
-}
+})

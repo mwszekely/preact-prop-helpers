@@ -62,5 +62,5 @@ export interface UseActiveElementReturnType {
  *
  * @compositeParams
  */
-export declare function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType;
+export declare const useActiveElement: ({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters) => UseActiveElementReturnType;
 //# sourceMappingURL=use-active-element.d.ts.map

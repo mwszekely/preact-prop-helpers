@@ -1,5 +1,5 @@
 import { Inputs, useEffect as useEffectNative, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 /**
  * Wrap the native `useEffect` to add arguments 
@@ -11,9 +11,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
-    monitorCallCount(useEffectDebug);
-
+export const useEffectDebug = monitored(function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
     const prevInputs = useRef<undefined | I>(undefined);
     const effect2 = () => {
         const changes: { from: any, to: any }[] = [];
@@ -29,6 +27,6 @@ export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, c
     };
 
     impl(effect2, inputs);
-}
+})
 
 export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] }

@@ -168,6 +168,6 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-export declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
+export declare const useAsync: <AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP> | undefined) => UseAsyncReturnType<SP, R>;
 export {};
 //# sourceMappingURL=use-async.d.ts.map

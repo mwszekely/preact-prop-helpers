@@ -1,7 +1,7 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
@@ -237,9 +237,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * 
  * @compositeParams
  */
-export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
-    monitorCallCount(useManagedChildren);
-
+export const useManagedChildren = monitored(function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     type IndexType = M["index"];
     type Info = M;
 
@@ -395,16 +393,14 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         }),
         managedChildrenReturn: { getChildren }
     }
-}
+})
 
 
 
 /**
  * @compositeParams
  */
-export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
-    monitorCallCount(useManagedChild);
-
+export const useManagedChild = monitored(function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
@@ -439,7 +435,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>({ c
     return {
         managedChildReturn: { getChildren: getChildren! }
     }
-}
+})
 
 
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {

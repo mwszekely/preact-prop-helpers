@@ -2,7 +2,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseTimeoutParameters {
     /**
@@ -32,9 +32,8 @@ export interface UseTimeoutParameters {
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
-    monitorCallCount(useTimeout);
-   
+export const useTimeout = monitored(function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
+
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
 
@@ -51,15 +50,15 @@ export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParame
         if (!timeoutIsNull) {
             const timeout = getTimeout();
             console.assert(timeoutIsNull == (timeout == null));
-    
+
             if (timeout != null) {
                 startTimeRef.current = +(new Date());
-    
+
                 const handle = setTimeout(stableCallback, timeout);
                 return () => clearTimeout(handle);
             }
         }
-        
+
     }, [triggerIndex, timeoutIsNull])
 
     const getElapsedTime = useCallback(() => {
@@ -72,4 +71,4 @@ export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParame
     }, []);
 
     return { getElapsedTime, getRemainingTime };
-}
+})

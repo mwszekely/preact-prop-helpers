@@ -13,7 +13,7 @@ import { focus } from "../util/focus.js";
 import { RequiredN, TargetedOmit } from "../util/lib-shared.js";
 import { EventType, TargetedPick, useCallback, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
 
@@ -180,13 +180,12 @@ export interface UseSingleSelectionContext {
  * 
  * @compositeParams
  */
-export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useSingleSelection = monitored(function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
     ...void4
 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement> {
-    monitorCallCount(useSingleSelection);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -247,7 +246,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             })
         }
     }
-}
+})
 
 
 /**
@@ -255,13 +254,12 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
  * 
  * @compositeParams
  */
-export function useSingleSelectionChild<ChildElement extends Element>({
+export const useSingleSelectionChild = monitored(function useSingleSelectionChild<ChildElement extends Element>({
     singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
     context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 },
     info: { index, untabbable, ...void3 },
     ...void4
 }: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
-    monitorCallCount(useSingleSelectionChild);
     type R = EventType<any, any>;
 
     assertEmptyObject(void1);
@@ -317,7 +315,7 @@ export function useSingleSelectionChild<ChildElement extends Element>({
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         pressParameters: { onPressSync }
     }
-}
+})
 
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
     singleSelectedIndex: Nullable<number>;

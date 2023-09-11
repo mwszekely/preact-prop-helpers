@@ -17,7 +17,7 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  *
  * @param target
  */
-export declare function useBlockingElement<E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>): {
+export declare const useBlockingElement: <E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>) => {
     getTop: () => HTMLElement | null;
     getLastActiveWhenClosed: () => HTMLElement | null;
     getLastActiveWhenOpen: () => HTMLElement | null;

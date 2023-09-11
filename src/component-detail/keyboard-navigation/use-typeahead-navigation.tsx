@@ -9,7 +9,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -125,14 +125,11 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
-    //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
-
-    monitorCallCount(useTypeaheadNavigation);
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -374,20 +371,19 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
             }
         }
     }
-}
+})
 
 /**
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigationChild<ChildElement extends Element>({
+export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },
     textContentParameters: { getText, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
-    monitorCallCount(useTypeaheadNavigationChild);
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -434,7 +430,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
         pressParameters: { excludeSpace }
     };
 
-}
+})
 
 /**
  * Your usual binary search implementation.

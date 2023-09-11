@@ -14,7 +14,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { UsePressParameters } from "./use-press.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends
@@ -109,7 +109,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * 
  * @compositeParams
  */
-export function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
+export const useCompleteListNavigation = (function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     linearNavigationParameters,
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
@@ -122,7 +122,6 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     refElementParameters,
     ...void1
 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
-    monitorCallCount(useCompleteListNavigation);
 
     const { initiallySingleSelectedIndex } = singleSelectionParameters;
     const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -212,13 +211,13 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         typeaheadNavigationReturn,
         childrenHaveFocusReturn
     }
-}
+})
 
 /**
  * 
  * @compositeParams
  */
-export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
+export const useCompleteListNavigationChild = monitored (function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters,
     refElementParameters,
@@ -228,9 +227,6 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 },
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
-    monitorCallCount(useCompleteListNavigationChild);
-
-
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info: { index }, context: { staggeredChildContext } });
 
@@ -322,7 +318,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         rovingTabIndexChildReturn
     }
 
-}
+})
 
 export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     OmitStrong<MakeSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">,

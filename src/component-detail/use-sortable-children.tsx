@@ -1,10 +1,11 @@
+
 import { useForceUpdate } from "../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../util/lib.js";
 import { VNode } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { shuffle as lodashShuffle } from "lodash-es";
@@ -161,12 +162,10 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
  * 
  * @compositeParams
  */
-export function useRearrangeableChildren<M extends UseSortableChildInfo>({
+export const useRearrangeableChildren = monitored( function useRearrangeableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters: { getIndex, onRearranged },
     managedChildrenReturn: { getChildren }
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
-    monitorCallCount(useRearrangeableChildren);
-
     useEnsureStability("useRearrangeableChildren", getIndex);
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
@@ -223,8 +222,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         forceUpdateRef.current?.();
     }, []);
 
-    const useRearrangedChildren = useCallback(function useRearrangedChildren(children: VNode[]) {
-        monitorCallCount(useRearrangedChildren);
+    const useRearrangedChildren = useCallback(monitored(function useRearrangedChildren(children: VNode[]) {
 
         console.assert(Array.isArray(children));
 
@@ -239,7 +237,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             .map(({ child, mangledIndex, demangledIndex }) => {
                 return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
             });
-    }, []);
+    }), []);
 
     const toJsonArray = useCallback((transform?: (info: M) => object) => {
         const managedRows = getChildren();
@@ -264,7 +262,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             toJsonArray
         }
     };
-}
+})
 
 
 /**
@@ -290,13 +288,11 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
  * 
  * @compositeParams
  */
-export function useSortableChildren<M extends UseSortableChildInfo>({
+export const useSortableChildren = monitored(function useSortableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters: { compare: userCompare },
     managedChildrenReturn: { getChildren }
 }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M> {
-    monitorCallCount(useSortableChildren);
-
     const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
 
     const { rearrangeableChildrenReturn } = useRearrangeableChildren<M>({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
@@ -326,7 +322,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
         sortableChildrenReturn: { sort },
         rearrangeableChildrenReturn
     };
-}
+})
 
 export function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined) {
     return compare1(lhs?.getSortValue(), rhs?.getSortValue());

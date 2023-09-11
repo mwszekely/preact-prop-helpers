@@ -39,5 +39,5 @@ export interface UseEscapeDismissParameters<PopupElement extends Element, B exte
  *
  * @compositeParams
  */
-export declare function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void;
+export declare const useEscapeDismiss: <PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>) => void;
 //# sourceMappingURL=use-escape-dismiss.d.ts.map

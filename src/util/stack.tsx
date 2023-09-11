@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "./lib.js";
-import { BuildMode } from "./mode.js";
+import "./mode.js";
 
 export function generateStack() {
-    if (BuildMode === 'development' && (window as any)._generate_setState_stacks) {
+    if (process.env.NODE_ENV === 'development' && (window as any)._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -19,7 +19,7 @@ export function generateStack() {
  * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 export function useStack() {
-    if (BuildMode === "development") {
+    if (process.env.NODE_ENV === "development") {
         const stack = useMemo(generateStack, []);
         const getStack = useCallback(() => stack, []);
         return getStack;

@@ -1,5 +1,5 @@
 import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 let a = null;
@@ -27,8 +27,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  *
  * @compositeParams
  */
-export function useImperativeProps({ refElementReturn: { getElement } }) {
-    monitorCallCount(useImperativeProps);
+export const useImperativeProps = monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
@@ -130,7 +129,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
         }).current,
         props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
     };
-}
+});
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });

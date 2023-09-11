@@ -11,7 +11,7 @@
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
-export declare function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType;
+export declare const useMediaQuery: (query: string | null | undefined, defaultGuess?: boolean) => UseMediaQueryReturnType;
 export interface UseMediaQueryReturnType {
     matches: boolean | null;
     getMatches(): boolean | null;

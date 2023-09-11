@@ -49,7 +49,7 @@ export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedC
  *
  * @hasChild {@link usePaginatedChild}
  */
-export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType;
+export declare const usePaginatedChildren: <ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>) => UsePaginatedChildrenReturnType;
 export interface UsePaginatedChildParameters {
     info: {
         index: number;
@@ -79,5 +79,5 @@ export interface UsePaginatedChildReturnTypeSelf {
  *
  * @compositeParams
  */
-export declare function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement>;
+export declare const usePaginatedChild: <ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters) => UsePaginatedChildReturnType<ChildElement>;
 //# sourceMappingURL=use-paginated-children.d.ts.map

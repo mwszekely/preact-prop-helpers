@@ -1,11 +1,12 @@
 import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import "wicg-inert";
+
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
@@ -28,7 +29,7 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * 
  * @param target 
  */
-export function useBlockingElement<E extends Element>({
+export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
     activeElementParameters: {
         getDocument,
         onActiveElementChange,
@@ -43,7 +44,6 @@ export function useBlockingElement<E extends Element>({
     },
     ...void2
 }: UseBlockingElementParameters<E>) {
-    monitorCallCount(useBlockingElement);
 
     const stableGetTarget = useStableCallback(getTarget);
 
@@ -98,7 +98,7 @@ export function useBlockingElement<E extends Element>({
     }, [enabled]);
 
     return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen }
-}
+})
 
 export function getTopElement() {
     return blockingElements().top;

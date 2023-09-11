@@ -1,22 +1,19 @@
+export { };
 
 declare global {
     // Sometimes there will be an error here if @types/node is included,
     // and sometimes there won't...not much we can do.
     /// @ts-ignore
-    const process: { env: { NODE_ENV?: string | undefined } | undefined };
+    const process: { env: { NODE_ENV: "production" | "development" } };
 }
 
-// Get the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
-// (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
+// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error)
 (globalThis as any)["process"] ??= {};
 (globalThis as any)["process"]["env"] ??= {};
+(globalThis as any)["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV; 
+// The above statement looks redundant, but it ensures that manual
+// reads to `process.env.NODE_ENV` work regardless of if the bundler 
+// replaces `process.env.NODE_ENV` with the string `"development"` or not.
 
-/**
- * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
- * 
- * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"` 
- * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
- */
-export const BuildMode = process.env!.NODE_ENV || "production" as "production" | "development";
-process.env!.NODE_ENV = BuildMode;
-export type BuildMode = "production" | "development";
+

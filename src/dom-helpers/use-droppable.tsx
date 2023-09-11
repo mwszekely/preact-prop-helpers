@@ -2,7 +2,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { DragEventType, useEffect, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseDroppableReturnType<E extends Element> {
 
@@ -77,8 +77,7 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
-    monitorCallCount(useDroppable);
+export const useDroppable = monitored(function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
 
     const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
     const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);
@@ -252,6 +251,6 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
 
         dropError
     }
-}
+})
 
 

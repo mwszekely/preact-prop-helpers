@@ -1,7 +1,7 @@
 import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -93,8 +93,7 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
-    monitorCallCount(useActiveElement);
+export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
@@ -127,5 +126,5 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
     const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
     const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-}
+});
 //# sourceMappingURL=use-active-element.js.map

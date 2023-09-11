@@ -31,9 +31,9 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  *
  * @hasChild {@link useListNavigationChild}
  */
-export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
+export declare const useListNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>) => UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
 /**
  * @compositeParams
  */
-export declare function useListNavigationChild<ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement>;
+export declare const useListNavigationChild: <ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
 //# sourceMappingURL=use-list-navigation-partial.d.ts.map

@@ -2,6 +2,7 @@ import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback } from "../util/lib.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Allows you to inspect when the entire URL changes,
  * either because the hash changed or because the Back/Forward
@@ -16,7 +17,7 @@ import { useCallback } from "../util/lib.js";
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export function useUrl(onUrlChange) {
+export const useUrl = monitored(function useUrl(onUrlChange) {
     const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
     useGlobalHandler(window, "hashchange", (e) => {
         setUrl(window.location.toString(), e);
@@ -40,5 +41,5 @@ export function useUrl(onUrlChange) {
                 setUrl(newUrlOrSetter, undefined);
             }
         }, [])];
-}
+});
 //# sourceMappingURL=use-url.js.map

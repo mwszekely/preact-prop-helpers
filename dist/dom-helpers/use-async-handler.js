@@ -1,7 +1,7 @@
 import { useAsync } from "../preact-extensions/use-async.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
  * along with some other information related to the current state.
@@ -67,8 +67,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
-    monitorCallCount(useAsyncHandler);
+export const useAsyncHandler = monitored(function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);
@@ -91,5 +90,5 @@ export function useAsyncHandler({ asyncHandler, capture: originalCapture, ...res
         hasCapture,
         ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
     };
-}
+});
 //# sourceMappingURL=use-async-handler.js.map

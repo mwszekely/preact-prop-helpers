@@ -3,7 +3,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useEffect } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
 function getElementDepth(element) {
     let depth = 0;
@@ -23,8 +23,7 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
-    monitorCallCount(useEscapeDismiss);
+export const useEscapeDismiss = monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const stableOnClose = useStableGetter(onClose);
@@ -99,5 +98,5 @@ export function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: o
             }
         }
     }, [open]);
-}
+});
 //# sourceMappingURL=use-escape-dismiss.js.map

@@ -21,5 +21,5 @@ export interface UseBackdropDismissParameters<PopupElement extends Element, B ex
  *
  * @compositeParams
  */
-export declare function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void;
+export declare const useBackdropDismiss: <PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>) => void;
 //# sourceMappingURL=use-backdrop-dismiss.d.ts.map

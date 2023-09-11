@@ -60,7 +60,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -69,5 +69,5 @@ export declare function useStaggeredChildren({ managedChildrenReturn: { getChild
  *
  * @compositeParams
  */
-export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement>;
+export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

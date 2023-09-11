@@ -1,5 +1,5 @@
 import { useLayoutEffect as useLayoutEffectNative } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useEffectDebug } from "./use-effect-debug.js";
 /**
  * Wrap the native `useLayoutEffect` to add arguments
@@ -9,8 +9,7 @@ import { useEffectDebug } from "./use-effect-debug.js";
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-export function useLayoutEffectDebug(effect, inputs) {
-    monitorCallCount(useLayoutEffectDebug);
+export const useLayoutEffectDebug = monitored(function useLayoutEffectDebug(effect, inputs) {
     return useEffectDebug(effect, inputs, useLayoutEffectNative);
-}
+});
 //# sourceMappingURL=use-layout-effect-debug.js.map

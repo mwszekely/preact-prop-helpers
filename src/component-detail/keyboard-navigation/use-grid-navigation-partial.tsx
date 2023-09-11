@@ -7,7 +7,7 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
@@ -112,7 +112,7 @@ export interface UseGridNavigationCellContext extends UseListNavigationContext {
 
 
 export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> {
-    info: Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysReturnType>; 
+    info: Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysReturnType>;
 }
 
 /**
@@ -134,13 +134,11 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element> ex
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
+export const useGridNavigation = monitored(function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters: { onTabbableColumnChange, ...void3 },
     linearNavigationParameters,
     ...listNavigationParameters
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
-    monitorCallCount(useGridNavigation);
-
     const [getTabbableColumn, setTabbableColumn] = usePassiveState<TabbableColumnInfo, EventType<any, any> | undefined>(onTabbableColumnChange, useStableCallback(() => {
         let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
         return { actual: t, ideal: t }
@@ -181,7 +179,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         rovingTabIndexReturn,
         typeaheadNavigationReturn
     }
-}
+})
 
 /**
  * Child hook for {@link useGridNavigation}
@@ -191,7 +189,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
  * 
  * @compositeParams
  */
-export function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
+export const useGridNavigationRow = monitored(function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
     info: { index, untabbable, ...void3 },
     textContentParameters,
@@ -207,7 +205,6 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     refElementReturn,
     ...void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, GridChildCellInfo<CellElement>>): UseGridNavigationRowReturnType<RowElement, CellElement> {
-    monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
 
     const getIndex = useStableCallback(() => { return index })
@@ -315,7 +312,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         setTabbableCell: setTabbableIndex
     })
 
-    
+
     // These will often have conflicting values, but we always use -1 for rows no matter what,
     // so instead of negotiating a resolution we can just give a straight answer.
     propsLN.tabIndex = propsLNC.tabIndex = -1;
@@ -343,14 +340,14 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         typeaheadNavigationReturn
     }
 
-}
+})
 
 /**
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  * 
  * @compositeParams
  */
-export function useGridNavigationCell<CellElement extends Element>({
+export const useGridNavigationCell = monitored(function useGridNavigationCell<CellElement extends Element>({
     context: {
         gridNavigationCellContext: {
             getRowIndex,
@@ -373,7 +370,6 @@ export function useGridNavigationCell<CellElement extends Element>({
     },
     ...void1
 }: UseGridNavigationCellParameters<CellElement>): UseGridNavigationCellReturnType<CellElement> {
-    monitorCallCount(useGridNavigationCell);
     colSpan ??= 1;
 
     const {
@@ -422,4 +418,4 @@ export function useGridNavigationCell<CellElement extends Element>({
             })
         },
     }
-}
+})

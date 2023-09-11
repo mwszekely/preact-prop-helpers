@@ -1,7 +1,7 @@
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
@@ -78,8 +78,7 @@ export interface UseRefElementParameters<T> {
  * 
  * @compositeParams
  */
-export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
-    monitorCallCount(useRefElement);
+export const useRefElement = monitored( function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     const nonElementWarn = useRef(false);
     if (nonElementWarn.current) {
         nonElementWarn.current = false;
@@ -120,5 +119,5 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
             getElement,
         }
     }
-}
+})
 

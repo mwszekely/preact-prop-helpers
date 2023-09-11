@@ -4,7 +4,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild } from "../use-selection.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 
@@ -43,7 +43,7 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * 
  * @compositeParams
  */
-export function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useListNavigationSelection = monitored(function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -56,7 +56,6 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
     childrenHaveFocusReturn,
     ...void3
 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
-    monitorCallCount(useListNavigationSelection);
     const { context: contextSS, propsStable, ...retSS } = useSelection<ParentOrChildElement, ChildElement>({ 
         childrenHaveFocusReturn, 
         rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a) }) }, 
@@ -91,12 +90,12 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
         }),
         props: useMergedProps(props, propsStable)
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useListNavigationSelectionChild<ChildElement extends Element>({
+export const useListNavigationSelectionChild = monitored (function useListNavigationSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, ...void2 },
     context,
     refElementReturn,
@@ -105,8 +104,6 @@ export function useListNavigationSelectionChild<ChildElement extends Element>({
     multiSelectionChildParameters,
     ...void1
 }: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
-    monitorCallCount(useListNavigationSelectionChild);
-
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 },
         info: infoSS,
@@ -160,4 +157,4 @@ export function useListNavigationSelectionChild<ChildElement extends Element>({
         propsChild: propsSS,
         propsTabbable: propsLN
     }
-}
+})

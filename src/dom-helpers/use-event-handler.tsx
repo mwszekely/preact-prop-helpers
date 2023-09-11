@@ -1,7 +1,7 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 /**
  * This is used to select *just* the typed addEventListener 
@@ -53,8 +53,7 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
-    monitorCallCount(useGlobalHandler);
+export const useGlobalHandler = monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", mode);
 
@@ -68,7 +67,7 @@ export function useGlobalHandler<T extends EventTarget, EventType extends TypedE
     else {
         useGlobalHandlerSingle<T, EventType, H>(target, type, handler, options);
     }
-}
+})
 
 type GlobalHandlerInfo = { listener: EventListener; listeners: Set<EventListener>; };
 type MapOfOptionsToInfo = Map<string, GlobalHandlerInfo>

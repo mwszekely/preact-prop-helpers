@@ -1,7 +1,7 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  *
@@ -12,8 +12,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export function useGlobalHandler(target, type, handler, options, mode) {
-    monitorCallCount(useGlobalHandler);
+export const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", mode);
     if (mode === "grouped") {
@@ -26,7 +25,7 @@ export function useGlobalHandler(target, type, handler, options, mode) {
     else {
         useGlobalHandlerSingle(target, type, handler, options);
     }
-}
+});
 let mapThing = new Map();
 function doMapThing(op, target, type, handler, options) {
     if (handler) {

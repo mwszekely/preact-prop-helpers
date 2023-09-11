@@ -47,5 +47,5 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  *
  * @compositeParams
  */
-export declare function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E>;
+export declare const useElementSize: <E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
 //# sourceMappingURL=use-element-size.d.ts.map

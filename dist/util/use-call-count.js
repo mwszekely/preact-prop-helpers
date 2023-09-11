@@ -1,17 +1,36 @@
-import { BuildMode } from "./mode.js";
+import { useRef } from "./lib.js";
+import "./mode.js";
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
 window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
+let i = 0;
+export function monitored(hook) {
+    const h = hook;
+    if (process.env.NODE_ENV === 'development') {
+        return (function (...args) {
+            const r = useRef(++i);
+            monitorCallCount(h);
+            const start = performance.mark(`${h.name}-start-${r.current}`);
+            const ret = h(...args);
+            const end = performance.mark(`${h.name}-end-${r.current}`);
+            performance.measure(h.name, start.name, end.name);
+            return ret;
+        });
+    }
+    else {
+        return hook;
+    }
+}
 /**
  * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
  *
  * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
  */
-export function monitorCallCount(hook) {
-    if (BuildMode !== 'development')
+function monitorCallCount(hook) {
+    if (process.env.NODE_ENV !== 'development')
         return;
     const name = hook.name;
     if (filterAll || filters.has(name))

@@ -4,7 +4,7 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useRef } from "../../util/lib.js";
 import { ElementProps, OmitStrong } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";
 import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
@@ -94,7 +94,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  * 
  * @hasChild {@link useListNavigationChild}
  */
-export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useListNavigation = monitored(function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     typeaheadNavigationParameters,
     rovingTabIndexParameters,
@@ -104,7 +104,6 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     rearrangeableChildrenReturn,
     ...void1
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
-    monitorCallCount(useListNavigation);
     const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
     const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
     const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn });
@@ -130,20 +129,18 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         linearNavigationReturn,
         props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useListNavigationChild<ChildElement extends Element>({
+export const useListNavigationChild = monitored(function useListNavigationChild<ChildElement extends Element>({
     info: { index, untabbable, ...void1 },
     context,
     refElementReturn,
     textContentParameters,
     ...void2
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
-    monitorCallCount(useListNavigationChild);
-
     const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ context, info: { index, untabbable }, refElementReturn });
     const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, textContentParameters, context, info: { index } });
 
@@ -155,4 +152,4 @@ export function useListNavigationChild<ChildElement extends Element>({
         ...tncr,
         ...rticr
     }
-}
+})

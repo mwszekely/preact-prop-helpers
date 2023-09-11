@@ -1,5 +1,5 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 
@@ -11,13 +11,17 @@ export type Stable<T> = T;// & { [_STABLE]: true };
  * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
  * `useCallback` will return a function that's stable across *all* renders, meaning
  * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
+ * 
+ * TODO: This is disabled because it doesn't provide much performance benefit and also inherently leaks memory
  */
 const map = new WeakMap<Function, boolean>();
 
 export function isStableGetter<T extends Function>(obj: T): obj is Stable<T> {
+    return false;
     return (map.get(obj) ?? false);
 }
 function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T> {
+    return obj;
     map.set(obj, true);
     return obj;
 }
@@ -33,9 +37,8 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
-    monitorCallCount(useStableCallback);
-    
+export const useStableCallback = monitored(function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+
     type U = (NonNullable<T> & ((...args: any) => any));
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
     if (isStableGetter(fn))
@@ -52,5 +55,5 @@ export function useStableCallback<T extends Function | null | undefined>(fn: Non
         console.assert(noDeps.length === 0);
         return setIsStableGetter(useCallbackNative<U>(fn, []));
     }
-}
+})
 

@@ -1,8 +1,9 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
 
@@ -53,9 +54,7 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
-    monitorCallCount(useHasCurrentFocus);
-
+export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
         refElementReturn: { getElement }
@@ -99,5 +98,5 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
             getCurrentFocusedInner: getFocusedInner,
         }
     };
-}
+})
 

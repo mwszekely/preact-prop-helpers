@@ -1,5 +1,5 @@
 import { useState } from "../preact-extensions/use-state.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Allows an element to start a drag operation.
  *
@@ -7,8 +7,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-export function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
-    monitorCallCount(useDraggable);
+export const useDraggable = monitored(function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
     const onDragStart = (e) => {
@@ -50,5 +49,5 @@ export function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset,
         getLastDropEffect
     };
     return ret;
-}
+});
 //# sourceMappingURL=use-draggable.js.map

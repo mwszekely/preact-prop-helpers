@@ -5,7 +5,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback } from "../../util/lib.js";
 import { FocusEventType, Nullable } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
 
@@ -38,7 +38,7 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * 
  * @compositeParams 
  */
-export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
+export const useLostFocusDismiss = monitored(function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
     refElementPopupReturn: { getElement: getPopupElement, ...void3 },
     refElementSourceReturn,
     lostFocusDismissParameters: {
@@ -48,7 +48,6 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
     },
     ...void1
 }: UseLostFocusDismissParameters<SourceElement, PopupElement, B>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
-    monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
     assertEmptyObject(void1);
@@ -72,4 +71,4 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
     }, [getSourceElement]);
 
     return { activeElementParameters: { onLastActiveElementChange } }
-}
+})

@@ -1,12 +1,13 @@
+
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: ElementProps<S>;
     propsReferencer: ElementProps<T>;
-    
+
     randomIdReturn: UseRandomIdReturnTypeSelf;
 }
 
@@ -35,16 +36,14 @@ export interface UseRandomIdParameters {
  * 
  * @compositeParams
  */
-export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
-    monitorCallCount(useRandomId);
-
+export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 
     const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
     const sourceElementProps = useRef<ElementProps<S>>({ id });
     useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
-    
+
 
     return {
         propsReferencer: referencerElementProps.current,
@@ -53,4 +52,4 @@ export function useRandomId<S extends Element, T extends Element>({ randomIdPara
             id: id
         }
     }
-}
+})

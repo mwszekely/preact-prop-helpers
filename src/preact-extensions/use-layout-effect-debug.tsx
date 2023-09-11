@@ -1,5 +1,6 @@
+
 import { Inputs, useLayoutEffect as useLayoutEffectNative } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 
 /**
@@ -10,8 +11,6 @@ import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-export function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
-    monitorCallCount(useLayoutEffectDebug);
-
+export const useLayoutEffectDebug = monitored(function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
     return useEffectDebug(effect, inputs, useLayoutEffectNative);
-}
+})

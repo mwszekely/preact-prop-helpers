@@ -31,5 +31,5 @@ export interface UseTextContentReturnType {
  *
  * @compositeParams
  */
-export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType;
+export declare const useTextContent: <E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>) => UseTextContentReturnType;
 //# sourceMappingURL=use-text-content.d.ts.map

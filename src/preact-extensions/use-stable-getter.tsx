@@ -1,5 +1,5 @@
 import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 
 const Unset = Symbol("unset");
@@ -12,9 +12,7 @@ const Unset = Symbol("unset");
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
-export function useStableGetter<T>(value: T) {
-    monitorCallCount(useStableGetter);
-
+export const useStableGetter = monitored(function useStableGetter<T>(value: T) {
     const ref = useRef<T>(Unset as unknown as T);
     useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
 
@@ -24,7 +22,7 @@ export function useStableGetter<T>(value: T) {
         }
         return ref.current;
     }, []);
-}
+})
 
 
 /**
@@ -40,7 +38,7 @@ function useStableObject<T extends {}>(t: T): T {
 }
 
 
-export function useMemoObject<T extends {}> (t: T): T {
+export function useMemoObject<T extends {}>(t: T): T {
     return useMemo(() => { return t; }, Object.values(t));
 }
 

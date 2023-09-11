@@ -1,5 +1,5 @@
 import { useEffect as useEffectNative, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Wrap the native `useEffect` to add arguments
  * that allow accessing the previous value as the first argument,
@@ -10,8 +10,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export function useEffectDebug(effect, inputs, impl = useEffectNative) {
-    monitorCallCount(useEffectDebug);
+export const useEffectDebug = monitored(function useEffectDebug(effect, inputs, impl = useEffectNative) {
     const prevInputs = useRef(undefined);
     const effect2 = () => {
         const changes = [];
@@ -26,5 +25,5 @@ export function useEffectDebug(effect, inputs, impl = useEffectNative) {
         return ret;
     };
     impl(effect2, inputs);
-}
+});
 //# sourceMappingURL=use-effect-debug.js.map

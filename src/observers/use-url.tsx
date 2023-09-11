@@ -1,7 +1,9 @@
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
+
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback } from "../util/lib.js";
+import { monitored } from "../util/use-call-count.js";
 
 /**
  * Allows you to inspect when the entire URL changes, 
@@ -17,7 +19,7 @@ import { useCallback } from "../util/lib.js";
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export function useUrl(onUrlChange: (url: string) => void) {
+export const useUrl = monitored(function useUrl(onUrlChange: (url: string) => void) {
 
     const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
 
@@ -45,4 +47,4 @@ export function useUrl(onUrlChange: (url: string) => void) {
             setUrl(newUrlOrSetter, undefined);
         }
     }, [])] as const;
-}
+})

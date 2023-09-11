@@ -7,7 +7,7 @@ import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
@@ -165,9 +165,7 @@ document.addEventListener("click", (e) => {
  * @compositeParams
  * 
  */
-export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
-    monitorCallCount(usePress);
-
+export const usePress = monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
         pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
@@ -524,7 +522,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             onClick
         },
     };
-}
+})
 
 export interface UsePressAsyncParameters<E extends Element> extends
     OmitStrong<UsePressParameters<E>, "pressParameters">,

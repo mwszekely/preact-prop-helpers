@@ -9,7 +9,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
 import { EventType, FocusEventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
@@ -256,7 +256,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({
+export const useRovingTabIndex = monitored(function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange },
     refElementReturn: { getElement },
@@ -264,7 +264,6 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 }: UseRovingTabIndexParameters<ParentElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>): UseRovingTabIndexReturnType<ParentElement, ChildElement> {
     type M = UseRovingTabIndexChildInfo<ChildElement>;
 
-    monitorCallCount(useRovingTabIndex);
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
 
@@ -448,7 +447,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             })
         }, "data-roving-tab-index")
     };
-}
+})
 
 /**
  * @compositeParams
@@ -457,14 +456,12 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export function useRovingTabIndexChild<ChildElement extends Element>({
+export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild<ChildElement extends Element>({
     info: { index, untabbable: iAmUntabbable, ...void2 },
     context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
     refElementReturn: { getElement },
     ...void3
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {
-    monitorCallCount(useRovingTabIndexChild);
-
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
 
     useEffect(() => {
@@ -504,4 +501,4 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
             ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
         } as {}, "data-roving-tab-index-child"),
     }
-}
+})

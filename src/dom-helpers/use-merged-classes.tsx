@@ -1,13 +1,12 @@
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 /**
  * Merged the `class` and `className` properties of two sets of props into a single string.
  * 
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-export function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined {
-    monitorCallCount(useMergedClasses);
+export const useMergedClasses = monitored(function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined {
 
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
@@ -23,4 +22,4 @@ export function useMergedClasses(...classes: ElementProps<EventTarget>["classNam
     else {
         return undefined;
     }
-}
+})

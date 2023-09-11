@@ -11,7 +11,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * All the list-related hooks combined into one large hook that encapsulates everything.
  *
@@ -22,8 +22,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
-    monitorCallCount(useCompleteListNavigation);
+export const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     const { initiallySingleSelectedIndex } = singleSelectionParameters;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -91,14 +90,13 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         typeaheadNavigationReturn,
         childrenHaveFocusReturn
     };
-}
+});
 /**
  *
  * @compositeParams
  */
-export function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
 textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
-    monitorCallCount(useCompleteListNavigationChild);
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
@@ -162,7 +160,7 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         staggeredChildReturn,
         rovingTabIndexChildReturn
     };
-}
+});
 export function useCompleteListNavigationDeclarative({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }) {
     const ret = useCompleteListNavigation({
         singleSelectionParameters: {

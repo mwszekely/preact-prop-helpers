@@ -4,7 +4,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild } from "../use-selection.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./use-list-navigation-partial.js";
@@ -69,7 +69,7 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  * 
  * @compositeParams
  */
-export function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
+export const useGridNavigationSelection = monitored(function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -83,7 +83,6 @@ export function useGridNavigationSelection<ParentOrRowElement extends Element, R
     childrenHaveFocusReturn,
     ...void2
 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>): UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement> {
-    monitorCallCount(useGridNavigationSelection);
 
     const {
         context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext },
@@ -138,12 +137,12 @@ export function useGridNavigationSelection<ParentOrRowElement extends Element, R
         multiSelectionReturn,
         typeaheadNavigationReturn
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
+export const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
     info: mcp1,
     linearNavigationParameters,
     managedChildrenReturn,
@@ -156,7 +155,6 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
     multiSelectionChildParameters,
     ...void1
 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>): UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>> {
-    monitorCallCount(useGridNavigationSelectionRow);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild<RowElement>({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow<RowElement, CellElement>({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
 
@@ -195,12 +193,11 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
         textContentReturn,
         typeaheadNavigationReturn
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement> {
-    monitorCallCount(useGridNavigationSelectionCell);
+export const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement> {
     return useGridNavigationCell<CellElement>(p);
-}
+})

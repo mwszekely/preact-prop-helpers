@@ -5,7 +5,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
@@ -16,9 +16,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
-    //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
-    monitorCallCount(useTypeaheadNavigation);
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -209,13 +207,12 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
             }
         }
     }
-}
+});
 /**
  *
  * @compositeParams
  */
-export function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
-    monitorCallCount(useTypeaheadNavigationChild);
+export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -255,7 +252,7 @@ export function useTypeaheadNavigationChild({ info: { index, ...void1 }, textCon
         textContentReturn,
         pressParameters: { excludeSpace }
     };
-}
+});
 /**
  * Your usual binary search implementation.
  *

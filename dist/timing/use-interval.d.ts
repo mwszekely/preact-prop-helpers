@@ -15,5 +15,5 @@ export interface UseIntervalParameters {
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-export declare function useInterval({ interval, callback }: UseIntervalParameters): void;
+export declare const useInterval: ({ interval, callback }: UseIntervalParameters) => void;
 //# sourceMappingURL=use-interval.d.ts.map

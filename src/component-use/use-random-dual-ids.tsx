@@ -1,7 +1,7 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
-import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id.js";
+import { monitored } from "../util/use-call-count.js";
+import { UseRandomIdParameters, UseRandomIdReturnType, useRandomId } from "./use-random-id.js";
 
 
 export interface UseRandomDualIdsParameters {
@@ -21,12 +21,10 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
  * 
  * @compositeParams
  */
-export function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
+export const useRandomDualIds = monitored(function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
     randomIdInputParameters,
     randomIdLabelParameters,
 }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {
-    monitorCallCount(useRandomDualIds);
-
     const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
     const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });
 
@@ -36,4 +34,4 @@ export function useRandomDualIds<InputElement extends Element, LabelElement exte
         randomIdInputReturn,
         randomIdLabelReturn
     }
-}
+})

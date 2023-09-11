@@ -2,7 +2,7 @@ import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from 
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
     onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
@@ -28,11 +28,10 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * 
  * @compositeParams
  */
-export function useMutationObserver<E extends Element>({
+export const useMutationObserver = monitored(function useMutationObserver<E extends Element>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
 }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
-    monitorCallCount(useMutationObserver);
 
     const { onElementChange, ...rest } = (refElementParameters || {})
 
@@ -103,7 +102,7 @@ export function useMutationObserver<E extends Element>({
     const { getElement } = refElementReturn;
 
     return {
-        refElementReturn, 
+        refElementReturn,
         propsStable
     };
-}
+})

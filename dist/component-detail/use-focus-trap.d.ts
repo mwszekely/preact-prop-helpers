@@ -55,7 +55,7 @@ export interface UseFocusTrapReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
+export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

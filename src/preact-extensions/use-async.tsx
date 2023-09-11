@@ -1,8 +1,9 @@
 
 import { CaptureFunctionType, asyncToSync } from "async-to-sync";
 import { identity } from "lodash-es";
+
 import { Nullable, useCallback, useEffect, useMemo } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 
@@ -169,7 +170,7 @@ function identityCapture<AP extends unknown[], SP extends unknown[]>(...t: SP) {
 
 
 
-const AsyncFunction = ((async function () {}).constructor)
+const AsyncFunction = ((async function () { }).constructor)
 
 /**
  * Given an async function, returns a function that's suitable for non-async APIs, 
@@ -200,9 +201,7 @@ const AsyncFunction = ((async function () {}).constructor)
  * @param options - @see {@link UseAsyncParameters}
  * 
  */
-export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
-    monitorCallCount(useAsync);
-
+export const useAsync = monitored(function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
 
     // Things related to current execution
     // Because we can both return and throw undefined, 
@@ -217,8 +216,8 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [hasResult, setHasResult, _getHasResult] = useState<boolean | null>(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler instanceof AsyncFunction? "async" : null);
-    
+    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler instanceof AsyncFunction ? "async" : null);
+
     // Keep track of this for the caller's sake -- we don't really care.
     const [runCount, setRunCount] = useState(0);
     const [settleCount, setSettleCount] = useState(0);
@@ -276,8 +275,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
         callCount: runCount,
         flushDebouncedPromise: flushSyncDebounce
     }
-
-
-}
+});
 
 

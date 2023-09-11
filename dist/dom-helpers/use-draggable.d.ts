@@ -47,5 +47,5 @@ export interface UseDraggableParameters {
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-export declare function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E>;
+export declare const useDraggable: <E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters) => UseDraggableReturnType<E>;
 //# sourceMappingURL=use-draggable.d.ts.map

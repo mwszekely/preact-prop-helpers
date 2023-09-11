@@ -23,5 +23,5 @@ export interface UseAnimationFrameParameters {
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
-export declare function useAnimationFrame({ callback }: UseAnimationFrameParameters): void;
+export declare const useAnimationFrame: ({ callback }: UseAnimationFrameParameters) => void;
 //# sourceMappingURL=use-animation-frame.d.ts.map

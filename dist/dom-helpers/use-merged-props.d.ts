@@ -23,6 +23,6 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
  *
  * @returns A single object with all the provided props merged into one.
  */
-export declare function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]): ElementProps<E>;
+export declare const useMergedProps: <E extends EventTarget>(...allProps: ElementProps<E>[]) => ElementProps<E>;
 export declare function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined): T | U | ((...args: Parameters<T>) => Promise<[void, void]> | undefined) | null | undefined;
 //# sourceMappingURL=use-merged-props.d.ts.map

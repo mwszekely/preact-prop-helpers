@@ -5,7 +5,7 @@
  *
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
  */
-export declare function useHideScroll(hideScroll: boolean): {
+export declare const useHideScroll: (hideScroll: boolean) => {
     getScrollbarWidth: () => number | null;
     getScrollbarHeight: () => number | null;
 };

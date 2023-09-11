@@ -4,5 +4,5 @@
  *
  * @remarks It's a bit smelly, so best to use sparingly.
  */
-export declare function useForceUpdate(): () => void;
+export declare const useForceUpdate: () => () => void;
 //# sourceMappingURL=use-force-update.d.ts.map

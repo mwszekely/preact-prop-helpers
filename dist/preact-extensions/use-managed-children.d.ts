@@ -182,11 +182,11 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  * @compositeParams
  */
-export declare function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M>;
+export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
 /**
  * @compositeParams
  */
-export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
+export declare const useManagedChild: <M extends ManagedChildInfo<string | number>>({ context, info }: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /**
      * Which child is considered active on mount.

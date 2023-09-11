@@ -2,7 +2,6 @@
 import { options } from "preact";
 import { EffectCallback, Inputs, useRef } from "preact/hooks";
 import { Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 
 const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: Nullable<void | (() => void)> }>();
 
@@ -61,8 +60,7 @@ function nextId() {
  * @param effect 
  * @param inputs 
  */
-export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
-    monitorCallCount(useBeforeLayoutEffect);
+export const useBeforeLayoutEffect = (function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
 
     // Note to self: This is by far the most called hook by sheer volume of dependencies.
     // So it should ideally be as quick as possible.
@@ -82,7 +80,7 @@ export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: In
             toRun.delete(id);
         }
     }, [id])*/
-}
+})
 
 function argsChanged(oldArgs?: Inputs, newArgs?: Inputs): boolean {
     return !!(

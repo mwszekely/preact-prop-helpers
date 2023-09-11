@@ -2,14 +2,13 @@ import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
  * @compositeParams
  */
-export function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
-    monitorCallCount(useBackdropDismiss);
+export const useBackdropDismiss = monitored(function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -31,5 +30,5 @@ export function useBackdropDismiss({ backdropDismissParameters: { dismissBackdro
     }, []);
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
-}
+});
 //# sourceMappingURL=use-backdrop-dismiss.js.map

@@ -1,7 +1,7 @@
+
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { BuildMode } from "../util/mode.js";
 import { Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R | undefined) => void); //[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R | undefined) => void);
@@ -16,7 +16,7 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
-    if (BuildMode !== 'development')
+    if (process.env.NODE_ENV !== 'development')
         return;
 
     const helperToEnsureStability = useRef<Array<T>>([]);
@@ -66,9 +66,8 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
  */
-export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
+export const usePassiveState = monitored(function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
 
-    monitorCallCount(usePassiveState);
     //let [id, ,getId] = useState(() => generateRandomId());
 
     const valueRef = useRef<T | typeof Unset>(Unset);
@@ -126,7 +125,7 @@ export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T,
 
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useCallback<PassiveStateUpdater<T, R>>((arg: Parameters<PassiveStateUpdater<T, R>>[0], reason: Parameters<PassiveStateUpdater<T, R>>[1]) => {
-       
+
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
 
@@ -187,7 +186,7 @@ export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T,
     }, []);
 
     return [getValue, setValue] as const;
-}
+})
 
 const Unset = Symbol();
 

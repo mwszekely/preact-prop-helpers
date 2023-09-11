@@ -8,7 +8,7 @@ import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
 import { focus } from "../util/focus.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
@@ -19,8 +19,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
-    monitorCallCount(useSingleSelection);
+export const useSingleSelection = monitored(function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -73,14 +72,13 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
             })
         }
     };
-}
+});
 /**
  *
  *
  * @compositeParams
  */
-export function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
-    monitorCallCount(useSingleSelectionChild);
+export const useSingleSelectionChild = monitored(function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -128,7 +126,7 @@ export function useSingleSelectionChild({ singleSelectionChildParameters: { sing
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         pressParameters: { onPressSync }
     };
-}
+});
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */

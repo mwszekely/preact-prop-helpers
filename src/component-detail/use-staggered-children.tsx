@@ -1,9 +1,10 @@
+
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
@@ -82,11 +83,10 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  * 
  * @hasChild {@link useStaggeredChild}
  */
-export function useStaggeredChildren({
+export const useStaggeredChildren = monitored(function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
-    monitorCallCount(useStaggeredChildren);
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
@@ -193,7 +193,7 @@ export function useStaggeredChildren({
             staggeredChildContext
         }), [staggeredChildContext]),
     }
-}
+})
 
 
 /**
@@ -204,9 +204,7 @@ export function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
-    monitorCallCount(useStaggeredChild);
-
+export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     useLayoutEffect(() => {
@@ -223,4 +221,4 @@ export function useStaggeredChild<ChildElement extends Element>({ info: { index 
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     }
-}
+})

@@ -1,3 +1,4 @@
+import "./mode.js";
 export declare function generateStack(): string | undefined;
 /**
  * Returns a function that retrieves the stack at the time this hook was called (in development mode only).

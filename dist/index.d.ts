@@ -388,9 +388,8 @@ export { UseTimeoutParameters, useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
 export { EnhancedEventHandler, EventDetail, TargetedEnhancedEvent, enhanceEvent, getEventDetail } from "./util/event.js";
 export { findBackupFocus, focus } from "./util/focus.js";
-export { BuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
-export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
+export { hideCallCount, monitored } from "./util/use-call-count.js";
 export { CSSProperties, CompositionEventType, DragEventType, EffectCallback, ElementProps, EventMapping, EventType, ExtendMerge, FocusEventType, Fragment, Inputs, JSX, KeyboardEventType, MouseEventType, MutableRef, Nullable, OmitStrong, PointerEventType, Reducer, Ref, RefCallback, RenderableProps, StateUpdater, TargetedOmit, TargetedPick, TouchEventType, VNode, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
 //# sourceMappingURL=index.d.ts.map

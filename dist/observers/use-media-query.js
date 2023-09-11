@@ -1,6 +1,6 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { useLayoutEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  *
  * Allows a component to use the boolean result of a media query as part of its render.
@@ -14,8 +14,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
-export function useMediaQuery(query, defaultGuess) {
-    monitorCallCount(useMediaQuery);
+export const useMediaQuery = monitored(function useMediaQuery(query, defaultGuess) {
     const queryList = useRef();
     // queryList.current ??= (query == null ? null : matchMedia(query))
     // This ^^^ is not done because it seems to cause reflows at inopportune moments.
@@ -39,5 +38,5 @@ export function useMediaQuery(query, defaultGuess) {
         matches,
         getMatches
     };
-}
+});
 //# sourceMappingURL=use-media-query.js.map

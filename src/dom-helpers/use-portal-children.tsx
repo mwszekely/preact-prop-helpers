@@ -3,7 +3,7 @@ import { useState } from "../preact-extensions/use-state.js";
 import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { VNode } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {
     /**
@@ -41,9 +41,7 @@ export interface UsePortalChildrenReturnType {
  * 
  * {@include } {@link UsePortalChildrenParameters}
  */
-export function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
-    monitorCallCount(usePortalChildren);
-
+export const usePortalChildren = monitored(function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
     const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
     const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);
     const [removeChild, setRemoveChild] = useState<RemovePortalChild | null>(null);
@@ -70,7 +68,7 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters): UseP
         removeChild: removeChildStable,
         portalElement: element
     }
-}
+})
 
 
 

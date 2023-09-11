@@ -1,8 +1,9 @@
+
 import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { Nullable, OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
@@ -118,13 +119,11 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * 
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
-    monitorCallCount(useAsyncHandler);
-
+export const useAsyncHandler = monitored(function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
     const [hasCapture, setHasCapture] = useState(false);
-    
+
     // Wrap around the normal `useAsync` `capture` function to also
     // keep track of the last value the user actually input.
     // 
@@ -132,8 +131,8 @@ export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture:
     // it being both controlled and also having the "correct" value,
     // and at any rate also protects against sudden exceptions reverting
     // your change out from under you.
-    const capture = useStableCallback((e: EventType): [CaptureType, EventType] => { 
-        const captured = originalCapture(e); 
+    const capture = useStableCallback((e: EventType): [CaptureType, EventType] => {
+        const captured = originalCapture(e);
         setCurrentCapture(captured);
         setHasCapture(true);
         return [captured, e];
@@ -146,4 +145,4 @@ export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture:
         hasCapture,
         ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
     };
-}
+})

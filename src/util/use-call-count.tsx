@@ -1,4 +1,5 @@
-import { BuildMode } from "./mode.js";
+import { useRef } from "./lib.js";
+import "./mode.js";
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
@@ -16,15 +17,35 @@ type WindowWithHookCallCount = (Window & typeof globalThis) & {
     _hookCallCount: HookCallCount;
 }
 
+let i = 0;
+export function monitored<T extends any>(hook: T): T {
+    const h = (hook as (...args: any) => any);
+
+    if (process.env.NODE_ENV === 'development') {
+        return (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
+            const r = useRef(++i);
+            monitorCallCount(h);
+            const start = performance.mark(`${h.name}-start-${r.current}`);
+            const ret = h(...args);
+            const end = performance.mark(`${h.name}-end-${r.current}`);
+            performance.measure(h.name, start.name, end.name);
+            return ret;
+        }) as T;
+    }
+    else {
+        return hook as T;
+    }
+}
+
 /**
  * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
  * 
  * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
  */
-export function monitorCallCount(hook: Function) {    
-    if (BuildMode !== 'development')
+function monitorCallCount(hook: Function) {
+    if (process.env.NODE_ENV !== 'development')
         return;
-        
+
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;

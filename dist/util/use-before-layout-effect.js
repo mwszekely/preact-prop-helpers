@@ -1,6 +1,5 @@
 import { options } from "preact";
 import { useRef } from "preact/hooks";
-import { monitorCallCount } from "../util/use-call-count.js";
 const toRun = new Map();
 // TODO: Whether this goes in options.diffed or options._commit
 // is a post-suspense question.
@@ -50,8 +49,7 @@ function nextId() {
  * @param effect
  * @param inputs
  */
-export function useBeforeLayoutEffect(effect, inputs) {
-    monitorCallCount(useBeforeLayoutEffect);
+export const useBeforeLayoutEffect = (function useBeforeLayoutEffect(effect, inputs) {
     // Note to self: This is by far the most called hook by sheer volume of dependencies.
     // So it should ideally be as quick as possible.
     const ref = useRef(null);
@@ -67,7 +65,7 @@ export function useBeforeLayoutEffect(effect, inputs) {
             toRun.delete(id);
         }
     }, [id])*/
-}
+});
 function argsChanged(oldArgs, newArgs) {
     return !!(!oldArgs ||
         oldArgs.length !== newArgs?.length ||

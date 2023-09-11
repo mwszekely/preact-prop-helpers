@@ -1,7 +1,7 @@
 import { returnFalse, returnZero, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -13,8 +13,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export function useChildrenHaveFocus(args) {
-    monitorCallCount(useChildrenHaveFocus);
+export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
@@ -25,12 +24,11 @@ export function useChildrenHaveFocus(args) {
         childrenHaveFocusReturn: { getAnyFocused },
         context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     };
-}
+});
 /**
  * @compositeParams
  */
-export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
-    monitorCallCount(useChildrenHaveFocusChild);
+export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -43,5 +41,5 @@ export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildCon
             }),
         }
     };
-}
+});
 //# sourceMappingURL=use-children-have-focus.js.map

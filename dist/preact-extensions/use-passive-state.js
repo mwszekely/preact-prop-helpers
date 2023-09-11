@@ -1,13 +1,12 @@
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { BuildMode } from "../util/mode.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability(parentHookName, ...values) {
-    if (BuildMode !== 'development')
+    if (process.env.NODE_ENV !== 'development')
         return;
     const helperToEnsureStability = useRef([]);
     const shownError = useRef([]);
@@ -50,8 +49,7 @@ export function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
-    monitorCallCount(usePassiveState);
+export const usePassiveState = monitored(function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
     //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset);
     const reasonRef = useRef(Unset);
@@ -144,7 +142,7 @@ export function usePassiveState(onChange, getInitialValue, customDebounceRenderi
         //valueRef.current = nextValue;
     }, []);
     return [getValue, setValue];
-}
+});
 const Unset = Symbol();
 // Easy constants for getInitialValue
 export function returnTrue() { return true; }

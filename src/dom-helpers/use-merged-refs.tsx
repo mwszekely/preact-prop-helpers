@@ -1,7 +1,8 @@
 
+
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { ElementProps, MutableRef, Ref } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
@@ -24,9 +25,8 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * 
  * @remarks Or just use {@link useMergedProps}
  */
-export function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
-    monitorCallCount(useMergedRefs);
-    
+export const useMergedRefs = monitored(function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
+
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current: E | null) {
         processRef(current, lhs);
@@ -45,4 +45,4 @@ export function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"]
     else {
         return combined;
     }
-}
+})

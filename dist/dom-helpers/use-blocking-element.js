@@ -4,7 +4,7 @@ import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useLayoutEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 function blockingElements() { return getDocument().$blockingElements; }
 /**
@@ -16,8 +16,7 @@ function blockingElements() { return getDocument().$blockingElements; }
  *
  * @param target
  */
-export function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
-    monitorCallCount(useBlockingElement);
+export const useBlockingElement = monitored(function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
     const stableGetTarget = useStableCallback(getTarget);
     //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
@@ -63,7 +62,7 @@ export function useBlockingElement({ activeElementParameters: { getDocument, onA
         }
     }, [enabled]);
     return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen };
-}
+});
 export function getTopElement() {
     return blockingElements().top;
 }

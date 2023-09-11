@@ -1,7 +1,7 @@
 import { asyncToSync } from "async-to-sync";
 import { identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 function identityCapture(...t) { return t; }
@@ -35,8 +35,7 @@ const AsyncFunction = ((async function () { }).constructor);
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-export function useAsync(asyncHandler, options) {
-    monitorCallCount(useAsync);
+export const useAsync = monitored(function useAsync(asyncHandler, options) {
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existence too.
@@ -103,5 +102,5 @@ export function useAsync(asyncHandler, options) {
         callCount: runCount,
         flushDebouncedPromise: flushSyncDebounce
     };
-}
+});
 //# sourceMappingURL=use-async.js.map

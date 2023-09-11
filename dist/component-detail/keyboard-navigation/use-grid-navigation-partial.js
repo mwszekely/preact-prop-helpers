@@ -5,7 +5,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 /**
@@ -27,8 +27,7 @@ import { useListNavigation, useListNavigationChild } from "./use-list-navigation
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
-    monitorCallCount(useGridNavigation);
+export const useGridNavigation = monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
         let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
         return { actual: t, ideal: t };
@@ -57,7 +56,7 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         rovingTabIndexReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * Child hook for {@link useGridNavigation}
  *
@@ -66,14 +65,13 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
  *
  * @compositeParams
  */
-export function useGridNavigationRow({ 
+export const useGridNavigationRow = monitored(function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
 info: { index, untabbable, ...void3 }, textContentParameters, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
 linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
-    monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
     const getIndex = useStableCallback(() => { return index; });
     // When this row is focused from the parent's `useRovingTabIndex`,
@@ -178,14 +176,13 @@ refElementReturn, ...void1 }) {
         rovingTabIndexReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  *
  * @compositeParams
  */
-export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
-    monitorCallCount(useGridNavigationCell);
+export const useGridNavigationCell = monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     colSpan ??= 1;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
         info: { index, untabbable },
@@ -222,5 +219,5 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
             })
         },
     };
-}
+});
 //# sourceMappingURL=use-grid-navigation-partial.js.map

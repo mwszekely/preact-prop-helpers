@@ -1,5 +1,5 @@
 import { useCallback } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 function capitalize(str) {
     return (str[0].toUpperCase() + str.substring(1));
 }
@@ -21,8 +21,7 @@ function capitalize(str) {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection({}) {
-    monitorCallCount(useLogicalDirection);
+export const useLogicalDirection = monitored(function useLogicalDirection({}) {
     //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
     // TODO: There's no way to refresh which writing mode we have once mounted.
@@ -159,7 +158,7 @@ export function useLogicalDirection({}) {
             convertToPhysicalSide
         }
     };
-}
+});
 // Position requires us to sometimes use one property (like `left`)
 // or sometimes two (like `left` + `width`)
 function getPhysicalLeftTop(dir) { if (dir === "ltr" || dir == "rtl")

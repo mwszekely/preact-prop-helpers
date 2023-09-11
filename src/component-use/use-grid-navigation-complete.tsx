@@ -7,6 +7,7 @@ import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDe
 import { UseStaggeredChildContext, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+
 import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
@@ -15,7 +16,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedOmit, useCallback } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 
 export type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> =
@@ -117,7 +118,7 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
+export const useCompleteGridNavigation = monitored(function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -131,7 +132,6 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     refElementParameters,
     ...void1
 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM> {
-    monitorCallCount(useCompleteGridNavigation);
     assertEmptyObject(void1);
     const getChildren: () => ManagedChildren<RM> = useCallback<() => ManagedChildren<RM>>(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
@@ -222,12 +222,12 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         typeaheadNavigationReturn
     }
 
-}
+})
 
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
+export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
 
     info: { index, untabbable, ...customUserInfo },
     context: contextIncomingForRowAsChildOfTable,
@@ -243,8 +243,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     ...void1
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
-    monitorCallCount(useCompleteGridNavigationRow);
-
     const {
         info: infoPaginatedChild,
         paginatedChildReturn,
@@ -370,20 +368,18 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         typeaheadNavigationReturn,
         props,
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
+export const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
     context,
     textContentParameters,
     info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo },
     ...void1
 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM> {
-    monitorCallCount(useCompleteGridNavigationCell);
-
     const { refElementReturn, propsStable } = useRefElement<CellElement>({ refElementParameters: {} });
 
     const {
@@ -440,7 +436,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         managedChildReturn,
         textContentReturn
     }
-}
+})
 
 export interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     OmitStrong<MakeSelectionDeclarativeParameters<UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn"> { }

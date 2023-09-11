@@ -3,7 +3,7 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
     
@@ -30,8 +30,7 @@ export interface UseBackdropDismissParameters<PopupElement extends Element, B ex
  * 
  * @compositeParams
  */
-export function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
-    monitorCallCount(useBackdropDismiss);
+export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -61,4 +60,4 @@ export function useBackdropDismiss<PopupElement extends Element, B extends boole
 
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
-}
+})

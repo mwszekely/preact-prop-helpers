@@ -1,6 +1,7 @@
+
 import { Inputs, useEffect } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { UseAsyncParameters, useAsync } from "./use-async.js";
 
 /**
@@ -13,9 +14,8 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
-    monitorCallCount(useAsyncEffect);
+export const useAsyncEffect = monitored( function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
     const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
     useEffect(syncHandler, inputs);
     return rest;
-}
+})

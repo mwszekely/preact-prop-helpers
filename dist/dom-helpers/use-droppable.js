@@ -1,7 +1,7 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 export class DroppableFileError extends Error {
     fileName;
     errorType;
@@ -18,8 +18,7 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-export function useDroppable({ effect }) {
-    monitorCallCount(useDroppable);
+export const useDroppable = monitored(function useDroppable({ effect }) {
     const [filesForConsideration, setFilesForConsideration] = useState(null);
     const [stringsForConsideration, setStringsForConsideration] = useState(null);
     const [droppedFiles, setDroppedFiles] = useState(null);
@@ -155,5 +154,5 @@ export function useDroppable({ effect }) {
         droppedStrings,
         dropError
     };
-}
+});
 //# sourceMappingURL=use-droppable.js.map

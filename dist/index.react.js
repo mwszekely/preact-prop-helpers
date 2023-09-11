@@ -125,18 +125,14 @@ const EventMapping = {
     ...EventMapping$1,
 };
 
-// Get the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
-// (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
+// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error)
 globalThis["process"] ??= {};
 globalThis["process"]["env"] ??= {};
-/**
- * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
- *
- * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"`
- * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
- */
-const BuildMode = process.env.NODE_ENV || "production";
-process.env.NODE_ENV = BuildMode;
+globalThis["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV;
+// The above statement looks redundant, but it ensures that manual
+// reads to `process.env.NODE_ENV` work regardless of if the bundler 
+// replaces `process.env.NODE_ENV` with the string `"development"` or not.
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
@@ -144,13 +140,31 @@ window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
+let i = 0;
+function monitored(hook) {
+    const h = hook;
+    if (process.env.NODE_ENV === 'development') {
+        return (function (...args) {
+            const r = useRef(++i);
+            monitorCallCount(h);
+            const start = performance.mark(`${h.name}-start-${r.current}`);
+            const ret = h(...args);
+            const end = performance.mark(`${h.name}-end-${r.current}`);
+            performance.measure(h.name, start.name, end.name);
+            return ret;
+        });
+    }
+    else {
+        return hook;
+    }
+}
 /**
  * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
  *
  * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
  */
 function monitorCallCount(hook) {
-    if (BuildMode !== 'development')
+    if (process.env.NODE_ENV !== 'development')
         return;
     const name = hook.name;
     if (filterAll || filters.has(name))
@@ -194,7 +208,7 @@ function hideCallCount(hook) {
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 function useEnsureStability(parentHookName, ...values) {
-    if (BuildMode !== 'development')
+    if (process.env.NODE_ENV !== 'development')
         return;
     const helperToEnsureStability = useRef([]);
     const shownError = useRef([]);
@@ -237,8 +251,7 @@ function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
-    monitorCallCount(usePassiveState);
+const usePassiveState = monitored(function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
     //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset$2);
     const reasonRef = useRef(Unset$2);
@@ -331,7 +344,7 @@ function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
         //valueRef.current = nextValue;
     }, []);
     return [getValue, setValue];
-}
+});
 const Unset$2 = Symbol();
 // Easy constants for getInitialValue
 function returnTrue() { return true; }
@@ -352,8 +365,7 @@ const Unset$1 = Symbol("unset");
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
-function useStableGetter(value) {
-    monitorCallCount(useStableGetter);
+const useStableGetter = monitored(function useStableGetter(value) {
     const ref = useRef(Unset$1);
     useInsertionEffect((() => { ref.current = value; }), [value]);
     return useCallback(() => {
@@ -362,22 +374,15 @@ function useStableGetter(value) {
         }
         return ref.current;
     }, []);
-}
+});
 function useMemoObject(t) {
     return useMemo(() => { return t; }, Object.values(t));
 }
 
-/**
- * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
- * `useCallback` will return a function that's stable across *all* renders, meaning
- * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
- */
-const map = new WeakMap();
 function isStableGetter(obj) {
-    return (map.get(obj) ?? false);
+    return false;
 }
 function setIsStableGetter(obj) {
-    map.set(obj, true);
     return obj;
 }
 /**
@@ -390,10 +395,9 @@ function setIsStableGetter(obj) {
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-function useStableCallback(fn, noDeps) {
-    monitorCallCount(useStableCallback);
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
-    if (isStableGetter(fn))
+const useStableCallback = monitored(function useStableCallback(fn, noDeps) {
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
+    if (isStableGetter())
         return fn;
     if (noDeps == null) {
         const currentCallbackGetter = useStableGetter(fn);
@@ -405,7 +409,7 @@ function useStableCallback(fn, noDeps) {
         console.assert(noDeps.length === 0);
         return setIsStableGetter(useCallback(fn, []));
     }
-}
+});
 
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
@@ -417,8 +421,7 @@ function useStableCallback(fn, noDeps) {
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-function useGlobalHandler(target, type, handler, options, mode) {
-    monitorCallCount(useGlobalHandler);
+const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", mode);
     if (mode === "grouped") {
@@ -431,7 +434,7 @@ function useGlobalHandler(target, type, handler, options, mode) {
     else {
         useGlobalHandlerSingle(target, type, handler, options);
     }
-}
+});
 let mapThing = new Map();
 function doMapThing(op, target, type, handler, options) {
     if (handler) {
@@ -504,8 +507,7 @@ function assertEmptyObject(_a) { }
  *
  * @compositeParams
  */
-function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
-    monitorCallCount(useBackdropDismiss);
+const useBackdropDismiss = monitored(function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     const getOpen = useStableGetter(open);
     const onClose = useStableGetter(onCloseUnstable);
     const onBackdropClick = useCallback(function onBackdropClick(e) {
@@ -524,7 +526,7 @@ function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive
     }, []);
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
-}
+});
 
 /**
  * Quick and easy way to add extra information to an event that was fired.
@@ -561,8 +563,7 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
-    monitorCallCount(useEscapeDismiss);
+const useEscapeDismiss = monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
@@ -633,7 +634,7 @@ function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose,
             }
         }
     }, [open]);
-}
+});
 
 /**
  * Invokes a callback when focus travels outside of the component's element.
@@ -642,8 +643,7 @@ function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose,
  *
  * @compositeParams
  */
-function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
-    monitorCallCount(useLostFocusDismiss);
+const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
@@ -659,7 +659,7 @@ function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElem
         }
     }, [getSourceElement]);
     return { activeElementParameters: { onLastActiveElementChange } };
-}
+});
 
 /**
  * Combines two `children`.
@@ -668,8 +668,7 @@ function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElem
  *
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-function useMergedChildren(lhs, rhs) {
-    monitorCallCount(useMergedChildren);
+const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
     if (lhs == null && rhs == null) {
         return undefined;
     }
@@ -682,15 +681,14 @@ function useMergedChildren(lhs, rhs) {
     else {
         return createElement(Fragment, {}, lhs, rhs);
     }
-}
+});
 
 /**
  * Merged the `class` and `className` properties of two sets of props into a single string.
  *
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-function useMergedClasses(...classes) {
-    monitorCallCount(useMergedClasses);
+const useMergedClasses = monitored(function useMergedClasses(...classes) {
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set();
@@ -704,7 +702,7 @@ function useMergedClasses(...classes) {
     else {
         return undefined;
     }
-}
+});
 
 function processRef(instance, ref) {
     if (typeof ref === "function") {
@@ -724,8 +722,7 @@ function processRef(instance, ref) {
  *
  * @remarks Or just use {@link useMergedProps}
  */
-function useMergedRefs(rhs, lhs) {
-    monitorCallCount(useMergedRefs);
+const useMergedRefs = monitored(function useMergedRefs(rhs, lhs) {
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);
@@ -743,7 +740,7 @@ function useMergedRefs(rhs, lhs) {
     else {
         return combined;
     }
-}
+});
 
 function styleStringToObject(style) {
     // TODO: This sucks D:
@@ -756,8 +753,7 @@ function styleStringToObject(style) {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-function useMergedStyles(lhs, rhs) {
-    monitorCallCount(useMergedStyles);
+const useMergedStyles = monitored(function useMergedStyles(lhs, rhs) {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -788,7 +784,7 @@ function useMergedStyles(lhs, rhs) {
         ...(lhs ?? {}),
         ...(rhs ?? {})
     };
-}
+});
 
 let log = console.warn;
 /**
@@ -817,15 +813,14 @@ function enableLoggingPropConflicts(log2) {
  *
  * @returns A single object with all the provided props merged into one.
  */
-function useMergedProps(...allProps) {
-    monitorCallCount(useMergedProps);
+const useMergedProps = monitored(function useMergedProps(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
-        ret = useMergedProps2(ret, nextProps);
+        useMergedProps2(ret, nextProps);
     }
     return ret;
-}
+});
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
 function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
@@ -866,36 +861,27 @@ function mergeUnknown(key, lhsValue, rhsValue) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2(lhsAll, rhsAll) {
-    const ret = {
-        ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
-        style: useMergedStyles(lhsAll.style, rhsAll.style),
-        className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
-        children: useMergedChildren(lhsAll.children, rhsAll.children),
-    };
-    if (ret.ref === undefined)
-        delete ret.ref;
-    if (ret.style === undefined)
-        delete ret.style;
-    if (ret.className === undefined)
-        delete ret.className;
-    if (ret["class"] === undefined)
-        delete ret["class"];
-    if (ret.children === undefined)
-        delete ret.children;
-    for (const lhsKeyU in lhsAll) {
-        const lhsKey = lhsKeyU;
-        if (knowns.has(lhsKey))
-            continue;
-        ret[lhsKey] = lhsAll[lhsKey];
-    }
-    for (const rhsKeyU in rhsAll) {
+function useMergedProps2(target, mods) {
+    target.ref = useMergedRefs(target.ref, mods.ref);
+    target.style = useMergedStyles(target.style, mods.style);
+    target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
+    target.children = useMergedChildren(target.children, mods.children);
+    if (target.ref === undefined)
+        delete target.ref;
+    if (target.style === undefined)
+        delete target.style;
+    if (target.className === undefined)
+        delete target.className;
+    if (target["class"] === undefined)
+        delete target["class"];
+    if (target.children === undefined)
+        delete target.children;
+    for (const rhsKeyU in mods) {
         const rhsKey = rhsKeyU;
         if (knowns.has(rhsKey))
             continue;
-        ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
+        target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
-    return ret;
 }
 function mergeFunctions(lhs, rhs) {
     if (!lhs)
@@ -911,7 +897,7 @@ function mergeFunctions(lhs, rhs) {
 }
 
 function generateStack() {
-    if (BuildMode === 'development' && window._generate_setState_stacks) {
+    if (process.env.NODE_ENV === 'development' && window._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -927,7 +913,7 @@ function generateStack() {
  * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 function useStack() {
-    if (BuildMode === "development") {
+    if (process.env.NODE_ENV === "development") {
         const stack = useMemo(generateStack, []);
         const getStack = useCallback(() => stack, []);
         return getStack;
@@ -943,7 +929,7 @@ function returnEmptyString() { return ""; }
  * here:
  */
 function focus(e) {
-    if (BuildMode === 'development' && window.LOG_FOCUS_CHANGES === true) {
+    if (process.env.NODE_ENV === 'development' && window.LOG_FOCUS_CHANGES === true) {
         console.log(`Focus changed to ${(e?.tagName || "").toLowerCase().padStart(6)}:`, e);
         console.log(generateStack());
     }
@@ -1005,8 +991,7 @@ function findBackupFocus(unmountingElement) {
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-function useTimeout({ timeout, callback, triggerIndex }) {
-    monitorCallCount(useTimeout);
+const useTimeout = monitored(function useTimeout({ timeout, callback, triggerIndex }) {
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
     // Set any time we start timeout.
@@ -1035,7 +1020,7 @@ function useTimeout({ timeout, callback, triggerIndex }) {
         return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
     }, []);
     return { getElapsedTime, getRemainingTime };
-}
+});
 
 let idIndex = 0;
 /**
@@ -1048,7 +1033,7 @@ let idIndex = 0;
  * @returns A modified copy of the given props
  */
 function useTagProps(props, tag) {
-    if (BuildMode === 'development' && window._generate_useTagProps_tags) {
+    if (process.env.NODE_ENV === 'development' && window._generate_useTagProps_tags) {
         const [id] = useState$1(() => ++idIndex);
         const propsIdTag = `data-props-${tag}-${id}`;
         const getStack = useStack();
@@ -1086,8 +1071,7 @@ function useTagProps(props, tag) {
  *
  * @compositeParams
  */
-function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
-    monitorCallCount(useLinearNavigation);
+const useLinearNavigation = (function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
@@ -1236,7 +1220,7 @@ function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, get
         linearNavigationReturn: {},
         propsStable: stableProps.current
     };
-}
+});
 function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }) {
     if (searchDirection === -1) {
         let bestUpResult = undefined;
@@ -1294,8 +1278,7 @@ function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangle
  *
  * @compositeParams
  */
-function useManagedChildren(parentParameters) {
-    monitorCallCount(useManagedChildren);
+const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
@@ -1428,12 +1411,11 @@ function useManagedChildren(parentParameters) {
         }),
         managedChildrenReturn: { getChildren }
     };
-}
+});
 /**
  * @compositeParams
  */
-function useManagedChild({ context, info }) {
-    monitorCallCount(useManagedChild);
+const useManagedChild = monitored(function useManagedChild({ context, info }) {
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available
@@ -1464,7 +1446,7 @@ function useManagedChild({ context, info }) {
     return {
         managedChildReturn: { getChildren: getChildren }
     };
-}
+});
 /**
  * An extension to useManagedChildren that handles the following common case:
  * 1. You have a bunch of children
@@ -1597,16 +1579,15 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-function useState(initialState) {
+const useState = monitored(function useState(initialState) {
     const getStack = useStack();
-    monitorCallCount(useState);
     // We keep both, but override the `setState` functionality
     const [state, setStateP] = useState$1(initialState);
     const ref = useRef(state);
     // Hijack the normal setter function 
     // to also set our ref to the new value
     const setState = useCallback(value => {
-        if (BuildMode === 'development') {
+        if (process.env.NODE_ENV === 'development') {
             window._setState_stack = getStack();
         }
         if (typeof value === "function") {
@@ -1632,7 +1613,7 @@ function useState(initialState) {
     }, []);
     const getState = useCallback(() => { return ref.current; }, []);
     return [state, setState, getState];
-}
+});
 
 /**
  * Implements a roving tabindex system where only one "focusable"
@@ -1653,8 +1634,7 @@ function useState(initialState) {
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
-    monitorCallCount(useRovingTabIndex);
+const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
     const lastFocused = useRef(null);
@@ -1816,7 +1796,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             })
         }, "data-roving-tab-index")
     };
-}
+});
 /**
  * @compositeParams
  *
@@ -1824,8 +1804,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
-    monitorCallCount(useRovingTabIndexChild);
+const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
         reevaluateClosestFit(undefined);
@@ -1858,15 +1837,14 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
             ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
         }, "data-roving-tab-index-child"),
     };
-}
+});
 
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
  */
-function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
-    monitorCallCount(useTextContent);
+const useTextContent = monitored(function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();
@@ -1878,7 +1856,7 @@ function useTextContent({ refElementReturn: { getElement }, textContentParameter
         }
     });
     return { textContentReturn: { getTextContent } };
-}
+});
 
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
@@ -1889,9 +1867,7 @@ function useTextContent({ refElementReturn: { getElement }, textContentParameter
  *
  * @compositeParams
  */
-function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
-    //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
-    monitorCallCount(useTypeaheadNavigation);
+const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
@@ -2075,13 +2051,12 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
             }
         }
     }
-}
+});
 /**
  *
  * @compositeParams
  */
-function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
-    monitorCallCount(useTypeaheadNavigationChild);
+const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
     const { textContentReturn } = useTextContent({
         refElementReturn: { getElement },
         textContentParameters: {
@@ -2116,7 +2091,7 @@ function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentPar
         textContentReturn,
         pressParameters: { excludeSpace }
     };
-}
+});
 /**
  * Your usual binary search implementation.
  *
@@ -2156,8 +2131,7 @@ function binarySearch(array, wanted, comparator) {
  *
  * @hasChild {@link useListNavigationChild}
  */
-function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }) {
-    monitorCallCount(useListNavigation);
+const useListNavigation = monitored(function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }) {
     const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
     const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
     const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn });
@@ -2176,12 +2150,11 @@ function useListNavigation({ linearNavigationParameters, typeaheadNavigationPara
         linearNavigationReturn,
         props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
     };
-}
+});
 /**
  * @compositeParams
  */
-function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }) {
-    monitorCallCount(useListNavigationChild);
+const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }) {
     const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
     const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentParameters, context, info: { index } });
     return {
@@ -2189,7 +2162,7 @@ function useListNavigationChild({ info: { index, untabbable, ...void1 }, context
         ...tncr,
         ...rticr
     };
-}
+});
 
 /**
  * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
@@ -2210,8 +2183,7 @@ function useListNavigationChild({ info: { index, untabbable, ...void1 }, context
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
-    monitorCallCount(useGridNavigation);
+const useGridNavigation = monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
         let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
         return { actual: t, ideal: t };
@@ -2238,7 +2210,7 @@ function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange,
         rovingTabIndexReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * Child hook for {@link useGridNavigation}
  *
@@ -2247,14 +2219,13 @@ function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange,
  *
  * @compositeParams
  */
-function useGridNavigationRow({ 
+const useGridNavigationRow = monitored(function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
 info: { index, untabbable, ...void3 }, textContentParameters, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
 linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
-    monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
     const getIndex = useStableCallback(() => { return index; });
     // When this row is focused from the parent's `useRovingTabIndex`,
@@ -2353,14 +2324,13 @@ refElementReturn, ...void1 }) {
         rovingTabIndexReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  *
  * @compositeParams
  */
-function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
-    monitorCallCount(useGridNavigationCell);
+const useGridNavigationCell = monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     colSpan ??= 1;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
         info: { index, untabbable },
@@ -2390,7 +2360,7 @@ function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowI
             })
         },
     };
-}
+});
 
 /**
  * Returns a function that will, when called, force the component
@@ -2398,11 +2368,10 @@ function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowI
  *
  * @remarks It's a bit smelly, so best to use sparingly.
  */
-function useForceUpdate() {
-    monitorCallCount(useForceUpdate);
+const useForceUpdate = monitored(function useForceUpdate() {
     const [, set] = useState$1(0);
     return useRef(() => set(i => ++i)).current;
-}
+});
 
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -2427,8 +2396,7 @@ function useForceUpdate() {
  *
  * @compositeParams
  */
-function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
-    monitorCallCount(useRearrangeableChildren);
+const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -2472,8 +2440,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
         onRearrangedGetter()?.();
         forceUpdateRef.current?.();
     }, []);
-    const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
-        monitorCallCount(useRearrangedChildren);
+    const useRearrangedChildren = useCallback(monitored(function useRearrangedChildren(children) {
         console.assert(Array.isArray(children));
         const forceUpdate = useForceUpdate();
         console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
@@ -2485,7 +2452,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
             .map(({ child, mangledIndex, demangledIndex }) => {
             return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
         });
-    }, []);
+    }), []);
     const toJsonArray = useCallback((transform) => {
         const managedRows = getChildren();
         return managedRows._arraySlice().map(child => {
@@ -2508,7 +2475,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
             toJsonArray
         }
     };
-}
+});
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -2532,8 +2499,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
  *
  * @compositeParams
  */
-function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
-    monitorCallCount(useSortableChildren);
+const useSortableChildren = monitored(function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
     const { rearrange } = rearrangeableChildrenReturn;
@@ -2556,7 +2522,7 @@ function useSortableChildren({ rearrangeableChildrenParameters, sortableChildren
         sortableChildrenReturn: { sort },
         rearrangeableChildrenReturn
     };
-}
+});
 function defaultCompare(lhs, rhs) {
     return compare1(lhs?.getSortValue(), rhs?.getSortValue());
     function compare1(lhs, rhs) {
@@ -2861,8 +2827,7 @@ function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParam
  *
  * @compositeParams
  */
-function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
-    monitorCallCount(useSingleSelection);
+const useSingleSelection = monitored(function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
     const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
     const getSelectedAt = useCallback((m) => { return m.getSingleSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
@@ -2911,14 +2876,13 @@ function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, 
             })
         }
     };
-}
+});
 /**
  *
  *
  * @compositeParams
  */
-function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
-    monitorCallCount(useSingleSelectionChild);
+const useSingleSelectionChild = monitored(function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
     useEnsureStability("useSingleSelectionChild", getSingleSelectedIndex, onSingleSelectedIndexChange);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSingleSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSingleSelectedIndex() == null ? null : (getSingleSelectedIndex() - index));
@@ -2961,7 +2925,7 @@ function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelec
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         pressParameters: { onPressSync }
     };
-}
+});
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
@@ -3046,8 +3010,7 @@ function useSelectionChildDeclarative(args) {
  *
  * @compositeParams
  */
-function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }) {
-    monitorCallCount(useGridNavigationSelection);
+const useGridNavigationSelection = monitored(function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }) {
     const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
         linearNavigationParameters,
@@ -3082,12 +3045,11 @@ function useGridNavigationSelection({ gridNavigationParameters, linearNavigation
         multiSelectionReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * @compositeParams
  */
-function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useGridNavigationSelectionRow);
+const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     return {
@@ -3115,14 +3077,13 @@ function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters,
         textContentReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * @compositeParams
  */
-function useGridNavigationSelectionCell(p) {
-    monitorCallCount(useGridNavigationSelectionCell);
+const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell(p) {
     return useGridNavigationCell(p);
-}
+});
 
 /**
  * Combines {@link useGridNavigation}, {@link useSelection}, and {@link useSortableChildren}.
@@ -3133,8 +3094,7 @@ function useGridNavigationSelectionCell(p) {
  *
  * @compositeParams
  */
-function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }) {
-    monitorCallCount(useGridNavigationSelectionSortable);
+const useGridNavigationSelectionSortable = (function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }) {
     const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSelection({
         rearrangeableChildrenReturn,
@@ -3154,14 +3114,13 @@ function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, s
         sortableChildrenReturn,
         ...gnr
     };
-}
+});
 /**
  * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
  *
  * @compositeParams
  */
-function useGridNavigationSelectionSortableRow({ context: ctxIncoming, info: { index, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useGridNavigationSelectionSortableRow);
+const useGridNavigationSelectionSortableRow = (function useGridNavigationSelectionSortableRow({ context: ctxIncoming, info: { index, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
     const getSortValue = useCallback(() => {
         let rows = managedChildrenReturn.getChildren();
@@ -3196,12 +3155,11 @@ function useGridNavigationSelectionSortableRow({ context: ctxIncoming, info: { i
         textContentReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * @compositeParams
  */
-function useGridNavigationSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
-    monitorCallCount(useGridNavigationSelectionSortableCell);
+const useGridNavigationSelectionSortableCell = (function useGridNavigationSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
     return useGridNavigationSelectionCell({
         context,
         info: { index, untabbable },
@@ -3209,7 +3167,7 @@ function useGridNavigationSelectionSortableCell({ context, gridNavigationCellPar
         refElementReturn,
         textContentParameters,
     });
-}
+});
 
 /**
  * Combines {@link useListNavigation} and {@link useSelection}.
@@ -3220,8 +3178,7 @@ function useGridNavigationSelectionSortableCell({ context, gridNavigationCellPar
  *
  * @compositeParams
  */
-function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
-    monitorCallCount(useListNavigationSelection);
+const useListNavigationSelection = monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
     const { context: contextSS, propsStable, ...retSS } = useSelection({
         childrenHaveFocusReturn,
         rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
@@ -3248,12 +3205,11 @@ function useListNavigationSelection({ linearNavigationParameters, rovingTabIndex
         }),
         props: useMergedProps(props, propsStable)
     };
-}
+});
 /**
  * @compositeParams
  */
-function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useListNavigationSelectionChild);
+const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
         info: { index, untabbable },
         context,
@@ -3282,7 +3238,7 @@ function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }
         propsChild: propsSS,
         propsTabbable: propsLN
     };
-}
+});
 
 /**
  * Combines {@link useListNavigation}, {@link useSelection}, and {@link useSortableChildren}.
@@ -3293,8 +3249,7 @@ function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }
  *
  * @compositeParams
  */
-function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
-    monitorCallCount(useListNavigationSelectionSortable);
+const useListNavigationSelectionSortable = monitored(function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
     return {
@@ -3304,12 +3259,11 @@ function useListNavigationSelectionSortable({ linearNavigationParameters, roving
         sortableChildrenReturn,
         ...restLN
     };
-}
+});
 /**
  * @compositeParams
  */
-function useListNavigationSelectionSortableChild({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useListNavigationSelectionSortableChild);
+const useListNavigationSelectionSortableChild = monitored(function useListNavigationSelectionSortableChild({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useListNavigationSelectionChild({
         info,
         context,
@@ -3318,7 +3272,7 @@ function useListNavigationSelectionSortableChild({ info, context, refElementRetu
         singleSelectionChildParameters,
         multiSelectionChildParameters
     });
-}
+});
 
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
@@ -3355,8 +3309,7 @@ function useListNavigationSelectionSortableChild({ info, context, refElementRetu
  *
  * @compositeParams
  */
-function useRefElement(args) {
-    monitorCallCount(useRefElement);
+const useRefElement = monitored(function useRefElement(args) {
     const nonElementWarn = useRef(false);
     if (nonElementWarn.current) {
         nonElementWarn.current = false;
@@ -3390,7 +3343,7 @@ function useRefElement(args) {
             getElement,
         }
     };
-}
+});
 
 /**
  * Functions to handle the specialization of a `Map` whose values are always a `Set`.
@@ -3468,8 +3421,7 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
-    monitorCallCount(useActiveElement);
+const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
@@ -3502,15 +3454,14 @@ function useActiveElement({ activeElementParameters: { onActiveElementChange, on
     const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
     const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-}
+});
 
 /**
  * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */
-function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
-    monitorCallCount(useDismiss);
+const useDismiss = monitored(function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement({ refElementParameters: {} });
     //const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
@@ -3563,7 +3514,7 @@ function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 },
         propsStableSource: propsStableSource,
         propsStablePopup: propsStablePopup
     };
-}
+});
 
 function getDocument(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
 /**
@@ -3573,8 +3524,7 @@ function getDocument(element) { return (element?.ownerDocument ?? document ?? wi
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
-function useDocumentClass(className, active, element) {
-    monitorCallCount(useDocumentClass);
+const useDocumentClass = monitored(function useDocumentClass(className, active, element) {
     element ??= getDocument().documentElement;
     className = clsx(className);
     useEffect(() => {
@@ -3585,7 +3535,7 @@ function useDocumentClass(className, active, element) {
             }
         }
     }, [className, active, element]);
-}
+});
 
 function blockingElements() { return getDocument().$blockingElements; }
 /**
@@ -3597,8 +3547,7 @@ function blockingElements() { return getDocument().$blockingElements; }
  *
  * @param target
  */
-function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
-    monitorCallCount(useBlockingElement);
+const useBlockingElement = monitored(function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
     const stableGetTarget = useStableCallback(getTarget);
     //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
@@ -3644,7 +3593,7 @@ function useBlockingElement({ activeElementParameters: { getDocument, onActiveEl
         }
     }, [enabled]);
     return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen };
-}
+});
 function getTopElement() {
     return blockingElements().top;
 }
@@ -3657,8 +3606,7 @@ function getTopElement() {
  *
  * @compositeParams
  */
-function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
-    monitorCallCount(useFocusTrap);
+const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
@@ -3696,7 +3644,7 @@ function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusP
     return {
         props: useTagProps({ "aria-modal": trapActive ? "true" : undefined }, "data-focus-trap")
     };
-}
+});
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */
@@ -3728,8 +3676,7 @@ function findFirstCondition(element, filter) {
  *
  * @hasChild {@link usePaginatedChild}
  */
-function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
-    monitorCallCount(usePaginatedChildren);
+const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
@@ -3793,7 +3740,7 @@ function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrang
         },
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
-}
+});
 /**
  * Child hook for {@link usePaginatedChildren}.
  *
@@ -3802,8 +3749,7 @@ function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrang
  *
  * @compositeParams
  */
-function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
-    monitorCallCount(usePaginatedChild);
+const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
@@ -3814,7 +3760,7 @@ function usePaginatedChild({ info: { index }, context: { paginatedChildContext: 
             setChildCountIfPaginated
         }
     };
-}
+});
 
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
@@ -3826,8 +3772,7 @@ function usePaginatedChild({ info: { index }, context: { paginatedChildContext: 
  *
  * @hasChild {@link useStaggeredChild}
  */
-function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
-    monitorCallCount(useStaggeredChildren);
+const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -3913,7 +3858,7 @@ function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggere
             staggeredChildContext
         }), [staggeredChildContext]),
     };
-}
+});
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -3922,8 +3867,7 @@ function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggere
  *
  * @compositeParams
  */
-function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
-    monitorCallCount(useStaggeredChild);
+const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {
         childCallsThisToTellTheParentTheHighestIndex(index);
@@ -3937,7 +3881,7 @@ function useStaggeredChild({ info: { index }, context: { staggeredChildContext: 
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     };
-}
+});
 
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
@@ -3950,8 +3894,7 @@ function useStaggeredChild({ info: { index }, context: { staggeredChildContext: 
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-function useChildrenHaveFocus(args) {
-    monitorCallCount(useChildrenHaveFocus);
+const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
@@ -3962,12 +3905,11 @@ function useChildrenHaveFocus(args) {
         childrenHaveFocusReturn: { getAnyFocused },
         context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     };
-}
+});
 /**
  * @compositeParams
  */
-function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
-    monitorCallCount(useChildrenHaveFocusChild);
+const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -3980,7 +3922,7 @@ function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: {
             }),
         }
     };
-}
+});
 
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
@@ -3989,8 +3931,7 @@ function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: {
  *
  * @compositeParams
  */
-function useHasCurrentFocus(args) {
-    monitorCallCount(useHasCurrentFocus);
+const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
     const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
@@ -4023,7 +3964,7 @@ function useHasCurrentFocus(args) {
             getCurrentFocusedInner: getFocusedInner,
         }
     };
-}
+});
 
 /**
  * Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything.
@@ -4033,8 +3974,7 @@ function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
-    monitorCallCount(useCompleteGridNavigation);
+const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4096,12 +4036,11 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
         sortableChildrenReturn,
         typeaheadNavigationReturn
     };
-}
+});
 /**
  * @compositeParams
  */
-function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useCompleteGridNavigationRow);
+const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps, ...void7 } = usePaginatedChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, staggeredChildReturn, props: staggeredProps, ...void8 } = useStaggeredChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);
@@ -4174,12 +4113,11 @@ function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUser
         typeaheadNavigationReturn,
         props,
     };
-}
+});
 /**
  * @compositeParams
  */
-function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }) {
-    monitorCallCount(useCompleteGridNavigationCell);
+const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }) {
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionSortableCell({
         gridNavigationCellParameters,
@@ -4215,7 +4153,7 @@ function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, 
         managedChildReturn,
         textContentReturn
     };
-}
+});
 function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
     const ret = useCompleteGridNavigation({
         linearNavigationParameters,
@@ -4248,8 +4186,7 @@ function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linear
  *
  * @compositeParams
  */
-function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
-    monitorCallCount(useCompleteListNavigation);
+const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4314,14 +4251,13 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         typeaheadNavigationReturn,
         childrenHaveFocusReturn
     };
-}
+});
 /**
  *
  * @compositeParams
  */
-function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
 textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
-    monitorCallCount(useCompleteListNavigationChild);
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
@@ -4378,7 +4314,7 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         staggeredChildReturn,
         rovingTabIndexChildReturn
     };
-}
+});
 function useCompleteListNavigationDeclarative({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }) {
     const ret = useCompleteListNavigation({
         singleSelectionParameters: {
@@ -4420,8 +4356,7 @@ function useCompleteListNavigationChildDeclarative({ multiSelectionChildParamete
  *
  * @compositeParams
  */
-function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
-    monitorCallCount(useModal);
+const useModal = monitored(function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
         dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
         escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
@@ -4442,7 +4377,7 @@ function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, e
         propsStablePopup,
         propsStableSource
     };
-}
+});
 
 function isPromise(p) {
     return p instanceof Promise;
@@ -4603,8 +4538,7 @@ const AsyncFunction = ((async function () { }).constructor);
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-function useAsync(asyncHandler, options) {
-    monitorCallCount(useAsync);
+const useAsync = monitored(function useAsync(asyncHandler, options) {
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existence too.
@@ -4671,7 +4605,7 @@ function useAsync(asyncHandler, options) {
         callCount: runCount,
         flushDebouncedPromise: flushSyncDebounce
     };
-}
+});
 
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
@@ -4738,8 +4672,7 @@ function useAsync(asyncHandler, options) {
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
-    monitorCallCount(useAsyncHandler);
+const useAsyncHandler = monitored(function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);
@@ -4762,7 +4695,7 @@ function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncO
         hasCapture,
         ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
     };
-}
+});
 
 function pressLog(...args) {
     if (window.__log_press_events)
@@ -4841,8 +4774,7 @@ document.addEventListener("click", (e) => {
  * @compositeParams
  *
  */
-function usePress(args) {
-    monitorCallCount(usePress);
+const usePress = monitored(function usePress(args) {
     const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -5149,7 +5081,7 @@ function usePress(args) {
             onClick
         },
     };
-}
+});
 function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
     const asyncHandlerReturn = useAsyncHandler({ asyncHandler, capture: noop, debounce, throttle });
     const { pressReturn, props } = usePress({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
@@ -5175,8 +5107,7 @@ function setPressVibrate(func) {
  *
  * @compositeParams
  */
-function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
-    monitorCallCount(useRandomId);
+const useRandomId = monitored(function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
     const referencerElementProps = useRef(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
@@ -5189,15 +5120,14 @@ function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
             id: id
         }
     };
-}
+});
 
 /**
  * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
  *
  * @compositeParams
  */
-function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
-    monitorCallCount(useRandomDualIds);
+const useRandomDualIds = monitored(function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
     const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId({ randomIdParameters: randomIdInputParameters });
     const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId({ randomIdParameters: randomIdLabelParameters });
     return {
@@ -5206,7 +5136,7 @@ function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, })
         randomIdInputReturn,
         randomIdLabelReturn
     };
-}
+});
 
 /**
  * Allows an element to start a drag operation.
@@ -5215,8 +5145,7 @@ function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, })
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
-    monitorCallCount(useDraggable);
+const useDraggable = monitored(function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
     const onDragStart = (e) => {
@@ -5258,7 +5187,7 @@ function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragIm
         getLastDropEffect
     };
     return ret;
-}
+});
 
 class DroppableFileError extends Error {
     fileName;
@@ -5276,8 +5205,7 @@ class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-function useDroppable({ effect }) {
-    monitorCallCount(useDroppable);
+const useDroppable = monitored(function useDroppable({ effect }) {
     const [filesForConsideration, setFilesForConsideration] = useState(null);
     const [stringsForConsideration, setStringsForConsideration] = useState(null);
     const [droppedFiles, setDroppedFiles] = useState(null);
@@ -5413,7 +5341,7 @@ function useDroppable({ effect }) {
         droppedStrings,
         dropError
     };
-}
+});
 
 /**
  * Allows for hiding the scroll bar of the root HTML element
@@ -5422,8 +5350,7 @@ function useDroppable({ effect }) {
  *
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
  */
-function useHideScroll(hideScroll) {
-    monitorCallCount(useHideScroll);
+const useHideScroll = monitored(function useHideScroll(hideScroll) {
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
     useEffect(() => {
@@ -5479,7 +5406,7 @@ function useHideScroll(hideScroll) {
         }
     }, [hideScroll]);
     return { getScrollbarWidth, getScrollbarHeight };
-}
+});
 
 let templateElement = null;
 function htmlToElement(parent, html) {
@@ -5505,8 +5432,7 @@ const ImperativeElement = memo(forwardRef(ImperativeElementU));
  *
  * @compositeParams
  */
-function useImperativeProps({ refElementReturn: { getElement } }) {
-    monitorCallCount(useImperativeProps);
+const useImperativeProps = monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
@@ -5608,7 +5534,7 @@ function useImperativeProps({ refElementReturn: { getElement } }) {
         }).current,
         props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
     };
-}
+});
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });
@@ -5648,8 +5574,7 @@ function generateRandomId(prefix) {
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-function usePortalChildren({ target }) {
-    monitorCallCount(usePortalChildren);
+const usePortalChildren = monitored(function usePortalChildren({ target }) {
     const [pushChild, setPushChild] = useState(null);
     const [updateChild, setUpdateChild] = useState(null);
     const [removeChild, setRemoveChild] = useState(null);
@@ -5671,7 +5596,7 @@ function usePortalChildren({ target }) {
         removeChild: removeChildStable,
         portalElement: element
     };
-}
+});
 /**
  * Implementation
  */
@@ -5718,8 +5643,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
  *
  * @compositeParams
  */
-function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
-    monitorCallCount(useElementSize);
+const useElementSize = monitored(function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {});
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
     const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, runImmediately);
@@ -5764,7 +5688,7 @@ function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }
         refElementReturn,
         ...rest
     };
-}
+});
 
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
@@ -5773,8 +5697,7 @@ function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }
  *
  * @compositeParams
  */
-function useHasLastFocus(args) {
-    monitorCallCount(useHasLastFocus);
+const useHasLastFocus = monitored(function useHasLastFocus(args) {
     const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 } } = args;
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
     const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, runImmediately);
@@ -5805,7 +5728,7 @@ function useHasLastFocus(args) {
             getLastFocusedInner,
         }
     };
-}
+});
 
 function capitalize(str) {
     return (str[0].toUpperCase() + str.substring(1));
@@ -5828,8 +5751,7 @@ function capitalize(str) {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-function useLogicalDirection({}) {
-    monitorCallCount(useLogicalDirection);
+const useLogicalDirection = monitored(function useLogicalDirection({}) {
     //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
     // TODO: There's no way to refresh which writing mode we have once mounted.
@@ -5966,7 +5888,7 @@ function useLogicalDirection({}) {
             convertToPhysicalSide
         }
     };
-}
+});
 // Position requires us to sometimes use one property (like `left`)
 // or sometimes two (like `left` + `width`)
 function getPhysicalLeftTop(dir) { if (dir === "ltr" || dir == "rtl")
@@ -6070,8 +5992,7 @@ const WritingModes = {
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
-function useMediaQuery(query, defaultGuess) {
-    monitorCallCount(useMediaQuery);
+const useMediaQuery = monitored(function useMediaQuery(query, defaultGuess) {
     const queryList = useRef();
     // queryList.current ??= (query == null ? null : matchMedia(query))
     // This ^^^ is not done because it seems to cause reflows at inopportune moments.
@@ -6095,15 +6016,14 @@ function useMediaQuery(query, defaultGuess) {
         matches,
         getMatches
     };
-}
+});
 
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
  */
-function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
-    monitorCallCount(useMutationObserver);
+const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     const { onElementChange, ...rest } = (refElementParameters || {});
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
@@ -6164,7 +6084,7 @@ function useMutationObserver({ refElementParameters, mutationObserverParameters:
         refElementReturn,
         propsStable
     };
-}
+});
 
 /**
  * Allows you to inspect when the entire URL changes,
@@ -6180,7 +6100,7 @@ function useMutationObserver({ refElementParameters, mutationObserverParameters:
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-function useUrl(onUrlChange) {
+const useUrl = monitored(function useUrl(onUrlChange) {
     const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
     useGlobalHandler(window, "hashchange", (e) => {
         setUrl(window.location.toString(), e);
@@ -6204,7 +6124,7 @@ function useUrl(onUrlChange) {
                 setUrl(newUrlOrSetter, undefined);
             }
         }, [])];
-}
+});
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
@@ -6216,12 +6136,11 @@ function useUrl(onUrlChange) {
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-function useAsyncEffect(effect, inputs, options) {
-    monitorCallCount(useAsyncEffect);
+const useAsyncEffect = monitored(function useAsyncEffect(effect, inputs, options) {
     const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
     useEffect(syncHandler, inputs);
     return rest;
-}
+});
 
 /**
  * Wrap the native `useEffect` to add arguments
@@ -6233,8 +6152,7 @@ function useAsyncEffect(effect, inputs, options) {
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-function useEffectDebug(effect, inputs, impl = useEffect) {
-    monitorCallCount(useEffectDebug);
+const useEffectDebug = monitored(function useEffectDebug(effect, inputs, impl = useEffect) {
     const prevInputs = useRef(undefined);
     const effect2 = () => {
         const changes = [];
@@ -6249,7 +6167,7 @@ function useEffectDebug(effect, inputs, impl = useEffect) {
         return ret;
     };
     impl(effect2, inputs);
-}
+});
 
 /**
  * Wrap the native `useLayoutEffect` to add arguments
@@ -6259,10 +6177,9 @@ function useEffectDebug(effect, inputs, impl = useEffect) {
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-function useLayoutEffectDebug(effect, inputs) {
-    monitorCallCount(useLayoutEffectDebug);
+const useLayoutEffectDebug = monitored(function useLayoutEffectDebug(effect, inputs) {
     return useEffectDebug(effect, inputs, useLayoutEffect);
-}
+});
 
 function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
     try {
@@ -6306,8 +6223,7 @@ function storeToLocalStorage(key, value, converter = JSON.stringify, storage = l
  * @param toString -
  * @returns
  */
-function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
-    monitorCallCount(usePersistentState);
+const usePersistentState = monitored(function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     // Ensure that if our key changes, we also update `localCopy` to match.
@@ -6344,7 +6260,7 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
         return trueValue ?? localCopy;
     });
     return [localCopy, setValueWrapper, getValue];
-}
+});
 
 var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
 
@@ -6558,8 +6474,7 @@ function ProvideBatchedAnimationFrames({ children }) {
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
-function useAnimationFrame({ callback }) {
-    monitorCallCount(useAnimationFrame);
+const useAnimationFrame = monitored(function useAnimationFrame({ callback }) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);
@@ -6586,7 +6501,7 @@ function useAnimationFrame({ callback }) {
             }
         }
     }, [sharedAnimationFrameContext, hasCallback]);
-}
+});
 
 /**
  * Runs a function every time the specified number of milliseconds elapses while the component is mounted.
@@ -6594,8 +6509,7 @@ function useAnimationFrame({ callback }) {
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-function useInterval({ interval, callback }) {
-    monitorCallCount(useInterval);
+const useInterval = monitored(function useInterval({ interval, callback }) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
@@ -6618,7 +6532,7 @@ function useInterval({ interval, callback }) {
         let handle = setInterval(adjustableCallback, interval);
         return () => clearInterval(handle);
     }, []);
-}
+});
 
-export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map

@@ -32,5 +32,5 @@ export interface UsePortalChildrenReturnType {
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-export declare function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType;
+export declare const usePortalChildren: ({ target }: UsePortalChildrenParameters) => UsePortalChildrenReturnType;
 //# sourceMappingURL=use-portal-children.d.ts.map

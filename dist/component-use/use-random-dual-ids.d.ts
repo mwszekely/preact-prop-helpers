@@ -15,5 +15,5 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
  *
  * @compositeParams
  */
-export declare function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({ randomIdInputParameters, randomIdLabelParameters, }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement>;
+export declare const useRandomDualIds: <InputElement extends Element, LabelElement extends Element>({ randomIdInputParameters, randomIdLabelParameters, }: UseRandomDualIdsParameters) => UseRandomDualIdsReturnType<InputElement, LabelElement>;
 //# sourceMappingURL=use-random-dual-ids.d.ts.map

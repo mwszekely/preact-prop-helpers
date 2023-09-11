@@ -1,7 +1,7 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Runs a function the specified number of milliseconds after the component renders.
  *
@@ -10,8 +10,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-export function useTimeout({ timeout, callback, triggerIndex }) {
-    monitorCallCount(useTimeout);
+export const useTimeout = monitored(function useTimeout({ timeout, callback, triggerIndex }) {
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
     // Set any time we start timeout.
@@ -40,5 +39,5 @@ export function useTimeout({ timeout, callback, triggerIndex }) {
         return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
     }, []);
     return { getElapsedTime, getRemainingTime };
-}
+});
 //# sourceMappingURL=use-timeout.js.map

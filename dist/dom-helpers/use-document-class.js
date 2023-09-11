@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 export function getDocument(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
 /**
  * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
@@ -9,8 +9,7 @@ export function getDocument(element) { return (element?.ownerDocument ?? documen
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
-export function useDocumentClass(className, active, element) {
-    monitorCallCount(useDocumentClass);
+export const useDocumentClass = monitored(function useDocumentClass(className, active, element) {
     element ??= getDocument().documentElement;
     className = clsx(className);
     useEffect(() => {
@@ -21,5 +20,5 @@ export function useDocumentClass(className, active, element) {
             }
         }
     }, [className, active, element]);
-}
+});
 //# sourceMappingURL=use-document-class.js.map

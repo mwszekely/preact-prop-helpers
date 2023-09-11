@@ -63,7 +63,7 @@ export declare const ImperativeElement: typeof ImperativeElementU;
  *
  * @compositeParams
  */
-export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E>;
+export declare const useImperativeProps: <E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) => UseImperativePropsReturnType<E>;
 declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<any>;
 export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

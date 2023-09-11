@@ -27,5 +27,5 @@ export interface UseRandomIdParameters {
  *
  * @compositeParams
  */
-export declare function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T>;
+export declare const useRandomId: <S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters) => UseRandomIdReturnType<S, T>;
 //# sourceMappingURL=use-random-id.d.ts.map

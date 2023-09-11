@@ -1,10 +1,11 @@
 
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedPick, useCallback, useEffect } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
 
 export interface UseHasLastFocusParametersSelf {
@@ -48,9 +49,7 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
-    monitorCallCount(useHasLastFocus);
-
+export const useHasLastFocus = monitored( function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
     const {
         refElementReturn: { getElement },
         activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
@@ -93,4 +92,4 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
             getLastFocusedInner,
         }
     };
-}
+})

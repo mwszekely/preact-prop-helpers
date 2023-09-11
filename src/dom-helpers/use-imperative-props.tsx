@@ -1,6 +1,6 @@
 import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
 
@@ -84,9 +84,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as 
  * 
  * @compositeParams
  */
-export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
-    monitorCallCount(useImperativeProps);
-
+export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 
@@ -198,13 +196,13 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         }).current,
         props: useMergedProps<E>(
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
-            currentImperativeProps.current.html? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {},
+            currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {},
             { children: currentImperativeProps.current.children },
             currentImperativeProps.current.others
         )
 
     }
-}
+})
 
 function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
     const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })

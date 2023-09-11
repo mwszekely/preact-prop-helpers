@@ -5,7 +5,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { onfocusout, useCallback } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 function pressLog(...args) {
     if (window.__log_press_events)
         console.log(...args);
@@ -83,8 +83,7 @@ document.addEventListener("click", (e) => {
  * @compositeParams
  *
  */
-export function usePress(args) {
-    monitorCallCount(usePress);
+export const usePress = monitored(function usePress(args) {
     const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -396,7 +395,7 @@ export function usePress(args) {
             onClick
         },
     };
-}
+});
 export function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
     const asyncHandlerReturn = useAsyncHandler({ asyncHandler, capture: noop, debounce, throttle });
     const { pressReturn, props } = usePress({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });

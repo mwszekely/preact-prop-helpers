@@ -2,7 +2,7 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useSelection, useSelectionChild } from "../use-selection.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 /**
@@ -14,8 +14,7 @@ import { useListNavigation, useListNavigationChild } from "./use-list-navigation
  *
  * @compositeParams
  */
-export function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
-    monitorCallCount(useListNavigationSelection);
+export const useListNavigationSelection = monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
     const { context: contextSS, propsStable, ...retSS } = useSelection({
         childrenHaveFocusReturn,
         rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
@@ -43,12 +42,11 @@ export function useListNavigationSelection({ linearNavigationParameters, rovingT
         }),
         props: useMergedProps(props, propsStable)
     };
-}
+});
 /**
  * @compositeParams
  */
-export function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useListNavigationSelectionChild);
+export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
         info: { index, untabbable },
         context,
@@ -83,5 +81,5 @@ export function useListNavigationSelectionChild({ info: { index, untabbable, ...
         propsChild: propsSS,
         propsTabbable: propsLN
     };
-}
+});
 //# sourceMappingURL=use-list-navigation-selection.js.map

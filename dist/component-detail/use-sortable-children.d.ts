@@ -130,7 +130,7 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
  *
  * @compositeParams
  */
-export declare function useRearrangeableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M>;
+export declare const useRearrangeableChildren: <M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -154,6 +154,6 @@ export declare function useRearrangeableChildren<M extends UseSortableChildInfo>
  *
  * @compositeParams
  */
-export declare function useSortableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M>;
+export declare const useSortableChildren: <M extends UseSortableChildInfo>({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }: UseSortableChildrenParameters<M>) => UseSortableChildrenReturnType<M>;
 export declare function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined): number;
 //# sourceMappingURL=use-sortable-children.d.ts.map

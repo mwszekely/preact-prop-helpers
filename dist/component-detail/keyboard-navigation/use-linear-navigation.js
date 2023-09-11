@@ -4,7 +4,6 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useRef } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 export { identity };
 /**
@@ -17,8 +16,7 @@ export { identity };
  *
  * @compositeParams
  */
-export function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
-    monitorCallCount(useLinearNavigation);
+export const useLinearNavigation = (function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -178,7 +176,7 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
         linearNavigationReturn: {},
         propsStable: stableProps.current
     };
-}
+});
 export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }) {
     if (searchDirection === -1) {
         let bestUpResult = undefined;

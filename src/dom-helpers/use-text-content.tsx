@@ -1,6 +1,7 @@
+
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
@@ -24,7 +25,7 @@ export interface UseTextContentParameters<E extends Element> extends TargetedPic
     textContentParameters: UseTextContentParametersSelf<E>;
 }
 
-export interface UseTextContentReturnTypeSelf { 
+export interface UseTextContentReturnTypeSelf {
     /** Returns the last known value of the element's text content */
     getTextContent: () => string | null;
 }
@@ -38,9 +39,7 @@ export interface UseTextContentReturnType {
  * 
  * @compositeParams
  */
-export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
-    monitorCallCount(useTextContent);
-
+export const useTextContent = monitored(function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();
@@ -52,4 +51,4 @@ export function useTextContent<E extends Element>({ refElementReturn: { getEleme
         }
     });
     return { textContentReturn: { getTextContent } }
-}
+})

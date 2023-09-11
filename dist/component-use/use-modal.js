@@ -3,7 +3,7 @@ import { useFocusTrap } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Combines dismissal hooks and focus trap hooks into one.
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
@@ -14,8 +14,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
-    monitorCallCount(useModal);
+export const useModal = monitored(function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
         dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
         escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
@@ -44,5 +43,5 @@ export function useModal({ dismissParameters: { dismissActive, onDismiss, ...voi
         propsStablePopup,
         propsStableSource
     };
-}
+});
 //# sourceMappingURL=use-modal.js.map

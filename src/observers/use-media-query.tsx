@@ -1,6 +1,6 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { useLayoutEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 /**
  * 
@@ -15,9 +15,8 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
-export function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
-    monitorCallCount(useMediaQuery);
-    
+export const useMediaQuery = monitored(function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
+
     const queryList = useRef<MediaQueryList | null>();
 
     // queryList.current ??= (query == null ? null : matchMedia(query))
@@ -49,7 +48,7 @@ export function useMediaQuery(query: string | null | undefined, defaultGuess?: b
         matches,
         getMatches
     };
-}
+})
 
 export interface UseMediaQueryReturnType {
     matches: boolean | null;

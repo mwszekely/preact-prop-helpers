@@ -31,7 +31,7 @@ export declare function useEnsureStability<T extends any[]>(parentHookName: stri
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
+export declare const usePassiveState: <T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: (() => T) | undefined, customDebounceRendering?: typeof debounceRendering) => readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
 export declare function returnTrue(): boolean;
 export declare function returnFalse(): boolean;
 export declare function returnNull(): null;

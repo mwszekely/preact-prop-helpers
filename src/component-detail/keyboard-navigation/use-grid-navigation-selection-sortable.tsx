@@ -3,7 +3,6 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
 import { OmitStrong } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseSelectionChildInfoKeysReturnType } from "../use-selection.js";
 import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "../use-sortable-children.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationRowSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellInfoKeysReturnType, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowInfoKeysReturnType, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "./use-grid-navigation-selection.js";
@@ -70,7 +69,7 @@ export interface UseGridNavigationSelectionSortableCellReturnType<CellElement ex
  * 
  * @compositeParams
  */
-export function useGridNavigationSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>>({
+export const useGridNavigationSelectionSortable = (function useGridNavigationSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
     linearNavigationParameters,
@@ -85,8 +84,6 @@ export function useGridNavigationSelectionSortable<ParentOrRowElement extends El
     childrenHaveFocusReturn,
     ...void1
 }: UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSelectionSortableReturnType<ParentOrRowElement, RowElement, RM> {
-    monitorCallCount(useGridNavigationSelectionSortable);
-
     const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSelection<ParentOrRowElement, RowElement>({
         rearrangeableChildrenReturn,
@@ -103,19 +100,19 @@ export function useGridNavigationSelectionSortable<ParentOrRowElement extends El
     });
     assertEmptyObject(void1);
 
-    return { 
+    return {
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
         ...gnr
-     }
-}
+    }
+})
 
 /**
  * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
  * 
  * @compositeParams
  */
-export function useGridNavigationSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>, CM extends GridSelectSortableChildCellInfo<CellElement>>({
+export const useGridNavigationSelectionSortableRow = (function useGridNavigationSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>, CM extends GridSelectSortableChildCellInfo<CellElement>>({
     context: ctxIncoming,
     info: { index, untabbable, ...void2 },
     linearNavigationParameters,
@@ -129,8 +126,6 @@ export function useGridNavigationSelectionSortableRow<RowElement extends Element
     multiSelectionChildParameters,
     ...void1
 }: UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSelectionSortableRowReturnType<RowElement, CellElement, RM, CM> {
-    monitorCallCount(useGridNavigationSelectionSortableRow);
-
     const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
 
     const getSortValue = useCallback(() => {
@@ -189,12 +184,12 @@ export function useGridNavigationSelectionSortableRow<RowElement extends Element
         textContentReturn,
         typeaheadNavigationReturn
     }
-}
+})
 
 /**
  * @compositeParams
  */
-export function useGridNavigationSelectionSortableCell<CellElement extends Element>({
+export const useGridNavigationSelectionSortableCell = (function useGridNavigationSelectionSortableCell<CellElement extends Element>({
     context,
     gridNavigationCellParameters,
     info: { index, untabbable, ...void2 },
@@ -202,7 +197,6 @@ export function useGridNavigationSelectionSortableCell<CellElement extends Eleme
     textContentParameters,
     ...void1
 }: UseGridNavigationSelectionSortableCellParameters<CellElement, GridSelectSortableChildCellInfo<CellElement>>): UseGridNavigationSelectionSortableCellReturnType<CellElement> {
-    monitorCallCount(useGridNavigationSelectionSortableCell);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return useGridNavigationSelectionCell<CellElement>({
@@ -212,4 +206,4 @@ export function useGridNavigationSelectionSortableCell<CellElement extends Eleme
         refElementReturn,
         textContentParameters,
     });
-}
+})

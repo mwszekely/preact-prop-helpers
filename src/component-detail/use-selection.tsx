@@ -1,5 +1,5 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { UseGenericChildParameters } from "../index.js";
+import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";

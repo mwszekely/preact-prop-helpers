@@ -42,9 +42,9 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export declare function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement>;
+export declare const useChildrenHaveFocus: <ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>) => UseChildrenHaveFocusReturnType<ChildElement>;
 /**
  * @compositeParams
  */
-export declare function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E>;
+export declare const useChildrenHaveFocusChild: <E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
 //# sourceMappingURL=use-children-have-focus.d.ts.map

@@ -1,7 +1,7 @@
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
@@ -13,8 +13,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @hasChild {@link useStaggeredChild}
  */
-export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
-    monitorCallCount(useStaggeredChildren);
+export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -100,7 +99,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
             staggeredChildContext
         }), [staggeredChildContext]),
     };
-}
+});
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -109,8 +108,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
  *
  * @compositeParams
  */
-export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
-    monitorCallCount(useStaggeredChild);
+export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {
         childCallsThisToTellTheParentTheHighestIndex(index);
@@ -124,5 +122,5 @@ export function useStaggeredChild({ info: { index }, context: { staggeredChildCo
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     };
-}
+});
 //# sourceMappingURL=use-staggered-children.js.map

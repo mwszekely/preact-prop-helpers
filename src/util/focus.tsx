@@ -1,5 +1,5 @@
 import { isTabbable } from "tabbable";
-import { BuildMode } from "./mode.js";
+import "./mode.js";
 import { generateStack } from "./stack.js";
 
 /**
@@ -7,7 +7,7 @@ import { generateStack } from "./stack.js";
  * here:
  */
 export function focus(e: Element | null) {
-    if (BuildMode === 'development' && (window as any).LOG_FOCUS_CHANGES === true) {
+    if (process.env.NODE_ENV === 'development' && (window as any).LOG_FOCUS_CHANGES === true) {
         console.log(`Focus changed to ${(e?.tagName || "").toLowerCase().padStart(6)}:`, e);
         console.log(generateStack());
     }

@@ -2,14 +2,13 @@ import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
  */
-export function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
-    monitorCallCount(useMutationObserver);
+export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     const { onElementChange, ...rest } = (refElementParameters || {});
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
@@ -70,5 +69,5 @@ export function useMutationObserver({ refElementParameters, mutationObserverPara
         refElementReturn,
         propsStable
     };
-}
+});
 //# sourceMappingURL=use-mutation-observer.js.map

@@ -1,7 +1,7 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows children to stop themselves from rendering outside of a narrow range.
@@ -12,8 +12,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
-    monitorCallCount(usePaginatedChildren);
+export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
@@ -77,7 +76,7 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, r
         },
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
-}
+});
 /**
  * Child hook for {@link usePaginatedChildren}.
  *
@@ -86,8 +85,7 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, r
  *
  * @compositeParams
  */
-export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
-    monitorCallCount(usePaginatedChild);
+export const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
@@ -98,5 +96,5 @@ export function usePaginatedChild({ info: { index }, context: { paginatedChildCo
             setChildCountIfPaginated
         }
     };
-}
+});
 //# sourceMappingURL=use-paginated-children.js.map

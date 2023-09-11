@@ -3,7 +3,7 @@ import { UseActiveElementParameters, useActiveElement } from "../observers/use-a
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, EventType, TargetedOmit } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { UseBackdropDismissParameters, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
 import { UseEscapeDismissParameters, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
 import { UseLostFocusDismissParameters, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
@@ -92,7 +92,7 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * 
  * @compositeParams
  */
-export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
+export const useDismiss = monitored(function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void3 },
     backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 },
     lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 },
@@ -100,8 +100,6 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
     activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 },
     ...void4
 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
-    monitorCallCount(useDismiss);
-
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement<PopupElement>({ refElementParameters: {} });
 
@@ -114,9 +112,9 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
         backdropDismissParameters: {
             dismissBackdropActive: (dismissBackdropActive && dismissActive) as false,
             onDismissBackdrop: useStableCallback((e) => {
-                    onDismissBackdrop?.(e);
-                    onDismiss(e, "backdrop" as Listeners);
-                
+                onDismissBackdrop?.(e);
+                onDismiss(e, "backdrop" as Listeners);
+
             }),
         },
     });
@@ -125,10 +123,10 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
         escapeDismissParameters: {
             dismissEscapeActive: (dismissEscapeActive && dismissActive) as false,
             getDocument,
-            onDismissEscape: useStableCallback((e) => { 
-                onDismissEscape?.(e); 
+            onDismissEscape: useStableCallback((e) => {
+                onDismissEscape?.(e);
                 onDismiss(e, "escape" as Listeners);
-             }),
+            }),
             parentDepth,
         },
     });
@@ -140,10 +138,10 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
     } = useLostFocusDismiss<SourceElement, PopupElement, Listeners extends "lost-focus" ? true : false>({
         lostFocusDismissParameters: {
             dismissLostFocusActive: (dismissLostFocusActive && dismissActive) as false,
-            onDismissLostFocus: useStableCallback((e) => { 
-                onDismissLostFocus?.(e); 
+            onDismissLostFocus: useStableCallback((e) => {
+                onDismissLostFocus?.(e);
                 onDismiss(e, "lost-focus" as Listeners);
-             }),
+            }),
         },
         refElementPopupReturn,
         refElementSourceReturn
@@ -181,4 +179,4 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
         propsStableSource: propsStableSource,
         propsStablePopup: propsStablePopup
     }
-}
+})

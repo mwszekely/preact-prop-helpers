@@ -8,5 +8,5 @@ import { EffectCallback, Inputs } from "preact/hooks";
  * @param effect
  * @param inputs
  */
-export declare function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs): void;
+export declare const useBeforeLayoutEffect: (effect: EffectCallback | null, inputs?: Inputs) => void;
 //# sourceMappingURL=use-before-layout-effect.d.ts.map

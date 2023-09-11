@@ -2,14 +2,13 @@ import { getDocument } from "../dom-helpers/use-document-class.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 /**
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
  */
-export function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
-    monitorCallCount(useElementSize);
+export const useElementSize = monitored(function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {});
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
     const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, runImmediately);
@@ -54,5 +53,5 @@ export function useElementSize({ elementSizeParameters: { getObserveBox, onSizeC
         refElementReturn,
         ...rest
     };
-}
+});
 //# sourceMappingURL=use-element-size.js.map

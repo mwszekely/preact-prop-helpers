@@ -4,7 +4,7 @@ import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
@@ -69,13 +69,11 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
+export const useFocusTrap = monitored (function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
-    monitorCallCount(useFocusTrap);
-
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
 
@@ -123,7 +121,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
     return {
         props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElement>, "data-focus-trap")
     };
-}
+})
 
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.

@@ -4,7 +4,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { TargetedPick, useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
@@ -69,14 +69,13 @@ export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedC
  * 
  * @hasChild {@link usePaginatedChild}
  */
-export function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({
+export const usePaginatedChildren = monitored(function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({
     managedChildrenReturn: { getChildren },
     rearrangeableChildrenReturn: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     refElementReturn: { getElement }
 }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType {
-    monitorCallCount(usePaginatedChildren);
 
     const [childCount, setChildCount] = useState(null as number | null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -149,7 +148,7 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
         },
         paginatedChildrenReturn: { refreshPagination, childCount }
     }
-}
+})
 
 
 
@@ -170,7 +169,7 @@ export interface UsePaginatedChildReturnTypeSelf {
      * Whether this child is part of a paginated parent component.
      */
     parentIsPaginated: boolean;
-    
+
     /**
      * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.
      */
@@ -185,9 +184,7 @@ export interface UsePaginatedChildReturnTypeSelf {
  * 
  * @compositeParams
  */
-export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
-    monitorCallCount(usePaginatedChild);
-
+export const usePaginatedChild = monitored(function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
 
@@ -199,4 +196,4 @@ export function usePaginatedChild<ChildElement extends Element>({ info: { index 
             setChildCountIfPaginated
         }
     }
-}
+})

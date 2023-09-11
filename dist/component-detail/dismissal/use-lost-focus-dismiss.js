@@ -1,7 +1,7 @@
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 ;
 /**
  * Invokes a callback when focus travels outside of the component's element.
@@ -10,8 +10,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
-    monitorCallCount(useLostFocusDismiss);
+export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -31,5 +30,5 @@ export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPo
         }
     }, [getSourceElement]);
     return { activeElementParameters: { onLastActiveElementChange } };
-}
+});
 //# sourceMappingURL=use-lost-focus-dismiss.js.map

@@ -5,7 +5,6 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
 import { UseRearrangeableChildrenReturnType } from "../use-sortable-children.js";
@@ -142,7 +141,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * 
  * @compositeParams
  */
-export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useLinearNavigation = (function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
@@ -150,8 +149,6 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = EventType<any, any>;
-    
-    monitorCallCount(useLinearNavigation);
 
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null? null : paginationMax - paginationMin);
 
@@ -336,7 +333,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     }
 
 
-}
+})
 
 
 

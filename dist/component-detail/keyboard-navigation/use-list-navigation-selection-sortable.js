@@ -1,5 +1,5 @@
 import { assertEmptyObject } from "../../util/assert.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { useSortableChildren } from "../use-sortable-children.js";
 import { useListNavigationSelection, useListNavigationSelectionChild } from "./use-list-navigation-selection.js";
 /**
@@ -18,8 +18,7 @@ const _dummy = 0;
  *
  * @compositeParams
  */
-export function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
-    monitorCallCount(useListNavigationSelectionSortable);
+export const useListNavigationSelectionSortable = monitored(function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
     assertEmptyObject(void1);
@@ -31,12 +30,11 @@ export function useListNavigationSelectionSortable({ linearNavigationParameters,
         sortableChildrenReturn,
         ...restLN
     };
-}
+});
 /**
  * @compositeParams
  */
-export function useListNavigationSelectionSortableChild({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    monitorCallCount(useListNavigationSelectionSortableChild);
+export const useListNavigationSelectionSortableChild = monitored(function useListNavigationSelectionSortableChild({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     assertEmptyObject(void1);
     return useListNavigationSelectionChild({
         info,
@@ -46,5 +44,5 @@ export function useListNavigationSelectionSortableChild({ info, context, refElem
         singleSelectionChildParameters,
         multiSelectionChildParameters
     });
-}
+});
 //# sourceMappingURL=use-list-navigation-selection-sortable.js.map

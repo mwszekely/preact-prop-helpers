@@ -1,7 +1,8 @@
+
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { OmitStrong } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { monitored } from "../../util/use-call-count.js";
 import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "../use-sortable-children.js";
 import { UseListNavigationSelectionChildContext, UseListNavigationSelectionChildInfo, UseListNavigationSelectionChildInfoKeysParameters, UseListNavigationSelectionChildInfoKeysReturnType, UseListNavigationSelectionChildParameters, UseListNavigationSelectionChildReturnType, UseListNavigationSelectionParameters, UseListNavigationSelectionReturnType, useListNavigationSelection, useListNavigationSelectionChild } from "./use-list-navigation-selection.js";
 
@@ -37,7 +38,7 @@ export interface UseListNavigationSelectionSortableReturnType<ParentOrChildEleme
 export interface UseListNavigationSelectionSortableChildParameters<ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends
     UseGenericChildParameters<UseListNavigationSelectionSortableChildContext, Pick<UseListNavigationSelectionSortableChildInfo<ChildElement>, UseListNavigationSelectionSortableChildInfoKeysParameters>>,
     UseListNavigationSelectionChildParameters<ChildElement, M> {
-        
+
 }
 export interface UseListNavigationSelectionSortableChildReturnType<ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends
     UseListNavigationSelectionChildReturnType<ChildElement, M> {
@@ -53,7 +54,7 @@ export interface UseListNavigationSelectionSortableChildReturnType<ChildElement 
  * 
  * @compositeParams
  */
-export function useListNavigationSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>>({
+export const useListNavigationSelectionSortable = monitored(function useListNavigationSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -67,7 +68,6 @@ export function useListNavigationSelectionSortable<ParentOrChildElement extends 
     childrenHaveFocusReturn,
     ...void3
 }: UseListNavigationSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
-    monitorCallCount(useListNavigationSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { props, context, ...restLN } = useListNavigationSelection<ParentOrChildElement, ChildElement>({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
 
@@ -81,13 +81,13 @@ export function useListNavigationSelectionSortable<ParentOrChildElement extends 
         sortableChildrenReturn,
         ...restLN
     }
-}
+})
 
 
 /**
  * @compositeParams
  */
-export function useListNavigationSelectionSortableChild<ChildElement extends Element>({
+export const useListNavigationSelectionSortableChild = monitored(function useListNavigationSelectionSortableChild<ChildElement extends Element>({
     info,
     context,
     refElementReturn,
@@ -96,7 +96,6 @@ export function useListNavigationSelectionSortableChild<ChildElement extends Ele
     multiSelectionChildParameters,
     ...void1
 }: UseListNavigationSelectionSortableChildParameters<ChildElement, UseListNavigationSelectionSortableChildInfo<ChildElement>>): UseListNavigationSelectionSortableChildReturnType<ChildElement, UseListNavigationSelectionSortableChildInfo<ChildElement>> {
-    monitorCallCount(useListNavigationSelectionSortableChild);
     assertEmptyObject(void1);
 
     return useListNavigationSelectionChild<ChildElement>({
@@ -107,4 +106,4 @@ export function useListNavigationSelectionSortableChild<ChildElement extends Ele
         singleSelectionChildParameters,
         multiSelectionChildParameters
     });
-}
+})

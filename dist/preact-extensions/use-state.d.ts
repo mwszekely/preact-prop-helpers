@@ -9,5 +9,5 @@ import { StateUpdater } from "../util/lib.js";
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
+export declare const useState: <T>(initialState: T | (() => T)) => readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
 //# sourceMappingURL=use-state.d.ts.map

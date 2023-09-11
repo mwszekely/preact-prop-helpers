@@ -1,4 +1,4 @@
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 function styleStringToObject(style) {
     // TODO: This sucks D:
     return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
@@ -10,8 +10,7 @@ function styleStringToObject(style) {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export function useMergedStyles(lhs, rhs) {
-    monitorCallCount(useMergedStyles);
+export const useMergedStyles = monitored(function useMergedStyles(lhs, rhs) {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -42,5 +41,5 @@ export function useMergedStyles(lhs, rhs) {
         ...(lhs ?? {}),
         ...(rhs ?? {})
     };
-}
+});
 //# sourceMappingURL=use-merged-styles.js.map

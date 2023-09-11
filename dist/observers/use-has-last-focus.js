@@ -1,7 +1,7 @@
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useActiveElement } from "./use-active-element.js";
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
@@ -10,8 +10,7 @@ import { useActiveElement } from "./use-active-element.js";
  *
  * @compositeParams
  */
-export function useHasLastFocus(args) {
-    monitorCallCount(useHasLastFocus);
+export const useHasLastFocus = monitored(function useHasLastFocus(args) {
     const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 } } = args;
     assertEmptyObject(void1);
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
@@ -43,5 +42,5 @@ export function useHasLastFocus(args) {
             getLastFocusedInner,
         }
     };
-}
+});
 //# sourceMappingURL=use-has-last-focus.js.map

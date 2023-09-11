@@ -2,7 +2,7 @@ import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 
 export interface UseElementSizeParametersSelf {
     /**
@@ -60,9 +60,7 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  * 
  * @compositeParams
  */
-export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
-    monitorCallCount(useElementSize);
-
+export const useElementSize = monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
@@ -122,4 +120,4 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
     }
 
 
-}
+})

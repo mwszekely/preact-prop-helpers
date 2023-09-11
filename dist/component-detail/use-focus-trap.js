@@ -2,7 +2,7 @@ import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.
@@ -12,8 +12,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
-    monitorCallCount(useFocusTrap);
+export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
@@ -54,7 +53,7 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
     return {
         props: useTagProps({ "aria-modal": trapActive ? "true" : undefined }, "data-focus-trap")
     };
-}
+});
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

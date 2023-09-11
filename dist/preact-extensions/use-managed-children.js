@@ -1,6 +1,6 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
@@ -40,8 +40,7 @@ const _comments = void (0);
  *
  * @compositeParams
  */
-export function useManagedChildren(parentParameters) {
-    monitorCallCount(useManagedChildren);
+export const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
@@ -175,12 +174,11 @@ export function useManagedChildren(parentParameters) {
         }),
         managedChildrenReturn: { getChildren }
     };
-}
+});
 /**
  * @compositeParams
  */
-export function useManagedChild({ context, info }) {
-    monitorCallCount(useManagedChild);
+export const useManagedChild = monitored(function useManagedChild({ context, info }) {
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available
@@ -211,7 +209,7 @@ export function useManagedChild({ context, info }) {
     return {
         managedChildReturn: { getChildren: getChildren }
     };
-}
+});
 /**
  * An extension to useManagedChildren that handles the following common case:
  * 1. You have a bunch of children

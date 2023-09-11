@@ -5,6 +5,6 @@
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
-export declare function useStableGetter<T>(value: T): () => T;
+export declare const useStableGetter: <T>(value: T) => () => T;
 export declare function useMemoObject<T extends {}>(t: T): T;
 //# sourceMappingURL=use-stable-getter.d.ts.map

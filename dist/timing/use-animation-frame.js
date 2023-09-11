@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
-import { monitorCallCount } from "../util/use-call-count.js";
+import { monitored } from "../util/use-call-count.js";
 const SharedAnimationFrameContext = createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
@@ -38,8 +38,7 @@ export function ProvideBatchedAnimationFrames({ children }) {
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
-export function useAnimationFrame({ callback }) {
-    monitorCallCount(useAnimationFrame);
+export const useAnimationFrame = monitored(function useAnimationFrame({ callback }) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);
@@ -66,5 +65,5 @@ export function useAnimationFrame({ callback }) {
             }
         }
     }, [sharedAnimationFrameContext, hasCallback]);
-}
+});
 //# sourceMappingURL=use-animation-frame.js.map
