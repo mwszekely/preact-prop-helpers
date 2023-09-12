@@ -1,12 +1,12 @@
 
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { useState } from "../preact-extensions/use-state.js";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
-import { useTagProps } from "../util/use-tag-props.js";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { useState } from "../../preact-extensions/use-state.js";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
+import { ElementProps } from "../../util/types.js";
+import { monitored } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
+import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;

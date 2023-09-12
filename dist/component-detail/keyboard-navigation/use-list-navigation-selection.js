@@ -3,7 +3,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { monitored } from "../../util/use-call-count.js";
-import { useSelection, useSelectionChild } from "../use-selection.js";
+import { useSelection, useSelectionChild } from "../selection/use-selection.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 /**
  * Combines {@link useListNavigation} and {@link useSelection}.

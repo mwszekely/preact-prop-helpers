@@ -1,19 +1,19 @@
 
-import { PressEventReason, UsePressParameters } from "../component-use/use-press.js";
-import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
-import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
-import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
-import { OnPassiveStateChange, returnFalse, returnTrue } from "../preact-extensions/use-passive-state.js";
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "../preact-extensions/use-stable-getter.js";
-import { useState } from "../preact-extensions/use-state.js";
-import { assertEmptyObject } from "../util/assert.js";
-import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../util/event.js";
-import { focus } from "../util/focus.js";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "../util/lib.js";
-import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../util/types.js";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
+import { PressEventReason, UsePressParameters } from "../../component-use/use-press.js";
+import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
+import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
+import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { OnPassiveStateChange, returnFalse, returnTrue } from "../../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
+import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
+import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
+import { focus } from "../../util/focus.js";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
+import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export type MultiSelectChildChangeHandler = EnhancedEventHandler<Event, { multiSelected: boolean; }>;
 export type MultiSelectChildChangeEvent = TargetedEnhancedEvent<Event, { multiSelected: boolean; }>;

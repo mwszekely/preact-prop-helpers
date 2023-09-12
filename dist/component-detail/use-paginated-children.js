@@ -1,6 +1,6 @@
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter } from "../index.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
@@ -12,8 +12,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
-    const [childCount, setChildCount] = useState(null);
+export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
@@ -56,25 +55,39 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
         parentIsPaginated,
         getDefaultPaginationVisible
     }), [parentIsPaginated]);
+    const getPaginationMin = useStableGetter(paginationMin);
+    const getPaginationMax = useStableGetter(paginationMax);
+    useLayoutEffect(() => {
+        const paginationMin = getPaginationMin();
+        const paginationMax = getPaginationMax();
+        const count = childCount ?? 0;
+        if (paginationMax != null || paginationMin != null) {
+            const min = (paginationMin ?? 0);
+            const max = (paginationMax ?? count);
+            for (let i = min; i < max; ++i) {
+                getChildren().getAt(i)?.setChildCountIfPaginated(count);
+            }
+        }
+    }, [childCount]);
     return {
         context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        managedChildrenParameters: {
-            onChildrenCountChange: useStableCallback((count) => {
-                if (paginationMax != null || paginationMin != null) {
-                    setChildCount(count);
-                    const min = (paginationMin ?? 0);
-                    const max = (paginationMax ?? count);
-                    for (let i = min; i < max; ++i) {
-                        getChildren().getAt(i)?.setChildCountIfPaginated(count);
-                    }
-                }
-                else {
-                    // TODO: Make this debug only.
-                    setChildCount(null);
-                }
-            }),
-        },
-        paginatedChildrenReturn: { refreshPagination, childCount }
+        /* managedChildrenParameters: {
+             onChildrenCountChange: useStableCallback((count: number) => {
+                 if (paginationMax != null || paginationMin != null) {
+                     setChildCount(count);
+                     const min = (paginationMin ?? 0);
+                     const max = (paginationMax ?? count);
+                     for (let i = min; i < max; ++i) {
+                         getChildren().getAt(i)?.setChildCountIfPaginated(count);
+                     }
+                 }
+                 else {
+                     // TODO: Make this debug only.
+                     setChildCount(null);
+                 }
+             }),
+         },*/
+        paginatedChildrenReturn: { refreshPagination }
     };
 });
 /**

@@ -130,30 +130,5 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
  *
  * @compositeParams
  */
-export declare const useRearrangeableChildren: <M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
-/**
- * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
- *
- * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
- *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
- * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
- * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
- *
- * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
- * sort all children according to their value from the `getValue` argument you pass in.
- *
- * If you want to perform some re-ordering operation that's *not* a sort, you can manually
- * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
- * sorted and unsorted index positions.
- *
- * Again, unlike some other hooks, **these children must be direct descendants**. This is because
- * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
- * Because keys are given special treatment and a child has no way of modifying its own key
- * there's no other time or place this can happen other than exactly within the parent component's render function.
- *
- * @compositeParams
- */
-export declare const useSortableChildren: <M extends UseSortableChildInfo>({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }: UseSortableChildrenParameters<M>) => UseSortableChildrenReturnType<M>;
-export declare function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined): number;
+export declare const useRearrangeableChildren2: <M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
 //# sourceMappingURL=use-sortable-children.d.ts.map

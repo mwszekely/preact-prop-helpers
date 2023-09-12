@@ -28,7 +28,7 @@ import { shuffle as lodashShuffle } from "lodash-es";
  *
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
+export const useRearrangeableChildren2 = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -108,63 +108,4 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
         }
     };
 });
-/**
- * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
- *
- * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
- *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
- * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
- * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
- *
- * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
- * sort all children according to their value from the `getValue` argument you pass in.
- *
- * If you want to perform some re-ordering operation that's *not* a sort, you can manually
- * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
- * sorted and unsorted index positions.
- *
- * Again, unlike some other hooks, **these children must be direct descendants**. This is because
- * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
- * Because keys are given special treatment and a child has no way of modifying its own key
- * there's no other time or place this can happen other than exactly within the parent component's render function.
- *
- * @compositeParams
- */
-export const useSortableChildren = monitored(function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
-    const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
-    const { rearrange } = rearrangeableChildrenReturn;
-    // The actual sort function.
-    const sort = useCallback((direction) => {
-        const managedRows = getChildren();
-        const compare = getCompare();
-        const originalRows = managedRows._arraySlice();
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
-            const lhsValue = lhsRow;
-            const rhsValue = rhsRow;
-            const result = compare(lhsValue, rhsValue);
-            if (direction[0] == "d")
-                return -result;
-            return result;
-        }) : managedRows._arraySlice();
-        return rearrange(originalRows, sortedRows);
-    }, [ /* Must remain stable */]);
-    return {
-        sortableChildrenReturn: { sort },
-        rearrangeableChildrenReturn
-    };
-});
-export function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.getSortValue(), rhs?.getSortValue());
-    function compare1(lhs, rhs) {
-        if (lhs == null || rhs == null) {
-            if (lhs == null)
-                return -1;
-            if (rhs == null)
-                return 1;
-        }
-        return lhs - rhs;
-    }
-}
 //# sourceMappingURL=use-sortable-children.js.map
