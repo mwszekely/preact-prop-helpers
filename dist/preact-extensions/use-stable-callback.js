@@ -1,5 +1,4 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 /**
@@ -29,7 +28,7 @@ function setIsStableGetter(obj) {
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-export const useStableCallback = monitored(function useStableCallback(fn, noDeps) {
+export const useStableCallback = (function useStableCallback(fn, noDeps) {
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
     if (isStableGetter(fn))
         return fn;

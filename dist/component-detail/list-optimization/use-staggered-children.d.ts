@@ -9,6 +9,7 @@ export interface UseStaggeredChildrenParametersSelf {
      * If true, each child will delay rendering itself until the one before it has.
      */
     staggered: boolean;
+    childCount: number | null;
 }
 export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
@@ -16,7 +17,6 @@ export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenR
 export interface UseStaggeredChildContextSelf {
     parentIsStaggered: boolean;
     childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
-    childCallsThisToTellTheParentTheHighestIndex(index: number): void;
     getDefaultStaggeredVisible(i: number): boolean;
 }
 export interface UseStaggeredChildContext {
@@ -60,7 +60,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -69,5 +69,5 @@ export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildr
  *
  * @compositeParams
  */
-export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

@@ -2,7 +2,6 @@
 
 import { StateUpdater, useCallback, useRef, useState as useStateP } from "../util/lib.js";
 import { useStack } from "../util/stack.js";
-import { monitored } from "../util/use-call-count.js";
 
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
@@ -14,7 +13,7 @@ import { monitored } from "../util/use-call-count.js";
  * 
  * @param initialState - Same as the built-in `setState`'s
  */
-export const useState = monitored(function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
+export const useState = (function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
     const getStack = useStack();
 
     // We keep both, but override the `setState` functionality
@@ -23,7 +22,7 @@ export const useState = monitored(function useState<T>(initialState: T | (() => 
 
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useCallback<StateUpdater<T>>(value => {
+    const setState = useRef<StateUpdater<T>>(value => {
         if (process.env.NODE_ENV === 'development') {
             (window as any)._setState_stack = getStack();
         }
@@ -47,9 +46,9 @@ export const useState = monitored(function useState<T>(initialState: T | (() => 
             ref.current = value;
             setStateP(value);
         }
-    }, []);
+    });
 
     const getState = useCallback(() => { return ref.current; }, []);
 
-    return [state, setState, getState] as const;
+    return [state, setState.current, getState] as const;
 })

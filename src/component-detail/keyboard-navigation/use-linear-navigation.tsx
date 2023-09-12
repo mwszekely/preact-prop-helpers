@@ -6,8 +6,8 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
-import { UseRearrangeableChildrenReturnType } from "../use-sortable-children.js";
+import { UsePaginatedChildrenParameters } from "../list-optimization/use-paginated-children.js";
+import { UseRearrangeableChildrenReturnType } from "../list-optimization/use-rearrangeable-children.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 

@@ -1,10 +1,9 @@
 import { jsx as _jsx, Fragment as _Fragment } from "preact/jsx-runtime";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
-import { usePropsOnChildren } from "../../preact-extensions/use-props-on-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { createContext, memo, useCallback, useContext } from "../../util/lib.js";
+import { memo, useCallback, useLayoutEffect } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
 import { useRearrangeableChildren2 } from "./use-rearrangeable-children.js";
@@ -32,9 +31,31 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @compositeParams
  */
-export const useListChildren = monitored(function useListChildren({ rearrangeableChildrenParameters, listChildrenParameters: { children, compare: userCompare }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters }) {
+export const useListChildren = monitored(function useListChildren({ rearrangeableChildrenParameters, listChildrenParameters: { children, compare: userCompare }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }) {
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: {} });
+    //const [childCount, setChildCount] = useState<null | number>(null);
+    const childCount = children.length;
+    const { paginationMax, paginationMin } = paginatedChildrenParameters;
+    const { staggered } = staggeredChildrenParameters;
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
+        managedChildrenParameters: {
+        /*onChildrenCountChange: useStableCallback((count: number) => {
+           if (paginationMax != null || paginationMin != null || staggered) {
+               debugger;
+               setChildCount(count);
+               const min = (paginationMin ?? 0);
+               const max = (paginationMax ?? count);
+               for (let i = min; i < max; ++i) {
+                   getChildren().getAt(i)?.setChildCountIfPaginated(count);
+               }
+           }
+           else {
+               // TODO: Make this debug only.
+               setChildCount(null);
+           }
+       }),*/
+        }
+    });
     const { rearrangeableChildrenReturn } = useRearrangeableChildren2({ rearrangeableChildrenParameters, managedChildrenReturn });
     const { rearrange, useRearrangedChildren } = rearrangeableChildrenReturn;
     const { getChildren } = managedChildrenReturn;
@@ -57,13 +78,22 @@ export const useListChildren = monitored(function useListChildren({ rearrangeabl
         refElementReturn,
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
         rovingTabIndexReturn,
-        paginatedChildrenParameters,
-        rearrangeableChildrenReturn: { indexDemangler: rearrangeableChildrenReturn.indexDemangler }
+        paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
+        rearrangeableChildrenReturn,
     });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        staggeredChildrenParameters
+        staggeredChildrenParameters: { staggered, childCount }
     });
+    useLayoutEffect(() => {
+        provideManglers({
+            indexDemangler: rearrangeableChildrenReturn.indexDemangler,
+            indexMangler: rearrangeableChildrenReturn.indexMangler,
+            reverse: rearrangeableChildrenReturn.reverse,
+            shuffle: rearrangeableChildrenReturn.shuffle,
+            sort
+        });
+    }, []);
     return {
         listChildrenReturn: {
             sort,
@@ -79,18 +109,11 @@ export const useListChildren = monitored(function useListChildren({ rearrangeabl
         })
     };
 });
-const RC = memo(({ children, useRearrangedChildren }) => {
-    return (_jsx(_Fragment, { children: useRearrangedChildren(children.map((child, index) => {
-            return (_jsx(PSC, { children: child, index: index }));
-        })) }));
-});
-const CTX = createContext(null);
-const PSC = memo(({ index, children }) => {
-    const context = useContext(CTX);
+export const useListChild = monitored(function useListChild({ context, info: { index }, listChildParameters: { children: childrenIn } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
-    const {} = useManagedChild({
+    const { managedChildReturn } = useManagedChild({
         context,
         info: {
             index,
@@ -101,10 +124,49 @@ const PSC = memo(({ index, children }) => {
     });
     const { hideBecausePaginated } = paginatedChildReturn;
     const { hideBecauseStaggered } = staggeredChildReturn;
+    let children = childrenIn;
+    const propsRet = useMergedProps(propsStaggered, propsPaginated);
+    if (hideBecausePaginated || hideBecauseStaggered)
+        children = null;
+    return {
+        props: propsRet,
+        managedChildReturn,
+        paginatedChildReturn,
+        staggeredChildReturn,
+        listChildReturn: {
+            children
+        }
+    };
+});
+const RC = memo(({ children, useRearrangedChildren }) => {
+    return (_jsx(_Fragment, { children: useRearrangedChildren(children) }));
+});
+/*
+const CTX = createContext<UsePaginatedChildContext & UseStaggeredChildContext & UseManagedChildrenContext<UseListChildInfo<any>>>(null!);
+
+const PSC = memo(({ index, children }: { children: VNode, index: number }) => {
+    const context = useContext(CTX);
+    const { paginatedChildContext, staggeredChildContext } = context;
+    const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
+    const { info: { setStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
+    const { } = useManagedChild<UseListChildInfo<any>>({
+        context,
+        info: {
+            index,
+            setChildCountIfPaginated,
+            setPaginationVisible,
+            setStaggeredVisible
+        }
+    });
+    const { hideBecausePaginated } = paginatedChildReturn;
+    const { hideBecauseStaggered } = staggeredChildReturn;
+
     if (hideBecausePaginated || hideBecauseStaggered)
         return null;
+
     return (usePropsOnChildren(children, useMergedProps(propsStaggered, propsPaginated), undefined));
-});
+})
+*/
 function defaultCompare(lhs, rhs) {
     return compare1(lhs?.index, rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
     function compare1(lhs, rhs) {

@@ -1,11 +1,10 @@
-//import "preact/debug";
+import "preact/debug";
 
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
 import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
 
-import { options } from "preact";
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
@@ -509,7 +508,7 @@ const DemoStaggered = memo(() => {
     const [checked, setChecked] = useState(false);
     const [childCount, setChildCount] = useState(100);
     const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo>({ managedChildrenParameters: {} })
-    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } })
+    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered, childCount } })
     return (
         <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
             <div class="demo">
@@ -548,10 +547,10 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 })
 
 
-options.debounceRendering = (f) => f();
+//options.debounceRendering = (f) => f();
 
 const Component = () => {
-    if (0)
+    if (1)
         return <DemoUseRovingTabIndex />;
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>

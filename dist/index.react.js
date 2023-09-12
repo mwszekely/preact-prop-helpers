@@ -1,4 +1,4 @@
-import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
+import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useEffect, createElement, Fragment, useState as useState$1, memo, useId, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
 export { createPortal } from 'react-dom';
@@ -125,83 +125,6 @@ const EventMapping = {
     ...EventMapping$1,
 };
 
-// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
-// (i.e. in a way that doesn't throw an error)
-globalThis["process"] ??= {};
-globalThis["process"]["env"] ??= {};
-globalThis["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV;
-// The above statement looks redundant, but it ensures that manual
-// reads to `process.env.NODE_ENV` work regardless of if the bundler 
-// replaces `process.env.NODE_ENV` with the string `"development"` or not.
-
-// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
-// And it's extremely small anyway and basically does nothing.
-window.requestIdleCallback ??= (callback) => {
-    return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
-};
-let timeoutHandle = null;
-let i = 0;
-function monitored(hook) {
-    const h = hook;
-    if (process.env.NODE_ENV === 'development') {
-        return (function (...args) {
-            const r = useRef(++i);
-            monitorCallCount(h);
-            const start = performance.mark(`${h.name}-start-${r.current}`);
-            const ret = h(...args);
-            const end = performance.mark(`${h.name}-end-${r.current}`);
-            performance.measure(h.name, start.name, end.name);
-            return ret;
-        });
-    }
-    else {
-        return hook;
-    }
-}
-/**
- * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
- *
- * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
- */
-function monitorCallCount(hook) {
-    if (process.env.NODE_ENV !== 'development')
-        return;
-    const name = hook.name;
-    if (filterAll || filters.has(name))
-        return;
-    console.assert(name.length > 0);
-    window._hookCallCount ??= { callCounts: {} };
-    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
-    window._hookCallCount.callCounts[name].moment += 1;
-    window._hookCallCount.callCounts[name].total += 1;
-    if (timeoutHandle == null) {
-        timeoutHandle = requestIdleCallback(() => {
-            //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
-            //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-            const o = Object.entries(window._hookCallCount.callCounts)
-                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
-                .filter(({ Now }) => { return !!Now; })
-                .sort(({ Now: lhsM }, { Now: rhsM }) => {
-                if (!lhsM && !rhsM)
-                    return 0;
-                lhsM ||= Infinity;
-                rhsM ||= Infinity;
-                return lhsM - rhsM;
-            });
-            console.table(o, ['Hook', 'Now', 'Total']);
-            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
-            timeoutHandle = null;
-        });
-    }
-}
-let filterAll = false;
-const filters = new Set();
-function hideCallCount(hook) {
-    filterAll = (hook === "all");
-    if (hook != "all")
-        filters.add(hook.name);
-}
-
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
@@ -251,7 +174,7 @@ function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-const usePassiveState = monitored(function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+const usePassiveState = (function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
     //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset$2);
     const reasonRef = useRef(Unset$2);
@@ -365,7 +288,7 @@ const Unset$1 = Symbol("unset");
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
-const useStableGetter = monitored(function useStableGetter(value) {
+const useStableGetter = (function useStableGetter(value) {
     const ref = useRef(Unset$1);
     useInsertionEffect((() => { ref.current = value; }), [value]);
     return useCallback(() => {
@@ -395,7 +318,7 @@ function setIsStableGetter(obj) {
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-const useStableCallback = monitored(function useStableCallback(fn, noDeps) {
+const useStableCallback = (function useStableCallback(fn, noDeps) {
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
     if (isStableGetter())
         return fn;
@@ -410,6 +333,94 @@ const useStableCallback = monitored(function useStableCallback(fn, noDeps) {
         return setIsStableGetter(useCallback(fn, []));
     }
 });
+
+// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error)
+globalThis["process"] ??= {};
+globalThis["process"]["env"] ??= {};
+globalThis["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV;
+// The above statement looks redundant, but it ensures that manual
+// reads to `process.env.NODE_ENV` work regardless of if the bundler 
+// replaces `process.env.NODE_ENV` with the string `"development"` or not.
+
+// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+// And it's extremely small anyway and basically does nothing.
+window.requestIdleCallback ??= (callback) => {
+    return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
+};
+let timeoutHandle = null;
+let i = 0;
+/**
+ * Wraps a hook/component that gives it nice devtools timing visualizations, only if process.env.NODE_ENV is "development".
+ *
+ * Some functions in this library are parenthesized but not wrapped in `monitored` --
+ * they are so small that their duration generally rounds down to 0 (or epsilon), so using
+ * this function usually makes no sense on them. The performance monitoring takes more time
+ * than the function itself.
+ *
+ * @param hook
+ * @returns
+ */
+function monitored(hook) {
+    const h = hook;
+    if (process.env.NODE_ENV === 'development') {
+        return (function (...args) {
+            const r = useRef(++i);
+            monitorCallCount(h);
+            const start = performance.mark(`${h.name}-start-${r.current}`);
+            const ret = h(...args);
+            const end = performance.mark(`${h.name}-end-${r.current}`);
+            performance.measure(h.name, start.name, end.name);
+            return ret;
+        });
+    }
+    else {
+        return hook;
+    }
+}
+/**
+ * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+ *
+ * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+ */
+function monitorCallCount(hook) {
+    if (process.env.NODE_ENV !== 'development')
+        return;
+    const name = hook.name;
+    if (filterAll || filters.has(name))
+        return;
+    console.assert(name.length > 0);
+    window._hookCallCount ??= { callCounts: {} };
+    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    window._hookCallCount.callCounts[name].moment += 1;
+    window._hookCallCount.callCounts[name].total += 1;
+    if (timeoutHandle == null) {
+        timeoutHandle = requestIdleCallback(() => {
+            //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
+            //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
+            const o = Object.entries(window._hookCallCount.callCounts)
+                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
+                .filter(({ Now }) => { return !!Now; })
+                .sort(({ Now: lhsM }, { Now: rhsM }) => {
+                if (!lhsM && !rhsM)
+                    return 0;
+                lhsM ||= Infinity;
+                rhsM ||= Infinity;
+                return lhsM - rhsM;
+            });
+            console.table(o, ['Hook', 'Now', 'Total']);
+            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
+            timeoutHandle = null;
+        });
+    }
+}
+let filterAll = false;
+const filters = new Set();
+function hideCallCount(hook) {
+    filterAll = (hook === "all");
+    if (hook != "all")
+        filters.add(hook.name);
+}
 
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
@@ -668,7 +679,7 @@ const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementP
  *
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
+const useMergedChildren = (function useMergedChildren(lhs, rhs) {
     if (lhs == null && rhs == null) {
         return undefined;
     }
@@ -688,7 +699,7 @@ const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
  *
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-const useMergedClasses = monitored(function useMergedClasses(...classes) {
+const useMergedClasses = (function useMergedClasses(...classes) {
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set();
@@ -722,7 +733,7 @@ function processRef(instance, ref) {
  *
  * @remarks Or just use {@link useMergedProps}
  */
-const useMergedRefs = monitored(function useMergedRefs(rhs, lhs) {
+const useMergedRefs = (function useMergedRefs(rhs, lhs) {
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);
@@ -753,7 +764,7 @@ function styleStringToObject(style) {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-const useMergedStyles = monitored(function useMergedStyles(lhs, rhs) {
+const useMergedStyles = (function useMergedStyles(lhs, rhs) {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -822,7 +833,7 @@ const useMergedProps = monitored(function useMergedProps(...allProps) {
     return ret;
 });
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
-const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
+const mergeUnknown = (function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
         // They're both functions that can be merged (or one's a function and the other's null).
         // Not an *easy* case, but a well-defined one.
@@ -861,7 +872,7 @@ const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mods) {
+const useMergedPropsHelper = (function useMergedPropsHelper(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -883,7 +894,7 @@ const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mod
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
 });
-const mergeFunctions = monitored(function mergeFunctions(lhs, rhs) {
+const mergeFunctions = (function mergeFunctions(lhs, rhs) {
     if (!lhs)
         return rhs;
     if (!rhs)
@@ -1579,14 +1590,14 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-const useState = monitored(function useState(initialState) {
+const useState = (function useState(initialState) {
     const getStack = useStack();
     // We keep both, but override the `setState` functionality
     const [state, setStateP] = useState$1(initialState);
     const ref = useRef(state);
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useCallback(value => {
+    const setState = useRef(value => {
         if (process.env.NODE_ENV === 'development') {
             window._setState_stack = getStack();
         }
@@ -1610,9 +1621,9 @@ const useState = monitored(function useState(initialState) {
             ref.current = value;
             setStateP(value);
         }
-    }, []);
+    });
     const getState = useCallback(() => { return ref.current; }, []);
-    return [state, setState, getState];
+    return [state, setState.current, getState];
 });
 
 /**
@@ -2362,6 +2373,102 @@ const useGridNavigationCell = monitored(function useGridNavigationCell({ context
     };
 });
 
+var l;function _$1(n){return n.children}l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
+
+var _=0;function o(o,e,n,t,f,l$1){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l$1};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l.vnode&&l.vnode(i),i}
+
+/**
+ * Allows children to stop themselves from rendering outside of a narrow range.
+ *
+ * @remarks Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link usePaginatedChild}
+ */
+const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
+    const parentIsPaginated = (paginationMin != null || paginationMax != null);
+    const lastPagination = useRef({ paginationMax: null, paginationMin: null });
+    const refreshPagination = useCallback((paginationMin, paginationMax) => {
+        const childMax = (getChildren().getHighestIndex() + 1);
+        const childMin = (getChildren().getLowestIndex());
+        for (let i = childMin; i <= childMax; ++i) {
+            const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
+            getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+            if (visible && (paginationMax != null || paginationMin != null))
+                getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        }
+    }, [ /* Must be empty */]);
+    useEffect(() => {
+        // At this point, the children have not yet updated themselves to match the pagination.
+        // We need to tell them to update, but also handle where the focus is.
+        // If a current list item is focused, then we need to move focus to a paginated one
+        // but we can't do it until they all re-render...
+        // TODO: Something better than setTimeout for this, please...
+        let tabbableIndex = getTabbableIndex();
+        if (tabbableIndex != null) {
+            let shouldFocus = getElement()?.contains(document.activeElement) || false;
+            setTimeout(() => {
+                if (paginationMin != null && tabbableIndex < paginationMin) {
+                    setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                }
+                else if (paginationMax != null && tabbableIndex >= paginationMax) {
+                    let next = paginationMax - 1;
+                    if (next == -1)
+                        next = null;
+                    setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                }
+            }, 1);
+        }
+        refreshPagination(paginationMin, paginationMax);
+        lastPagination.current.paginationMax = paginationMax ?? null;
+        lastPagination.current.paginationMin = paginationMin ?? null;
+    }, [paginationMax, paginationMin]);
+    const getDefaultPaginationVisible = useCallback((i) => { return (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)); }, []);
+    const paginatedChildContext = useMemo(() => ({
+        parentIsPaginated,
+        getDefaultPaginationVisible
+    }), [parentIsPaginated]);
+    const getPaginationMin = useStableGetter(paginationMin);
+    const getPaginationMax = useStableGetter(paginationMax);
+    useLayoutEffect(() => {
+        const paginationMin = getPaginationMin();
+        const paginationMax = getPaginationMax();
+        const count = childCount ?? 0;
+        if (paginationMax != null || paginationMin != null) {
+            const min = (paginationMin ?? 0);
+            const max = (paginationMax ?? count);
+            for (let i = min; i < max; ++i) {
+                getChildren().getAt(i)?.setChildCountIfPaginated(count);
+            }
+        }
+    }, [childCount]);
+    return {
+        context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
+        paginatedChildrenReturn: { refreshPagination }
+    };
+});
+/**
+ * Child hook for {@link usePaginatedChildren}.
+ *
+ * @remarks When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ *
+ * @compositeParams
+ */
+const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
+    const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
+    const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
+    return {
+        props: useTagProps(!parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) }, "data-paginated-children-child"),
+        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        info: {
+            setPaginationVisible: setPaginatedVisible,
+            setChildCountIfPaginated
+        }
+    };
+});
+
 /**
  * Returns a function that will, when called, force the component
  * that uses this hook to re-render itself.
@@ -2396,7 +2503,7 @@ const useForceUpdate = monitored(function useForceUpdate() {
  *
  * @compositeParams
  */
-const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
+const useRearrangeableChildren2 = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -2453,15 +2560,15 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
             return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
         });
     }), []);
-    const toJsonArray = useCallback((transform) => {
+    /*const toJsonArray = useCallback((transform?: (info: M) => object) => {
         const managedRows = getChildren();
         return managedRows._arraySlice().map(child => {
             if (transform)
                 return (transform(child));
             else
                 return child.getSortValue();
-        });
-    }, []);
+        })
+    }, []);*/
     return {
         rearrangeableChildrenReturn: {
             indexMangler,
@@ -2471,11 +2578,142 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
             rearrange,
             shuffle: shuffle$1,
             reverse,
-            useRearrangedChildren,
-            toJsonArray
+            useRearrangedChildren
         }
     };
 });
+
+/**
+ * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ *
+ * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
+ * delay other complicated or heavy logic, until the child is no longer staggered.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useStaggeredChild}
+ */
+const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
+    const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
+    // This is the highest index that we want to show, inclusive.
+    const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
+    // By default, when a child mounts, we tell the next child to mount and simply repeat.
+    // If a child is missing, however, it will break that chain.
+    // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
+    const timeoutHandle = useRef(-1);
+    const resetEmergencyTimeout = useCallback(() => {
+        if (timeoutHandle.current != -1)
+            clearTimeout(timeoutHandle.current);
+        // We've gone this long without hearing the next child mount itself...
+        // We need to continue.
+        timeoutHandle.current = setTimeout(() => {
+            // This is split up into two setTimeouts for timing reasons:
+            // If it's taking a long time to render a child, it's possible that we'll
+            // trip this emergency timeout even though the child renders itself perfectly fine.
+            // Due to the way timeouts are ordered, we want to ensure this timeout runs AFTER
+            // the component's effect timeout. So we just wait again for a short tick.
+            timeoutHandle.current = setTimeout(() => {
+                timeoutHandle.current = -1;
+                let target = getTargetStaggerIndex();
+                setDisplayedStaggerIndex(prev => Math.min(target || 0, (prev || 0) + 1));
+            }, 10);
+        }, 100);
+    }, [ /* Must be empty */]);
+    // The target index is the index that we're "animating" to.
+    // Each child simply sets this to the highest value ever seen.
+    // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
+    useEffect(() => {
+        // Any time our target changes,
+        // ensure our timeout is running, and start a new one if not
+        if (timeoutHandle.current == -1) {
+            resetEmergencyTimeout();
+            // If there's no timeout running, then that also means we're not waiting for a child to mount.
+            // So ask a child to mount and then wait for that child to mount.
+            setDisplayedStaggerIndex(c => Math.min(childCount ?? 0, (c ?? 0) + 1));
+        }
+    }, [childCount]);
+    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
+        if (newIndex == null || !s.current) {
+            return;
+        }
+        setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
+        // It's time to show the next child,
+        // either because the current one finished mounting,
+        // or because our emergency backup timeout fired.
+        //
+        // Either way, tell the next child to show itself.
+        // Also make sure that anyone we skipped somehow show themselves as well.
+        // (queueMicrotask prevents warnings if debounceRendering is immediate)
+        queueMicrotask(() => {
+            for (let i = (prevIndex ?? 0) - 1; i <= newIndex; ++i) {
+                getChildren().getAt(i)?.setStaggeredVisible(true);
+            }
+        });
+        // Set a new emergency timeout
+        resetEmergencyTimeout();
+    }, [ /* Must be empty */]), returnNull);
+    const parentIsStaggered = (!!staggered);
+    const childCallsThisToTellTheParentToMountTheNextOne = useCallback((justMountedChildIndex) => {
+        setDisplayedStaggerIndex(prevIndex => {
+            return Math.min((getTargetStaggerIndex() ?? 0), // Don't go higher than the highest child
+            1 + (Math.max(prevIndex ?? 0, justMountedChildIndex)) // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
+            );
+        });
+    }, []);
+    // TODO: Modification during render (but it's really, really hard to avoid here,
+    // but also probably fine because parents render before children? Does that include suspense?)
+    const s = useRef(parentIsStaggered);
+    s.current = parentIsStaggered;
+    const getDefaultStaggeredVisible = useCallback((i) => {
+        if (s.current) {
+            const staggerIndex = getDisplayedStaggerIndex();
+            if (staggerIndex == null)
+                return false;
+            return i < staggerIndex;
+        }
+        else {
+            return true;
+        }
+    }, []);
+    const staggeredChildContext = useMemo(() => ({
+        parentIsStaggered,
+        childCallsThisToTellTheParentToMountTheNextOne,
+        getDefaultStaggeredVisible
+    }), [parentIsStaggered]);
+    return {
+        staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
+        context: useMemo(() => ({
+            staggeredChildContext
+        }), [staggeredChildContext]),
+    };
+});
+/**
+ * Child hook for {@link useStaggeredChildren}.
+ *
+ * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ *
+ * @compositeParams
+ */
+const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+    useEffect(() => {
+        if ((parentIsStaggered && staggeredVisible)) {
+            //setTimeout(() => {childCallsThisToTellTheParentToMountTheNextOne(index);}, 30)
+            childCallsThisToTellTheParentToMountTheNextOne(index);
+        }
+        else if (!parentIsStaggered) {
+            // Ensure that if we mount unstaggered and change to staggered, we start at the end
+            childCallsThisToTellTheParentToMountTheNextOne(index);
+        }
+    }, [index, (parentIsStaggered && staggeredVisible)]);
+    return {
+        props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
+        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        info: { setStaggeredVisible: setStaggeredVisible, }
+    };
+});
+
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -2499,10 +2737,34 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
  *
  * @compositeParams
  */
-const useSortableChildren = monitored(function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
+const useListChildren = monitored(function useListChildren({ rearrangeableChildrenParameters, listChildrenParameters: { children, compare: userCompare }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }) {
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters, managedChildrenReturn: { getChildren } });
-    const { rearrange } = rearrangeableChildrenReturn;
+    //const [childCount, setChildCount] = useState<null | number>(null);
+    const childCount = children.length;
+    const { paginationMax, paginationMin } = paginatedChildrenParameters;
+    const { staggered } = staggeredChildrenParameters;
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
+        managedChildrenParameters: {
+        /*onChildrenCountChange: useStableCallback((count: number) => {
+           if (paginationMax != null || paginationMin != null || staggered) {
+               debugger;
+               setChildCount(count);
+               const min = (paginationMin ?? 0);
+               const max = (paginationMax ?? count);
+               for (let i = min; i < max; ++i) {
+                   getChildren().getAt(i)?.setChildCountIfPaginated(count);
+               }
+           }
+           else {
+               // TODO: Make this debug only.
+               setChildCount(null);
+           }
+       }),*/
+        }
+    });
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren2({ rearrangeableChildrenParameters, managedChildrenReturn });
+    const { rearrange, useRearrangedChildren } = rearrangeableChildrenReturn;
+    const { getChildren } = managedChildrenReturn;
     // The actual sort function.
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
@@ -2518,13 +2780,101 @@ const useSortableChildren = monitored(function useSortableChildren({ rearrangeab
         }) : managedRows._arraySlice();
         return rearrange(originalRows, sortedRows);
     }, [ /* Must remain stable */]);
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
+        refElementReturn,
+        managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
+        rovingTabIndexReturn,
+        paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
+        rearrangeableChildrenReturn,
+    });
+    const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
+        managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
+        staggeredChildrenParameters: { staggered, childCount }
+    });
+    useLayoutEffect(() => {
+        provideManglers({
+            indexDemangler: rearrangeableChildrenReturn.indexDemangler,
+            indexMangler: rearrangeableChildrenReturn.indexMangler,
+            reverse: rearrangeableChildrenReturn.reverse,
+            shuffle: rearrangeableChildrenReturn.shuffle,
+            sort
+        });
+    }, []);
     return {
-        sortableChildrenReturn: { sort },
-        rearrangeableChildrenReturn
+        listChildrenReturn: {
+            sort,
+            children: o(RC, { useRearrangedChildren: useRearrangedChildren, children: children })
+        },
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn,
+        paginatedChildrenReturn,
+        context: useMemoObject({
+            staggeredChildContext,
+            paginatedChildContext,
+            managedChildContext
+        })
     };
 });
+const useListChild = monitored(function useListChild({ context, info: { index }, listChildParameters: { children: childrenIn } }) {
+    const { paginatedChildContext, staggeredChildContext } = context;
+    const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
+    const { info: { setStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
+    const { managedChildReturn } = useManagedChild({
+        context,
+        info: {
+            index,
+            setChildCountIfPaginated,
+            setPaginationVisible,
+            setStaggeredVisible
+        }
+    });
+    const { hideBecausePaginated } = paginatedChildReturn;
+    const { hideBecauseStaggered } = staggeredChildReturn;
+    let children = childrenIn;
+    const propsRet = useMergedProps(propsStaggered, propsPaginated);
+    if (hideBecausePaginated || hideBecauseStaggered)
+        children = null;
+    return {
+        props: propsRet,
+        managedChildReturn,
+        paginatedChildReturn,
+        staggeredChildReturn,
+        listChildReturn: {
+            children
+        }
+    };
+});
+const RC = memo(({ children, useRearrangedChildren }) => {
+    return (o(_$1, { children: useRearrangedChildren(children) }));
+});
+/*
+const CTX = createContext<UsePaginatedChildContext & UseStaggeredChildContext & UseManagedChildrenContext<UseListChildInfo<any>>>(null!);
+
+const PSC = memo(({ index, children }: { children: VNode, index: number }) => {
+    const context = useContext(CTX);
+    const { paginatedChildContext, staggeredChildContext } = context;
+    const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
+    const { info: { setStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
+    const { } = useManagedChild<UseListChildInfo<any>>({
+        context,
+        info: {
+            index,
+            setChildCountIfPaginated,
+            setPaginationVisible,
+            setStaggeredVisible
+        }
+    });
+    const { hideBecausePaginated } = paginatedChildReturn;
+    const { hideBecauseStaggered } = staggeredChildReturn;
+
+    if (hideBecausePaginated || hideBecauseStaggered)
+        return null;
+
+    return (usePropsOnChildren(children, useMergedProps(propsStaggered, propsPaginated), undefined));
+})
+*/
 function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.getSortValue(), rhs?.getSortValue());
+    return compare1(lhs?.index, rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
     function compare1(lhs, rhs) {
         if (lhs == null || rhs == null) {
             if (lhs == null)
@@ -3001,280 +3351,6 @@ function useSelectionChildDeclarative(args) {
 }
 
 /**
- * Combines {@link useGridNavigation} and {@link useSelection}.
- *
- * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
- *
- * @hasChild {@link useGridNavigationSelectionRow}
- * @hasChild {@link useGridNavigationSelectionCell}
- *
- * @compositeParams
- */
-const useGridNavigationSelection = monitored(function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }) {
-    const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
-        gridNavigationParameters,
-        linearNavigationParameters,
-        managedChildrenReturn,
-        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
-        typeaheadNavigationParameters,
-        paginatedChildrenParameters,
-        rearrangeableChildrenReturn,
-        refElementReturn
-    });
-    const { childrenHaveFocusParameters, context: { singleSelectionContext, multiSelectionContext }, multiSelectionReturn, propsStable, singleSelectionReturn, ...void1 } = useSelection({
-        managedChildrenReturn,
-        rovingTabIndexReturn,
-        singleSelectionParameters,
-        multiSelectionParameters,
-        childrenHaveFocusReturn
-    });
-    return {
-        context: useMemoObject({
-            gridNavigationRowContext,
-            rovingTabIndexContext,
-            singleSelectionContext,
-            multiSelectionContext,
-            typeaheadNavigationContext
-        }),
-        childrenHaveFocusParameters,
-        linearNavigationReturn,
-        managedChildrenParameters,
-        props: useMergedProps(props, propsStable),
-        rovingTabIndexReturn,
-        singleSelectionReturn,
-        multiSelectionReturn,
-        typeaheadNavigationReturn
-    };
-});
-/**
- * @compositeParams
- */
-const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
-    return {
-        context: contextGridNavigation,
-        linearNavigationReturn,
-        info: {
-            getLocallyTabbable,
-            getSingleSelected,
-            singleSelected,
-            setLocallyTabbable,
-            setLocalSingleSelected,
-            focusSelf,
-            getMultiSelected,
-            setSelectedFromParent,
-            getMultiSelectionDisabled
-        },
-        managedChildrenParameters,
-        pressParameters: { onPressSync, excludeSpace },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason); }) },
-        props: useMergedProps(propsGridNavigation, propsSelection),
-        rovingTabIndexChildReturn,
-        rovingTabIndexReturn,
-        singleSelectionChildReturn,
-        multiSelectionChildReturn,
-        textContentReturn,
-        typeaheadNavigationReturn
-    };
-});
-/**
- * @compositeParams
- */
-const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell(p) {
-    return useGridNavigationCell(p);
-});
-
-/**
- * Combines {@link useGridNavigation}, {@link useSelection}, and {@link useSortableChildren}.
- *
- * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
- *
- * @hasChild {@link useGridNavigationSelectionSortableRow}
- *
- * @compositeParams
- */
-const useGridNavigationSelectionSortable = (function useGridNavigationSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }) {
-    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
-    const gnr = useGridNavigationSelection({
-        rearrangeableChildrenReturn,
-        linearNavigationParameters,
-        managedChildrenReturn,
-        gridNavigationParameters,
-        paginatedChildrenParameters,
-        refElementReturn,
-        rovingTabIndexParameters,
-        singleSelectionParameters,
-        multiSelectionParameters,
-        typeaheadNavigationParameters,
-        childrenHaveFocusReturn
-    });
-    return {
-        rearrangeableChildrenReturn,
-        sortableChildrenReturn,
-        ...gnr
-    };
-});
-/**
- * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
- *
- * @compositeParams
- */
-const useGridNavigationSelectionSortableRow = (function useGridNavigationSelectionSortableRow({ context: ctxIncoming, info: { index, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
-    const getSortValue = useCallback(() => {
-        let rows = managedChildrenReturn.getChildren();
-        let columnIndex = getSortableColumnIndex() || 0;
-        let cell = rows.getAt(columnIndex);
-        return cell?.getSortValue();
-    }, []);
-    const { info: { getLocallyTabbable, getSingleSelected, getMultiSelected, setSelectedFromParent, singleSelected, setLocalSingleSelected, setLocallyTabbable, focusSelf, getMultiSelectionDisabled, ...void4 }, context: ctxOutgoing, hasCurrentFocusParameters, linearNavigationReturn, managedChildrenParameters, pressParameters, props, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelectionRow({
-        context: ctxIncoming,
-        info: { index, untabbable },
-        linearNavigationParameters,
-        managedChildrenReturn,
-        refElementReturn,
-        rovingTabIndexParameters,
-        textContentParameters,
-        typeaheadNavigationParameters,
-        singleSelectionChildParameters,
-        multiSelectionChildParameters
-    });
-    return {
-        info: { getLocallyTabbable, getMultiSelected, setSelectedFromParent, getSingleSelected, getMultiSelectionDisabled, singleSelected, setLocallyTabbable, setLocalSingleSelected, getSortValue, focusSelf },
-        context: ctxOutgoing,
-        hasCurrentFocusParameters,
-        linearNavigationReturn,
-        managedChildrenParameters,
-        pressParameters,
-        props,
-        rovingTabIndexChildReturn,
-        rovingTabIndexReturn,
-        singleSelectionChildReturn,
-        multiSelectionChildReturn,
-        textContentReturn,
-        typeaheadNavigationReturn
-    };
-});
-/**
- * @compositeParams
- */
-const useGridNavigationSelectionSortableCell = (function useGridNavigationSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
-    return useGridNavigationSelectionCell({
-        context,
-        info: { index, untabbable },
-        gridNavigationCellParameters,
-        refElementReturn,
-        textContentParameters,
-    });
-});
-
-/**
- * Combines {@link useListNavigation} and {@link useSelection}.
- *
- * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
- *
- * @hasChild {@link useListNavigationSelectionChild}
- *
- * @compositeParams
- */
-const useListNavigationSelection = monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
-    const { context: contextSS, propsStable, ...retSS } = useSelection({
-        childrenHaveFocusReturn,
-        rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
-        managedChildrenReturn,
-        singleSelectionParameters,
-        multiSelectionParameters
-    });
-    const { context: contextLN, props, rovingTabIndexReturn, ...retLN } = useListNavigation({
-        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
-        linearNavigationParameters,
-        paginatedChildrenParameters,
-        typeaheadNavigationParameters,
-        managedChildrenReturn,
-        refElementReturn,
-        rearrangeableChildrenReturn
-    });
-    return {
-        rovingTabIndexReturn,
-        ...retSS,
-        ...retLN,
-        context: useMemoObject({
-            ...contextLN,
-            ...contextSS
-        }),
-        props: useMergedProps(props, propsStable)
-    };
-});
-/**
- * @compositeParams
- */
-const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
-        info: { index, untabbable },
-        context,
-        multiSelectionChildParameters,
-        singleSelectionChildParameters
-    });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
-        info: { index, untabbable },
-        context,
-        refElementReturn,
-        textContentParameters,
-    });
-    return {
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
-                ocfic1?.(focused, previouslyFocused, e);
-                ocfic2?.(focused, previouslyFocused, e);
-            })
-        },
-        pressParameters: { onPressSync, excludeSpace },
-        info: { ...infoSS, ...infoLN },
-        rovingTabIndexChildReturn,
-        multiSelectionChildReturn,
-        singleSelectionChildReturn,
-        textContentReturn,
-        propsChild: propsSS,
-        propsTabbable: propsLN
-    };
-});
-
-/**
- * Combines {@link useListNavigation}, {@link useSelection}, and {@link useSortableChildren}.
- *
- * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
- *
- * @hasChild {@link useListNavigationSelectionSortableChild}
- *
- * @compositeParams
- */
-const useListNavigationSelectionSortable = monitored(function useListNavigationSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }) {
-    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
-    const { props, context, ...restLN } = useListNavigationSelection({ childrenHaveFocusReturn, linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
-    return {
-        context,
-        props,
-        rearrangeableChildrenReturn,
-        sortableChildrenReturn,
-        ...restLN
-    };
-});
-/**
- * @compositeParams
- */
-const useListNavigationSelectionSortableChild = monitored(function useListNavigationSelectionSortableChild({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    return useListNavigationSelectionChild({
-        info,
-        context,
-        refElementReturn,
-        textContentParameters,
-        singleSelectionChildParameters,
-        multiSelectionChildParameters
-    });
-});
-
-/**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
@@ -3668,218 +3744,158 @@ function findFirstCondition(element, filter) {
 }
 
 /**
- * Allows children to stop themselves from rendering outside of a narrow range.
+ * Combines {@link useGridNavigation} and {@link useSelection}.
  *
- * @remarks Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
+ * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useGridNavigationSelectionRow}
+ * @hasChild {@link useGridNavigationSelectionCell}
  *
  * @compositeParams
- *
- * @hasChild {@link usePaginatedChild}
  */
-const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
-    const [childCount, setChildCount] = useState(null);
-    const parentIsPaginated = (paginationMin != null || paginationMax != null);
-    const lastPagination = useRef({ paginationMax: null, paginationMin: null });
-    const refreshPagination = useCallback((paginationMin, paginationMax) => {
-        const childMax = (getChildren().getHighestIndex() + 1);
-        const childMin = (getChildren().getLowestIndex());
-        for (let i = childMin; i <= childMax; ++i) {
-            const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-            getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
-            if (visible && (paginationMax != null || paginationMin != null))
-                getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
-        }
-    }, [ /* Must be empty */]);
-    useEffect(() => {
-        // At this point, the children have not yet updated themselves to match the pagination.
-        // We need to tell them to update, but also handle where the focus is.
-        // If a current list item is focused, then we need to move focus to a paginated one
-        // but we can't do it until they all re-render...
-        // TODO: Something better than setTimeout for this, please...
-        let tabbableIndex = getTabbableIndex();
-        if (tabbableIndex != null) {
-            let shouldFocus = getElement()?.contains(document.activeElement) || false;
-            setTimeout(() => {
-                if (paginationMin != null && tabbableIndex < paginationMin) {
-                    setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-                }
-                else if (paginationMax != null && tabbableIndex >= paginationMax) {
-                    let next = paginationMax - 1;
-                    if (next == -1)
-                        next = null;
-                    setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-                }
-            }, 1);
-        }
-        refreshPagination(paginationMin, paginationMax);
-        lastPagination.current.paginationMax = paginationMax ?? null;
-        lastPagination.current.paginationMin = paginationMin ?? null;
-    }, [paginationMax, paginationMin]);
-    const getDefaultPaginationVisible = useCallback((i) => { return (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)); }, []);
-    const paginatedChildContext = useMemo(() => ({
-        parentIsPaginated,
-        getDefaultPaginationVisible
-    }), [parentIsPaginated]);
+const useGridNavigationSelection = monitored(function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }) {
+    const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
+        gridNavigationParameters,
+        linearNavigationParameters,
+        managedChildrenReturn,
+        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
+        typeaheadNavigationParameters,
+        paginatedChildrenParameters,
+        rearrangeableChildrenReturn,
+        refElementReturn
+    });
+    const { childrenHaveFocusParameters, context: { singleSelectionContext, multiSelectionContext }, multiSelectionReturn, propsStable, singleSelectionReturn, ...void1 } = useSelection({
+        managedChildrenReturn,
+        rovingTabIndexReturn,
+        singleSelectionParameters,
+        multiSelectionParameters,
+        childrenHaveFocusReturn
+    });
     return {
-        context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        managedChildrenParameters: {
-            onChildrenCountChange: useStableCallback((count) => {
-                if (paginationMax != null || paginationMin != null) {
-                    setChildCount(count);
-                    const min = (paginationMin ?? 0);
-                    const max = (paginationMax ?? count);
-                    for (let i = min; i < max; ++i) {
-                        getChildren().getAt(i)?.setChildCountIfPaginated(count);
-                    }
-                }
-                else {
-                    // TODO: Make this debug only.
-                    setChildCount(null);
-                }
-            }),
-        },
-        paginatedChildrenReturn: { refreshPagination, childCount }
+        context: useMemoObject({
+            gridNavigationRowContext,
+            rovingTabIndexContext,
+            singleSelectionContext,
+            multiSelectionContext,
+            typeaheadNavigationContext
+        }),
+        childrenHaveFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        props: useMergedProps(props, propsStable),
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        multiSelectionReturn,
+        typeaheadNavigationReturn
     };
 });
 /**
- * Child hook for {@link usePaginatedChildren}.
- *
- * @remarks When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering),
- * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
- *
  * @compositeParams
  */
-const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
-    const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
-    const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
+const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     return {
-        props: useTagProps(!parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) }, "data-paginated-children-child"),
-        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        context: contextGridNavigation,
+        linearNavigationReturn,
         info: {
-            setPaginationVisible: setPaginatedVisible,
-            setChildCountIfPaginated
-        }
+            getLocallyTabbable,
+            getSingleSelected,
+            singleSelected,
+            setLocallyTabbable,
+            setLocalSingleSelected,
+            focusSelf,
+            getMultiSelected,
+            setSelectedFromParent,
+            getMultiSelectionDisabled
+        },
+        managedChildrenParameters,
+        pressParameters: { onPressSync, excludeSpace },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason); }) },
+        props: useMergedProps(propsGridNavigation, propsSelection),
+        rovingTabIndexChildReturn,
+        rovingTabIndexReturn,
+        singleSelectionChildReturn,
+        multiSelectionChildReturn,
+        textContentReturn,
+        typeaheadNavigationReturn
     };
+});
+/**
+ * @compositeParams
+ */
+const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell(p) {
+    return useGridNavigationCell(p);
 });
 
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ * Combines {@link useListNavigation} and {@link useSelection}.
  *
- * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
- * delay other complicated or heavy logic, until the child is no longer staggered.
+ * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useListNavigationSelectionChild}
  *
  * @compositeParams
- *
- * @hasChild {@link useStaggeredChild}
  */
-const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
-    // By default, when a child mounts, we tell the next child to mount and simply repeat.
-    // If a child is missing, however, it will break that chain.
-    // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
-    const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
-    const timeoutHandle = useRef(-1);
-    const resetEmergencyTimeout = useCallback(() => {
-        if (timeoutHandle.current != -1)
-            clearTimeout(timeoutHandle.current);
-        timeoutHandle.current = setTimeout(() => {
-            // We've gone this long without hearing the next child mount itself...
-            // We need to continue.
-            timeoutHandle.current = -1;
-            let target = getTargetStaggerIndex();
-            if (target != null)
-                setDisplayedStaggerIndex(c => Math.min(target, (c ?? 0) + 1));
-        }, 50);
-    }, [ /* Must be empty */]);
-    // The target index is the index that we're "animating" to.
-    // Each child simply sets this to the highest value ever seen.
-    // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(useCallback((newIndex, _prevIndex) => {
-        // Any time our target changes,
-        // ensure our timeout is running, and start a new one if not
-        // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
-        //for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
-        //    getChildren().getAt(i)?.setParentIsStaggered(s.current);
-        //}
-        if (timeoutHandle.current == -1) {
-            resetEmergencyTimeout();
-            // If there's no timeout running, then that also means we're not waiting for a child to mount.
-            // So ask a child to mount and then wait for that child to mount.
-            setDisplayedStaggerIndex(c => Math.min(newIndex ?? 0, (c ?? 0) + 1));
-        }
-    }, [ /* Must be empty */]), returnNull);
-    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
-        if (newIndex == null || !s.current) {
-            return;
-        }
-        setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
-        // It's time to show the next child,
-        // either because the current one finished mounting,
-        // or because our emergency backup timeout fired.
-        //
-        // Either way, tell the next child to show itself.
-        // Also make sure that anyone we skipped somehow show themselves as well.
-        for (let i = (prevIndex ?? 0); i < newIndex; ++i) {
-            getChildren().getAt(i)?.setStaggeredVisible(true);
-        }
-        // Set a new emergency timeout
-        resetEmergencyTimeout();
-    }, [ /* Must be empty */]), returnNull);
-    const parentIsStaggered = (!!staggered);
-    const childCallsThisToTellTheParentToMountTheNextOne = useCallback((index) => {
-        setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));
-    }, []);
-    const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex) => {
-        setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex));
-    }, []);
-    // TODO: Modification during render (but it's really, really hard to avoid here,
-    // but also probably fine because parents render before children? Does that include suspense?)
-    const s = useRef(parentIsStaggered);
-    s.current = parentIsStaggered;
-    const getDefaultStaggeredVisible = useCallback((i) => {
-        if (s.current) {
-            const staggerIndex = getDisplayedStaggerIndex();
-            if (staggerIndex == null)
-                return false;
-            return i < staggerIndex;
-        }
-        else {
-            return true;
-        }
-    }, []);
-    const staggeredChildContext = useMemo(() => ({
-        parentIsStaggered,
-        childCallsThisToTellTheParentToMountTheNextOne,
-        childCallsThisToTellTheParentTheHighestIndex,
-        getDefaultStaggeredVisible
-    }), [parentIsStaggered]);
+const useListNavigationSelection = monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
+    const { context: contextSS, propsStable, ...retSS } = useSelection({
+        childrenHaveFocusReturn,
+        rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
+        managedChildrenReturn,
+        singleSelectionParameters,
+        multiSelectionParameters
+    });
+    const { context: contextLN, props, rovingTabIndexReturn, ...retLN } = useListNavigation({
+        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
+        linearNavigationParameters,
+        paginatedChildrenParameters,
+        typeaheadNavigationParameters,
+        managedChildrenReturn,
+        refElementReturn,
+        rearrangeableChildrenReturn
+    });
     return {
-        staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
-        context: useMemo(() => ({
-            staggeredChildContext
-        }), [staggeredChildContext]),
+        rovingTabIndexReturn,
+        ...retSS,
+        ...retLN,
+        context: useMemoObject({
+            ...contextLN,
+            ...contextSS
+        }),
+        props: useMergedProps(props, propsStable)
     };
 });
 /**
- * Child hook for {@link useStaggeredChildren}.
- *
- * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
- * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
- *
  * @compositeParams
  */
-const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
-    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
-    useLayoutEffect(() => {
-        childCallsThisToTellTheParentTheHighestIndex(index);
-    }, [index]);
-    useEffect(() => {
-        if ((parentIsStaggered && staggeredVisible))
-            childCallsThisToTellTheParentToMountTheNextOne(index);
-    }, [index, (parentIsStaggered && staggeredVisible)]);
+const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
+        info: { index, untabbable },
+        context,
+        multiSelectionChildParameters,
+        singleSelectionChildParameters
+    });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
+        info: { index, untabbable },
+        context,
+        refElementReturn,
+        textContentParameters,
+    });
     return {
-        props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
-        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
-        info: { setStaggeredVisible: setStaggeredVisible, }
+        hasCurrentFocusParameters: {
+            onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
+                ocfic1?.(focused, previouslyFocused, e);
+                ocfic2?.(focused, previouslyFocused, e);
+            })
+        },
+        pressParameters: { onPressSync, excludeSpace },
+        info: { ...infoSS, ...infoLN },
+        rovingTabIndexChildReturn,
+        multiSelectionChildReturn,
+        singleSelectionChildReturn,
+        textContentReturn,
+        propsChild: propsSS,
+        propsTabbable: propsLN
     };
 });
 
@@ -3974,7 +3990,7 @@ const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
+const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -3987,7 +4003,24 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelectionSortable({
+    // TODO: Put these in their own hook? Extremely specific, though
+    const sortRef = useRef(null);
+    const shuffleRef = useRef(null);
+    const reverseRef = useRef(null);
+    const indexManglerRef = useRef(null);
+    const indexDemanglerRef = useRef(null);
+    const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
+    const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
+    const completeListNavigationContext = useMemoObject({
+        provideManglers: ({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        }
+    });
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -3997,19 +4030,14 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         paginatedChildrenParameters,
         refElementReturn,
-        rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
-            ...rearrangeableChildrenParameters
-        },
         childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-        sortableChildrenParameters
+        rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
-    const { indexDemangler } = rearrangeableChildrenReturn;
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const mcr = useManagedChildren({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange?.(c)), ...managedChildrenParameters } });
+    const mcr = useManagedChildren({ managedChildrenParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, rearrangeableChildrenReturn: { indexDemangler } });
-    const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
+    //const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentOrRowElement, RowElement, RM>({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, rearrangeableChildrenReturn: { indexDemangler } });
+    // const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
     const context = useMemoObject({
         singleSelectionContext,
         multiSelectionContext,
@@ -4017,33 +4045,40 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         rovingTabIndexContext,
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
-        paginatedChildContext,
-        staggeredChildContext,
-        gridNavigationRowContext
+        gridNavigationRowContext,
+        completeGridNavigationContext: completeListNavigationContext
     });
     return {
         context,
         props: useMergedProps(props, propsStable),
         managedChildrenReturn,
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn,
         rovingTabIndexReturn,
         childrenHaveFocusReturn,
-        paginatedChildrenReturn,
         linearNavigationReturn,
         singleSelectionReturn,
         multiSelectionReturn,
-        sortableChildrenReturn,
         typeaheadNavigationReturn
     };
 });
 /**
  * @compositeParams
  */
-const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps, ...void7 } = usePaginatedChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
-    const { info: infoStaggeredChild, staggeredChildReturn, props: staggeredProps, ...void8 } = useStaggeredChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
-    untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);
+const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+    /*const {
+        info: infoPaginatedChild,
+        paginatedChildReturn,
+        props: paginationProps,
+        ...void7
+    } = usePaginatedChild<RowElement>({ info: { index }, context: contextIncomingForRowAsChildOfTable });
+
+    const {
+        info: infoStaggeredChild,
+        staggeredChildReturn,
+        props: staggeredProps,
+        ...void8
+    } = useStaggeredChild<RowElement>({ info: { index }, context: contextIncomingForRowAsChildOfTable })
+
+    untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);*/
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -4056,7 +4091,7 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
-    const r = useGridNavigationSelectionSortableRow({
+    const r = useGridNavigationSelectionRow({
         rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
@@ -4065,7 +4100,6 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
         context: contextIncomingForRowAsChildOfTable,
         info: { index, untabbable },
         textContentParameters,
-        gridNavigationSelectionSortableRowParameters,
         singleSelectionChildParameters,
         multiSelectionChildParameters
     });
@@ -4076,8 +4110,6 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
         index,
         untabbable,
         ...infoRowReturn,
-        ...infoPaginatedChild,
-        ...infoStaggeredChild,
     };
     const { managedChildReturn, ...void4 } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
     const context = useMemoObject({
@@ -4095,15 +4127,13 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
             }),
         }
     });
-    const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
+    const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable);
     return {
         pressParameters,
         hasCurrentFocusReturn,
         managedChildrenReturn,
         context,
         managedChildReturn,
-        staggeredChildReturn,
-        paginatedChildReturn,
         linearNavigationReturn,
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
@@ -4117,9 +4147,9 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
 /**
  * @compositeParams
  */
-const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }) {
+const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionSortableCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionCell({
         gridNavigationCellParameters,
         info: { index, untabbable },
         context,
@@ -4134,7 +4164,6 @@ const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigati
         refElementReturn
     });
     const baseInfo = {
-        getSortValue,
         getElement: refElementReturn.getElement,
         getLocallyTabbable: rovingTabIndexChildReturn.getTabbable,
         setLocallyTabbable: info2.setLocallyTabbable,
@@ -4154,16 +4183,13 @@ const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigati
         textContentReturn
     };
 });
-function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
+function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
     const ret = useCompleteGridNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
         rovingTabIndexParameters,
         singleSelectionParameters: { initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)), ...singleSelectionParameters },
         multiSelectionParameters,
-        sortableChildrenParameters,
-        staggeredChildrenParameters,
         refElementParameters,
         typeaheadNavigationParameters,
         gridNavigationParameters,
@@ -4186,7 +4212,9 @@ function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linear
  *
  * @compositeParams
  */
-const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
+const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
+//staggeredChildrenParameters,
+refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4199,72 +4227,96 @@ const useCompleteListNavigation = (function useCompleteListNavigation({ linearNa
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
+    // TODO: Put these in their own hook? Extremely specific, though
+    const sortRef = useRef(null);
+    const shuffleRef = useRef(null);
+    const reverseRef = useRef(null);
+    const indexManglerRef = useRef(null);
+    const indexDemanglerRef = useRef(null);
+    const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
+    const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
+    const sort = useStableCallback((i) => { return (sortRef.current ?? identity)(i); }, []);
+    const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
+    const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
+    const weirdContext = useMemoObject({
+        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        })
+    });
+    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
         multiSelectionParameters,
-        rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
-            ...rearrangeableChildrenParameters
-        },
         paginatedChildrenParameters,
         refElementReturn,
-        sortableChildrenParameters,
-        childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) }
+        childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
+        rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, rearrangeableChildrenReturn: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
-    const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
     const mcr = useManagedChildren({
         managedChildrenParameters: {
             onChildrenMountChange,
-            ...mcp2,
             ...mcp1
         }
     });
-    const { context: { managedChildContext }, managedChildrenReturn } = mcr;
-    const context = useMemoObject(useMemoObject({
+    const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
+    /*
+        const {
+            context: { managedChildContext: managedChildRPSContext, paginatedChildContext, staggeredChildContext },
+            listChildrenReturn,
+            paginatedChildrenReturn,
+            staggeredChildrenReturn,
+            rearrangeableChildrenReturn,
+        } = useListChildren<ParentElement, ChildElement>({
+            listChildrenParameters,
+            paginatedChildrenParameters,
+            rearrangeableChildrenParameters,
+            refElementReturn,
+            rovingTabIndexReturn,
+            staggeredChildrenParameters
+        });*/
+    const context = useMemoObject({
         childrenHaveFocusChildContext,
-        managedChildContext,
-        paginatedChildContext,
         rovingTabIndexContext,
         singleSelectionContext,
         multiSelectionContext,
-        staggeredChildContext,
         typeaheadNavigationContext,
-    }));
+        //paginatedChildContext,
+        //staggeredChildContext,
+        //managedChildRPSContext,
+        managedChildContext: managedChildRTIContext,
+        listContext: weirdContext
+    });
     return {
         context,
         props: useMergedProps(props, propsRef),
         managedChildrenReturn,
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn,
-        paginatedChildrenReturn,
-        sortableChildrenReturn,
         linearNavigationReturn,
         rovingTabIndexReturn,
         singleSelectionReturn,
         multiSelectionReturn,
         typeaheadNavigationReturn,
-        childrenHaveFocusReturn
+        childrenHaveFocusReturn,
+        refElementReturn,
+        listChildrenReturn: { sort },
+        rearrangeableChildrenReturn: { reverse, shuffle },
     };
 });
 /**
  *
  * @compositeParams
  */
-const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
-    const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
-    const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
-    // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
-    // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
-    untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
+const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, listContext, ...void5 }, ...void1 }) {
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionSortableChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
         info: { index, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
         singleSelectionChildParameters,
@@ -4276,10 +4328,9 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         index,
         focusSelf,
         getElement: refElementReturn.getElement,
-        getSortValue,
         untabbable,
-        ...infoFromStaggered,
-        ...infoFromPaginated,
+        //...infoFromStaggered,
+        //...infoFromPaginated,
         ...infoFromListNav,
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
@@ -4296,7 +4347,7 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         },
         refElementReturn
     });
-    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild, paginationProps, staggeredProps);
+    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild);
     return {
         propsChild: props,
         propsTabbable,
@@ -4310,8 +4361,6 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         multiSelectionChildReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
-        paginatedChildReturn,
-        staggeredChildReturn,
         rovingTabIndexChildReturn
     };
 });
@@ -6262,10 +6311,6 @@ const usePersistentState = monitored(function usePersistentState(key, initialVal
     return [localCopy, setValueWrapper, getValue];
 });
 
-var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
-
-var _=0;function o(o,e,n,t,f,l$1){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l$1};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l.vnode&&l.vnode(i),i}
-
 function childrenIsVnode(children) {
     if (children && children.type && children.props)
         return true;
@@ -6534,5 +6579,5 @@ const useInterval = monitored(function useInterval({ interval, callback }) {
     }, []);
 });
 
-export { DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListChild, useListChildren, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren2, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map

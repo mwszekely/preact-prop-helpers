@@ -2,6 +2,8 @@ import { UseGridNavigationRowContext } from "../component-detail/keyboard-naviga
 import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
+import { UseListChildrenReturnTypeSelf, WeirdUseListContextSelf } from "../component-detail/list-optimization/use-list-children.js";
+import { UseRearrangeableChildrenReturnTypeSelf } from "../component-detail/list-optimization/use-rearrangeable-children.js";
 import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -15,7 +17,6 @@ import { assertEmptyObject } from "../util/assert.js";
 import { TargetedOmit, useCallback, useRef } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { CompleteListNavigationContextSelf } from "./use-list-navigation-complete.js";
 
 
 export type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> =
@@ -40,9 +41,9 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">,
 
     Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters">
-    //Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">,
-    //Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> 
-    {
+//Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">,
+//Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> 
+{
 
 }
 
@@ -66,11 +67,14 @@ export interface CompleteGridNavigationRowContext<RowElement extends Element, RM
     UseManagedChildrenContext<RM>,
     //UsePaginatedChildContext,
     //UseStaggeredChildContext,
+
     UseChildrenHaveFocusContext<RowElement>,
     UseTypeaheadNavigationContext,
     UseSelectionContext,
     RovingTabIndexChildContext,
-    UseGridNavigationRowContext { }
+    UseGridNavigationRowContext {
+    completeGridNavigationContext: WeirdUseListContextSelf;
+}
 
 
 export interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends
@@ -84,7 +88,7 @@ export interface CompleteGridNavigationCellContext<ChildElement extends Element,
 export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     OmitStrong<UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>, "props" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters">,
     //Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
-   // Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
+    // Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
     Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">,
     Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn"> {
     context: CompleteGridNavigationRowContext<RowElement, RM>;
@@ -96,9 +100,9 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">,
     Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">,
     Pick<UseManagedChildReturnType<RM>, "managedChildReturn">
-    //Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">,
-    //Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn"> 
-    {
+//Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">,
+//Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn"> 
+{
     context: CompleteGridNavigationCellContext<CellElement, CM>;
 }
 
@@ -147,11 +151,22 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const { refElementReturn, propsStable, ...void2 } = useRefElement<ParentOrRowElement>({ refElementParameters })
 
     // TODO: Put these in their own hook? Extremely specific, though
+    const sortRef = useRef<null | UseListChildrenReturnTypeSelf["sort"]>(null);
+    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
+    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
     const indexManglerRef = useRef<null | ((n: number) => number)>(null);
     const indexDemanglerRef = useRef<null | ((n: number) => number)>(null);
     const indexMangler = useStableCallback((i: number) => { return (indexManglerRef.current ?? identity)(i)! }, []);
     const indexDemangler = useStableCallback((i: number) => { return (indexDemanglerRef.current ?? identity)(i)! }, []);
-    const completeListNavigationContext = useMemoObject<CompleteListNavigationContextSelf>({ provideManglers: (m, d) => { indexManglerRef.current = m; indexDemanglerRef.current = d; } });
+    const completeListNavigationContext = useMemoObject<WeirdUseListContextSelf>({
+        provideManglers: ({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        }
+    });
 
     const {
         childrenHaveFocusParameters,
@@ -184,7 +199,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const mcr: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;          // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
     //const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentOrRowElement, RowElement, RM>({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, rearrangeableChildrenReturn: { indexDemangler } });
-   // const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
+    // const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
 
     const context = useMemoObject<CompleteGridNavigationRowContext<RowElement, RM>>({
         singleSelectionContext,
@@ -193,7 +208,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         rovingTabIndexContext,
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
-        gridNavigationRowContext
+        gridNavigationRowContext,
+        completeGridNavigationContext: completeListNavigationContext
     });
 
     assertEmptyObject(void1);

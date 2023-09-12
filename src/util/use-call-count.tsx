@@ -18,6 +18,17 @@ type WindowWithHookCallCount = (Window & typeof globalThis) & {
 }
 
 let i = 0;
+/**
+ * Wraps a hook/component that gives it nice devtools timing visualizations, only if process.env.NODE_ENV is "development".
+ * 
+ * Some functions in this library are parenthesized but not wrapped in `monitored` -- 
+ * they are so small that their duration generally rounds down to 0 (or epsilon), so using
+ * this function usually makes no sense on them. The performance monitoring takes more time
+ * than the function itself.
+ * 
+ * @param hook 
+ * @returns 
+ */
 export function monitored<T extends any>(hook: T): T {
     const h = (hook as (...args: any) => any);
 

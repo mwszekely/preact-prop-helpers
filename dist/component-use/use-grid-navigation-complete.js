@@ -34,11 +34,22 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
     // TODO: Put these in their own hook? Extremely specific, though
+    const sortRef = useRef(null);
+    const shuffleRef = useRef(null);
+    const reverseRef = useRef(null);
     const indexManglerRef = useRef(null);
     const indexDemanglerRef = useRef(null);
     const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
     const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
-    const completeListNavigationContext = useMemoObject({ provideManglers: (m, d) => { indexManglerRef.current = m; indexDemanglerRef.current = d; } });
+    const completeListNavigationContext = useMemoObject({
+        provideManglers: ({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        }
+    });
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -64,7 +75,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         rovingTabIndexContext,
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
-        gridNavigationRowContext
+        gridNavigationRowContext,
+        completeGridNavigationContext: completeListNavigationContext
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);

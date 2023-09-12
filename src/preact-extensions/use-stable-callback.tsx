@@ -1,5 +1,4 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 
@@ -37,7 +36,7 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-export const useStableCallback = monitored(function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+export const useStableCallback = (function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
 
     type U = (NonNullable<T> & ((...args: any) => any));
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));

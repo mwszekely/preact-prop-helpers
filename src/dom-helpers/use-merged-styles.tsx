@@ -1,6 +1,5 @@
 
 import { CSSProperties, ElementProps } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
 
 function styleStringToObject(style: string): CSSProperties {
     // TODO: This sucks D:
@@ -14,7 +13,7 @@ function styleStringToObject(style: string): CSSProperties {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export const useMergedStyles = monitored(function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
+export const useMergedStyles = (function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;

@@ -11,7 +11,11 @@ import { UseAsyncParameters } from "./use-async.js";
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I | undefined, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) => {
+export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I | undefined, options?: OmitStrong<UseAsyncParameters<[
+    void
+], [
+    void
+]>, "capture">) => {
     pending: boolean;
     debouncingSync: boolean;
     debouncingAsync: boolean;
@@ -23,7 +27,7 @@ export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(v
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "async" | "sync" | "throw" | null;
+    invocationResult: "sync" | "async" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 //# sourceMappingURL=use-async-effect.d.ts.map

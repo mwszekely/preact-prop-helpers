@@ -48,7 +48,7 @@ export const useMergedProps = monitored(function useMergedProps<E extends EventT
 
 const knowns = new Set<string>(["children", "ref", "className", "class", "style"])
 
-const mergeUnknown = monitored( function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
+const mergeUnknown = (function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
 
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
 
@@ -90,7 +90,7 @@ const mergeUnknown = monitored( function mergeUnknown(key: string, lhsValue: unk
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = monitored(function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
+const useMergedPropsHelper = (function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
 
 
     target.ref = useMergedRefs<E>(target.ref, mods.ref);
@@ -114,7 +114,7 @@ const useMergedPropsHelper = monitored(function useMergedPropsHelper<E extends E
 
 })
 
-export const mergeFunctions = monitored(function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
+export const mergeFunctions = (function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
 
     if (!lhs)
         return rhs;

@@ -71,22 +71,6 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
     }, [childCount]);
     return {
         context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        /* managedChildrenParameters: {
-             onChildrenCountChange: useStableCallback((count: number) => {
-                 if (paginationMax != null || paginationMin != null) {
-                     setChildCount(count);
-                     const min = (paginationMin ?? 0);
-                     const max = (paginationMax ?? count);
-                     for (let i = min; i < max; ++i) {
-                         getChildren().getAt(i)?.setChildCountIfPaginated(count);
-                     }
-                 }
-                 else {
-                     // TODO: Make this debug only.
-                     setChildCount(null);
-                 }
-             }),
-         },*/
         paginatedChildrenReturn: { refreshPagination }
     };
 });
