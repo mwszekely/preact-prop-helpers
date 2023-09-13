@@ -331,7 +331,6 @@ interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
     remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-    remoteULEChildChanged: (index: M["index"]) => (() => void);
 }
 interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
     managedChildContext: UseManagedChildrenContextSelf<M>;
@@ -1855,10 +1854,13 @@ interface UseStaggeredChildReturnType<ChildElement extends Element> {
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ * Allows children to each wait until the previous has finished rendering before itself rendering.
+ * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  *
- * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
- * delay other complicated or heavy logic, until the child is no longer staggered.
+ * @remarks If a child appears on-screen for 100ms then it will be forcibly displayed.
+ *
+ * When using the child hook, it's highly recommended to separate out any heavy logic into
+ * a separate component that won't be rendered until it's de-staggered into visibility.
  *
  * @compositeParams
  *
@@ -1869,7 +1871,8 @@ declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, s
  * Child hook for {@link useStaggeredChildren}.
  *
  * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
- * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic. Ideally that kind of heavy
+ * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  *
  * @compositeParams
  */

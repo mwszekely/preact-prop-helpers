@@ -109,6 +109,7 @@ export declare const EventMapping: {
     readonly fullscreenerror: never;
     readonly ratechange: never;
     readonly resize: never;
+    readonly scrollend: never;
     readonly securitypolicyviolation: never;
     readonly selectionchange: never;
     readonly selectstart: never;

@@ -1,4 +1,4 @@
-import "preact/debug";
+//import "preact/debug";
 
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";

@@ -96,6 +96,7 @@ const EventMapping$1 = {
     fullscreenerror: null,
     ratechange: null,
     resize: null,
+    scrollend: null,
     securitypolicyviolation: null,
     selectionchange: null,
     selectstart: null,
@@ -1341,19 +1342,6 @@ const useManagedChildren = monitored(function useManagedChildren(parentParameter
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
     const hasRemoteULEChildMounted = useRef(null);
-    const remoteULEChildChangedCausers = useRef(new Set());
-    const remoteULEChildChanged = useCallback((index) => {
-        if (remoteULEChildChangedCausers.current.size == 0) {
-            if (onAfterChildLayoutEffect != null) {
-                debounceRendering(() => {
-                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                    remoteULEChildChangedCausers.current.clear();
-                });
-            }
-        }
-        remoteULEChildChangedCausers.current.add(index);
-        return () => { };
-    }, [ /* Must remain stable */]);
     const remoteULEChildMounted = useCallback((index, mounted) => {
         if (!hasRemoteULEChildMounted.current) {
             hasRemoteULEChildMounted.current = {
@@ -1416,7 +1404,7 @@ const useManagedChildren = monitored(function useManagedChildren(parentParameter
             managedChildContext: useMemoObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
-                remoteULEChildChanged,
+                //remoteULEChildChanged,
                 getChildren
             })
         }),
@@ -1427,14 +1415,14 @@ const useManagedChildren = monitored(function useManagedChildren(parentParameter
  * @compositeParams
  */
 const useManagedChild = monitored(function useManagedChild({ context, info }) {
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
     // and multiple children updating in the same tick will all be sent at once.
     useLayoutEffect(() => {
-        if (managedChildrenArray == null || remoteULEChildChanged == null)
+        if (managedChildrenArray == null)
             return;
         // Insert this information in-place
         if (typeof index == "number") {
@@ -1443,8 +1431,8 @@ const useManagedChild = monitored(function useManagedChild({ context, info }) {
         else {
             managedChildrenArray.rec[index] = { ...info };
         }
-        return remoteULEChildChanged(index);
-    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+        //return remoteULEChildChanged(index as IndexType);
+    });
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
     // Do the same on unmount.
@@ -2617,10 +2605,13 @@ function defaultCompare(lhs, rhs) {
 }
 
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ * Allows children to each wait until the previous has finished rendering before itself rendering.
+ * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  *
- * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
- * delay other complicated or heavy logic, until the child is no longer staggered.
+ * @remarks If a child appears on-screen for 100ms then it will be forcibly displayed.
+ *
+ * When using the child hook, it's highly recommended to separate out any heavy logic into
+ * a separate component that won't be rendered until it's de-staggered into visibility.
  *
  * @compositeParams
  *
@@ -2696,14 +2687,9 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({ managedCh
             let next = Math.min((getTargetStaggerIndex() ?? 0), // Don't go higher than the highest child
             1 + (Math.max(prevIndex ?? 0, justMountedChildIndex)) // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
             );
-            // Skip over any children that have already been made visible ahead
-            // (through IntersectionObserver)
-            let s = 0;
             while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
                 ++next;
-                ++s;
             }
-            console.log(`Destaggering ${next} (skipped ${s} children)`);
             return next;
         });
     }, []);
@@ -2738,45 +2724,37 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({ managedCh
  * Child hook for {@link useStaggeredChildren}.
  *
  * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
- * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic. Ideally that kind of heavy
+ * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  *
  * @compositeParams
  */
 const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = useRef(false);
-    //let timeoutRef = useRef<number>(-1);
     const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
-        if (prev != null)
-            console.log(`IntersectionObserver for ${index} changed to being ${!next ? "not " : ""}on-screen`);
-        // if (timeoutRef.current != -1) {
-        //     clearTimeout(timeoutRef.current);
-        //     timeoutRef.current = -1;
-        //     console.log(`Cancelled ${index}'s force timeout`);
-        // }
         if (staggeredVisible)
             return;
         if (next) {
-            //timeoutRef.current = setTimeout(() => {
-            console.log(`Forcing ${index} to be visible after timeout`);
             setStaggeredVisible(true);
             becauseScreen.current = true;
-            //}, 500);
         }
     }), returnFalse);
     useEffect(() => {
-        if (!staggeredVisible) {
-            let io = new IntersectionObserver(debounce((entries) => {
+        const element = getElement();
+        if (!staggeredVisible && element) {
+            let observer = new IntersectionObserver(debounce(((entries) => {
                 let onScreen = false;
                 for (const entry of entries) {
-                    if (entry.intersectionRatio == 1) {
+                    if (entry.isIntersecting) {
                         onScreen = true;
+                        break;
                     }
                 }
                 setOnScreen(onScreen);
-            }, 50, { leading: false, trailing: true }), { threshold: [1] });
-            io.observe(getElement());
-            return () => io.disconnect();
+            }), 50, { leading: false, trailing: true }), { threshold: [0] });
+            observer.observe(element);
+            return () => observer.disconnect();
         }
     }, [index, staggeredVisible]);
     let timeoutRef = useRef(-1);
@@ -2913,9 +2891,11 @@ const useListChild = monitored(function useListChild({ context, info: { index },
     const { hideBecausePaginated } = paginatedChildReturn;
     const { hideBecauseStaggered } = staggeredChildReturn;
     let children = childrenIn;
-    const propsRet = useMergedProps(propsStaggered, propsPaginated);
-    if (hideBecausePaginated || hideBecauseStaggered)
+    let hiding = (hideBecausePaginated || hideBecauseStaggered);
+    if (hiding) {
         children = null;
+    }
+    const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
         props: propsRet,
         managedChildReturn,

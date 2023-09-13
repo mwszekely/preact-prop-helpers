@@ -117,9 +117,11 @@ export const useListChild = monitored(function useListChild({ context, info: { i
     const { hideBecausePaginated } = paginatedChildReturn;
     const { hideBecauseStaggered } = staggeredChildReturn;
     let children = childrenIn;
-    const propsRet = useMergedProps(propsStaggered, propsPaginated);
-    if (hideBecausePaginated || hideBecauseStaggered)
+    let hiding = (hideBecausePaginated || hideBecauseStaggered);
+    if (hiding) {
         children = null;
+    }
+    const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
         props: propsRet,
         managedChildReturn,

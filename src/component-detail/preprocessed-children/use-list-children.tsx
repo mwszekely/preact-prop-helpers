@@ -227,11 +227,15 @@ export const useListChild = monitored(function useListChild<TabbableChildElement
 
     let children: ElementProps<any>["children"] = childrenIn;
 
-    const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
 
-    if (hideBecausePaginated || hideBecauseStaggered)
+    let hiding = (hideBecausePaginated || hideBecauseStaggered)
+
+    if (hiding) {
         children = null;
+    }
 
+    const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
+    
     return {
         props: propsRet,
         managedChildReturn,

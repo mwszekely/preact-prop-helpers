@@ -170,10 +170,10 @@ const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTab
         refElementReturn,
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index },
-        listChildParameters: { children: <DemoUseRovingTabIndexChild index={index} /> }
+        listChildParameters: { children: useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]) }
     })
     return (
-        <li {...useMergedProps(props, propsStable)}>{listChildReturn.children}</li>
+        <li {...useMergedProps(props, propsStable)}>{listChildReturn.children? listChildReturn.children : "\xA0"}</li>
     )
 }));
 

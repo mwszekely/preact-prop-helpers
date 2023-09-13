@@ -80,10 +80,13 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
 
 
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ * Allows children to each wait until the previous has finished rendering before itself rendering. 
+ * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  * 
- * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
- * delay other complicated or heavy logic, until the child is no longer staggered.
+ * @remarks If a child appears on-screen for 100ms then it will be forcibly displayed.
+ * 
+ * When using the child hook, it's highly recommended to separate out any heavy logic into
+ * a separate component that won't be rendered until it's de-staggered into visibility.
  * 
  * @compositeParams
  * 
@@ -186,7 +189,6 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
                 ++s;
             }
 
-            console.log(`Destaggering ${next} (skipped ${s} children)`)
             return next;
         });
     }, []);
@@ -227,7 +229,8 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  * Child hook for {@link useStaggeredChildren}.
  * 
  * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
- * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic. Ideally that kind of heavy
+ * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  * 
  * @compositeParams
  */
@@ -239,41 +242,32 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = useRef(false);
 
-    //let timeoutRef = useRef<number>(-1);
     const [getOnScreen, setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, prev, reason) => {
-        if (prev != null)
-            console.log(`IntersectionObserver for ${index} changed to being ${!next ? "not " : ""}on-screen`);
-        // if (timeoutRef.current != -1) {
-        //     clearTimeout(timeoutRef.current);
-        //     timeoutRef.current = -1;
-        //     console.log(`Cancelled ${index}'s force timeout`);
-        // }
 
         if (staggeredVisible)
             return;
 
         if (next) {
-            //timeoutRef.current = setTimeout(() => {
-            console.log(`Forcing ${index} to be visible after timeout`);
             setStaggeredVisible(true);
             becauseScreen.current = true;
-            //}, 500);
         }
     }), returnFalse)
 
     useEffect(() => {
-        if (!staggeredVisible) {
-            let io = new IntersectionObserver(debounce((entries) => {
+        const element = getElement();
+        if (!staggeredVisible && element) {
+            let observer = new IntersectionObserver(debounce(((entries) => {
                 let onScreen = false;
                 for (const entry of entries) {
-                    if (entry.intersectionRatio == 1) {
+                    if (entry.isIntersecting) {
                         onScreen = true;
+                        break;
                     }
                 }
                 setOnScreen(onScreen);
-            }, 50, { leading: false, trailing: true }), { threshold: [1] });
-            io.observe(getElement());
-            return () => io.disconnect();
+            }) satisfies IntersectionObserverCallback, 50, { leading: false, trailing: true }), { threshold: [0] });
+            observer.observe(element);
+            return () => observer.disconnect();
         }
     }, [index, staggeredVisible])
 

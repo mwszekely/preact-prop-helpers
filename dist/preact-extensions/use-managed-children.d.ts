@@ -4,7 +4,6 @@ export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> 
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
     remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-    remoteULEChildChanged: (index: M["index"]) => (() => void);
 }
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
     managedChildContext: UseManagedChildrenContextSelf<M>;
