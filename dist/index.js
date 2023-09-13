@@ -325,10 +325,10 @@ export { identity, tryNavigateToIndex, useLinearNavigation } from "./component-d
 export { useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
 export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
-export { useListChild, useListChildren } from "./component-detail/list-optimization/use-list-children.js";
-export { usePaginatedChild, usePaginatedChildren } from "./component-detail/list-optimization/use-paginated-children.js";
-export { useRearrangeableChildren2 } from "./component-detail/list-optimization/use-rearrangeable-children.js";
-export { useStaggeredChild, useStaggeredChildren } from "./component-detail/list-optimization/use-staggered-children.js";
+export { useListChild, useListChildren } from "./component-detail/preprocessed-children/use-list-children.js";
+export { usePaginatedChild, usePaginatedChildren } from "./component-detail/preprocessed-children/use-paginated-children.js";
+export { useRearrangeableChildren2 } from "./component-detail/preprocessed-children/use-rearrangeable-children.js";
+export { useStaggeredChild, useStaggeredChildren } from "./component-detail/preprocessed-children/use-staggered-children.js";
 export { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./component-detail/selection/use-multi-selection.js";
 export { useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/selection/use-selection.js";
 export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/selection/use-single-selection.js";

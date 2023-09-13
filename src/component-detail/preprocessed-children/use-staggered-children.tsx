@@ -1,9 +1,12 @@
+import { debounce } from "lodash-es";
+import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { ElementProps } from "../../util/types.js";
+import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -11,6 +14,7 @@ import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-ta
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
+    getStaggeredVisible(): boolean;
 }
 
 export interface UseStaggeredChildrenParametersSelf {
@@ -51,7 +55,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
 }
 
 
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">>, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
 }
 
 export interface UseStaggeredChildReturnTypeSelf {
@@ -71,7 +75,7 @@ export interface UseStaggeredChildReturnTypeSelf {
 export interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">;
+    info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
 
 
@@ -90,6 +94,9 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
     staggeredChildrenParameters: { staggered, childCount }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
 
+    // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
+    // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
+    // until they fill in.
 
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
 
@@ -122,7 +129,6 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
 
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
-    // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
     useEffect(() => {
         // Any time our target changes,
         // ensure our timeout is running, and start a new one if not
@@ -131,7 +137,10 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
 
             // If there's no timeout running, then that also means we're not waiting for a child to mount.
             // So ask a child to mount and then wait for that child to mount.
-            setDisplayedStaggerIndex(c => Math.min(childCount ?? 0, (c ?? 0) + 1));
+            let current = getDisplayedStaggerIndex();
+            let next = Math.min(childCount ?? 0, (current ?? 0) + 1);
+
+            setDisplayedStaggerIndex(next);
         }
     }, [childCount]);
 
@@ -162,13 +171,23 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
     }, [/* Must be empty */]), returnNull)
 
     const parentIsStaggered = (!!staggered);
-
+    const getChildCount = useStableGetter(childCount);
     const childCallsThisToTellTheParentToMountTheNextOne = useCallback((justMountedChildIndex: number) => {
         setDisplayedStaggerIndex(prevIndex => {
-            return Math.min(
+            let next = Math.min(
                 (getTargetStaggerIndex() ?? 0), // Don't go higher than the highest child
                 1 + (Math.max(prevIndex ?? 0, justMountedChildIndex))   // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
             );
+            // Skip over any children that have already been made visible ahead
+            // (through IntersectionObserver)
+            let s = 0;
+            while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
+                ++next;
+                ++s;
+            }
+
+            console.log(`Destaggering ${next} (skipped ${s} children)`)
+            return next;
         });
     }, []);
 
@@ -212,23 +231,78 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
-    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({
+    info: { index },
+    refElementReturn: { getElement },
+    context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } }
+}: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
+    const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+    const becauseScreen = useRef(false);
+
+    //let timeoutRef = useRef<number>(-1);
+    const [getOnScreen, setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, prev, reason) => {
+        if (prev != null)
+            console.log(`IntersectionObserver for ${index} changed to being ${!next ? "not " : ""}on-screen`);
+        // if (timeoutRef.current != -1) {
+        //     clearTimeout(timeoutRef.current);
+        //     timeoutRef.current = -1;
+        //     console.log(`Cancelled ${index}'s force timeout`);
+        // }
+
+        if (staggeredVisible)
+            return;
+
+        if (next) {
+            //timeoutRef.current = setTimeout(() => {
+            console.log(`Forcing ${index} to be visible after timeout`);
+            setStaggeredVisible(true);
+            becauseScreen.current = true;
+            //}, 500);
+        }
+    }), returnFalse)
 
     useEffect(() => {
-        if ((parentIsStaggered && staggeredVisible)) {
-            //setTimeout(() => {childCallsThisToTellTheParentToMountTheNextOne(index);}, 30)
-            childCallsThisToTellTheParentToMountTheNextOne(index);
+        if (!staggeredVisible) {
+            let io = new IntersectionObserver(debounce((entries) => {
+                let onScreen = false;
+                for (const entry of entries) {
+                    if (entry.intersectionRatio == 1) {
+                        onScreen = true;
+                    }
+                }
+                setOnScreen(onScreen);
+            }, 50, { leading: false, trailing: true }), { threshold: [1] });
+            io.observe(getElement());
+            return () => io.disconnect();
         }
-        else if (!parentIsStaggered) {
-            // Ensure that if we mount unstaggered and change to staggered, we start at the end
-            childCallsThisToTellTheParentToMountTheNextOne(index);
+    }, [index, staggeredVisible])
+
+    let timeoutRef = useRef(-1);
+    useEffect(() => {
+        if (!becauseScreen.current) {
+            if (timeoutRef.current != -1)
+                clearTimeout(timeoutRef.current);
+
+            timeoutRef.current = setTimeout(() => {
+
+                timeoutRef.current = setTimeout(() => {
+                    if ((parentIsStaggered && staggeredVisible)) {
+                        childCallsThisToTellTheParentToMountTheNextOne(index);
+                    }
+                    else if (!parentIsStaggered) {
+                        // Ensure that if we mount unstaggered and change to staggered, we start at the end
+                        childCallsThisToTellTheParentToMountTheNextOne(index);
+                    }
+                }, 10);
+            }, 100);
+
         }
     }, [index, (parentIsStaggered && staggeredVisible)])
+
 
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
-        info: { setStaggeredVisible: setStaggeredVisible, }
+        info: { setStaggeredVisible, getStaggeredVisible }
     }
 })

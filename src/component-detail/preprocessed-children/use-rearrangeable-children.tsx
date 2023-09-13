@@ -17,7 +17,18 @@ export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 
-export interface UseRearrangeableChildrenParametersSelf {
+export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
+    /**
+     * Controls how values compare against each other when `sort` is called.
+     * 
+     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
+     * 
+     * @param lhs - The first value to compare
+     * @param rhs - The second value to compare
+     */
+    compare: Nullable<Compare<M>>;
+
+
     /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      * 
@@ -38,7 +49,7 @@ export interface UseRearrangeableChildrenParametersSelf {
  * All of these functions **MUST** be stable across renders.
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
 }
 
 
@@ -92,6 +103,14 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      */
     useRearrangedChildren: (children: VNode[]) => VNode[];
 
+    /** 
+     * @stable
+     * 
+     * Call to rearrange the children in ascending or descending order according to `compare`.
+     * 
+     */
+    sort: (direction: "ascending" | "descending") => Promise<void> | void;
+
     /**
      * Returns an array of each cell's `getSortValue()` result.
      */
@@ -125,7 +144,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  * @compositeParams
  */
 export const useRearrangeableChildren2 = monitored( function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
-    rearrangeableChildrenParameters: { getIndex, onRearranged },
+    rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare },
     managedChildrenReturn: { getChildren }
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
     useEnsureStability("useRearrangeableChildren", getIndex);
@@ -184,6 +203,28 @@ export const useRearrangeableChildren2 = monitored( function useRearrangeableChi
         forceUpdateRef.current?.();
     }, []);
 
+    // The actual sort function.
+    const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
+    const sort = useCallback((direction: "ascending" | "descending"): Promise<void> | void => {
+        const managedRows = getChildren();
+        const compare = getCompare();
+        const originalRows = managedRows._arraySlice();
+
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+
+            const lhsValue = lhsRow;
+            const rhsValue = rhsRow;
+            const result = compare(lhsValue, rhsValue);
+            if (direction[0] == "d")
+                return -result;
+            return result;
+
+        }) : managedRows._arraySlice();
+
+        return rearrange(originalRows, sortedRows);
+
+    }, [ /* Must remain stable */]);
+
     const useRearrangedChildren = useCallback(monitored(function useRearrangedChildren(children: VNode[]) {
 
         console.assert(Array.isArray(children));
@@ -222,8 +263,24 @@ export const useRearrangeableChildren2 = monitored( function useRearrangeableChi
             rearrange,
             shuffle,
             reverse,
+            sort,
             useRearrangedChildren
         }
     };
 })
 
+
+function defaultCompare<TabbableChildElement extends Element>(lhs: UseRearrangeableChildInfo | undefined, rhs: UseRearrangeableChildInfo | undefined) {
+    return compare1(lhs?.index, rhs?.index);    // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
+
+    function compare1(lhs: unknown | undefined, rhs: unknown | undefined) {
+        if (lhs == null || rhs == null) {
+            if (lhs == null)
+                return -1;
+            if (rhs == null)
+                return 1;
+        }
+
+        return (lhs as any) - (rhs as any);
+    }
+}

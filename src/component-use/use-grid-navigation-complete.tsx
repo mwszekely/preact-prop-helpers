@@ -2,8 +2,8 @@ import { UseGridNavigationRowContext } from "../component-detail/keyboard-naviga
 import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
-import { UseListChildrenReturnTypeSelf, WeirdUseListContextSelf } from "../component-detail/list-optimization/use-list-children.js";
-import { UseRearrangeableChildrenReturnTypeSelf } from "../component-detail/list-optimization/use-rearrangeable-children.js";
+import { WeirdUseListContextSelf } from "../component-detail/preprocessed-children/use-list-children.js";
+import { UseRearrangeableChildrenReturnTypeSelf } from "../component-detail/preprocessed-children/use-rearrangeable-children.js";
 import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -151,7 +151,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const { refElementReturn, propsStable, ...void2 } = useRefElement<ParentOrRowElement>({ refElementParameters })
 
     // TODO: Put these in their own hook? Extremely specific, though
-    const sortRef = useRef<null | UseListChildrenReturnTypeSelf["sort"]>(null);
+    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["sort"]>(null);
     const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
     const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
     const indexManglerRef = useRef<null | ((n: number) => number)>(null);

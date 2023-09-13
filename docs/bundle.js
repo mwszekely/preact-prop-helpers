@@ -3493,7 +3493,7 @@
     return l.vnode && l.vnode(i4), i4;
   }
 
-  // ../dist/component-detail/list-optimization/use-paginated-children.js
+  // ../dist/component-detail/preprocessed-children/use-paginated-children.js
   var usePaginatedChildren = monitored(function usePaginatedChildren2({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _2({ paginationMax: null, paginationMin: null });
@@ -3528,8 +3528,12 @@
       lastPagination.current.paginationMax = paginationMax ?? null;
       lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
+    const pmin = _2(paginationMin);
+    const pmax = _2(paginationMax);
+    pmin.current = paginationMin;
+    pmax.current = paginationMax;
     const getDefaultPaginationVisible = T2((i4) => {
-      return i4 >= (paginationMin ?? -Infinity) && i4 < (paginationMax ?? Infinity);
+      return i4 >= (pmin.current ?? -Infinity) && i4 < (pmax.current ?? Infinity);
     }, []);
     const paginatedChildContext = F2(() => ({
       parentIsPaginated,
@@ -3577,8 +3581,8 @@
     return _2(() => set((i4) => ++i4)).current;
   });
 
-  // ../dist/component-detail/list-optimization/use-rearrangeable-children.js
-  var useRearrangeableChildren2 = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
+  // ../dist/component-detail/preprocessed-children/use-rearrangeable-children.js
+  var useRearrangeableChildren2 = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare }, managedChildrenReturn: { getChildren } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     const mangleMap = _2(/* @__PURE__ */ new Map());
     const demangleMap = _2(/* @__PURE__ */ new Map());
@@ -3615,6 +3619,23 @@
       onRearrangedGetter()?.();
       forceUpdateRef.current?.();
     }, []);
+    const getCompare = useStableGetter(userCompare ?? defaultCompare);
+    const sort = T2((direction) => {
+      const managedRows = getChildren();
+      const compare = getCompare();
+      const originalRows = managedRows._arraySlice();
+      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+        const lhsValue = lhsRow;
+        const rhsValue = rhsRow;
+        const result = compare(lhsValue, rhsValue);
+        if (direction[0] == "d")
+          return -result;
+        return result;
+      }) : managedRows._arraySlice();
+      return rearrange(originalRows, sortedRows);
+    }, [
+      /* Must remain stable */
+    ]);
     const useRearrangedChildren = T2(monitored(function useRearrangedChildren2(children) {
       console.assert(Array.isArray(children));
       const forceUpdate = useForceUpdate();
@@ -3635,12 +3656,25 @@
         rearrange,
         shuffle: shuffle2,
         reverse,
+        sort,
         useRearrangedChildren
       }
     };
   });
+  function defaultCompare(lhs, rhs) {
+    return compare1(lhs?.index, rhs?.index);
+    function compare1(lhs2, rhs2) {
+      if (lhs2 == null || rhs2 == null) {
+        if (lhs2 == null)
+          return -1;
+        if (rhs2 == null)
+          return 1;
+      }
+      return lhs2 - rhs2;
+    }
+  }
 
-  // ../dist/component-detail/list-optimization/use-staggered-children.js
+  // ../dist/component-detail/preprocessed-children/use-staggered-children.js
   var useStaggeredChildren = monitored(function useStaggeredChildren2({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
@@ -3661,7 +3695,9 @@
     p3(() => {
       if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
-        setDisplayedStaggerIndex((c4) => Math.min(childCount ?? 0, (c4 ?? 0) + 1));
+        let current = getDisplayedStaggerIndex();
+        let next = Math.min(childCount ?? 0, (current ?? 0) + 1);
+        setDisplayedStaggerIndex(next);
       }
     }, [childCount]);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T2((newIndex, prevIndex) => {
@@ -3679,14 +3715,22 @@
       /* Must be empty */
     ]), returnNull);
     const parentIsStaggered = !!staggered;
+    const getChildCount = useStableGetter(childCount);
     const childCallsThisToTellTheParentToMountTheNextOne = T2((justMountedChildIndex) => {
       setDisplayedStaggerIndex((prevIndex) => {
-        return Math.min(
+        let next = Math.min(
           getTargetStaggerIndex() ?? 0,
           // Don't go higher than the highest child
           1 + Math.max(prevIndex ?? 0, justMountedChildIndex)
           // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
         );
+        let s5 = 0;
+        while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
+          ++next;
+          ++s5;
+        }
+        console.log(`Destaggering ${next} (skipped ${s5} children)`);
+        return next;
       });
     }, []);
     const s4 = _2(parentIsStaggered);
@@ -3713,66 +3757,71 @@
       }), [staggeredChildContext])
     };
   });
-  var useStaggeredChild = monitored(function useStaggeredChild2({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
-    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+  var useStaggeredChild = monitored(function useStaggeredChild2({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+    const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+    const becauseScreen = _2(false);
+    const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
+      if (prev != null)
+        console.log(`IntersectionObserver for ${index} changed to being ${!next ? "not " : ""}on-screen`);
+      if (staggeredVisible)
+        return;
+      if (next) {
+        console.log(`Forcing ${index} to be visible after timeout`);
+        setStaggeredVisible(true);
+        becauseScreen.current = true;
+      }
+    }), returnFalse);
     p3(() => {
-      if (parentIsStaggered && staggeredVisible) {
-        childCallsThisToTellTheParentToMountTheNextOne(index);
-      } else if (!parentIsStaggered) {
-        childCallsThisToTellTheParentToMountTheNextOne(index);
+      if (!staggeredVisible) {
+        let io = new IntersectionObserver(debounce_default((entries) => {
+          let onScreen = false;
+          for (const entry of entries) {
+            if (entry.intersectionRatio == 1) {
+              onScreen = true;
+            }
+          }
+          setOnScreen(onScreen);
+        }, 50, { leading: false, trailing: true }), { threshold: [1] });
+        io.observe(getElement());
+        return () => io.disconnect();
+      }
+    }, [index, staggeredVisible]);
+    let timeoutRef = _2(-1);
+    p3(() => {
+      if (!becauseScreen.current) {
+        if (timeoutRef.current != -1)
+          clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+          timeoutRef.current = setTimeout(() => {
+            if (parentIsStaggered && staggeredVisible) {
+              childCallsThisToTellTheParentToMountTheNextOne(index);
+            } else if (!parentIsStaggered) {
+              childCallsThisToTellTheParentToMountTheNextOne(index);
+            }
+          }, 10);
+        }, 100);
       }
     }, [index, parentIsStaggered && staggeredVisible]);
     return {
       props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
       staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
-      info: { setStaggeredVisible }
+      info: { setStaggeredVisible, getStaggeredVisible }
     };
   });
 
-  // ../dist/component-detail/list-optimization/use-list-children.js
-  var useListChildren = monitored(function useListChildren2({ rearrangeableChildrenParameters, listChildrenParameters: { children, compare: userCompare }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }) {
-    const getCompare = useStableGetter(userCompare ?? defaultCompare);
+  // ../dist/component-detail/preprocessed-children/use-list-children.js
+  var useListChildren = monitored(function useListChildren2({ rearrangeableChildrenParameters: { onRearranged, ...rearrangeableChildrenParameters }, listChildrenParameters: { children }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }) {
     const childCount = children.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
-      managedChildrenParameters: {
-        /*onChildrenCountChange: useStableCallback((count: number) => {
-            if (paginationMax != null || paginationMin != null || staggered) {
-                debugger;
-                setChildCount(count);
-                const min = (paginationMin ?? 0);
-                const max = (paginationMax ?? count);
-                for (let i = min; i < max; ++i) {
-                    getChildren().getAt(i)?.setChildCountIfPaginated(count);
-                }
-            }
-            else {
-                // TODO: Make this debug only.
-                setChildCount(null);
-            }
-        }),*/
-      }
+      managedChildrenParameters: {}
     });
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren2({ rearrangeableChildrenParameters, managedChildrenReturn });
-    const { rearrange, useRearrangedChildren } = rearrangeableChildrenReturn;
-    const { getChildren } = managedChildrenReturn;
-    const sort = T2((direction) => {
-      const managedRows = getChildren();
-      const compare = getCompare();
-      const originalRows = managedRows._arraySlice();
-      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
-        const lhsValue = lhsRow;
-        const rhsValue = rhsRow;
-        const result = compare(lhsValue, rhsValue);
-        if (direction[0] == "d")
-          return -result;
-        return result;
-      }) : managedRows._arraySlice();
-      return rearrange(originalRows, sortedRows);
-    }, [
-      /* Must remain stable */
-    ]);
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren2({ rearrangeableChildrenParameters: { onRearranged: useStableCallback(() => {
+      refreshPagination(paginationMin, paginationMax);
+      onRearranged?.();
+    }), ...rearrangeableChildrenParameters }, managedChildrenReturn });
+    const { useRearrangedChildren } = rearrangeableChildrenReturn;
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
       refElementReturn,
       managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
@@ -3790,13 +3839,12 @@
         indexMangler: rearrangeableChildrenReturn.indexMangler,
         reverse: rearrangeableChildrenReturn.reverse,
         shuffle: rearrangeableChildrenReturn.shuffle,
-        sort
+        sort: rearrangeableChildrenReturn.sort
       });
     }, []);
     return {
       listChildrenReturn: {
-        sort,
-        children: o4(RC, { useRearrangedChildren, children })
+        children: o4(_, { children: useRearrangedChildren(children) })
       },
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
@@ -3808,17 +3856,18 @@
       })
     };
   });
-  var useListChild = monitored(function useListChild2({ context, info: { index }, listChildParameters: { children: childrenIn } }) {
+  var useListChild = monitored(function useListChild2({ context, info: { index }, listChildParameters: { children: childrenIn }, refElementReturn: { getElement } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
+    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
     const { managedChildReturn } = useManagedChild({
       context,
       info: {
         index,
         setChildCountIfPaginated,
         setPaginationVisible,
-        setStaggeredVisible
+        setStaggeredVisible,
+        getStaggeredVisible
       }
     });
     const { hideBecausePaginated } = paginatedChildReturn;
@@ -3837,21 +3886,6 @@
       }
     };
   });
-  var RC = x3(({ children, useRearrangedChildren }) => {
-    return o4(_, { children: useRearrangedChildren(children) });
-  });
-  function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.index, rhs?.index);
-    function compare1(lhs2, rhs2) {
-      if (lhs2 == null || rhs2 == null) {
-        if (lhs2 == null)
-          return -1;
-        if (rhs2 == null)
-          return 1;
-      }
-      return lhs2 - rhs2;
-    }
-  }
 
   // ../dist/component-detail/selection/use-multi-selection.js
   function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
@@ -5873,6 +5907,50 @@
   }
 
   // ../dist/component-use/use-list-navigation-complete.js
+  function useCreateWeirdContext() {
+    const sortRef = _2(null);
+    const shuffleRef = _2(null);
+    const reverseRef = _2(null);
+    const rearrangeRef = _2(null);
+    const indexManglerRef = _2(null);
+    const indexDemanglerRef = _2(null);
+    const indexMangler = useStableCallback((i4) => {
+      return (indexManglerRef.current ?? identity_default)(i4);
+    }, []);
+    const indexDemangler = useStableCallback((i4) => {
+      return (indexDemanglerRef.current ?? identity_default)(i4);
+    }, []);
+    const sort = useStableCallback((i4) => {
+      return (sortRef.current ?? identity_default)(i4);
+    }, []);
+    const shuffle2 = useStableCallback(() => {
+      return (shuffleRef.current ?? identity_default)();
+    }, []);
+    const reverse = useStableCallback(() => {
+      return (reverseRef.current ?? identity_default)();
+    }, []);
+    const rearrange = useStableCallback((original, ordered) => {
+      (rearrangeRef.current ?? noop_default)(original, ordered);
+    }, []);
+    const listContext = useMemoObject({
+      provideManglers: useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
+        indexManglerRef.current = indexMangler2;
+        indexDemanglerRef.current = indexDemangler2;
+        reverseRef.current = reverse2;
+        shuffleRef.current = shuffle3;
+        sortRef.current = sort2;
+      })
+    });
+    return {
+      context: useMemoObject({ listContext }),
+      indexDemangler,
+      indexMangler,
+      rearrange,
+      reverse,
+      shuffle: shuffle2,
+      sort
+    };
+  }
   var useCompleteListNavigation = function useCompleteListNavigation2({
     linearNavigationParameters,
     typeaheadNavigationParameters,
@@ -5896,35 +5974,7 @@
       return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const sortRef = _2(null);
-    const shuffleRef = _2(null);
-    const reverseRef = _2(null);
-    const indexManglerRef = _2(null);
-    const indexDemanglerRef = _2(null);
-    const indexMangler = useStableCallback((i4) => {
-      return (indexManglerRef.current ?? identity_default)(i4);
-    }, []);
-    const indexDemangler = useStableCallback((i4) => {
-      return (indexDemanglerRef.current ?? identity_default)(i4);
-    }, []);
-    const sort = useStableCallback((i4) => {
-      return (sortRef.current ?? identity_default)(i4);
-    }, []);
-    const shuffle2 = useStableCallback(() => {
-      return (shuffleRef.current ?? identity_default)();
-    }, []);
-    const reverse = useStableCallback(() => {
-      return (reverseRef.current ?? identity_default)();
-    }, []);
-    const weirdContext = useMemoObject({
-      provideManglers: useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
-        indexManglerRef.current = indexMangler2;
-        indexDemanglerRef.current = indexDemangler2;
-        reverseRef.current = reverse2;
-        shuffleRef.current = shuffle3;
-        sortRef.current = sort2;
-      })
-    });
+    const { context: weirdContext, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateWeirdContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
       managedChildrenReturn: { getChildren },
       linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -5951,16 +6001,13 @@
       singleSelectionContext,
       multiSelectionContext,
       typeaheadNavigationContext,
-      //paginatedChildContext,
-      //staggeredChildContext,
-      //managedChildRPSContext,
-      managedChildContext: managedChildRTIContext,
-      listContext: weirdContext
+      managedChildContext: managedChildRTIContext
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {
-      context,
+      contextChildren: context,
+      contextPreprocessing: weirdContext,
       props: useMergedProps(props, propsRef),
       managedChildrenReturn,
       linearNavigationReturn,
@@ -5971,7 +6018,7 @@
       childrenHaveFocusReturn,
       refElementReturn,
       listChildrenReturn: { sort },
-      rearrangeableChildrenReturn: { reverse, shuffle: shuffle2 }
+      rearrangeableChildrenReturn: { reverse, shuffle: shuffle2, rearrange, sort }
     };
   };
   var useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild2({
@@ -5982,7 +6029,7 @@
     hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 },
     singleSelectionChildParameters,
     multiSelectionChildParameters,
-    context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, listContext, ...void5 },
+    context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 },
     ...void1
   }) {
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
@@ -5999,8 +6046,6 @@
       focusSelf,
       getElement: refElementReturn.getElement,
       untabbable,
-      //...infoFromStaggered,
-      //...infoFromPaginated,
       ...infoFromListNav
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
@@ -7957,6 +8002,7 @@
   var UntabbableContext = F(false);
   var ListNavigationSingleSelectionChildContext = F(null);
   var ListChildContext = F(null);
+  var WeirdContext = F(null);
   var DemoUseRovingTabIndex = x3(monitored(function DemoUseRovingTabIndex2() {
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
     const [singleSelectedIndex, setSingleSelectedIndex] = useState(null);
@@ -7988,12 +8034,12 @@
     });
     const {
       props,
-      context: contextRTI,
+      contextChildren,
+      contextPreprocessing,
       rovingTabIndexReturn: { setTabbableIndex },
       managedChildrenReturn: { getChildren },
       typeaheadNavigationReturn: { typeaheadStatus },
-      rearrangeableChildrenReturn: { shuffle: shuffle2, reverse },
-      listChildrenReturn: { sort }
+      rearrangeableChildrenReturn: { shuffle: shuffle2, reverse, sort: _sort }
     } = r4;
     return /* @__PURE__ */ o4("div", { className: "demo", children: [
       /* @__PURE__ */ o4("h2", { children: "Keyboard & List Navigation" }),
@@ -8143,11 +8189,10 @@
         Math.round(multiSelectPercent * 100 * 10) / 10,
         "%"
       ] }),
-      /* @__PURE__ */ o4(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o4(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o4(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o4(ListNavigationSingleSelectionChildContext.Provider, { value: contextRTI, children: /* @__PURE__ */ o4("ol", { start: 0, ...props, children: /* @__PURE__ */ o4(DemoUseRovingTabIndexChildren, { max, min, staggered, count, getElement: r4.refElementReturn.getElement, getTabbableIndex: r4.rovingTabIndexReturn.getTabbableIndex, setTabbableIndex: r4.rovingTabIndexReturn.setTabbableIndex }) }) }) }) }) })
+      /* @__PURE__ */ o4(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o4(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o4(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o4(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o4(WeirdContext.Provider, { value: contextPreprocessing, children: /* @__PURE__ */ o4("ol", { start: 0, ...props, children: /* @__PURE__ */ o4(DemoUseRovingTabIndexChildren, { max, min, staggered, count, getElement: r4.refElementReturn.getElement, getTabbableIndex: r4.rovingTabIndexReturn.getTabbableIndex, setTabbableIndex: r4.rovingTabIndexReturn.setTabbableIndex }) }) }) }) }) }) })
     ] });
   }));
   var DemoUseRovingTabIndexChildren = x3(monitored(function DemoUseRovingTabIndexChildren2({ count, max, min, staggered, getTabbableIndex, setTabbableIndex, getElement }) {
-    const context = q2(ListNavigationSingleSelectionChildContext);
     const {
       context: contextRPS,
       listChildrenReturn,
@@ -8160,25 +8205,31 @@
           for (let i4 = 0; i4 < count; ++i4) {
             yield /* @__PURE__ */ o4(DemoUseRovingTabIndexChildOuter, { index: i4 }, i4);
           }
-        }()), [count]),
-        compare: null
+        }()), [count])
       },
       paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
       rearrangeableChildrenParameters: {
         getIndex: T2((a4) => a4.props.index, []),
-        onRearranged: null
+        onRearranged: null,
+        compare: null
       },
       refElementReturn: { getElement },
       rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
       staggeredChildrenParameters: { staggered },
-      context
+      context: q2(WeirdContext)
     });
     return /* @__PURE__ */ o4(ListChildContext.Provider, { value: contextRPS, children: listChildrenReturn.children });
   }));
   var DemoUseRovingTabIndexChildOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter2({ index }) {
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
-    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild({ context: { managedChildContext, paginatedChildContext, staggeredChildContext }, info: { index }, listChildParameters: { children: /* @__PURE__ */ o4(DemoUseRovingTabIndexChild, { index }) } });
-    return /* @__PURE__ */ o4("li", { ...props, children: listChildReturn.children });
+    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild({
+      refElementReturn,
+      context: { managedChildContext, paginatedChildContext, staggeredChildContext },
+      info: { index },
+      listChildParameters: { children: /* @__PURE__ */ o4(DemoUseRovingTabIndexChild, { index }) }
+    });
+    return /* @__PURE__ */ o4("li", { ...useMergedProps(props, propsStable), children: listChildReturn.children });
   }));
   var DemoUseRovingTabIndexChild = x3(monitored(function DemoUseRovingTabIndexChild2({ index }) {
     if (index == 1)

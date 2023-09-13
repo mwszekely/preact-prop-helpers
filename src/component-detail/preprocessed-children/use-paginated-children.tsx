@@ -122,7 +122,11 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Pare
         lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
 
-    const getDefaultPaginationVisible = useCallback((i: number) => { return (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) }, []);
+    const pmin = useRef(paginationMin);
+    const pmax = useRef(paginationMax);
+    pmin.current = paginationMin;
+    pmax.current = paginationMax;
+    const getDefaultPaginationVisible = useCallback((i: number) => { return (i >= (pmin.current ?? -Infinity) && i < (pmax.current ?? Infinity)) }, []);
     const paginatedChildContext = useMemo<UsePaginatedChildContext["paginatedChildContext"]>(() => ({
         parentIsPaginated,
         getDefaultPaginationVisible

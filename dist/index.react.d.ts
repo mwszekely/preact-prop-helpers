@@ -910,7 +910,16 @@ type GetIndex = (row: VNode) => (number | null | undefined);
 type GetValid = (index: number) => boolean;
 type GetHighestChildIndex = () => number;
 type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
-interface UseRearrangeableChildrenParametersSelf {
+interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
+    /**
+     * Controls how values compare against each other when `sort` is called.
+     *
+     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
+     *
+     * @param lhs - The first value to compare
+     * @param rhs - The second value to compare
+     */
+    compare: Nullable<Compare<M>>;
     /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      *
@@ -928,7 +937,7 @@ interface UseRearrangeableChildrenParametersSelf {
  * All of these functions **MUST** be stable across renders.
  */
 interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
 }
 interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
     rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
@@ -973,6 +982,13 @@ interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChild
      *
      */
     useRearrangedChildren: (children: VNode[]) => VNode[];
+    /**
+     * @stable
+     *
+     * Call to rearrange the children in ascending or descending order according to `compare`.
+     *
+     */
+    sort: (direction: "ascending" | "descending") => Promise<void> | void;
 }
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -997,7 +1013,7 @@ interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChild
  *
  * @compositeParams
  */
-declare const useRearrangeableChildren2: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
+declare const useRearrangeableChildren2: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
 interface LinearNavigationResult {
     valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end";
@@ -1789,6 +1805,7 @@ declare const useGridNavigationCell: <CellElement extends Element>({ context: { 
 interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
+    getStaggeredVisible(): boolean;
 }
 interface UseStaggeredChildrenParametersSelf {
     /**
@@ -1819,7 +1836,7 @@ interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
+interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">>, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
 }
 interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -1835,7 +1852,7 @@ interface UseStaggeredChildReturnTypeSelf {
 interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">;
+    info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
@@ -1856,32 +1873,25 @@ declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, s
  *
  * @compositeParams
  */
-declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 interface UseListChildrenReturnTypeSelf {
-    /**
-     * @stable
-     *
-     * Call to rearrange the children in ascending or descending order.
-     *
-     */
-    sort: (direction: "ascending" | "descending") => Promise<void> | void;
     children: VNode;
 }
 interface WeirdUseListContextSelf {
-    provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle"> & Pick<UseListChildrenReturnTypeSelf, "sort">): void;
+    provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
 }
 interface UseListChildrenReturnType<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UseStaggeredChildrenReturnType, never>, OmitStrong<UsePaginatedChildrenReturnType, never> {
     listChildrenReturn: UseListChildrenReturnTypeSelf;
     context: NormalListChildContext<TabbableChildElement, M>;
 }
-interface WeirdUseListChildContext<M extends UseRearrangeableChildInfo> extends UsePaginatedChildContext, UseStaggeredChildContext, UseManagedChildrenContext<M> {
+interface WeirdUseListChildContext {
     listContext: WeirdUseListContextSelf;
 }
 // These are the info parameters required by useRovingTabIndexChild specifically
 type UseListChildInfoKeysParameters = "index";
 // These are the info parameters provided by useRovingTabIndexChild specifically
 type UseListChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
-interface UseListChildParameters<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends UseGenericChildParameters<NormalListChildContext<TabbableChildElement, M>, Pick<UseListChildInfo<TabbableChildElement>, UseListChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseStaggeredChildParameters, never>, Pick<UseManagedChildParameters<M>, never> {
+interface UseListChildParameters<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends UseGenericChildParameters<NormalListChildContext<TabbableChildElement, M>, Pick<UseListChildInfo<TabbableChildElement>, UseListChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseStaggeredChildParameters, "refElementReturn">, Pick<UseManagedChildParameters<M>, never> {
     listChildParameters: UseListChildParametersSelf;
 }
 interface UseListChildParametersSelf {
@@ -1898,15 +1908,6 @@ interface UseListChildReturnTypeSelf {
 interface UseListChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 }
 interface UseListChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
-    /**
-     * Controls how values compare against each other when `sort` is called.
-     *
-     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
-     *
-     * @param lhs - The first value to compare
-     * @param rhs - The second value to compare
-     */
-    compare: Nullable<Compare<M>>;
     children: VNode[];
 }
 /**
@@ -1914,33 +1915,55 @@ interface UseListChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
  */
 interface UseListChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRearrangeableChildInfo> extends OmitStrong<UseRearrangeableChildrenParameters<M>, "managedChildrenReturn">, OmitStrong<UseStaggeredChildrenParameters, "managedChildrenReturn" | "staggeredChildrenParameters">, TargetedOmit<UseStaggeredChildrenParameters, "staggeredChildrenParameters", "childCount">, Pick<UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>, "refElementReturn" | "rovingTabIndexReturn">, TargetedOmit<UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>, "paginatedChildrenParameters", "childCount"> {
     listChildrenParameters: UseListChildrenParametersSelf<M>;
-    context: TargetedPick<WeirdUseListChildContext<M>, "listContext", "provideManglers">;
+    context: WeirdUseListChildContext;
 }
 /**
- * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+ * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
  *
- * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+ * @remarks This is separate from `useManagedChildren`, but takes advantage of its flexibility, especially with its
+ * allowing for "holes" of missing children, to prevent all children from rendering at once on mount.
  *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
- * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
- * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
+ * Staggering and pagination exists because no matter how well optimized your CSS and Javascript for each child is,
+ * eventually some number of children will cause jank when mounting them all at once. Considering that maybe 1% of them
+ * will actually be visible at first within the screen, with the other 99% wasting time doing things off-screen, it makes
+ * sense to only show what's necessary at first, and delay as much as possible.
  *
- * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
- * sort all children according to their value from the `getValue` argument you pass in.
+ * If you're loading a dynamic list of data, where you don't know the length in advance
+ * (but that it could be more than, say, 30 - 50 at any point),
+ * this is all but essential for a good user experience.
  *
- * If you want to perform some re-ordering operation that's *not* a sort, you can manually
- * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
- * sorted and unsorted index positions.
+ * * 100 children without staggering/pagination is "start to feel jank on mobile"
+ * * 1000 children without staggering/pagination is "start to feel jank on desktop"
+ * * 10000 children staggered/paginated is "start to feel jank on desktop"
+ * * 100000 children is "you're probably out of memory"
  *
- * Again, unlike some other hooks, **these children must be direct descendants**. This is because
- * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
- * Because keys are given special treatment and a child has no way of modifying its own key
- * there's no other time or place this can happen other than exactly within the parent component's render function.
+ * <br />
+ *
+ * Additionally, this hook allows for reorganization of its children. A default `sort` and `shuffle` are provided,
+ * but you can implement any arbitrary reordering.
+ *
+ * <br />
+ *
+ * The main limitation of this hook is that, unlike hooks that use/derive from `useManagedChildren`
+ * (in which children can arbitrarily be anywhere descendant in the tree), children here ***must***
+ * be in a single, sequential array (gaps are still fine).
+ *
+ * This is separate from `useListNavigation` and friends for performance reasons -- if a child is
+ * hidden because it's paginated out or not staggered in yet, then we want to avoid running the normal
+ * child list logic (which is as fast as possible, but still only so fast).
+ *
+ * Similarly, it can be useful for the children to be in a separate component for performance reasons, which
+ * is another reason to separate this logic from `useListNavigation`.
+ *
+ * Finally, `useListNavigation` imposes no requirements on how your children are laid out in the DOM, but
+ * this hook **requires** all children be in one contiguous array.
  *
  * @compositeParams
+ *
+ * @hasChild {@link useListChild}
  */
-declare const useListChildren: <ParentElement extends Element, TabbableChildElement extends Element>({ rearrangeableChildrenParameters, listChildrenParameters: { children, compare: userCompare }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }: UseListChildrenParameters<ParentElement, TabbableChildElement, UseListChildInfo<TabbableChildElement>>) => UseListChildrenReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>>;
-declare const useListChild: <TabbableChildElement extends Element>({ context, info: { index }, listChildParameters: { children: childrenIn } }: UseListChildParameters<TabbableChildElement, UseListChildInfo<TabbableChildElement>>) => UseListChildReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>>;
+declare const useListChildren: <ParentElement extends Element, TabbableChildElement extends Element>({ rearrangeableChildrenParameters: { onRearranged, ...rearrangeableChildrenParameters }, listChildrenParameters: { children }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }: UseListChildrenParameters<ParentElement, TabbableChildElement, UseListChildInfo<TabbableChildElement>>) => UseListChildrenReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>>;
+declare const useListChild: <TabbableChildElement extends Element>({ context, info: { index }, listChildParameters: { children: childrenIn }, refElementReturn: { getElement } }: UseListChildParameters<TabbableChildElement, UseListChildInfo<TabbableChildElement>>) => UseListChildReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>>;
 interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
@@ -2635,28 +2658,18 @@ interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement exte
 interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn", "changeSingleSelectedIndex">, TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "multiSelectionReturn", never>, OmitStrong<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn" | "multiSelectionReturn"> {
 }
 declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
-interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionChildInfo<ChildElement>, 
-//UsePaginatedChildrenInfo<ChildElement>,
-//UseStaggeredChildrenInfo,
-ManagedChildInfo<number> {
+interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionChildInfo<ChildElement>, ManagedChildInfo<number> {
 }
-interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters">, TargetedOmit<Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">, 
-//Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">,
-Pick<UseRefElementParameters<ParentElement>, "refElementParameters">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "untabbableBehavior"> {
+interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters">, TargetedOmit<Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">, Pick<UseRefElementParameters<ParentElement>, "refElementParameters">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "untabbableBehavior"> {
 }
-interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
-//Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
-// Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
-OmitStrong<UseRefElementReturnType<ParentElement>, "propsStable">, TargetedPick<UseListChildrenReturnType<any, any>, "rearrangeableChildrenReturn", "reverse" | "shuffle">, TargetedOmit<UseListChildrenReturnType<any, any>, "listChildrenReturn", "children">, Pick<UseListChildrenReturnType<any, any>, never>, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">, OmitStrong<UseListNavigationSelectionReturnType<ParentElement, ChildElement>, "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRefElementReturnType<ParentElement>, "propsStable">, TargetedOmit<UseListChildrenReturnType<any, any>, "rearrangeableChildrenReturn", "indexDemangler" | "indexMangler" | "useRearrangedChildren">, TargetedOmit<UseListChildrenReturnType<any, any>, "listChildrenReturn", "children">, Pick<UseListChildrenReturnType<any, any>, never>, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">, OmitStrong<UseListNavigationSelectionReturnType<ParentElement, ChildElement>, "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: ElementProps<ParentElement>;
-    context: CompleteListNavigationContext<ChildElement, M>;
+    contextChildren: CompleteListNavigationContext<ChildElement, M>;
+    contextPreprocessing: WeirdUseListChildContext;
 }
 interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
-//UsePaginatedChildContext,
-//UseStaggeredChildContext,
-Pick<WeirdUseListChildContext<M>, "listContext">, UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, RovingTabIndexChildContext {
-    //managedChildRPSContext: UseManagedChildrenContextSelf<UseListChildInfo<ChildElement>>;
-    managedChildContext: UseManagedChildrenContextSelf<M>;
+//Pick<WeirdUseListChildContext<M>, "listContext">,
+UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, UseManagedChildrenContext<M>, RovingTabIndexChildContext {
 }
 type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = 
 // All types in the user-supplied info type that aren't in the base type (since we handle it)
@@ -2665,14 +2678,9 @@ Exclude<keyof M, keyof UseCompleteListNavigationChildInfo<any>> |
 // TODO: Where exactly does focusSelf come from? (should be typed)
 // I feel like this always happens with focusSelf, why.
 UseListNavigationSelectionChildInfoKeysParameters | "focusSelf";
-interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>, OmitStrong<UseListNavigationSelectionChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn">, Pick<UseRefElementParameters<ChildElement>, "refElementParameters">, 
-//Pick<UseListChildParameters<ChildElement, UseListChildInfo<ChildElement>>, "listChildParameters">,
-Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
+interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>, OmitStrong<UseListNavigationSelectionChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn">, Pick<UseRefElementParameters<ChildElement>, "refElementParameters">, Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
 }
-interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSelectionChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">, 
-//OmitStrong<UsePaginatedChildReturnType<ChildElement>, "info" | "props">,
-//OmitStrong<UseStaggeredChildReturnType<ChildElement>, "info" | "props">,
-OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, UseHasCurrentFocusReturnType<ChildElement>, UseManagedChildReturnType<M>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
+interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSelectionChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, UseHasCurrentFocusReturnType<ChildElement>, UseManagedChildReturnType<M>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
     /**
      * These props should be passed to whichever element is tabbable.
      * This may be the same element as `propsChild`, in which case `useMergedProps` is recommended.
@@ -2708,7 +2716,7 @@ refElementParameters, ...void1 }: UseCompleteListNavigationParameters<ParentElem
  */
 declare const useCompleteListNavigationChild: <ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info: { index, focusSelf, untabbable, ...customUserInfo }, 
 // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, listContext, ...void5 }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>) => UseCompleteListNavigationChildReturnType<ChildElement, M>;
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>) => UseCompleteListNavigationChildReturnType<ChildElement, M>;
 interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<UseSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters", "initiallySingleSelectedIndex" | "onSingleSelectedIndexChange"> {
 }
 interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSingleSelectedIndex">, TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "multiSelectionReturn", never>, OmitStrong<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn" | "multiSelectionReturn"> {

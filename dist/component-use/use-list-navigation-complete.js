@@ -1,3 +1,4 @@
+import { noop } from "lodash-es";
 import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
 import { useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useListNavigationSelection, useListNavigationSelectionChild } from "../component-detail/use-list-navigation-selection.js";
@@ -11,6 +12,39 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+function useCreateWeirdContext() {
+    // TODO: Put these in their own hook? Extremely specific, though
+    const sortRef = useRef(null);
+    const shuffleRef = useRef(null);
+    const reverseRef = useRef(null);
+    const rearrangeRef = useRef(null);
+    const indexManglerRef = useRef(null);
+    const indexDemanglerRef = useRef(null);
+    const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
+    const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
+    const sort = useStableCallback((i) => { return (sortRef.current ?? identity)(i); }, []);
+    const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
+    const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
+    const rearrange = useStableCallback((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered); }, []);
+    const listContext = useMemoObject({
+        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        })
+    });
+    return {
+        context: useMemoObject({ listContext }),
+        indexDemangler,
+        indexMangler,
+        rearrange,
+        reverse,
+        shuffle,
+        sort
+    };
+}
 /**
  * All the list-related hooks combined into one large hook that encapsulates everything.
  *
@@ -36,26 +70,7 @@ refElementParameters, ...void1 }) {
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    // TODO: Put these in their own hook? Extremely specific, though
-    const sortRef = useRef(null);
-    const shuffleRef = useRef(null);
-    const reverseRef = useRef(null);
-    const indexManglerRef = useRef(null);
-    const indexDemanglerRef = useRef(null);
-    const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
-    const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
-    const sort = useStableCallback((i) => { return (sortRef.current ?? identity)(i); }, []);
-    const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
-    const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
-    const weirdContext = useMemoObject({
-        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
-            indexManglerRef.current = indexMangler;
-            indexDemanglerRef.current = indexDemangler;
-            reverseRef.current = reverse;
-            shuffleRef.current = shuffle;
-            sortRef.current = sort;
-        })
-    });
+    const { context: weirdContext, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateWeirdContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -76,37 +91,19 @@ refElementParameters, ...void1 }) {
         }
     });
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
-    /*
-        const {
-            context: { managedChildContext: managedChildRPSContext, paginatedChildContext, staggeredChildContext },
-            listChildrenReturn,
-            paginatedChildrenReturn,
-            staggeredChildrenReturn,
-            rearrangeableChildrenReturn,
-        } = useListChildren<ParentElement, ChildElement>({
-            listChildrenParameters,
-            paginatedChildrenParameters,
-            rearrangeableChildrenParameters,
-            refElementReturn,
-            rovingTabIndexReturn,
-            staggeredChildrenParameters
-        });*/
     const context = useMemoObject({
         childrenHaveFocusChildContext,
         rovingTabIndexContext,
         singleSelectionContext,
         multiSelectionContext,
         typeaheadNavigationContext,
-        //paginatedChildContext,
-        //staggeredChildContext,
-        //managedChildRPSContext,
         managedChildContext: managedChildRTIContext,
-        listContext: weirdContext
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {
-        context,
+        contextChildren: context,
+        contextPreprocessing: weirdContext,
         props: useMergedProps(props, propsRef),
         managedChildrenReturn,
         linearNavigationReturn,
@@ -117,7 +114,7 @@ refElementParameters, ...void1 }) {
         childrenHaveFocusReturn,
         refElementReturn,
         listChildrenReturn: { sort },
-        rearrangeableChildrenReturn: { reverse, shuffle },
+        rearrangeableChildrenReturn: { reverse, shuffle, rearrange, sort },
     };
 });
 /**
@@ -125,14 +122,7 @@ refElementParameters, ...void1 }) {
  * @compositeParams
  */
 export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, listContext, ...void5 }, ...void1 }) {
-    //const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
-    //const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info: { index }, context: { staggeredChildContext } });
-    // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
-    // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
-    //untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
-    // Not used by us
-    void (listContext);
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
         info: { index, untabbable },
@@ -147,8 +137,6 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         focusSelf,
         getElement: refElementReturn.getElement,
         untabbable,
-        //...infoFromStaggered,
-        //...infoFromPaginated,
         ...infoFromListNav,
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
