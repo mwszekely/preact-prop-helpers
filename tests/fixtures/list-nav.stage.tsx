@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./list-nav.constants.js";
@@ -26,7 +26,9 @@ export interface ListNavConstants {
     onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
-const Context = createContext<CompleteListNavigationContext<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
+const Context1 = createContext<CompleteListNavigationContext<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
+const Context2 = createContext<UseProcessedChildrenContext>(null!);
+const Context3 = createContext<UseProcessedChildContext<any, any>>(null!);
 
 export function TestBasesListNav() {
     const [mounted] = useTestSyncState("ListNav", "setMounted", true, fromStringBoolean);
@@ -98,20 +100,21 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     const { props: p1 } = useOnRender("parent");
 
     const {
-        context,
+        contextChildren,
+        contextPreprocessing,
         linearNavigationReturn: { },
         managedChildrenReturn: { getChildren },
-        paginatedChildrenReturn: { refreshPagination },
+        //paginatedChildrenReturn: { refreshPagination },
         props,
-        rearrangeableChildrenReturn: { indexDemangler, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
-        rovingTabIndexReturn: { focusSelf, getTabbableIndex, setTabbableIndex },
+        refElementReturn,
+        rearrangeableChildrenReturn: { rearrange, reverse, shuffle },
+        rovingTabIndexReturn,
         singleSelectionReturn: { getSingleSelectedIndex },
-        sortableChildrenReturn: { sort },
-        staggeredChildrenReturn: { stillStaggering },
+        //sortableChildrenReturn: { sort },
+        //staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
-        rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         singleSelectionDeclarativeParameters: {
@@ -122,26 +125,53 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             }, [])
         },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-pressed", multiSelectionMode: "disabled", onSelectionChange: null, },
-        sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
-        staggeredChildrenParameters: { staggered },
-        paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
+        //sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
+        //staggeredChildrenParameters: { staggered },
+        //paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null },
-        refElementParameters: {}
+        refElementParameters: {},
+        paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
+    });
+
+    const { context, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useProcessedChildren({
+        context: contextPreprocessing,
+        paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
+        rearrangeableChildrenParameters: {
+            getIndex: useCallback(info => info.props.index, []),
+            adjust: null,
+            children: Array.from(function* () {
+                for (let i = 0; i < childCount; ++i) {
+                    yield (
+                        <Outer index={i} />
+                    );
+                }
+            }()),
+            compare: null,
+            onRearranged: null
+        },
+        refElementReturn,
+        rovingTabIndexReturn,
+        staggeredChildrenParameters: { staggered },
     });
 
     return (
-        <Context.Provider value={context}>
-            <ol {...useMergedProps(props, p1, {
-                role: "toolbar",
-                "data-still-staggering": stillStaggering,
-                "data-typeahead-status": typeaheadStatus
-            } as {})}>
-                <TestBasesListNavChildren count={childCount} />
-            </ol>
-        </Context.Provider>
+        <Context1.Provider value={contextChildren}>
+            <Context2.Provider value={contextPreprocessing}>
+                <Context3.Provider value={context}>
+                    <ol {...useMergedProps(props, p1, {
+                        role: "toolbar",
+                        "data-still-staggering": stillStaggering,
+                        "data-typeahead-status": typeaheadStatus
+                    } as {})}>
+                        {rearrangeableChildrenReturn.children}
+                    </ol>
+                </Context3.Provider>
+            </Context2.Provider>
+        </Context1.Provider>
     )
 }
 
+/*
 function TestBasesListNavChildren({ count }: { count: number }) {
 
     return (
@@ -155,8 +185,27 @@ function TestBasesListNavChildren({ count }: { count: number }) {
             }())}
         </>
     )
-}
+}*/
 
+function Outer({ index }: { index: number }) {
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
+    const { processedChildReturn: { children }, managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
+        context: useContext(Context3),
+        info: { index },
+        processedChildParameters: { children: <TestBasesListNavChild index={index} /> },
+        refElementReturn
+    });
+
+    return (<>{
+        children ??
+        <li
+            data-hide-because-paginated={hideBecausePaginated}
+            data-parent-is-paginated={parentIsPaginated}
+            data-hide-because-staggered={hideBecauseStaggered}
+            data-parent-is-staggered={parentIsStaggered}
+            {...useMergedProps(propsStable, props)
+            }>{children ?? "(staggered)"}</li>}</>)
+}
 
 
 function TestBasesListNavChild({ index }: { index: number }) {
@@ -175,22 +224,22 @@ function TestBasesListNavChild({ index }: { index: number }) {
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
-        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
+        //paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         propsChild,
         propsTabbable,
         refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
-        staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
+        //staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
         pressParameters: { onPressSync, excludeSpace }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
-        context: useContext(Context),
+        context: useContext(Context1),
         info: {
             focusSelf,
             untabbable: hidden,
             index,
-            getSortValue: getTextContent,
+            //getSortValue: getTextContent,
         },
         textContentParameters: { getText: getTextContent },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
@@ -198,6 +247,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
         multiSelectionChildParameters: { multiSelectionDisabled: disabled, initiallyMultiSelected: false, onMultiSelectChange: null },
         singleSelectionChildParameters: { singleSelectionDisabled: disabled }
     });
+
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({
         pressParameters: {
             focusSelf,
@@ -217,14 +267,10 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-index={index}
                 data-pressing={pressing}
                 data-long-pressing={longPress}
-                data-hide-because-paginated={hideBecausePaginated}
-                data-parent-is-paginated={parentIsPaginated}
                 data-tabbable={tabbable}
-                data-hide-because-staggered={hideBecauseStaggered}
                 data-selected={singleSelected}
                 data-selected-offset={singleSelectedOffset}
-                data-parent-is-staggered={parentIsStaggered}
-                {...useMergedProps(propsChild, propsTabbable, propsPressStable, p1, p2)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
+                {...useMergedProps(propsChild, propsTabbable, propsPressStable, p1, p2)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )
 }

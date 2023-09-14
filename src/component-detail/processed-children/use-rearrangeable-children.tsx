@@ -2,13 +2,74 @@
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
-import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
-import { VNode } from "../../util/types.js";
+import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
+import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { Nullable, TargetedPick, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { OmitStrong, VNode } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
-import { shuffle as lodashShuffle } from "lodash-es";
+import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
+
+
+
+
+
+
+export interface UseProcessedChildrenContextSelf {
+    provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
+}
+
+/**
+ * Unusually, this context is not passed from parent to child,
+ * but from parent to a different parent.
+ */
+export interface UseProcessedChildrenContext {
+    rearrangeableChildrenContext: UseProcessedChildrenContextSelf;
+}
+
+
+/**
+ * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
+ * 
+ * @returns 
+ */
+export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & { context: UseProcessedChildrenContext } {
+    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["sort"]>(null);
+    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
+    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
+    const rearrangeRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["rearrange"]>(null);
+    const indexManglerRef = useRef<null | ((n: number) => number)>(null);
+    const indexDemanglerRef = useRef<null | ((n: number) => number)>(null);
+    const indexMangler = useStableCallback((i: number) => { return (indexManglerRef.current ?? identity)(i)! }, []);
+    const indexDemangler = useStableCallback((i: number) => { return (indexDemanglerRef.current ?? identity)(i)! }, []);
+    const sort = useStableCallback<(typeof sortRef)["current"]>((i) => { return (sortRef.current ?? identity)(i)! }, []);
+    const shuffle = useStableCallback<(typeof shuffleRef)["current"]>(() => { return (shuffleRef.current ?? identity)()! }, []);
+    const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
+    const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);
+    const rearrangeableChildrenContext = useMemoObject<UseProcessedChildrenContextSelf>({
+        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+            indexManglerRef.current = indexMangler;
+            indexDemanglerRef.current = indexDemangler;
+            reverseRef.current = reverse;
+            shuffleRef.current = shuffle;
+            sortRef.current = sort;
+        })
+    });
+    return {
+        context: useMemoObject<UseProcessedChildrenContext>({ rearrangeableChildrenContext }),
+        indexDemangler,
+        indexMangler,
+        rearrange,
+        reverse,
+        shuffle,
+        sort
+    }
+}
+
+
+
+
 
 export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> { }
 
@@ -30,6 +91,14 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
 
 
     /**
+     * Because this hook needs to re-render each child with a new `key` prop,
+     * it may be useful to apply a transformation before that step completes.
+     * 
+     * @default `identity`
+     */
+    adjust: Nullable<(input: VNode, data: { mangledIndex: number | null, demangledIndex: number | null }) => VNode | null>;
+
+    /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      * 
      * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
@@ -43,6 +112,11 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      * Called after the children have been rearranged.
      */
     onRearranged: Nullable<(() => void)>;
+
+    /**
+     * The children to sort.
+     */
+    children: (VNode | null)[];
 }
 
 /**
@@ -50,6 +124,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
+    context: UseProcessedChildrenContext;
 }
 
 
@@ -95,13 +170,10 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
     /** @stable */
     indexDemangler: (n: number) => number;
 
-    /** 
-     * @stable
-     * 
-     * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
-     * 
+    /**
+     * The transformed (i.e. rearranged) children to render.
      */
-    useRearrangedChildren: (children: VNode[]) => VNode[];
+    children: (VNode | null)[];
 
     /** 
      * @stable
@@ -143,9 +215,10 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  * 
  * @compositeParams
  */
-export const useRearrangeableChildren2 = monitored( function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
-    rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare },
-    managedChildrenReturn: { getChildren }
+export const useRearrangeableChildren = monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
+    rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
+    managedChildrenReturn: { getChildren },
+    context: { rearrangeableChildrenContext: { provideManglers } }
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
     useEnsureStability("useRearrangeableChildren", getIndex);
 
@@ -156,9 +229,6 @@ export const useRearrangeableChildren2 = monitored( function useRearrangeableChi
     const indexMangler = useCallback((n: number) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n: number) => (demangleMap.current.get(n) ?? n), []);
     const onRearrangedGetter = useStableGetter(onRearranged);
-    //const { setTabbableIndex } = rovingTabIndexReturn;
-
-
 
     const shuffle = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
@@ -179,8 +249,6 @@ export const useRearrangeableChildren2 = monitored( function useRearrangeableChi
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
     const forceUpdateRef = useRef<null | (() => void)>(null);
 
     const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
@@ -225,52 +293,61 @@ export const useRearrangeableChildren2 = monitored( function useRearrangeableChi
 
     }, [ /* Must remain stable */]);
 
-    const useRearrangedChildren = useCallback(monitored(function useRearrangedChildren(children: VNode[]) {
+    console.assert(Array.isArray(children));
 
-        console.assert(Array.isArray(children));
+    const forceUpdate = useForceUpdate();
+    console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+    forceUpdateRef.current = forceUpdate;    // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
 
-        const forceUpdate = useForceUpdate();
-        console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
-        forceUpdateRef.current = forceUpdate;    // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
+    let sorted = children
+        .slice()
+        .map(child => {
+            const mangledIndex = ((child == null ? null : indexMangler(getIndex(child)!)) ?? null);
+            const demangledIndex = ((child == null ? null : getIndex(child))) ?? null;
+            return ({
+                child,
+                sort: mangledIndex ?? -1,
+                mangledIndex,
+                demangledIndex
+            })
+        }
+        )
+        .sort((lhs, rhs) => (lhs.sort - rhs.sort))
+        .map(({ child, mangledIndex, demangledIndex }) => {
+            // "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex
+            if (child)
+                return ((adjust || identity)(createElement(child.type as any, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex })) ?? null
+            return null;
+        });
 
-        return (children as VNode[])
-            .slice()
-            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
-            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
-            .map(({ child, mangledIndex, demangledIndex }) => {
-                return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
-            });
-    }), []);
-
-    
-
-    /*const toJsonArray = useCallback((transform?: (info: M) => object) => {
-        const managedRows = getChildren();
-        return managedRows._arraySlice().map(child => {
-            if (transform)
-                return (transform(child));
-            else
-                return child.getSortValue();
+    // The parent useListNavigation uses these for various reasons.
+    // If it called useRearrangeableChildren directly, it would have this information,
+    // but we're one level deeper in the tree, so once we mount we need to give it to them.
+    useLayoutEffect(() => {
+        provideManglers({
+            indexDemangler,
+            indexMangler,
+            reverse,
+            shuffle,
+            sort
         })
-    }, []);*/
+    }, [])
 
     return {
         rearrangeableChildrenReturn: {
             indexMangler,
             indexDemangler,
-            //mangleMap,
-            //demangleMap,
             rearrange,
             shuffle,
             reverse,
             sort,
-            useRearrangedChildren
+            children: sorted
         }
     };
 })
 
 
-function defaultCompare<TabbableChildElement extends Element>(lhs: UseRearrangeableChildInfo | undefined, rhs: UseRearrangeableChildInfo | undefined) {
+function defaultCompare(lhs: UseRearrangeableChildInfo | undefined, rhs: UseRearrangeableChildInfo | undefined) {
     return compare1(lhs?.index, rhs?.index);    // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
 
     function compare1(lhs: unknown | undefined, rhs: unknown | undefined) {

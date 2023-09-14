@@ -1,4 +1,4 @@
-import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
+import { useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -9,7 +9,7 @@ import { useManagedChild, useManagedChildren } from "../preact-extensions/use-ma
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { useCallback, useRef } from "../util/lib.js";
+import { useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 /**
  * Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything.
@@ -33,41 +33,25 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    // TODO: Put these in their own hook? Extremely specific, though
-    const sortRef = useRef(null);
-    const shuffleRef = useRef(null);
-    const reverseRef = useRef(null);
-    const indexManglerRef = useRef(null);
-    const indexDemanglerRef = useRef(null);
-    const indexMangler = useStableCallback((i) => { return (indexManglerRef.current ?? identity)(i); }, []);
-    const indexDemangler = useStableCallback((i) => { return (indexDemanglerRef.current ?? identity)(i); }, []);
-    const completeListNavigationContext = useMemoObject({
-        provideManglers: ({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
-            indexManglerRef.current = indexMangler;
-            indexDemanglerRef.current = indexDemangler;
-            reverseRef.current = reverse;
-            shuffleRef.current = shuffle;
-            sortRef.current = sort;
-        }
-    });
+    // Grab the information from the array of children we may or may not render.
+    // (see useProcessedChildren -- it send this information to us if it's used.)
+    // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
+    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
+        singleSelectionParameters,
+        multiSelectionParameters,
+        paginatedChildrenParameters,
+        refElementReturn,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-        singleSelectionParameters,
-        multiSelectionParameters,
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-        paginatedChildrenParameters,
-        refElementReturn,
         childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
         rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const mcr = useManagedChildren({ managedChildrenParameters });
-    const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
-    //const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentOrRowElement, RowElement, RM>({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, rearrangeableChildrenReturn: { indexDemangler } });
-    // const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const context = useMemoObject({
         singleSelectionContext,
         multiSelectionContext,
@@ -76,42 +60,31 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
-        completeGridNavigationContext: completeListNavigationContext
+        contextPreprocessing
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
-        context,
+        contextChildren: context,
+        contextProcessing: contextPreprocessing,
         props: useMergedProps(props, propsStable),
+        refElementReturn,
         managedChildrenReturn,
         rovingTabIndexReturn,
         childrenHaveFocusReturn,
         linearNavigationReturn,
         singleSelectionReturn,
         multiSelectionReturn,
-        typeaheadNavigationReturn
+        typeaheadNavigationReturn,
+        rearrangeableChildrenReturn: { rearrange, reverse, shuffle, sort }
     };
 });
 /**
  * @compositeParams
  */
 export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    /*const {
-        info: infoPaginatedChild,
-        paginatedChildReturn,
-        props: paginationProps,
-        ...void7
-    } = usePaginatedChild<RowElement>({ info: { index }, context: contextIncomingForRowAsChildOfTable });
-
-    const {
-        info: infoStaggeredChild,
-        staggeredChildReturn,
-        props: staggeredProps,
-        ...void8
-    } = useStaggeredChild<RowElement>({ info: { index }, context: contextIncomingForRowAsChildOfTable })
-
-    untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);*/
+    // Create some helper functions
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -123,8 +96,10 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
             return false;
         return true;
     }, []);
+    // Someone somewhere needs useRefElement, no shock there
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
-    const r = useGridNavigationSelectionRow({
+    // Enormous bag of parameters for useGridNavigationRow
+    const parameters = {
         rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
@@ -135,15 +110,20 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         textContentParameters,
         singleSelectionChildParameters,
         multiSelectionChildParameters
-    });
-    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r;
-    const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+    };
+    // Actually call useGridNavigationRow,
+    // and get an enormous bag of return values
+    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
+    // This is all the info the parent needs about us, the row
+    // (NOT the info the cells provide to us, the row)
     const completeInfo = {
         getElement: refElementReturn.getElement,
         index,
         untabbable,
         ...infoRowReturn,
     };
+    // Call both `useManagedChildren` and `useManagedChild` with their appropriate parameters.
+    const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { managedChildReturn, ...void4 } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
     const context = useMemoObject({
         ...contextGNR,
@@ -224,23 +204,19 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
         textContentReturn
     };
 });
-export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
-    const ret = useCompleteGridNavigation({
-        linearNavigationParameters,
-        paginatedChildrenParameters,
-        rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)), ...singleSelectionParameters },
-        multiSelectionParameters,
-        refElementParameters,
-        typeaheadNavigationParameters,
-        gridNavigationParameters,
+export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }) {
+    const ret2 = useCompleteGridNavigation({
+        singleSelectionParameters: {
+            initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
+            onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)),
+            ...singleSelectionParameters
+        },
+        ...normalGridNavParameters
     });
     const { singleSelectionParameters: { onSingleSelectedIndexChange } } = useSelectionDeclarative({
         singleSelectionDeclarativeParameters,
-        singleSelectionReturn: ret.singleSelectionReturn
+        singleSelectionReturn: ret2.singleSelectionReturn
     });
-    const { singleSelectionReturn: { getSingleSelectedIndex }, ...ret2 } = ret;
-    assertEmptyObject(void1);
-    return { ...ret2, singleSelectionReturn: { getSingleSelectedIndex } };
+    return ret2;
 }
 //# sourceMappingURL=use-grid-navigation-complete.js.map

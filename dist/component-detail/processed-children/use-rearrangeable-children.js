@@ -6,6 +6,11 @@ import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/
 import { monitored } from "../../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
+/**
+ * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
+ *
+ * @returns
+ */
 export function useCreateProcessedChildrenContext() {
     const sortRef = useRef(null);
     const shuffleRef = useRef(null);

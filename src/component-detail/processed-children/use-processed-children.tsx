@@ -3,91 +3,75 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
-import { ElementProps, OmitStrong, TargetedOmit, VNode, useLayoutEffect } from "../../util/lib.js";
+import { ElementProps, OmitStrong, TargetedOmit } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
-import { UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangeableChildrenReturnTypeSelf, useRearrangeableChildren2 } from "./use-rearrangeable-children.js";
+import { UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, useRearrangeableChildren } from "./use-rearrangeable-children.js";
 import { UseStaggeredChildContext, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
 
-export interface UseListChildrenReturnTypeSelf {
-    children: VNode;
-
-}
-
-export interface WeirdUseListContextSelf {
-    provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
-}
-
-export interface UseListChildrenReturnType<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends
+export interface UseProcessedChildrenReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
     OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
     OmitStrong<UseStaggeredChildrenReturnType, never>,
     OmitStrong<UsePaginatedChildrenReturnType, never> {
-    listChildrenReturn: UseListChildrenReturnTypeSelf;
-    context: NormalListChildContext<TabbableChildElement, M>;
-}
-
-export interface WeirdUseListChildContext {
-    listContext: WeirdUseListContextSelf;
+    context: UseProcessedChildContext<TabbableChildElement, M>;
 }
 
 // These are the info parameters required by useRovingTabIndexChild specifically
-export type UseListChildInfoKeysParameters = "index";
+export type UseProcessedChildInfoKeysParameters = "index";
 // These are the info parameters provided by useRovingTabIndexChild specifically
-export type UseListChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
+export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export interface UseListChildParameters<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends
-    UseGenericChildParameters<NormalListChildContext<TabbableChildElement, M>, Pick<UseListChildInfo<TabbableChildElement>, UseListChildInfoKeysParameters>>,
+export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
+    UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>>,
     Pick<UsePaginatedChildParameters, never>,
     Pick<UseStaggeredChildParameters, "refElementReturn">,
     Pick<UseManagedChildParameters<M>, never> {
-    listChildParameters: UseListChildParametersSelf;
+    processedChildParameters: UseProcessedChildParametersSelf;
 }
 
-export interface UseListChildParametersSelf {
+export interface UseProcessedChildParametersSelf {
     children: ElementProps<any>["children"];
 }
 
-export interface NormalListChildContext<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends UsePaginatedChildContext, UseStaggeredChildContext, UseManagedChildrenContext<M> { }
+export interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
+    UsePaginatedChildContext,
+    UseStaggeredChildContext,
+    UseManagedChildrenContext<M> { }
 
-export interface UseListChildReturnType<TabbableChildElement extends Element, M extends UseListChildInfo<TabbableChildElement>> extends
+export interface UseProcessedChildReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
     Pick<UsePaginatedChildReturnType<TabbableChildElement>, "paginatedChildReturn" | "props">,
     Pick<UseStaggeredChildReturnType<TabbableChildElement>, "staggeredChildReturn">,
     Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
-    listChildReturn: UseListChildReturnTypeSelf;
+    processedChildReturn: UseProcessedChildReturnTypeSelf;
 }
 
-export interface UseListChildReturnTypeSelf {
+export interface UseProcessedChildReturnTypeSelf {
     children: ComponentChildren | null;
 }
 
-export interface UseListChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
-    // getSortValue(): unknown;
+export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
+
 }
 
 
-export interface UseListChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
-
-    children: VNode[];
-}
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseListChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRearrangeableChildInfo> extends
+export interface UseProcessedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRearrangeableChildInfo> extends
     OmitStrong<UseRearrangeableChildrenParameters<M>, "managedChildrenReturn">,
     OmitStrong<UseStaggeredChildrenParameters, "managedChildrenReturn" | "staggeredChildrenParameters">,
     TargetedOmit<UseStaggeredChildrenParameters, "staggeredChildrenParameters", "childCount">,
     Pick<UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>, "refElementReturn" | "rovingTabIndexReturn">,
     TargetedOmit<UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>, "paginatedChildrenParameters", "childCount"> {
-    listChildrenParameters: UseListChildrenParametersSelf<M>;
-    context: WeirdUseListChildContext;
 }
 
 /**
  * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
  * 
- * @remarks This is separate from `useManagedChildren`, but takes advantage of its flexibility, especially with its
- * allowing for "holes" of missing children, to prevent all children from rendering at once on mount.
+ * @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation), 
+ * but takes advantage of its flexibility (especially with its allowing for "holes" of missing children) 
+ * to prevent all children from rendering at once on mount.
  * 
  * Staggering and pagination exists because no matter how well optimized your CSS and Javascript for each child is,
  * eventually some number of children will cause jank when mounting them all at once. Considering that maybe 1% of them
@@ -126,21 +110,19 @@ export interface UseListChildrenParameters<ParentElement extends Element, Tabbab
  * 
  * @compositeParams
  * 
- * @hasChild {@link useListChild}
+ * @hasChild {@link useProcessedChild}
  */
-export const useListChildren = monitored(function useListChildren<ParentElement extends Element, TabbableChildElement extends Element>({
-    rearrangeableChildrenParameters: { onRearranged, ...rearrangeableChildrenParameters },
-    listChildrenParameters: { children },
+export const useProcessedChildren = monitored(function useProcessedChildren<ParentElement extends Element, TabbableChildElement extends Element>({
+    rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters },
     paginatedChildrenParameters,
     refElementReturn,
     rovingTabIndexReturn,
     staggeredChildrenParameters,
-    context: { listContext: { provideManglers } }
-}: UseListChildrenParameters<ParentElement, TabbableChildElement, UseListChildInfo<TabbableChildElement>>): UseListChildrenReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>> {
-    type M = UseListChildInfo<TabbableChildElement>;
+    context,
+}: UseProcessedChildrenParameters<ParentElement, TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>): UseProcessedChildrenReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>> {
+    type M = UseProcessedChildInfo<TabbableChildElement>;
 
-    //const [childCount, setChildCount] = useState<null | number>(null);
-    const childCount = children.length;
+    const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
 
@@ -149,8 +131,15 @@ export const useListChildren = monitored(function useListChildren<ParentElement 
         }
     })
 
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren2<M>({ rearrangeableChildrenParameters: { onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }), ...rearrangeableChildrenParameters, }, managedChildrenReturn });
-    const { useRearrangedChildren } = rearrangeableChildrenReturn;
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren<M>({
+        rearrangeableChildrenParameters: {
+            onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
+            children: childrenUnsorted,
+            ...rearrangeableChildrenParameters,
+        },
+        managedChildrenReturn,
+        context
+    });
 
     const {
         paginatedChildrenReturn,
@@ -172,27 +161,11 @@ export const useListChildren = monitored(function useListChildren<ParentElement 
         staggeredChildrenParameters: { staggered, childCount }
     });
 
-    // The parent useListNavigation uses these for various reasons.
-    // If it called useRearrangeableChildren directly, it would have this information,
-    // but we're one level deeper in the tree, so once we mount we need to give it to them.
-    useLayoutEffect(() => {
-        provideManglers({
-            indexDemangler: rearrangeableChildrenReturn.indexDemangler,
-            indexMangler: rearrangeableChildrenReturn.indexMangler,
-            reverse: rearrangeableChildrenReturn.reverse,
-            shuffle: rearrangeableChildrenReturn.shuffle,
-            sort: rearrangeableChildrenReturn.sort
-        })
-    }, [])
-
     return {
-        listChildrenReturn: {
-            children: <>{useRearrangedChildren(children)}</>
-        },
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
         paginatedChildrenReturn,
-        context: useMemoObject<NormalListChildContext<TabbableChildElement, M>>({
+        context: useMemoObject<UseProcessedChildContext<TabbableChildElement, M>>({
             staggeredChildContext,
             paginatedChildContext,
             managedChildContext
@@ -200,13 +173,13 @@ export const useListChildren = monitored(function useListChildren<ParentElement 
     };
 });
 
-export const useListChild = monitored(function useListChild<TabbableChildElement extends Element>({
+export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element>({
     context,
     info: { index },
-    listChildParameters: { children: childrenIn },
+    processedChildParameters: { children: childrenIn },
     refElementReturn: { getElement },
-}: UseListChildParameters<TabbableChildElement, UseListChildInfo<TabbableChildElement>>): UseListChildReturnType<TabbableChildElement, UseListChildInfo<TabbableChildElement>> {
-    type M = UseListChildInfo<TabbableChildElement>;
+}: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>): UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>> {
+    type M = UseProcessedChildInfo<TabbableChildElement>;
 
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
@@ -235,13 +208,13 @@ export const useListChild = monitored(function useListChild<TabbableChildElement
     }
 
     const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
-    
+
     return {
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
         staggeredChildReturn,
-        listChildReturn: {
+        processedChildReturn: {
             children
         }
     }

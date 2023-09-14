@@ -1,14 +1,23 @@
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { Nullable, TargetedPick } from "../../util/lib.js";
 import { OmitStrong, VNode } from "../../util/types.js";
-export interface UseProcessedChildContextSelf {
+export interface UseProcessedChildrenContextSelf {
     provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
 }
-export interface UseProcessedChildContext {
-    rearrangeableChildrenContext: UseProcessedChildContextSelf;
+/**
+ * Unusually, this context is not passed from parent to child,
+ * but from parent to a different parent.
+ */
+export interface UseProcessedChildrenContext {
+    rearrangeableChildrenContext: UseProcessedChildrenContextSelf;
 }
+/**
+ * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
+ *
+ * @returns
+ */
 export declare function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & {
-    context: UseProcessedChildContext;
+    context: UseProcessedChildrenContext;
 };
 export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
 }
@@ -58,7 +67,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
-    context: UseProcessedChildContext;
+    context: UseProcessedChildrenContext;
 }
 export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
     rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;

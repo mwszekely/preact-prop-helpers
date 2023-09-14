@@ -3271,20 +3271,7 @@
     };
   });
 
-  // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
-  var _3 = 0;
-  function o3(o4, e3, n2, t3, f3, l3) {
-    var s3, u3, a3 = {};
-    for (u3 in e3)
-      "ref" == u3 ? s3 = e3[u3] : a3[u3] = e3[u3];
-    var i3 = { type: o4, props: a3, key: n2, ref: s3, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_3, __source: f3, __self: l3 };
-    if ("function" == typeof o4 && (s3 = o4.defaultProps))
-      for (u3 in s3)
-        void 0 === a3[u3] && (a3[u3] = s3[u3]);
-    return l.vnode && l.vnode(i3), i3;
-  }
-
-  // ../dist/component-detail/preprocessed-children/use-paginated-children.js
+  // ../dist/component-detail/processed-children/use-paginated-children.js
   var usePaginatedChildren = monitored(function usePaginatedChildren2({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _2({ paginationMax: null, paginationMin: null });
@@ -3372,8 +3359,52 @@
     return _2(() => set((i3) => ++i3)).current;
   });
 
-  // ../dist/component-detail/preprocessed-children/use-rearrangeable-children.js
-  var useRearrangeableChildren2 = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare }, managedChildrenReturn: { getChildren } }) {
+  // ../dist/component-detail/processed-children/use-rearrangeable-children.js
+  function useCreateProcessedChildrenContext() {
+    const sortRef = _2(null);
+    const shuffleRef = _2(null);
+    const reverseRef = _2(null);
+    const rearrangeRef = _2(null);
+    const indexManglerRef = _2(null);
+    const indexDemanglerRef = _2(null);
+    const indexMangler = useStableCallback((i3) => {
+      return (indexManglerRef.current ?? identity_default)(i3);
+    }, []);
+    const indexDemangler = useStableCallback((i3) => {
+      return (indexDemanglerRef.current ?? identity_default)(i3);
+    }, []);
+    const sort = useStableCallback((i3) => {
+      return (sortRef.current ?? identity_default)(i3);
+    }, []);
+    const shuffle2 = useStableCallback(() => {
+      return (shuffleRef.current ?? identity_default)();
+    }, []);
+    const reverse = useStableCallback(() => {
+      return (reverseRef.current ?? identity_default)();
+    }, []);
+    const rearrange = useStableCallback((original, ordered) => {
+      (rearrangeRef.current ?? noop_default)(original, ordered);
+    }, []);
+    const rearrangeableChildrenContext = useMemoObject({
+      provideManglers: useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
+        indexManglerRef.current = indexMangler2;
+        indexDemanglerRef.current = indexDemangler2;
+        reverseRef.current = reverse2;
+        shuffleRef.current = shuffle3;
+        sortRef.current = sort2;
+      })
+    });
+    return {
+      context: useMemoObject({ rearrangeableChildrenContext }),
+      indexDemangler,
+      indexMangler,
+      rearrange,
+      reverse,
+      shuffle: shuffle2,
+      sort
+    };
+  }
+  var useRearrangeableChildren = monitored(function useRearrangeableChildren2({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     const mangleMap = _2(/* @__PURE__ */ new Map());
     const demangleMap = _2(/* @__PURE__ */ new Map());
@@ -3427,28 +3458,42 @@
     }, [
       /* Must remain stable */
     ]);
-    const useRearrangedChildren = T2(monitored(function useRearrangedChildren2(children) {
-      console.assert(Array.isArray(children));
-      const forceUpdate = useForceUpdate();
-      console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
-      forceUpdateRef.current = forceUpdate;
-      return children.slice().map((child) => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) })).sort((lhs, rhs) => {
-        return lhs.mangledIndex - rhs.mangledIndex;
-      }).map(({ child, mangledIndex, demangledIndex }) => {
-        return y(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
+    console.assert(Array.isArray(children));
+    const forceUpdate = useForceUpdate();
+    console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+    forceUpdateRef.current = forceUpdate;
+    let sorted = children.slice().map((child) => {
+      const mangledIndex = (child == null ? null : indexMangler(getIndex(child))) ?? null;
+      const demangledIndex = (child == null ? null : getIndex(child)) ?? null;
+      return {
+        child,
+        sort: mangledIndex ?? -1,
+        mangledIndex,
+        demangledIndex
+      };
+    }).sort((lhs, rhs) => lhs.sort - rhs.sort).map(({ child, mangledIndex, demangledIndex }) => {
+      if (child)
+        return (adjust || identity_default)(y(child.type, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex }) ?? null;
+      return null;
+    });
+    y2(() => {
+      provideManglers({
+        indexDemangler,
+        indexMangler,
+        reverse,
+        shuffle: shuffle2,
+        sort
       });
-    }), []);
+    }, []);
     return {
       rearrangeableChildrenReturn: {
         indexMangler,
         indexDemangler,
-        //mangleMap,
-        //demangleMap,
         rearrange,
         shuffle: shuffle2,
         reverse,
         sort,
-        useRearrangedChildren
+        children: sorted
       }
     };
   });
@@ -3465,7 +3510,7 @@
     }
   }
 
-  // ../dist/component-detail/preprocessed-children/use-staggered-children.js
+  // ../dist/component-detail/processed-children/use-staggered-children.js
   var useStaggeredChildren = monitored(function useStaggeredChildren2({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
@@ -3598,19 +3643,26 @@
     };
   });
 
-  // ../dist/component-detail/preprocessed-children/use-list-children.js
-  var useListChildren = monitored(function useListChildren2({ rearrangeableChildrenParameters: { onRearranged, ...rearrangeableChildrenParameters }, listChildrenParameters: { children }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context: { listContext: { provideManglers } } }) {
-    const childCount = children.length;
+  // ../dist/component-detail/processed-children/use-processed-children.js
+  var useProcessedChildren = monitored(function useProcessedChildren2({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context }) {
+    const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
       managedChildrenParameters: {}
     });
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren2({ rearrangeableChildrenParameters: { onRearranged: useStableCallback(() => {
-      refreshPagination(paginationMin, paginationMax);
-      onRearranged?.();
-    }), ...rearrangeableChildrenParameters }, managedChildrenReturn });
-    const { useRearrangedChildren } = rearrangeableChildrenReturn;
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren({
+      rearrangeableChildrenParameters: {
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginationMin, paginationMax);
+          onRearranged?.();
+        }),
+        children: childrenUnsorted,
+        ...rearrangeableChildrenParameters
+      },
+      managedChildrenReturn,
+      context
+    });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
       refElementReturn,
       managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
@@ -3622,19 +3674,7 @@
       managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
       staggeredChildrenParameters: { staggered, childCount }
     });
-    y2(() => {
-      provideManglers({
-        indexDemangler: rearrangeableChildrenReturn.indexDemangler,
-        indexMangler: rearrangeableChildrenReturn.indexMangler,
-        reverse: rearrangeableChildrenReturn.reverse,
-        shuffle: rearrangeableChildrenReturn.shuffle,
-        sort: rearrangeableChildrenReturn.sort
-      });
-    }, []);
     return {
-      listChildrenReturn: {
-        children: o3(_, { children: useRearrangedChildren(children) })
-      },
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
       paginatedChildrenReturn,
@@ -3645,7 +3685,7 @@
       })
     };
   });
-  var useListChild = monitored(function useListChild2({ context, info: { index }, listChildParameters: { children: childrenIn }, refElementReturn: { getElement } }) {
+  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index }, processedChildParameters: { children: childrenIn }, refElementReturn: { getElement } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
@@ -3672,7 +3712,7 @@
       managedChildReturn,
       paginatedChildReturn,
       staggeredChildReturn,
-      listChildReturn: {
+      processedChildReturn: {
         children
       }
     };
@@ -5507,42 +5547,22 @@
       return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const sortRef = _2(null);
-    const shuffleRef = _2(null);
-    const reverseRef = _2(null);
-    const indexManglerRef = _2(null);
-    const indexDemanglerRef = _2(null);
-    const indexMangler = useStableCallback((i3) => {
-      return (indexManglerRef.current ?? identity_default)(i3);
-    }, []);
-    const indexDemangler = useStableCallback((i3) => {
-      return (indexDemanglerRef.current ?? identity_default)(i3);
-    }, []);
-    const completeListNavigationContext = useMemoObject({
-      provideManglers: ({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse, shuffle: shuffle2, sort }) => {
-        indexManglerRef.current = indexMangler2;
-        indexDemanglerRef.current = indexDemangler2;
-        reverseRef.current = reverse;
-        shuffleRef.current = shuffle2;
-        sortRef.current = sort;
-      }
-    });
+    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
       gridNavigationParameters,
+      singleSelectionParameters,
+      multiSelectionParameters,
+      paginatedChildrenParameters,
+      refElementReturn,
       linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
       managedChildrenReturn: { getChildren },
       rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-      singleSelectionParameters,
-      multiSelectionParameters,
       typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-      paginatedChildrenParameters,
-      refElementReturn,
       childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
       rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const mcr = useManagedChildren({ managedChildrenParameters });
-    const { context: { managedChildContext }, managedChildrenReturn } = mcr;
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const context = useMemoObject({
       singleSelectionContext,
       multiSelectionContext,
@@ -5551,21 +5571,24 @@
       typeaheadNavigationContext,
       childrenHaveFocusChildContext,
       gridNavigationRowContext,
-      completeGridNavigationContext: completeListNavigationContext
+      contextPreprocessing
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
-      context,
+      contextChildren: context,
+      contextProcessing: contextPreprocessing,
       props: useMergedProps(props, propsStable),
+      refElementReturn,
       managedChildrenReturn,
       rovingTabIndexReturn,
       childrenHaveFocusReturn,
       linearNavigationReturn,
       singleSelectionReturn,
       multiSelectionReturn,
-      typeaheadNavigationReturn
+      typeaheadNavigationReturn,
+      rearrangeableChildrenReturn: { rearrange, reverse, shuffle: shuffle2, sort }
     };
   });
   var useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow2({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
@@ -5581,7 +5604,7 @@
       return true;
     }, []);
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
-    const r4 = useGridNavigationSelectionRow({
+    const parameters = {
       rovingTabIndexParameters,
       typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
       linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
@@ -5592,15 +5615,15 @@
       textContentParameters,
       singleSelectionChildParameters,
       multiSelectionChildParameters
-    });
-    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r4;
-    const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+    };
+    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
     const completeInfo = {
       getElement: refElementReturn.getElement,
       index,
       untabbable,
       ...infoRowReturn
     };
+    const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { managedChildReturn, ...void4 } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
     const context = useMemoObject({
       ...contextGNR,
@@ -5677,71 +5700,23 @@
       textContentReturn
     };
   });
-  function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
-    const ret = useCompleteGridNavigation({
-      linearNavigationParameters,
-      paginatedChildrenParameters,
-      rovingTabIndexParameters,
-      singleSelectionParameters: { initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((...e3) => onSingleSelectedIndexChange?.(...e3)), ...singleSelectionParameters },
-      multiSelectionParameters,
-      refElementParameters,
-      typeaheadNavigationParameters,
-      gridNavigationParameters
+  function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }) {
+    const ret2 = useCompleteGridNavigation({
+      singleSelectionParameters: {
+        initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
+        onSingleSelectedIndexChange: useStableCallback((...e3) => onSingleSelectedIndexChange?.(...e3)),
+        ...singleSelectionParameters
+      },
+      ...normalGridNavParameters
     });
     const { singleSelectionParameters: { onSingleSelectedIndexChange } } = useSelectionDeclarative({
       singleSelectionDeclarativeParameters,
-      singleSelectionReturn: ret.singleSelectionReturn
+      singleSelectionReturn: ret2.singleSelectionReturn
     });
-    const { singleSelectionReturn: { getSingleSelectedIndex }, ...ret2 } = ret;
-    assertEmptyObject(void1);
-    return { ...ret2, singleSelectionReturn: { getSingleSelectedIndex } };
+    return ret2;
   }
 
   // ../dist/component-use/use-list-navigation-complete.js
-  function useCreateWeirdContext() {
-    const sortRef = _2(null);
-    const shuffleRef = _2(null);
-    const reverseRef = _2(null);
-    const rearrangeRef = _2(null);
-    const indexManglerRef = _2(null);
-    const indexDemanglerRef = _2(null);
-    const indexMangler = useStableCallback((i3) => {
-      return (indexManglerRef.current ?? identity_default)(i3);
-    }, []);
-    const indexDemangler = useStableCallback((i3) => {
-      return (indexDemanglerRef.current ?? identity_default)(i3);
-    }, []);
-    const sort = useStableCallback((i3) => {
-      return (sortRef.current ?? identity_default)(i3);
-    }, []);
-    const shuffle2 = useStableCallback(() => {
-      return (shuffleRef.current ?? identity_default)();
-    }, []);
-    const reverse = useStableCallback(() => {
-      return (reverseRef.current ?? identity_default)();
-    }, []);
-    const rearrange = useStableCallback((original, ordered) => {
-      (rearrangeRef.current ?? noop_default)(original, ordered);
-    }, []);
-    const listContext = useMemoObject({
-      provideManglers: useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
-        indexManglerRef.current = indexMangler2;
-        indexDemanglerRef.current = indexDemangler2;
-        reverseRef.current = reverse2;
-        shuffleRef.current = shuffle3;
-        sortRef.current = sort2;
-      })
-    });
-    return {
-      context: useMemoObject({ listContext }),
-      indexDemangler,
-      indexMangler,
-      rearrange,
-      reverse,
-      shuffle: shuffle2,
-      sort
-    };
-  }
   var useCompleteListNavigation = function useCompleteListNavigation2({
     linearNavigationParameters,
     typeaheadNavigationParameters,
@@ -5765,7 +5740,7 @@
       return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { context: weirdContext, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateWeirdContext();
+    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
       managedChildrenReturn: { getChildren },
       linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -5786,7 +5761,7 @@
       }
     });
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
-    const context = useMemoObject({
+    const contextChildren = useMemoObject({
       childrenHaveFocusChildContext,
       rovingTabIndexContext,
       singleSelectionContext,
@@ -5797,8 +5772,8 @@
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {
-      contextChildren: context,
-      contextPreprocessing: weirdContext,
+      contextChildren,
+      contextPreprocessing,
       props: useMergedProps(props, propsRef),
       managedChildrenReturn,
       linearNavigationReturn,
@@ -5808,7 +5783,6 @@
       typeaheadNavigationReturn,
       childrenHaveFocusReturn,
       refElementReturn,
-      listChildrenReturn: { sort },
       rearrangeableChildrenReturn: { reverse, shuffle: shuffle2, rearrange, sort }
     };
   };
@@ -7364,6 +7338,19 @@
     return [localCopy, setValueWrapper, getValue];
   });
 
+  // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
+  var _3 = 0;
+  function o3(o4, e3, n2, t3, f3, l3) {
+    var s3, u3, a3 = {};
+    for (u3 in e3)
+      "ref" == u3 ? s3 = e3[u3] : a3[u3] = e3[u3];
+    var i3 = { type: o4, props: a3, key: n2, ref: s3, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_3, __source: f3, __self: l3 };
+    if ("function" == typeof o4 && (s3 = o4.defaultProps))
+      for (u3 in s3)
+        void 0 === a3[u3] && (a3[u3] = s3[u3]);
+    return l.vnode && l.vnode(i3), i3;
+  }
+
   // ../dist/timing/use-animation-frame.js
   var SharedAnimationFrameContext = F(null);
   var useAnimationFrame = monitored(function useAnimationFrame2({ callback }) {
@@ -7990,7 +7977,7 @@
       paginatedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn
-    } = useListChildren({
+    } = useProcessedChildren({
       listChildrenParameters: {
         children: F2(() => Array.from(function* () {
           for (let i3 = 0; i3 < count; ++i3) {
@@ -8014,7 +8001,7 @@
   var DemoUseRovingTabIndexChildOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter2({ index }) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
-    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild({
+    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
       refElementReturn,
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
       info: { index },
