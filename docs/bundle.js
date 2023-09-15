@@ -981,6 +981,52 @@
     f3();
   }
 
+  // ../dist/preact-extensions/use-stable-getter.js
+  var Unset2 = Symbol("unset");
+  var useStableGetter = function useStableGetter2(value) {
+    const ref = _2(Unset2);
+    useBeforeLayoutEffect(() => {
+      ref.current = value;
+    }, [value]);
+    return T2(() => {
+      if (ref.current === Unset2) {
+        throw new Error("Value retrieved from useStableGetter() cannot be called during render.");
+      }
+      return ref.current;
+    }, []);
+  };
+  function useMemoObject(t3) {
+    return F2(() => {
+      return t3;
+    }, Object.values(t3));
+  }
+
+  // ../dist/preact-extensions/use-stable-callback.js
+  var map = /* @__PURE__ */ new WeakMap();
+  function isStableGetter(obj) {
+    return false;
+    return map.get(obj) ?? false;
+  }
+  function setIsStableGetter(obj) {
+    return obj;
+    map.set(obj, true);
+    return obj;
+  }
+  var useStableCallback = function useStableCallback2(fn, noDeps) {
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
+    if (isStableGetter(fn))
+      return fn;
+    if (noDeps == null) {
+      const currentCallbackGetter = useStableGetter(fn);
+      return setIsStableGetter(T2((...args) => {
+        return currentCallbackGetter()(...args);
+      }, []));
+    } else {
+      console.assert(noDeps.length === 0);
+      return setIsStableGetter(T2(fn, []));
+    }
+  };
+
   // ../dist/util/mode.js
   globalThis["process"] ??= {};
   globalThis["process"]["env"] ??= {};
@@ -1046,52 +1092,6 @@
   }
   var filterAll = false;
   var filters = /* @__PURE__ */ new Set();
-
-  // ../dist/preact-extensions/use-stable-getter.js
-  var Unset2 = Symbol("unset");
-  var useStableGetter = monitored(function useStableGetter2(value) {
-    const ref = _2(Unset2);
-    useBeforeLayoutEffect(() => {
-      ref.current = value;
-    }, [value]);
-    return T2(() => {
-      if (ref.current === Unset2) {
-        throw new Error("Value retrieved from useStableGetter() cannot be called during render.");
-      }
-      return ref.current;
-    }, []);
-  });
-  function useMemoObject(t3) {
-    return F2(() => {
-      return t3;
-    }, Object.values(t3));
-  }
-
-  // ../dist/preact-extensions/use-stable-callback.js
-  var map = /* @__PURE__ */ new WeakMap();
-  function isStableGetter(obj) {
-    return false;
-    return map.get(obj) ?? false;
-  }
-  function setIsStableGetter(obj) {
-    return obj;
-    map.set(obj, true);
-    return obj;
-  }
-  var useStableCallback = monitored(function useStableCallback2(fn, noDeps) {
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
-    if (isStableGetter(fn))
-      return fn;
-    if (noDeps == null) {
-      const currentCallbackGetter = useStableGetter(fn);
-      return setIsStableGetter(T2((...args) => {
-        return currentCallbackGetter()(...args);
-      }, []));
-    } else {
-      console.assert(noDeps.length === 0);
-      return setIsStableGetter(T2(fn, []));
-    }
-  });
 
   // ../dist/dom-helpers/use-event-handler.js
   var useGlobalHandler = monitored(function useGlobalHandler2(target, type, handler, options, mode) {
@@ -1799,7 +1799,7 @@
   var shuffle_default = shuffle;
 
   // ../dist/dom-helpers/use-merged-children.js
-  var useMergedChildren = monitored(function useMergedChildren2(lhs, rhs) {
+  var useMergedChildren = function useMergedChildren2(lhs, rhs) {
     if (lhs == null && rhs == null) {
       return void 0;
     } else if (lhs == null) {
@@ -1809,10 +1809,10 @@
     } else {
       return y(_, {}, lhs, rhs);
     }
-  });
+  };
 
   // ../dist/dom-helpers/use-merged-classes.js
-  var useMergedClasses = monitored(function useMergedClasses2(...classes) {
+  var useMergedClasses = function useMergedClasses2(...classes) {
     let classesSet = /* @__PURE__ */ new Set();
     for (let c3 of classes) {
       if (typeof c3 == "string" && c3.trim())
@@ -1823,7 +1823,7 @@
     } else {
       return void 0;
     }
-  });
+  };
 
   // ../dist/dom-helpers/use-merged-refs.js
   function processRef(instance, ref) {
@@ -1836,7 +1836,7 @@
       console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
     }
   }
-  var useMergedRefs = monitored(function useMergedRefs2(rhs, lhs) {
+  var useMergedRefs = function useMergedRefs2(rhs, lhs) {
     const combined = useStableCallback(function combined2(current) {
       processRef(current, lhs);
       processRef(current, rhs);
@@ -1850,13 +1850,13 @@
     } else {
       return combined;
     }
-  });
+  };
 
   // ../dist/dom-helpers/use-merged-styles.js
   function styleStringToObject(style) {
     return Object.fromEntries(style.split(";").map((statement) => statement.split(":")));
   }
-  var useMergedStyles = monitored(function useMergedStyles2(lhs, rhs) {
+  var useMergedStyles = function useMergedStyles2(lhs, rhs) {
     if (!lhs && !rhs)
       return void 0;
     if (typeof lhs != typeof rhs) {
@@ -1879,20 +1879,20 @@
       ...lhs ?? {},
       ...rhs ?? {}
     };
-  });
+  };
 
   // ../dist/dom-helpers/use-merged-props.js
   var log = console.warn;
-  var useMergedProps = monitored(function useMergedProps2(...allProps) {
+  var useMergedProps = function useMergedProps2(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
       useMergedPropsHelper(ret, nextProps);
     }
     return ret;
-  });
+  };
   var knowns = /* @__PURE__ */ new Set(["children", "ref", "className", "class", "style"]);
-  var mergeUnknown = monitored(function mergeUnknown2(key, lhsValue, rhsValue) {
+  var mergeUnknown = function mergeUnknown2(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
       const merged = mergeFunctions(lhsValue, rhsValue);
       return merged;
@@ -1914,8 +1914,8 @@
         return rhsValue;
       }
     }
-  });
-  var useMergedPropsHelper = monitored(function useMergedPropsHelper2(target, mods) {
+  };
+  var useMergedPropsHelper = function useMergedPropsHelper2(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -1936,8 +1936,8 @@
         continue;
       target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
-  });
-  var mergeFunctions = monitored(function mergeFunctions2(lhs, rhs) {
+  };
+  var mergeFunctions = function mergeFunctions2(lhs, rhs) {
     if (!lhs)
       return rhs;
     if (!rhs)
@@ -1948,7 +1948,7 @@
       if (lv instanceof Promise || rv instanceof Promise)
         return Promise.all([lv, rv]);
     };
-  });
+  };
 
   // ../node_modules/.pnpm/tabbable@6.2.0/node_modules/tabbable/dist/index.esm.js
   var candidateSelectors = ["input:not([inert])", "select:not([inert])", "textarea:not([inert])", "a[href]:not([inert])", "button:not([inert])", "[tabindex]:not(slot):not([inert])", "audio[controls]:not([inert])", "video[controls]:not([inert])", '[contenteditable]:not([contenteditable="false"]):not([inert])', "details>summary:first-of-type:not([inert])", "details:not([inert])"];

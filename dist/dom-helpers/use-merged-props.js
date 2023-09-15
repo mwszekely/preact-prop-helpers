@@ -1,5 +1,4 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { monitored } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
@@ -31,7 +30,7 @@ export function enableLoggingPropConflicts(log2) {
  *
  * @returns A single object with all the provided props merged into one.
  */
-export const useMergedProps = monitored(function useMergedProps(...allProps) {
+export const useMergedProps = (function useMergedProps(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
@@ -40,7 +39,7 @@ export const useMergedProps = monitored(function useMergedProps(...allProps) {
     return ret;
 });
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
-const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
+const mergeUnknown = (function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
         // They're both functions that can be merged (or one's a function and the other's null).
         // Not an *easy* case, but a well-defined one.
@@ -79,7 +78,7 @@ const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mods) {
+const useMergedPropsHelper = (function useMergedPropsHelper(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -101,7 +100,7 @@ const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mod
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
 });
-export const mergeFunctions = monitored(function mergeFunctions(lhs, rhs) {
+export const mergeFunctions = (function mergeFunctions(lhs, rhs) {
     if (!lhs)
         return rhs;
     if (!rhs)

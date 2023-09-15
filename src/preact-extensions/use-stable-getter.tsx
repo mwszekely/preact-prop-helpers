@@ -1,5 +1,4 @@
 import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 
 const Unset = Symbol("unset");
@@ -12,7 +11,7 @@ const Unset = Symbol("unset");
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
-export const useStableGetter = monitored(function useStableGetter<T>(value: T) {
+export const useStableGetter = (function useStableGetter<T>(value: T) {
     const ref = useRef<T>(Unset as unknown as T);
     useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
 

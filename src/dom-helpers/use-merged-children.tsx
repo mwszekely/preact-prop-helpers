@@ -1,6 +1,5 @@
 import { createElement, Fragment } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
 
 /**
  * Combines two `children`.
@@ -9,7 +8,7 @@ import { monitored } from "../util/use-call-count.js";
  * 
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-export const useMergedChildren = monitored(function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"] {
+export const useMergedChildren = (function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"] {
     if (lhs == null && rhs == null) {
         return undefined;
     }

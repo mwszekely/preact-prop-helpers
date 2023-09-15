@@ -1,5 +1,4 @@
 import { createElement, Fragment } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 /**
  * Combines two `children`.
  *
@@ -7,7 +6,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-export const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
+export const useMergedChildren = (function useMergedChildren(lhs, rhs) {
     if (lhs == null && rhs == null) {
         return undefined;
     }

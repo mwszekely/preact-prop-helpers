@@ -280,6 +280,60 @@ function returnZero() { return 0; }
  */
 function runImmediately(f) { f(); }
 
+const Unset$1 = Symbol("unset");
+/**
+ * Given an input value, returns a constant getter function that can be used
+ * inside of `useEffect` and friends without including it in the dependency array.
+ *
+ * @remarks This uses `options.diffed` in order to run before everything, even
+ * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+ */
+const useStableGetter = (function useStableGetter(value) {
+    const ref = useRef(Unset$1);
+    useInsertionEffect((() => { ref.current = value; }), [value]);
+    return useCallback(() => {
+        if (ref.current === Unset$1) {
+            throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+        }
+        return ref.current;
+    }, []);
+});
+function useMemoObject(t) {
+    return useMemo(() => { return t; }, Object.values(t));
+}
+
+function isStableGetter(obj) {
+    return false;
+}
+function setIsStableGetter(obj) {
+    return obj;
+}
+/**
+ * Alternate useCallback() which always returns the same (wrapped) function reference
+ * so that it can be excluded from the dependency arrays of `useEffect` and friends.
+ *
+ * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
+ * so be careful!).  Alternatively, if you need a stable callback that **can** be used
+ * during render, pass an empty dependency array and it'll act like `useCallback` with an
+ * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
+ * truly has no dependencies/only stable dependencies!!
+ */
+const useStableCallback = (function useStableCallback(fn, noDeps) {
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
+    if (isStableGetter())
+        return fn;
+    if (noDeps == null) {
+        const currentCallbackGetter = useStableGetter(fn);
+        return setIsStableGetter(useCallback(((...args) => {
+            return currentCallbackGetter()(...args);
+        }), []));
+    }
+    else {
+        console.assert(noDeps.length === 0);
+        return setIsStableGetter(useCallback(fn, []));
+    }
+});
+
 // Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
 // (i.e. in a way that doesn't throw an error)
 globalThis["process"] ??= {};
@@ -364,60 +418,6 @@ function hideCallCount(hook) {
     if (hook != "all")
         filters.add(hook.name);
 }
-
-const Unset$1 = Symbol("unset");
-/**
- * Given an input value, returns a constant getter function that can be used
- * inside of `useEffect` and friends without including it in the dependency array.
- *
- * @remarks This uses `options.diffed` in order to run before everything, even
- * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
- */
-const useStableGetter = monitored(function useStableGetter(value) {
-    const ref = useRef(Unset$1);
-    useInsertionEffect((() => { ref.current = value; }), [value]);
-    return useCallback(() => {
-        if (ref.current === Unset$1) {
-            throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-        }
-        return ref.current;
-    }, []);
-});
-function useMemoObject(t) {
-    return useMemo(() => { return t; }, Object.values(t));
-}
-
-function isStableGetter(obj) {
-    return false;
-}
-function setIsStableGetter(obj) {
-    return obj;
-}
-/**
- * Alternate useCallback() which always returns the same (wrapped) function reference
- * so that it can be excluded from the dependency arrays of `useEffect` and friends.
- *
- * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
- * so be careful!).  Alternatively, if you need a stable callback that **can** be used
- * during render, pass an empty dependency array and it'll act like `useCallback` with an
- * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
- * truly has no dependencies/only stable dependencies!!
- */
-const useStableCallback = monitored(function useStableCallback(fn, noDeps) {
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
-    if (isStableGetter())
-        return fn;
-    if (noDeps == null) {
-        const currentCallbackGetter = useStableGetter(fn);
-        return setIsStableGetter(useCallback(((...args) => {
-            return currentCallbackGetter()(...args);
-        }), []));
-    }
-    else {
-        console.assert(noDeps.length === 0);
-        return setIsStableGetter(useCallback(fn, []));
-    }
-});
 
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
@@ -676,7 +676,7 @@ const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementP
  *
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
+const useMergedChildren = (function useMergedChildren(lhs, rhs) {
     if (lhs == null && rhs == null) {
         return undefined;
     }
@@ -696,7 +696,7 @@ const useMergedChildren = monitored(function useMergedChildren(lhs, rhs) {
  *
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-const useMergedClasses = monitored(function useMergedClasses(...classes) {
+const useMergedClasses = (function useMergedClasses(...classes) {
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set();
@@ -730,7 +730,7 @@ function processRef(instance, ref) {
  *
  * @remarks Or just use {@link useMergedProps}
  */
-const useMergedRefs = monitored(function useMergedRefs(rhs, lhs) {
+const useMergedRefs = (function useMergedRefs(rhs, lhs) {
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);
@@ -761,7 +761,7 @@ function styleStringToObject(style) {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-const useMergedStyles = monitored(function useMergedStyles(lhs, rhs) {
+const useMergedStyles = (function useMergedStyles(lhs, rhs) {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -821,7 +821,7 @@ function enableLoggingPropConflicts(log2) {
  *
  * @returns A single object with all the provided props merged into one.
  */
-const useMergedProps = monitored(function useMergedProps(...allProps) {
+const useMergedProps = (function useMergedProps(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
@@ -830,7 +830,7 @@ const useMergedProps = monitored(function useMergedProps(...allProps) {
     return ret;
 });
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
-const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
+const mergeUnknown = (function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
         // They're both functions that can be merged (or one's a function and the other's null).
         // Not an *easy* case, but a well-defined one.
@@ -869,7 +869,7 @@ const mergeUnknown = monitored(function mergeUnknown(key, lhsValue, rhsValue) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mods) {
+const useMergedPropsHelper = (function useMergedPropsHelper(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -891,7 +891,7 @@ const useMergedPropsHelper = monitored(function useMergedPropsHelper(target, mod
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
 });
-const mergeFunctions = monitored(function mergeFunctions(lhs, rhs) {
+const mergeFunctions = (function mergeFunctions(lhs, rhs) {
     if (!lhs)
         return rhs;
     if (!rhs)
