@@ -88,7 +88,7 @@ declare function useEnsureStability<T extends any[]>(parentHookName: string, ...
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-declare const usePassiveState: <T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: (() => T) | undefined, customDebounceRendering?: typeof debounceRendering) => readonly [
+declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [
     getStateStable: () => T,
     setStateStable: PassiveStateUpdater<T, R>
 ];
@@ -3554,7 +3554,7 @@ declare function storeToLocalStorage<Key extends (keyof PersistentStates) & stri
  * @param toString -
  * @returns
  */
-declare const usePersistentState: <Key extends never, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString?: (value: string) => T, toString?: (value: T) => string, storage?: Storage) => [
+declare function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString?: ((value: string) => T), toString?: ((value: T) => string), storage?: Storage): [
     T,
     StateUpdater<T>,
     () => T
@@ -3660,7 +3660,7 @@ declare function useMemoObject<T extends {}>(t: T): T;
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-declare const useState: <T>(initialState: T | (() => T)) => readonly [
+declare function useState<T>(initialState: T | (() => T)): readonly [
     value: T,
     setValue: StateUpdater<T>,
     getValue: () => T
@@ -3788,6 +3788,14 @@ declare function generateStack(): string | undefined;
  * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 declare function useStack(): () => string | undefined;
+/**
+ * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling.
+ *
+ * @remarks Important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
+ *
+ * @param hook
+ * @returns
+ */
 declare function monitored<T extends any>(hook: T): T;
 declare function hideCallCount(hook: Function | "all"): void;
 /**

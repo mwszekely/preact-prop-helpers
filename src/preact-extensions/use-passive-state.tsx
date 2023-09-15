@@ -1,7 +1,6 @@
 
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R | undefined) => void); //[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R | undefined) => void);
@@ -66,7 +65,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
  */
-export const usePassiveState = monitored(function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
+export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
 
     //let [id, ,getId] = useState(() => generateRandomId());
 
@@ -186,7 +185,7 @@ export const usePassiveState = monitored(function usePassiveState<T, R>(onChange
     }, []);
 
     return [getValue, setValue] as const;
-})
+}
 
 const Unset = Symbol();
 

@@ -7,6 +7,14 @@ window.requestIdleCallback ??= (callback) => {
 };
 let timeoutHandle = null;
 let i = 0;
+/**
+ * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling.
+ *
+ * @remarks Important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
+ *
+ * @param hook
+ * @returns
+ */
 export function monitored(hook) {
     const h = hook;
     if (process.env.NODE_ENV === 'development') {

@@ -1,6 +1,5 @@
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { useLayoutEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
@@ -29,6 +28,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
         debugger;
     }
 }
+function dummy(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) { return null; }
 /**
  * @remarks Use module augmentation to get the correct types for this function.
  *
@@ -46,7 +46,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  * @param toString -
  * @returns
  */
-export const usePersistentState = monitored(function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
+export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     // Ensure that if our key changes, we also update `localCopy` to match.
@@ -83,5 +83,5 @@ export const usePersistentState = monitored(function usePersistentState(key, ini
         return trueValue ?? localCopy;
     });
     return [localCopy, setValueWrapper, getValue];
-});
+}
 //# sourceMappingURL=use-persistent-state.js.map

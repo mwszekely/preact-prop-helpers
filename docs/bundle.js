@@ -878,6 +878,109 @@
     ...EventMapping
   };
 
+  // ../dist/preact-extensions/use-passive-state.js
+  function useEnsureStability(parentHookName, ...values2) {
+    if (false)
+      return;
+    const helperToEnsureStability = _2([]);
+    const shownError = _2([]);
+    useHelper(values2.length, -1);
+    values2.forEach(useHelper);
+    return;
+    function useHelper(value, i4) {
+      const index = i4 + 1;
+      if (helperToEnsureStability.current[index] === void 0)
+        helperToEnsureStability.current[index] = value;
+      if (helperToEnsureStability.current[index] != value) {
+        if (!shownError.current[index]) {
+          debugger;
+          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i4}-indexed argument (${i4 >= 0 ? JSON.stringify(values2[i4]) : "the number of supposedly stable elements"}).`);
+          shownError.current[index] = true;
+        }
+      }
+    }
+  }
+  function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+    const valueRef = _2(Unset);
+    const reasonRef = _2(Unset);
+    const warningRef = _2(false);
+    const dependencyToCompareAgainst = _2(Unset);
+    const cleanupCallbackRef = _2(void 0);
+    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
+    const onShouldCleanUp = T2(() => {
+      const cleanupCallback = cleanupCallbackRef.current;
+      if (cleanupCallback)
+        cleanupCallback();
+    }, []);
+    const tryEnsureValue = T2(() => {
+      if (valueRef.current === Unset && getInitialValue != void 0) {
+        try {
+          const initialValue = getInitialValue();
+          valueRef.current = initialValue;
+          cleanupCallbackRef.current = onChange?.(initialValue, void 0, void 0) ?? void 0;
+        } catch (ex) {
+        }
+      }
+    }, [
+      /* getInitialValue and onChange intentionally omitted */
+    ]);
+    const getValue = T2(() => {
+      if (warningRef.current)
+        console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
+      if (valueRef.current === Unset)
+        tryEnsureValue();
+      return valueRef.current === Unset ? void 0 : valueRef.current;
+    }, []);
+    y2(() => {
+      tryEnsureValue();
+    }, []);
+    const setValue = T2((arg, reason) => {
+      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset ? void 0 : valueRef.current) : arg;
+      if (
+        /*dependencyToCompareAgainst.current === Unset &&*/
+        nextValue !== valueRef.current
+      ) {
+        dependencyToCompareAgainst.current = valueRef.current;
+        valueRef.current = nextValue;
+        reasonRef.current = reason;
+        (customDebounceRendering ?? debounceRendering)(() => {
+          const nextReason = reasonRef.current;
+          const nextDep = valueRef.current;
+          const prevDep = dependencyToCompareAgainst.current;
+          if (dependencyToCompareAgainst.current != valueRef.current) {
+            valueRef.current = dependencyToCompareAgainst.current = Unset;
+            warningRef.current = true;
+            try {
+              onShouldCleanUp();
+              valueRef.current = nextDep;
+              cleanupCallbackRef.current = onChange?.(nextDep, prevDep === Unset ? void 0 : prevDep, nextReason) ?? void 0;
+            } finally {
+              warningRef.current = false;
+            }
+          }
+          dependencyToCompareAgainst.current = Unset;
+        });
+      }
+    }, []);
+    return [getValue, setValue];
+  }
+  var Unset = Symbol();
+  function returnTrue() {
+    return true;
+  }
+  function returnFalse() {
+    return false;
+  }
+  function returnNull() {
+    return null;
+  }
+  function returnZero() {
+    return 0;
+  }
+  function runImmediately(f3) {
+    f3();
+  }
+
   // ../dist/util/mode.js
   globalThis["process"] ??= {};
   globalThis["process"]["env"] ??= {};
@@ -943,109 +1046,6 @@
   }
   var filterAll = false;
   var filters = /* @__PURE__ */ new Set();
-
-  // ../dist/preact-extensions/use-passive-state.js
-  function useEnsureStability(parentHookName, ...values2) {
-    if (false)
-      return;
-    const helperToEnsureStability = _2([]);
-    const shownError = _2([]);
-    useHelper(values2.length, -1);
-    values2.forEach(useHelper);
-    return;
-    function useHelper(value, i4) {
-      const index = i4 + 1;
-      if (helperToEnsureStability.current[index] === void 0)
-        helperToEnsureStability.current[index] = value;
-      if (helperToEnsureStability.current[index] != value) {
-        if (!shownError.current[index]) {
-          debugger;
-          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i4}-indexed argument (${i4 >= 0 ? JSON.stringify(values2[i4]) : "the number of supposedly stable elements"}).`);
-          shownError.current[index] = true;
-        }
-      }
-    }
-  }
-  var usePassiveState = monitored(function usePassiveState2(onChange, getInitialValue, customDebounceRendering) {
-    const valueRef = _2(Unset);
-    const reasonRef = _2(Unset);
-    const warningRef = _2(false);
-    const dependencyToCompareAgainst = _2(Unset);
-    const cleanupCallbackRef = _2(void 0);
-    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
-    const onShouldCleanUp = T2(() => {
-      const cleanupCallback = cleanupCallbackRef.current;
-      if (cleanupCallback)
-        cleanupCallback();
-    }, []);
-    const tryEnsureValue = T2(() => {
-      if (valueRef.current === Unset && getInitialValue != void 0) {
-        try {
-          const initialValue = getInitialValue();
-          valueRef.current = initialValue;
-          cleanupCallbackRef.current = onChange?.(initialValue, void 0, void 0) ?? void 0;
-        } catch (ex) {
-        }
-      }
-    }, [
-      /* getInitialValue and onChange intentionally omitted */
-    ]);
-    const getValue = T2(() => {
-      if (warningRef.current)
-        console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
-      if (valueRef.current === Unset)
-        tryEnsureValue();
-      return valueRef.current === Unset ? void 0 : valueRef.current;
-    }, []);
-    y2(() => {
-      tryEnsureValue();
-    }, []);
-    const setValue = T2((arg, reason) => {
-      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset ? void 0 : valueRef.current) : arg;
-      if (
-        /*dependencyToCompareAgainst.current === Unset &&*/
-        nextValue !== valueRef.current
-      ) {
-        dependencyToCompareAgainst.current = valueRef.current;
-        valueRef.current = nextValue;
-        reasonRef.current = reason;
-        (customDebounceRendering ?? debounceRendering)(() => {
-          const nextReason = reasonRef.current;
-          const nextDep = valueRef.current;
-          const prevDep = dependencyToCompareAgainst.current;
-          if (dependencyToCompareAgainst.current != valueRef.current) {
-            valueRef.current = dependencyToCompareAgainst.current = Unset;
-            warningRef.current = true;
-            try {
-              onShouldCleanUp();
-              valueRef.current = nextDep;
-              cleanupCallbackRef.current = onChange?.(nextDep, prevDep === Unset ? void 0 : prevDep, nextReason) ?? void 0;
-            } finally {
-              warningRef.current = false;
-            }
-          }
-          dependencyToCompareAgainst.current = Unset;
-        });
-      }
-    }, []);
-    return [getValue, setValue];
-  });
-  var Unset = Symbol();
-  function returnTrue() {
-    return true;
-  }
-  function returnFalse() {
-    return false;
-  }
-  function returnNull() {
-    return null;
-  }
-  function returnZero() {
-    return 0;
-  }
-  function runImmediately(f3) {
-    f3();
-  }
 
   // ../dist/preact-extensions/use-stable-getter.js
   var Unset2 = Symbol("unset");
@@ -2693,7 +2693,7 @@
   }
 
   // ../dist/preact-extensions/use-state.js
-  var useState = monitored(function useState2(initialState) {
+  function useState(initialState) {
     const getStack = useStack();
     const [state, setStateP] = h2(initialState);
     const ref = _2(state);
@@ -2723,7 +2723,7 @@
       return ref.current;
     }, []);
     return [state, setState, getState];
-  });
+  }
 
   // ../dist/component-detail/keyboard-navigation/use-roving-tabindex.js
   var useRovingTabIndex = monitored(function useRovingTabIndex2({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
@@ -7312,63 +7312,6 @@
   // ../dist/preact-extensions/use-layout-effect-debug.js
   var useLayoutEffectDebug = monitored(function useLayoutEffectDebug2(effect, inputs) {
     return useEffectDebug(effect, inputs, y2);
-  });
-
-  // ../dist/preact-extensions/use-persistent-state.js
-  function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
-    try {
-      const item = storage.getItem(key);
-      if (item == null)
-        return null;
-      return converter(item);
-    } catch (e3) {
-      debugger;
-      return null;
-    }
-  }
-  function storeToLocalStorage(key, value, converter = JSON.stringify, storage = localStorage) {
-    try {
-      if (value == null)
-        storage.removeItem(key);
-      else
-        storage.setItem(key, converter(value));
-    } catch (e3) {
-      debugger;
-    }
-  }
-  var usePersistentState = monitored(function usePersistentState2(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
-    const [localCopy, setLocalCopy, getLocalCopy] = useState(() => (key ? getFromLocalStorage(key, fromString, storage) : null) ?? initialValue);
-    const getInitialValue = useStableGetter(initialValue);
-    y2(() => {
-      if (key) {
-        const newCopy = getFromLocalStorage(key, fromString, storage);
-        setLocalCopy(newCopy ?? getInitialValue());
-      }
-    }, [key, storage]);
-    useGlobalHandler(window, "storage", useStableCallback((e3) => {
-      if (key && e3.key === key && e3.storageArea == storage) {
-        const newValue = e3.newValue;
-        if (newValue != null)
-          setLocalCopy(fromString(newValue));
-        else
-          setLocalCopy(initialValue);
-      }
-    }));
-    const setValueWrapper = useStableCallback((valueOrSetter) => {
-      const value = typeof valueOrSetter === "function" ? valueOrSetter(getLocalCopy()) : valueOrSetter;
-      setLocalCopy(valueOrSetter);
-      if (key) {
-        storeToLocalStorage(key, value, toString, storage);
-        if (typeof value == "object" && value instanceof Date) {
-          console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
-        }
-      }
-    });
-    const getValue = useStableCallback(() => {
-      const trueValue = !key ? void 0 : getFromLocalStorage(key, fromString, storage);
-      return trueValue ?? localCopy;
-    });
-    return [localCopy, setValueWrapper, getValue];
   });
 
   // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js

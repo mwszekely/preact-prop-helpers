@@ -125,83 +125,6 @@ const EventMapping = {
     ...EventMapping$1,
 };
 
-// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
-// (i.e. in a way that doesn't throw an error)
-globalThis["process"] ??= {};
-globalThis["process"]["env"] ??= {};
-globalThis["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV;
-// The above statement looks redundant, but it ensures that manual
-// reads to `process.env.NODE_ENV` work regardless of if the bundler 
-// replaces `process.env.NODE_ENV` with the string `"development"` or not.
-
-// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
-// And it's extremely small anyway and basically does nothing.
-window.requestIdleCallback ??= (callback) => {
-    return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
-};
-let timeoutHandle = null;
-let i = 0;
-function monitored(hook) {
-    const h = hook;
-    if (process.env.NODE_ENV === 'development') {
-        return (function (...args) {
-            const r = useRef(++i);
-            monitorCallCount(h);
-            const start = performance.mark(`${h.name}-start-${r.current}`);
-            const ret = h(...args);
-            const end = performance.mark(`${h.name}-end-${r.current}`);
-            performance.measure(h.name, start.name, end.name);
-            return ret;
-        });
-    }
-    else {
-        return hook;
-    }
-}
-/**
- * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
- *
- * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
- */
-function monitorCallCount(hook) {
-    if (process.env.NODE_ENV !== 'development')
-        return;
-    const name = hook.name;
-    if (filterAll || filters.has(name))
-        return;
-    console.assert(name.length > 0);
-    window._hookCallCount ??= { callCounts: {} };
-    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
-    window._hookCallCount.callCounts[name].moment += 1;
-    window._hookCallCount.callCounts[name].total += 1;
-    if (timeoutHandle == null) {
-        timeoutHandle = requestIdleCallback(() => {
-            //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
-            //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-            const o = Object.entries(window._hookCallCount.callCounts)
-                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
-                .filter(({ Now }) => { return !!Now; })
-                .sort(({ Now: lhsM }, { Now: rhsM }) => {
-                if (!lhsM && !rhsM)
-                    return 0;
-                lhsM ||= Infinity;
-                rhsM ||= Infinity;
-                return lhsM - rhsM;
-            });
-            console.table(o, ['Hook', 'Now', 'Total']);
-            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
-            timeoutHandle = null;
-        });
-    }
-}
-let filterAll = false;
-const filters = new Set();
-function hideCallCount(hook) {
-    filterAll = (hook === "all");
-    if (hook != "all")
-        filters.add(hook.name);
-}
-
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
@@ -251,7 +174,7 @@ function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-const usePassiveState = monitored(function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
     //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset$2);
     const reasonRef = useRef(Unset$2);
@@ -344,7 +267,7 @@ const usePassiveState = monitored(function usePassiveState(onChange, getInitialV
         //valueRef.current = nextValue;
     }, []);
     return [getValue, setValue];
-});
+}
 const Unset$2 = Symbol();
 // Easy constants for getInitialValue
 function returnTrue() { return true; }
@@ -356,6 +279,91 @@ function returnZero() { return 0; }
  * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
  */
 function runImmediately(f) { f(); }
+
+// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error)
+globalThis["process"] ??= {};
+globalThis["process"]["env"] ??= {};
+globalThis["process"]["env"]["NODE_ENV"] = process.env.NODE_ENV;
+// The above statement looks redundant, but it ensures that manual
+// reads to `process.env.NODE_ENV` work regardless of if the bundler 
+// replaces `process.env.NODE_ENV` with the string `"development"` or not.
+
+// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+// And it's extremely small anyway and basically does nothing.
+window.requestIdleCallback ??= (callback) => {
+    return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
+};
+let timeoutHandle = null;
+let i = 0;
+/**
+ * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling.
+ *
+ * @remarks Important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
+ *
+ * @param hook
+ * @returns
+ */
+function monitored(hook) {
+    const h = hook;
+    if (process.env.NODE_ENV === 'development') {
+        return (function (...args) {
+            const r = useRef(++i);
+            monitorCallCount(h);
+            const start = performance.mark(`${h.name}-start-${r.current}`);
+            const ret = h(...args);
+            const end = performance.mark(`${h.name}-end-${r.current}`);
+            performance.measure(h.name, start.name, end.name);
+            return ret;
+        });
+    }
+    else {
+        return hook;
+    }
+}
+/**
+ * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+ *
+ * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+ */
+function monitorCallCount(hook) {
+    if (process.env.NODE_ENV !== 'development')
+        return;
+    const name = hook.name;
+    if (filterAll || filters.has(name))
+        return;
+    console.assert(name.length > 0);
+    window._hookCallCount ??= { callCounts: {} };
+    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    window._hookCallCount.callCounts[name].moment += 1;
+    window._hookCallCount.callCounts[name].total += 1;
+    if (timeoutHandle == null) {
+        timeoutHandle = requestIdleCallback(() => {
+            //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
+            //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
+            const o = Object.entries(window._hookCallCount.callCounts)
+                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
+                .filter(({ Now }) => { return !!Now; })
+                .sort(({ Now: lhsM }, { Now: rhsM }) => {
+                if (!lhsM && !rhsM)
+                    return 0;
+                lhsM ||= Infinity;
+                rhsM ||= Infinity;
+                return lhsM - rhsM;
+            });
+            console.table(o, ['Hook', 'Now', 'Total']);
+            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
+            timeoutHandle = null;
+        });
+    }
+}
+let filterAll = false;
+const filters = new Set();
+function hideCallCount(hook) {
+    filterAll = (hook === "all");
+    if (hook != "all")
+        filters.add(hook.name);
+}
 
 const Unset$1 = Symbol("unset");
 /**
@@ -1579,7 +1587,7 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-const useState = monitored(function useState(initialState) {
+function useState(initialState) {
     const getStack = useStack();
     // We keep both, but override the `setState` functionality
     const [state, setStateP] = useState$1(initialState);
@@ -1613,7 +1621,7 @@ const useState = monitored(function useState(initialState) {
     }, []);
     const getState = useCallback(() => { return ref.current; }, []);
     return [state, setState, getState];
-});
+}
 
 /**
  * Implements a roving tabindex system where only one "focusable"
@@ -6223,7 +6231,7 @@ function storeToLocalStorage(key, value, converter = JSON.stringify, storage = l
  * @param toString -
  * @returns
  */
-const usePersistentState = monitored(function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
+function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     // Ensure that if our key changes, we also update `localCopy` to match.
@@ -6260,7 +6268,7 @@ const usePersistentState = monitored(function usePersistentState(key, initialVal
         return trueValue ?? localCopy;
     });
     return [localCopy, setValueWrapper, getValue];
-});
+}
 
 var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
 
