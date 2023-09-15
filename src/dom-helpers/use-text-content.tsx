@@ -1,7 +1,6 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
@@ -39,7 +38,7 @@ export interface UseTextContentReturnType {
  * 
  * @compositeParams
  */
-export const useTextContent = monitored(function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
+export const useTextContent = (function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();

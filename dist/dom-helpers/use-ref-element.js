@@ -1,6 +1,5 @@
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
@@ -37,7 +36,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export const useRefElement = monitored(function useRefElement(args) {
+export const useRefElement = (function useRefElement(args) {
     const nonElementWarn = useRef(false);
     if (nonElementWarn.current) {
         nonElementWarn.current = false;

@@ -1,12 +1,11 @@
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
  */
-export const useTextContent = monitored(function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
+export const useTextContent = (function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();

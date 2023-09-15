@@ -1852,7 +1852,7 @@ const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info:
  *
  * @compositeParams
  */
-const useTextContent = monitored(function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
+const useTextContent = (function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();
@@ -3317,7 +3317,7 @@ const useListNavigationSelectionSortableChild = monitored(function useListNaviga
  *
  * @compositeParams
  */
-const useRefElement = monitored(function useRefElement(args) {
+const useRefElement = (function useRefElement(args) {
     const nonElementWarn = useRef(false);
     if (nonElementWarn.current) {
         nonElementWarn.current = false;
