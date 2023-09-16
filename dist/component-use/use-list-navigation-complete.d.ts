@@ -26,9 +26,9 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
 }
 export interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, UseManagedChildrenContext<M>, RovingTabIndexChildContext {
 }
-export interface UseCompleteListNavigationChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+export interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
-export interface UseCompleteListNavigationChildrenReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
+export interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
     context: UseProcessedChildContext<TabbableChildElement, M>;
 }
 export type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = Exclude<keyof M, keyof UseCompleteListNavigationChildInfo<any>> | UseListNavigationSelectionChildInfoKeysParameters | "focusSelf";
@@ -67,7 +67,7 @@ export declare const useCompleteListNavigation: <ParentElement extends Element, 
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-export declare const useCompleteListNavigationChildren: <ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }: UseCompleteListNavigationChildrenParameters<ParentElement, TabbableChildElement, M>) => UseCompleteListNavigationChildrenReturnType<ParentElement, TabbableChildElement, M>;
+export declare const useCompleteListNavigationChildren: <TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M>) => UseCompleteListNavigationChildrenReturnType<TabbableChildElement, M>;
 /**
  *
  * @compositeParams

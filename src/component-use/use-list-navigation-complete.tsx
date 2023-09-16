@@ -57,11 +57,11 @@ export interface CompleteListNavigationContext<ChildElement extends Element, M e
 }
 
 
-export interface UseCompleteListNavigationChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
+export interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
     OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
 
-export interface UseCompleteListNavigationChildrenReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
+export interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
     OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
     OmitStrong<UsePaginatedChildrenReturnType, "context">,
     OmitStrong<UseStaggeredChildrenReturnType, "context"> {
@@ -226,13 +226,13 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  */
-export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
+export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
     context,
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
     staggeredChildrenParameters,
     managedChildrenParameters
-}: UseCompleteListNavigationChildrenParameters<ParentElement, TabbableChildElement, M>): UseCompleteListNavigationChildrenReturnType<ParentElement, TabbableChildElement, M> {
+}: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M>): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, M> {
     const {
         context: contextRPS,
         paginatedChildrenReturn,

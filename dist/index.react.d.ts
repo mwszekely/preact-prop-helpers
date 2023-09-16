@@ -2700,9 +2700,9 @@ interface UseCompleteListNavigationReturnType<ParentElement extends Element, Chi
 }
 interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, UseManagedChildrenContext<M>, RovingTabIndexChildContext {
 }
-interface UseCompleteListNavigationChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
-interface UseCompleteListNavigationChildrenReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
+interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
     context: UseProcessedChildContext<TabbableChildElement, M>;
 }
 type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = 
@@ -2749,7 +2749,7 @@ refElementParameters, ...void1 }: UseCompleteListNavigationParameters<ParentElem
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-declare const useCompleteListNavigationChildren: <ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }: UseCompleteListNavigationChildrenParameters<ParentElement, TabbableChildElement, M>) => UseCompleteListNavigationChildrenReturnType<ParentElement, TabbableChildElement, M>;
+declare const useCompleteListNavigationChildren: <TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M>) => UseCompleteListNavigationChildrenReturnType<TabbableChildElement, M>;
 /**
  *
  * @compositeParams
