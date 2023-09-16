@@ -29,7 +29,7 @@ export interface UseCompleteListNavigationChildrenInfo<ChildElement extends Elem
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     Pick<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters">,
-    TargetedOmit<Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">,
+    TargetedOmit<Pick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">,
     Pick<UseRefElementParameters<ParentElement>, "refElementParameters">,
     TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
     TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
@@ -58,7 +58,7 @@ export interface CompleteListNavigationContext<ChildElement extends Element, M e
 
 
 export interface UseCompleteListNavigationChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<ParentElement, TabbableChildElement, M>, never> {
+    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
 
 export interface UseCompleteListNavigationChildrenReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
@@ -238,7 +238,7 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
-    } = useProcessedChildren<ParentElement, TabbableChildElement, M>({
+    } = useProcessedChildren<TabbableChildElement, M>({
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,

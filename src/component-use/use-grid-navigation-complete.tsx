@@ -51,11 +51,11 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 
 
-export interface UseCompleteGridNavigationRowsParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<ParentElement, TabbableChildElement, M>, never> {
+export interface UseCompleteGridNavigationRowsParameters<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
+    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
 
-export interface UseCompleteGridNavigationRowsReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
+export interface UseCompleteGridNavigationRowsReturnType<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
     OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
     OmitStrong<UsePaginatedChildrenReturnType, "context">,
     OmitStrong<UseStaggeredChildrenReturnType, "context"> {
@@ -243,19 +243,19 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  */
-export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
+export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
     context,
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
     staggeredChildrenParameters,
     managedChildrenParameters
-}: UseCompleteGridNavigationRowsParameters<ParentElement, TabbableChildElement, M>): UseCompleteGridNavigationRowsReturnType<ParentElement, TabbableChildElement, M> {
+}: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M>): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, M> {
     const {
         context: contextRPS, 
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
-    } = useProcessedChildren<ParentElement, TabbableChildElement, M>({
+    } = useProcessedChildren<TabbableChildElement, M>({
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,

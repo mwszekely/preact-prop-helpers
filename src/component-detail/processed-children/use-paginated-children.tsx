@@ -20,7 +20,7 @@ export interface UsePaginatedChildrenParametersSelf {
     childCount: Nullable<number>;
 }
 
-export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element>
+export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
     extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
     TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">,
     TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
@@ -70,13 +70,13 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * 
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({
+export const usePaginatedChildren = monitored(function usePaginatedChildren<TabbableChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rearrangeableChildrenReturn: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     childrenHaveFocusReturn: { getAnyFocused }
-}: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType {
+}: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
 
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
