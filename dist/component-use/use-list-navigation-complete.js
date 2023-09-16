@@ -1,3 +1,4 @@
+import { useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useListNavigationSelection, useListNavigationSelectionChild } from "../component-detail/use-list-navigation-selection.js";
@@ -21,7 +22,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
+export const useCompleteListNavigation = monitored(function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
 refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -39,7 +40,7 @@ refElementParameters, ...void1 }) {
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -60,6 +61,8 @@ refElementParameters, ...void1 }) {
         }
     });
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const { getAnyFocused } = childrenHaveFocusReturn;
     const contextChildren = useMemoObject({
         childrenHaveFocusChildContext,
         rovingTabIndexContext,
@@ -72,7 +75,10 @@ refElementParameters, ...void1 }) {
     assertEmptyObject(void2);
     return {
         contextChildren,
-        contextPreprocessing,
+        contextProcessing: useMemoObject({
+            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+            ...contextProcessing
+        }),
         props: useMergedProps(props, propsRef),
         managedChildrenReturn,
         linearNavigationReturn,
@@ -83,6 +89,26 @@ refElementParameters, ...void1 }) {
         childrenHaveFocusReturn,
         refElementReturn,
         rearrangeableChildrenReturn: { reverse, shuffle, rearrange, sort },
+    };
+});
+/**
+ * Helper for `useCompleteListNavigation` that handles the array of children in a way that allows for sorting, pagination, and staggering. Optional but recommended.
+ *
+ * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
+ */
+export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        staggeredChildrenParameters,
+        managedChildrenParameters,
+        context,
+    });
+    return {
+        context: contextRPS,
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn
     };
 });
 /**

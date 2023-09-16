@@ -2370,7 +2370,7 @@ const useGridNavigationCell = monitored(function useGridNavigationCell({ context
  *
  * @hasChild {@link usePaginatedChild}
  */
-const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
+const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
@@ -2391,7 +2391,7 @@ const usePaginatedChildren = monitored(function usePaginatedChildren({ managedCh
         // TODO: Something better than setTimeout for this, please...
         let tabbableIndex = getTabbableIndex();
         if (tabbableIndex != null) {
-            let shouldFocus = getElement()?.contains(document.activeElement) || false;
+            let shouldFocus = getAnyFocused() || false;
             setTimeout(() => {
                 if (paginationMin != null && tabbableIndex < paginationMin) {
                     setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
@@ -2869,13 +2869,11 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
  *
  * @hasChild {@link useProcessedChild}
  */
-const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context, }) {
+const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
     const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
-        managedChildrenParameters: {}
-    });
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
@@ -2886,9 +2884,9 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
         context
     });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
-        refElementReturn,
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        rovingTabIndexReturn,
+        rovingTabIndexReturn: context.processedChildrenContext,
+        childrenHaveFocusReturn: context.processedChildrenContext,
         paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
         rearrangeableChildrenReturn,
     });
@@ -4060,7 +4058,8 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
         singleSelectionParameters,
@@ -4071,11 +4070,16 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-        childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
+        childrenHaveFocusReturn: { getAnyFocused },
         rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const c2 = useMemoObject({
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        ...contextProcessing
+    });
     const context = useMemoObject({
         singleSelectionContext,
         multiSelectionContext,
@@ -4084,11 +4088,11 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
-        contextPreprocessing
+        contextProcessing: c2
     });
     return {
         contextChildren: context,
-        contextProcessing: contextPreprocessing,
+        contextProcessing: c2,
         props: useMergedProps(props, propsStable),
         refElementReturn,
         managedChildrenReturn,
@@ -4099,6 +4103,26 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         multiSelectionReturn,
         typeaheadNavigationReturn,
         rearrangeableChildrenReturn: { rearrange, reverse, shuffle, sort }
+    };
+});
+/**
+ * Helper for `useCompleteGridNavigation` that handles the array of children in a way that allows for sorting, pagination, and staggering. Optional but recommended.
+ *
+ * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
+ */
+const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        staggeredChildrenParameters,
+        managedChildrenParameters,
+        context,
+    });
+    return {
+        context: contextRPS,
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn
     };
 });
 /**
@@ -4243,7 +4267,7 @@ function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativeParame
  *
  * @compositeParams
  */
-const useCompleteListNavigation = (function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
+const useCompleteListNavigation = monitored(function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
 refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -4261,7 +4285,7 @@ refElementParameters, ...void1 }) {
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -4282,6 +4306,8 @@ refElementParameters, ...void1 }) {
         }
     });
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const { getAnyFocused } = childrenHaveFocusReturn;
     const contextChildren = useMemoObject({
         childrenHaveFocusChildContext,
         rovingTabIndexContext,
@@ -4292,7 +4318,10 @@ refElementParameters, ...void1 }) {
     });
     return {
         contextChildren,
-        contextPreprocessing,
+        contextProcessing: useMemoObject({
+            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+            ...contextProcessing
+        }),
         props: useMergedProps(props, propsRef),
         managedChildrenReturn,
         linearNavigationReturn,
@@ -4303,6 +4332,26 @@ refElementParameters, ...void1 }) {
         childrenHaveFocusReturn,
         refElementReturn,
         rearrangeableChildrenReturn: { reverse, shuffle, rearrange, sort },
+    };
+});
+/**
+ * Helper for `useCompleteListNavigation` that handles the array of children in a way that allows for sorting, pagination, and staggering. Optional but recommended.
+ *
+ * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
+ */
+const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        staggeredChildrenParameters,
+        managedChildrenParameters,
+        context,
+    });
+    return {
+        context: contextRPS,
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn
     };
 });
 /**
@@ -6577,5 +6626,5 @@ const useInterval = monitored(function useInterval({ interval, callback }) {
     }, []);
 });
 
-export { EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useCreateProcessedChildrenContext, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useCreateProcessedChildrenContext, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map

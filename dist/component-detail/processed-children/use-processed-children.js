@@ -52,13 +52,11 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @hasChild {@link useProcessedChild}
  */
-export const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context, }) {
+export const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
     const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
-        managedChildrenParameters: {}
-    });
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
@@ -69,9 +67,9 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         context
     });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
-        refElementReturn,
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        rovingTabIndexReturn,
+        rovingTabIndexReturn: context.processedChildrenContext,
+        childrenHaveFocusReturn: context.processedChildrenContext,
         paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
         rearrangeableChildrenReturn,
     });

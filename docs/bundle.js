@@ -3272,7 +3272,7 @@
   });
 
   // ../dist/component-detail/processed-children/use-paginated-children.js
-  var usePaginatedChildren = monitored(function usePaginatedChildren2({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
+  var usePaginatedChildren = monitored(function usePaginatedChildren2({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _2({ paginationMax: null, paginationMin: null });
     const refreshPagination = T2((paginationMin2, paginationMax2) => {
@@ -3290,7 +3290,7 @@
     p2(() => {
       let tabbableIndex = getTabbableIndex();
       if (tabbableIndex != null) {
-        let shouldFocus = getElement()?.contains(document.activeElement) || false;
+        let shouldFocus = getAnyFocused() || false;
         setTimeout(() => {
           if (paginationMin != null && tabbableIndex < paginationMin) {
             setTabbableIndex(paginationMin, void 0, shouldFocus);
@@ -3644,13 +3644,11 @@
   });
 
   // ../dist/component-detail/processed-children/use-processed-children.js
-  var useProcessedChildren = monitored(function useProcessedChildren2({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, refElementReturn, rovingTabIndexReturn, staggeredChildrenParameters, context }) {
+  var useProcessedChildren = monitored(function useProcessedChildren2({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
     const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
-      managedChildrenParameters: {}
-    });
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({
       rearrangeableChildrenParameters: {
         onRearranged: useStableCallback(() => {
@@ -3664,9 +3662,9 @@
       context
     });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
-      refElementReturn,
       managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-      rovingTabIndexReturn,
+      rovingTabIndexReturn: context.processedChildrenContext,
+      childrenHaveFocusReturn: context.processedChildrenContext,
       paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
       rearrangeableChildrenReturn
     });
@@ -5547,7 +5545,8 @@
       return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
+    const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
       gridNavigationParameters,
       singleSelectionParameters,
@@ -5558,11 +5557,16 @@
       managedChildrenReturn: { getChildren },
       rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
       typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-      childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
+      childrenHaveFocusReturn: { getAnyFocused },
       rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const c22 = useMemoObject({
+      processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+      ...contextProcessing
+    });
     const context = useMemoObject({
       singleSelectionContext,
       multiSelectionContext,
@@ -5571,14 +5575,14 @@
       typeaheadNavigationContext,
       childrenHaveFocusChildContext,
       gridNavigationRowContext,
-      contextPreprocessing
+      contextProcessing: c22
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
       contextChildren: context,
-      contextProcessing: contextPreprocessing,
+      contextProcessing: c22,
       props: useMergedProps(props, propsStable),
       refElementReturn,
       managedChildrenReturn,
@@ -5589,6 +5593,21 @@
       multiSelectionReturn,
       typeaheadNavigationReturn,
       rearrangeableChildrenReturn: { rearrange, reverse, shuffle: shuffle2, sort }
+    };
+  });
+  var useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows2({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn } = useProcessedChildren({
+      paginatedChildrenParameters,
+      rearrangeableChildrenParameters,
+      staggeredChildrenParameters,
+      managedChildrenParameters,
+      context
+    });
+    return {
+      context: contextRPS,
+      paginatedChildrenReturn,
+      rearrangeableChildrenReturn,
+      staggeredChildrenReturn
     };
   });
   var useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow2({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
@@ -5717,7 +5736,7 @@
   }
 
   // ../dist/component-use/use-list-navigation-complete.js
-  var useCompleteListNavigation = function useCompleteListNavigation2({
+  var useCompleteListNavigation = monitored(function useCompleteListNavigation2({
     linearNavigationParameters,
     typeaheadNavigationParameters,
     rovingTabIndexParameters,
@@ -5740,7 +5759,7 @@
       return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle: shuffle2, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
       managedChildrenReturn: { getChildren },
       linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -5761,6 +5780,8 @@
       }
     });
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const { getAnyFocused } = childrenHaveFocusReturn;
     const contextChildren = useMemoObject({
       childrenHaveFocusChildContext,
       rovingTabIndexContext,
@@ -5773,7 +5794,10 @@
     assertEmptyObject(void2);
     return {
       contextChildren,
-      contextPreprocessing,
+      contextProcessing: useMemoObject({
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        ...contextProcessing
+      }),
       props: useMergedProps(props, propsRef),
       managedChildrenReturn,
       linearNavigationReturn,
@@ -5785,7 +5809,22 @@
       refElementReturn,
       rearrangeableChildrenReturn: { reverse, shuffle: shuffle2, rearrange, sort }
     };
-  };
+  });
+  var useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren2({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn } = useProcessedChildren({
+      paginatedChildrenParameters,
+      rearrangeableChildrenParameters,
+      staggeredChildrenParameters,
+      managedChildrenParameters,
+      context
+    });
+    return {
+      context: contextRPS,
+      paginatedChildrenReturn,
+      rearrangeableChildrenReturn,
+      staggeredChildrenReturn
+    };
+  });
   var useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild2({
     info: { index, focusSelf, untabbable, ...customUserInfo },
     // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
@@ -7405,6 +7444,8 @@
   var SortableColumnContext = F(null);
   var SetSortableColumnContext = F(null);
   var GetSortableColumnContext = F(null);
+  var ListChildrenContext = F(null);
+  var ListChildContext = F(null);
   var DemoUseGrid = x3(() => {
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
@@ -7468,32 +7509,32 @@
         // This can be used by you to track which 0-indexed column is currently the one with focus.
         onTabbableColumnChange: setTabbableColumn
       },
-      rearrangeableChildrenParameters: {
-        // This must return a VNode's 0-based index from its props
-        getIndex: T2((a3) => a3.props.index, [])
-      },
-      sortableChildrenParameters: {
-        // Controls how rows compare against each other
-        compare: T2((rhs, lhs) => {
-          return lhs.index - rhs.index;
-        }, [])
-      },
+      // paginatedChildrenParameters: {
+      // This must return a VNode's 0-based index from its props
+      //     getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+      //    },
+      //sortableChildrenParameters: {
+      // Controls how rows compare against each other
+      //    compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
+      //},
       paginatedChildrenParameters: {
         // Controls the current pagination range
         paginationMin: null,
         paginationMax: null
       },
-      staggeredChildrenParameters: {
-        // Controls whether children appear staggered as CPU time permits
-        staggered: false
-      },
+      // staggeredChildrenParameters: {
+      // Controls whether children appear staggered as CPU time permits
+      //      staggered: false
+      //  },
       refElementParameters: {}
     });
     const {
       // Spread these props to the HTMLElement that will implement this grid behavior
       props,
       // The child row will useContext this, so provide it to them.
-      context,
+      contextChildren,
+      // Optionally, if you paginate or stagger your children, each child can `useContext` this as well.
+      contextProcessing,
       // This is what `useRovingTabIndex` returned; use it for whatever you need:
       rovingTabIndexReturn: {
         // Call to focus the grid, which focuses the current row, which focuses its current cell.
@@ -7518,21 +7559,20 @@
       multiSelectionReturn: {
         // Nothing, actually
       },
+      refElementReturn: {},
       rearrangeableChildrenReturn: {
         // You must call this hook on your array of children to implement the sorting behavior
-        useRearrangedChildren,
+        //     useRearrangedChildren,
         // Largely internal use only
-        indexDemangler,
+        //    indexDemangler,
         // Largely internal use only
-        indexMangler,
+        //    indexMangler,
         // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
         rearrange,
         // Reverses all children 
         reverse,
         // Shuffles all children
-        shuffle: shuffle2
-      },
-      sortableChildrenReturn: {
+        shuffle: shuffle2,
         // A table header button would probably call this function to sort all the table rows.
         sort
       },
@@ -7541,14 +7581,14 @@
         // Returns metadata about each row
         getChildren
       },
-      paginatedChildrenReturn: {
-        // Largely internal use only
-        refreshPagination
-      },
-      staggeredChildrenReturn: {
-        // When the staggering behavior is currently hiding one or more children, this is true.
-        stillStaggering
-      },
+      //paginatedChildrenReturn: {
+      // Largely internal use only
+      //    refreshPagination
+      //},
+      //staggeredChildrenReturn: {
+      // When the staggering behavior is currently hiding one or more children, this is true.
+      //     stillStaggering
+      // },
       childrenHaveFocusReturn: {
         // Returns true if any row in this grid is focused
         getAnyFocused
@@ -7577,18 +7617,48 @@
           /* @__PURE__ */ o3("th", { children: "Column 2" }),
           /* @__PURE__ */ o3("th", { children: "Column 3" })
         ] }) }),
-        /* @__PURE__ */ o3(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ o3(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ o3(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ o3(GridRowContext.Provider, { value: context, children: /* @__PURE__ */ o3("tbody", { ...props, children: useRearrangedChildren(
-          Array.from(function* () {
-            for (let i3 = 0; i3 < 10; ++i3) {
-              yield /* @__PURE__ */ o3(DemoUseGridRow, { index: i3 }, i3);
-            }
-          }())
-        ) }) }) }) }) })
+        /* @__PURE__ */ o3(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ o3(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ o3(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ o3(GridRowContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(ListChildrenContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("tbody", { ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren, { count: 100, min: null, max: null, staggered: true }) }) }) }) }) }) })
       ] })
     ] });
   });
+  var DemoUseRovingTabIndexChildren = x3(monitored(function DemoUseRovingTabIndexChildren2({ count, max, min, staggered }) {
+    const {
+      context,
+      paginatedChildrenReturn,
+      rearrangeableChildrenReturn,
+      staggeredChildrenReturn
+    } = useCompleteGridNavigationRows({
+      paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
+      rearrangeableChildrenParameters: {
+        getIndex: T2((a3) => a3.props.index, []),
+        onRearranged: null,
+        compare: null,
+        adjust: null,
+        children: F2(() => Array.from(function* () {
+          for (let i3 = 0; i3 < count; ++i3) {
+            yield /* @__PURE__ */ o3(DemoUseGridRowOuter, { index: i3 }, i3);
+          }
+        }()), [count])
+      },
+      managedChildrenParameters: {},
+      staggeredChildrenParameters: { staggered },
+      context: q2(ListChildrenContext)
+    });
+    return /* @__PURE__ */ o3(ListChildContext.Provider, { value: context, children: rearrangeableChildrenReturn.children });
+  }));
   var GridRowContext = F(null);
   var GridCellContext = F(null);
+  var DemoUseGridRowOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter({ index }) {
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
+    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
+      refElementReturn,
+      context: { managedChildContext, paginatedChildContext, staggeredChildContext },
+      info: { index },
+      processedChildParameters: { children: F2(() => /* @__PURE__ */ o3(DemoUseGridRow, { index }), [index]) }
+    });
+    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: processedChildReturn.children ? processedChildReturn.children : "\xA0" });
+  }));
   var DemoUseGridRow = x3(({ index }) => {
     const [_randomWord] = useState(() => RandomWords[
       index
@@ -7611,7 +7681,7 @@
       }), untabbable: false, initiallyTabbedIndex: 0 },
       typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1e3, onNavigateTypeahead: null },
       hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
-      gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex },
+      //gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex },
       singleSelectionChildParameters: { singleSelectionDisabled: false },
       multiSelectionChildParameters: { initiallyMultiSelected: false, onMultiSelectChange: null, multiSelectionDisabled: false }
     });
@@ -7643,7 +7713,7 @@
       rovingTabIndexChildReturn: { tabbable }
     } = useCompleteGridNavigationCell({
       gridNavigationCellParameters: { colSpan: 1 },
-      info: { index, bar: "baz", focusSelf: useStableCallback((e3) => e3.focus()), untabbable: false, getSortValue: useStableGetter(index) },
+      info: { index, bar: "baz", focusSelf: useStableCallback((e3) => e3.focus()), untabbable: false },
       context,
       textContentParameters: { getText: T2((e3) => {
         return e3?.textContent ?? "";
@@ -7779,7 +7849,7 @@
   var MultiSelectionModeContext = F("activation");
   var UntabbableContext = F(false);
   var ListNavigationSingleSelectionChildContext = F(null);
-  var ListChildContext = F(null);
+  var ListChildContext2 = F(null);
   var WeirdContext = F(null);
   var DemoUseRovingTabIndex = x3(monitored(function DemoUseRovingTabIndex2() {
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
@@ -7813,7 +7883,7 @@
     const {
       props,
       contextChildren,
-      contextPreprocessing,
+      contextProcessing,
       rovingTabIndexReturn: { setTabbableIndex },
       managedChildrenReturn: { getChildren },
       typeaheadNavigationReturn: { typeaheadStatus },
@@ -7967,47 +8037,44 @@
         Math.round(multiSelectPercent * 100 * 10) / 10,
         "%"
       ] }),
-      /* @__PURE__ */ o3(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o3(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o3(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o3(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(WeirdContext.Provider, { value: contextPreprocessing, children: /* @__PURE__ */ o3("ol", { start: 0, ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren, { max, min, staggered, count, getElement: r4.refElementReturn.getElement, getTabbableIndex: r4.rovingTabIndexReturn.getTabbableIndex, setTabbableIndex: r4.rovingTabIndexReturn.setTabbableIndex }) }) }) }) }) }) })
+      /* @__PURE__ */ o3(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o3(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o3(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o3(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(WeirdContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("ol", { start: 0, ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren3, { max, min, staggered, count }) }) }) }) }) }) })
     ] });
   }));
-  var DemoUseRovingTabIndexChildren = x3(monitored(function DemoUseRovingTabIndexChildren2({ count, max, min, staggered, getTabbableIndex, setTabbableIndex, getElement }) {
+  var DemoUseRovingTabIndexChildren3 = x3(monitored(function DemoUseRovingTabIndexChildren4({ count, max, min, staggered }) {
     const {
-      context: contextRPS,
-      listChildrenReturn,
+      context,
       paginatedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn
-    } = useProcessedChildren({
-      listChildrenParameters: {
-        children: F2(() => Array.from(function* () {
-          for (let i3 = 0; i3 < count; ++i3) {
-            yield /* @__PURE__ */ o3(DemoUseRovingTabIndexChildOuter, { index: i3 }, i3);
-          }
-        }()), [count])
-      },
+    } = useCompleteListNavigationChildren({
       paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
       rearrangeableChildrenParameters: {
         getIndex: T2((a3) => a3.props.index, []),
         onRearranged: null,
-        compare: null
+        compare: null,
+        adjust: null,
+        children: F2(() => Array.from(function* () {
+          for (let i3 = 0; i3 < count; ++i3) {
+            yield /* @__PURE__ */ o3(DemoUseRovingTabIndexChildOuter2, { index: i3 }, i3);
+          }
+        }()), [count])
       },
-      refElementReturn: { getElement },
-      rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
+      managedChildrenParameters: {},
       staggeredChildrenParameters: { staggered },
       context: q2(WeirdContext)
     });
-    return /* @__PURE__ */ o3(ListChildContext.Provider, { value: contextRPS, children: listChildrenReturn.children });
+    return /* @__PURE__ */ o3(ListChildContext2.Provider, { value: context, children: rearrangeableChildrenReturn.children });
   }));
-  var DemoUseRovingTabIndexChildOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter2({ index }) {
+  var DemoUseRovingTabIndexChildOuter2 = x3(monitored(function DemoUseRovingTabIndexChildOuter3({ index }) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
-    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext2);
+    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
       refElementReturn,
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
       info: { index },
-      listChildParameters: { children: F2(() => /* @__PURE__ */ o3(DemoUseRovingTabIndexChild, { index }), [index]) }
+      processedChildParameters: { children: F2(() => /* @__PURE__ */ o3(DemoUseRovingTabIndexChild, { index }), [index]) }
     });
-    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: listChildReturn.children ? listChildReturn.children : "\xA0" });
+    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: processedChildReturn.children ? processedChildReturn.children : "\xA0" });
   }));
   var DemoUseRovingTabIndexChild = x3(monitored(function DemoUseRovingTabIndexChild2({ index }) {
     if (index == 1)

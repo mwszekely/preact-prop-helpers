@@ -1,4 +1,4 @@
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseChildrenHaveFocusReturnType } from "../../index.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
@@ -23,8 +23,8 @@ export interface UsePaginatedChildrenParametersSelf {
 export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element>
     extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
     TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">,
-    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
-    TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
+    TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 
@@ -75,7 +75,7 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Pare
     rearrangeableChildrenReturn: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
-    refElementReturn: { getElement }
+    childrenHaveFocusReturn: { getAnyFocused }
 }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType {
 
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -100,7 +100,7 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Pare
         // TODO: Something better than setTimeout for this, please...
         let tabbableIndex = getTabbableIndex();
         if (tabbableIndex != null) {
-            let shouldFocus = getElement()?.contains(document.activeElement) || false;
+            let shouldFocus = getAnyFocused() || false;
 
             setTimeout(() => {
 

@@ -16,7 +16,7 @@ import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
 
 
 
-export interface UseProcessedChildrenContextSelf {
+export interface UseRearrangedChildrenContextSelf {
     provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
 }
 
@@ -24,8 +24,8 @@ export interface UseProcessedChildrenContextSelf {
  * Unusually, this context is not passed from parent to child,
  * but from parent to a different parent.
  */
-export interface UseProcessedChildrenContext {
-    rearrangeableChildrenContext: UseProcessedChildrenContextSelf;
+export interface UseRearrangedChildrenContext {
+    rearrangeableChildrenContext: UseRearrangedChildrenContextSelf;
 }
 
 
@@ -34,7 +34,7 @@ export interface UseProcessedChildrenContext {
  * 
  * @returns 
  */
-export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & { context: UseProcessedChildrenContext } {
+export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & { context: UseRearrangedChildrenContext } {
     const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["sort"]>(null);
     const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
     const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
@@ -47,7 +47,7 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
     const shuffle = useStableCallback<(typeof shuffleRef)["current"]>(() => { return (shuffleRef.current ?? identity)()! }, []);
     const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
     const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);
-    const rearrangeableChildrenContext = useMemoObject<UseProcessedChildrenContextSelf>({
+    const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({
         provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
             indexManglerRef.current = indexMangler;
             indexDemanglerRef.current = indexDemangler;
@@ -57,7 +57,7 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
         })
     });
     return {
-        context: useMemoObject<UseProcessedChildrenContext>({ rearrangeableChildrenContext }),
+        context: useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext }),
         indexDemangler,
         indexMangler,
         rearrange,
@@ -124,7 +124,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
-    context: UseProcessedChildrenContext;
+    context: UseRearrangedChildrenContext;
 }
 
 

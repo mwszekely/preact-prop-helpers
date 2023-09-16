@@ -12,7 +12,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
+export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
@@ -33,7 +33,7 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
         // TODO: Something better than setTimeout for this, please...
         let tabbableIndex = getTabbableIndex();
         if (tabbableIndex != null) {
-            let shouldFocus = getElement()?.contains(document.activeElement) || false;
+            let shouldFocus = getAnyFocused() || false;
             setTimeout(() => {
                 if (paginationMin != null && tabbableIndex < paginationMin) {
                     setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.

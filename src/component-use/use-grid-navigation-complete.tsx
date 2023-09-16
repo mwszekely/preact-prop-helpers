@@ -1,8 +1,10 @@
 import { UseGridNavigationRowContext } from "../component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
-import { UseProcessedChildrenReturnType } from "../component-detail/processed-children/use-processed-children.js";
-import { UseProcessedChildrenContext, useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
+import { UsePaginatedChildrenReturnType } from "../component-detail/processed-children/use-paginated-children.js";
+import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
+import { UseRearrangeableChildrenReturnType, useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
+import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
 import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -31,6 +33,10 @@ export type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseComplet
 export interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSelectChildRowInfo<RowElement>, ManagedChildInfo<number> { }
 export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSelectChildCellInfo<CellElement>, ManagedChildInfo<number> { }
 
+export interface UseCompleteGridNavigationRowsInfo<ChildElement extends Element> extends
+    UseProcessedChildInfo<ChildElement>,
+    ManagedChildInfo<number> { }
+
 export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">,
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
@@ -39,6 +45,25 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
 
 }
+
+
+
+
+
+
+export interface UseCompleteGridNavigationRowsParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
+    OmitStrong<UseProcessedChildrenParameters<ParentElement, TabbableChildElement, M>, never> {
+}
+
+export interface UseCompleteGridNavigationRowsReturnType<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
+    OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
+    OmitStrong<UsePaginatedChildrenReturnType, "context">,
+    OmitStrong<UseStaggeredChildrenReturnType, "context"> {
+    context: UseProcessedChildContext<TabbableChildElement, M>;
+}
+
+
+
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
     UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>,
@@ -64,7 +89,7 @@ export interface CompleteGridNavigationRowContext<RowElement extends Element, RM
     UseSelectionContext,
     RovingTabIndexChildContext,
     UseGridNavigationRowContext {
-    contextPreprocessing: UseProcessedChildrenContext;
+    contextProcessing: UseProcessedChildrenContext;
 }
 
 
@@ -142,8 +167,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextPreprocessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
-
+    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const getAnyFocused = useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused());
     const {
         childrenHaveFocusParameters,
         managedChildrenParameters,
@@ -165,7 +190,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-        childrenHaveFocusReturn: { getAnyFocused: useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused()) },
+        childrenHaveFocusReturn: { getAnyFocused },
         rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
 
@@ -173,7 +198,11 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
 
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus<RowElement>({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn }: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters });
-
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const c2 = useMemoObject({
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        ...contextProcessing
+    });
     const context = useMemoObject<CompleteGridNavigationRowContext<RowElement, RM>>({
         singleSelectionContext,
         multiSelectionContext,
@@ -182,7 +211,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
-        contextPreprocessing
+        contextProcessing: c2
     });
 
     assertEmptyObject(void1);
@@ -191,7 +220,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
 
     return {
         contextChildren: context,
-        contextProcessing: contextPreprocessing,
+        contextProcessing: c2,
         props: useMergedProps(props, propsStable),
         refElementReturn,
 
@@ -205,6 +234,41 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         rearrangeableChildrenReturn: { rearrange, reverse, shuffle, sort }
     }
 
+})
+
+
+
+/**
+ * Helper for `useCompleteGridNavigation` that handles the array of children in a way that allows for sorting, pagination, and staggering. Optional but recommended.
+ * 
+ * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
+ */
+export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<ParentElement extends Element, TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
+    context,
+    paginatedChildrenParameters,
+    rearrangeableChildrenParameters,
+    staggeredChildrenParameters,
+    managedChildrenParameters
+}: UseCompleteGridNavigationRowsParameters<ParentElement, TabbableChildElement, M>): UseCompleteGridNavigationRowsReturnType<ParentElement, TabbableChildElement, M> {
+    const {
+        context: contextRPS, 
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn,
+    } = useProcessedChildren<ParentElement, TabbableChildElement, M>({
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        staggeredChildrenParameters,
+        managedChildrenParameters,
+        context,
+    });
+
+    return {
+        context: contextRPS,
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn
+    }
 })
 
 /**

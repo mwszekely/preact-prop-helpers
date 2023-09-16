@@ -1,5 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
+import { UseProcessedChildrenContext } from "../../dist/component-detail/processed-children/use-processed-children.js";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -8,16 +9,14 @@ import {
     UseProcessedChildContext as NormalListChildContext,
     UseCompleteListNavigationChildInfo,
     UseCompleteListNavigationDeclarativeReturnType,
-    UseRefElementReturnTypeSelf,
-    UseRovingTabIndexReturnTypeSelf,
     VNode,
-    UseProcessedChildrenContext as WeirdUseListChildContext,
+
     focus,
     monitored,
     useCompleteListNavigationChildDeclarative,
+    useCompleteListNavigationChildren,
     useCompleteListNavigationDeclarative,
     useProcessedChild as useListChild,
-    useProcessedChildren as useListChildren,
     useMemo,
     useMergedProps,
     usePress,
@@ -37,7 +36,7 @@ const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabl
 const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
 const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
-const WeirdContext = createContext<WeirdUseListChildContext>(null!);
+const WeirdContext = createContext<UseProcessedChildrenContext>(null!);
 export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
@@ -76,7 +75,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     const {
         props,
         contextChildren,
-        contextPreprocessing,
+        contextProcessing,
         rovingTabIndexReturn: { setTabbableIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
@@ -136,8 +135,10 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                 <SingleSelectionModeContext.Provider value={singleSelectionMode}>
                     <MultiSelectionModeContext.Provider value={multiSelectionMode}>
                         <ListNavigationSingleSelectionChildContext.Provider value={contextChildren}>
-                            <WeirdContext.Provider value={contextPreprocessing}>
-                                <ol start={0} {...props}><DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} getElement={r.refElementReturn.getElement} getTabbableIndex={r.rovingTabIndexReturn.getTabbableIndex} setTabbableIndex={r.rovingTabIndexReturn.setTabbableIndex} /></ol>
+                            <WeirdContext.Provider value={contextProcessing}>
+                                <ol start={0} {...props}>
+                                    <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} />
+                                </ol>
                             </WeirdContext.Provider>
                         </ListNavigationSingleSelectionChildContext.Provider>
                     </MultiSelectionModeContext.Provider>
@@ -147,36 +148,32 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     );
 }))
 
-export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, getTabbableIndex, setTabbableIndex, getElement }: { count: number, min: number | null, max: number | null, staggered: boolean } & Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseRefElementReturnTypeSelf<any>, "getElement">) {
-    //const context = useContext(ListNavigationSingleSelectionChildContext);
-    const {
-        context: contextRPS,
-        listChildrenReturn,
+export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered }: { count: number, min: number | null, max: number | null, staggered: boolean }) {
+    const { 
+        context,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn
-    } = useListChildren({
-        listChildrenParameters: {
+    } = useCompleteListNavigationChildren({
+        paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
+        rearrangeableChildrenParameters: {
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+            onRearranged: null,
+            compare: null,
+            adjust: null,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
                 }
             })()), [count]),
         },
-        paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
-        rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null,
-            compare: null
-        },
-        refElementReturn: { getElement },
-        rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
+        managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
         context: useContext(WeirdContext)
     })
 
     return (
-        <ListChildContext.Provider value={contextRPS}>{listChildrenReturn.children}</ListChildContext.Provider>
+        <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
     )
 }));
 
@@ -190,14 +187,14 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
-    const { props, listChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild<HTMLLIElement>({
+    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild<HTMLLIElement>({
         refElementReturn,
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index },
-        listChildParameters: { children: useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]) }
+        processedChildParameters: { children: useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]) }
     })
     return (
-        <li {...useMergedProps(props, propsStable)}>{listChildReturn.children? listChildReturn.children : "\xA0"}</li>
+        <li {...useMergedProps(props, propsStable)}>{processedChildReturn.children ? processedChildReturn.children : "\xA0"}</li>
     )
 }));
 
