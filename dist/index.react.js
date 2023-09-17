@@ -4230,6 +4230,7 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
         multiSelectionChildReturn,
         textContentReturn,
         typeaheadNavigationReturn,
+        refElementReturn,
         props,
     };
 });

@@ -5694,6 +5694,7 @@
       multiSelectionChildReturn,
       textContentReturn,
       typeaheadNavigationReturn,
+      refElementReturn,
       props
     };
   });

@@ -116,6 +116,7 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     OmitStrong<UseGridNavigationSelectionRowReturnType<RowElement, CellElement, RM>, "hasCurrentFocusParameters" | "managedChildrenParameters" | "info">,
     Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">,
     Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">,
+    Pick<UseRefElementReturnType<RowElement>, "refElementReturn">,
     Pick<UseManagedChildReturnType<RM>, "managedChildReturn"> {
     context: CompleteGridNavigationCellContext<CellElement, CM>;
 }
@@ -396,6 +397,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         multiSelectionChildReturn,
         textContentReturn,
         typeaheadNavigationReturn,
+        refElementReturn,
         props,
     }
 })

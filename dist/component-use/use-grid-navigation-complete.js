@@ -188,6 +188,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         multiSelectionChildReturn,
         textContentReturn,
         typeaheadNavigationReturn,
+        refElementReturn,
         props,
     };
 });
