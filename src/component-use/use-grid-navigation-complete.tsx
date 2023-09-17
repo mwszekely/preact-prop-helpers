@@ -52,7 +52,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 
 export interface UseCompleteGridNavigationRowsParameters<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, "refElementReturn"> {
 }
 
 export interface UseCompleteGridNavigationRowsReturnType<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
