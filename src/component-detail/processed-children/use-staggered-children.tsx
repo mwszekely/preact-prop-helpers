@@ -234,11 +234,12 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
         elementToIndex.current.set(element, index);
     }, [])
 
+    const getIntersectionObserver = useCallback(() => intersectionObserver.current, []);
     const staggeredChildContext = useMemo<UseStaggeredChildContext["staggeredChildContext"]>(() => ({
         parentIsStaggered,
         childCallsThisToTellTheParentToMountTheNextOne,
         getDefaultStaggeredVisible,
-        getIntersectionObserver: useCallback(() => intersectionObserver.current, []),
+        getIntersectionObserver,
         setElementToIndexMap
     }), [parentIsStaggered]);
 

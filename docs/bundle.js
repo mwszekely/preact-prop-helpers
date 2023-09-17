@@ -3590,11 +3590,12 @@
     const setElementToIndexMap = T2((index, element) => {
       elementToIndex.current.set(element, index);
     }, []);
+    const getIntersectionObserver = T2(() => intersectionObserver.current, []);
     const staggeredChildContext = F2(() => ({
       parentIsStaggered,
       childCallsThisToTellTheParentToMountTheNextOne,
       getDefaultStaggeredVisible,
-      getIntersectionObserver: T2(() => intersectionObserver.current, []),
+      getIntersectionObserver,
       setElementToIndexMap
     }), [parentIsStaggered]);
     p2(() => {
