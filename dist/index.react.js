@@ -2799,8 +2799,8 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
         }
     }, [index, staggeredVisible]);
     let timeoutRef = useRef(-1);
-    useEffect(() => {
-        if (!becauseScreen.current) {
+    const childUseEffect = useCallback(() => {
+        if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
             if (timeoutRef.current != -1)
                 clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => {
@@ -2818,7 +2818,7 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
-        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
         info: { setStaggeredVisible, getStaggeredVisible }
     };
 });

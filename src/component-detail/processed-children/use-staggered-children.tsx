@@ -70,6 +70,13 @@ export interface UseStaggeredChildReturnTypeSelf {
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
     hideBecauseStaggered: boolean;
+
+    /**
+     * Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).
+     * 
+     * This is generally passed to an inner child, if this is the outer child.
+     */
+    childUseEffect(): void;
 }
 
 export interface UseStaggeredChildReturnType<ChildElement extends Element> {
@@ -272,8 +279,8 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
     }, [index, staggeredVisible])
 
     let timeoutRef = useRef(-1);
-    useEffect(() => {
-        if (!becauseScreen.current) {
+    const childUseEffect = useCallback(() => {
+        if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
             if (timeoutRef.current != -1)
                 clearTimeout(timeoutRef.current);
 
@@ -296,7 +303,7 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
 
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
-        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
         info: { setStaggeredVisible, getStaggeredVisible }
     }
 })

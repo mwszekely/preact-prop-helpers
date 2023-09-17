@@ -1877,6 +1877,12 @@ interface UseStaggeredChildReturnTypeSelf {
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
     hideBecauseStaggered: boolean;
+    /**
+     * Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).
+     *
+     * This is generally passed to an inner child, if this is the outer child.
+     */
+    childUseEffect(): void;
 }
 interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;

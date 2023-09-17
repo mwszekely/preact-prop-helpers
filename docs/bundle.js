@@ -3621,8 +3621,8 @@
       }
     }, [index, staggeredVisible]);
     let timeoutRef = _2(-1);
-    p2(() => {
-      if (!becauseScreen.current) {
+    const childUseEffect = T2(() => {
+      if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
         if (timeoutRef.current != -1)
           clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
@@ -3638,7 +3638,7 @@
     }, [index, parentIsStaggered && staggeredVisible]);
     return {
       props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
-      staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+      staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
       info: { setStaggeredVisible, getStaggeredVisible }
     };
   });
