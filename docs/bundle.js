@@ -8058,13 +8058,13 @@
   var DemoUseRovingTabIndexChildOuter2 = x3(monitored(function DemoUseRovingTabIndexChildOuter3({ index }) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext2);
-    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
       refElementReturn,
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-      info: { index },
-      processedChildParameters: { children: F2(() => /* @__PURE__ */ o3(DemoUseRovingTabIndexChild, { index }), [index]) }
+      info: { index }
     });
-    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: processedChildReturn.children ? processedChildReturn.children : "\xA0" });
+    const c3 = F2(() => /* @__PURE__ */ o3(DemoUseRovingTabIndexChild, { index }), [index]);
+    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c3 });
   }));
   var DemoUseRovingTabIndexChild = x3(monitored(function DemoUseRovingTabIndexChild2({ index }) {
     if (index == 1)

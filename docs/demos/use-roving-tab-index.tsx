@@ -187,14 +187,14 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
-    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild<HTMLLIElement>({
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild<HTMLLIElement>({
         refElementReturn,
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-        info: { index },
-        processedChildParameters: { children: useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]) }
+        info: { index }
     })
+    const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
     return (
-        <li {...useMergedProps(props, propsStable)}>{processedChildReturn.children ? processedChildReturn.children : "\xA0"}</li>
+        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : c}</li>
     )
 }));
 
