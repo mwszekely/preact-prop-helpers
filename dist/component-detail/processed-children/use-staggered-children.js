@@ -1,9 +1,8 @@
-import { debounce } from "lodash-es";
 import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 /**
@@ -19,7 +18,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link useStaggeredChild}
  */
-export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
+export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
     // until they fill in.
@@ -44,7 +43,12 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
             timeoutHandle.current = setTimeout(() => {
                 timeoutHandle.current = -1;
                 let target = getTargetStaggerIndex();
-                setDisplayedStaggerIndex(prev => Math.min(target || 0, (prev || 0) + 1));
+                setDisplayedStaggerIndex(prev => {
+                    let next = Math.min(target || 0, (prev || 0) + 1);
+                    while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+                        ++next;
+                    return next;
+                });
             }, 10);
         }, 100);
     }, [ /* Must be empty */]);
@@ -114,11 +118,33 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
             return true;
         }
     }, []);
+    const intersectionObserver = useRef(null);
+    const elementToIndex = useRef(new Map());
+    const setElementToIndexMap = useCallback((index, element) => {
+        elementToIndex.current.set(element, index);
+    }, []);
     const staggeredChildContext = useMemo(() => ({
         parentIsStaggered,
         childCallsThisToTellTheParentToMountTheNextOne,
-        getDefaultStaggeredVisible
+        getDefaultStaggeredVisible,
+        getIntersectionObserver: useCallback(() => intersectionObserver.current, []),
+        setElementToIndexMap
     }), [parentIsStaggered]);
+    useEffect(() => {
+        const element = getElement();
+        const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+            debugger;
+            for (let entry of entries) {
+                if (entry.isIntersecting) {
+                    const index = elementToIndex.current.get(entry.target);
+                    if (index != null) {
+                        getChildren().getAt(index)?.setStaggeredVisible(true);
+                    }
+                }
+            }
+        });
+        return () => io.disconnect();
+    }, []);
     return {
         staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
         context: useMemo(() => ({
@@ -135,7 +161,9 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
  *
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, 
+//refElementReturn: { getElement },
+context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = useRef(false);
     const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
@@ -146,7 +174,7 @@ export const useStaggeredChild = monitored(function useStaggeredChild({ info: { 
             becauseScreen.current = true;
         }
     }), returnFalse);
-    useEffect(() => {
+    /*useEffect(() => {
         const element = getElement();
         if (!staggeredVisible && element) {
             let observer = new IntersectionObserver(debounce(((entries) => {
@@ -158,11 +186,12 @@ export const useStaggeredChild = monitored(function useStaggeredChild({ info: { 
                     }
                 }
                 setOnScreen(onScreen);
-            }), 50, { leading: false, trailing: true }), { threshold: [0] });
+            }) satisfies IntersectionObserverCallback, 50, { leading: false, trailing: true }), { threshold: [0] });
             observer.observe(element);
             return () => observer.disconnect();
         }
-    }, [index, staggeredVisible]);
+    }, [index, staggeredVisible])*/
+    useLayoutEffect(() => { }, [index]);
     const childUseEffect = useCallback(() => {
         if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
             if ((parentIsStaggered && staggeredVisible)) {
@@ -174,10 +203,24 @@ export const useStaggeredChild = monitored(function useStaggeredChild({ info: { 
             }
         }
     }, [index, (parentIsStaggered && staggeredVisible)]);
+    const e = useRef(null);
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
-        info: { setStaggeredVisible, getStaggeredVisible }
+        info: { setStaggeredVisible, getStaggeredVisible },
+        refElementParameters: {
+            onElementChange: useStableCallback((element) => {
+                setElementToIndexMap(index, element);
+                e.current = (element || e.current);
+                const io = getIntersectionObserver();
+                if (element) {
+                    io?.observe(element);
+                }
+                else {
+                    io?.unobserve(e.current);
+                }
+            })
+        }
     };
 });
 //# sourceMappingURL=use-staggered-children.js.map

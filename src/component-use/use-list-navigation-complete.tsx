@@ -58,7 +58,7 @@ export interface CompleteListNavigationContext<ChildElement extends Element, M e
 
 
 export interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, "refElementReturn"> {
 }
 
 export interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
@@ -205,7 +205,7 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
     return {
         contextChildren,
         contextProcessing: useMemoObject({
-            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
             ...contextProcessing
         }),
         props: useMergedProps(props, propsRef),
@@ -243,6 +243,7 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
+        refElementReturn: context.processedChildrenContext,
         context,
     });
 

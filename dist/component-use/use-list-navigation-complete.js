@@ -76,7 +76,7 @@ refElementParameters, ...void1 }) {
     return {
         contextChildren,
         contextProcessing: useMemoObject({
-            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
             ...contextProcessing
         }),
         props: useMergedProps(props, propsRef),
@@ -102,6 +102,7 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
+        refElementReturn: context.processedChildrenContext,
         context,
     });
     return {

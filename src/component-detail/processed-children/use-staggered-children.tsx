@@ -1,11 +1,10 @@
-import { debounce } from "lodash-es";
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -26,7 +25,9 @@ export interface UseStaggeredChildrenParametersSelf {
     childCount: number | null;
 }
 
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters extends
+    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">,
+    TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 
@@ -35,6 +36,8 @@ export interface UseStaggeredChildContextSelf {
     childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
     //childCallsThisToTellTheParentTheHighestIndex(index: number): void;
     getDefaultStaggeredVisible(i: number): boolean;
+    getIntersectionObserver(): IntersectionObserver | null;
+    setElementToIndexMap(index: number, element: any): void;
 
 }
 
@@ -55,7 +58,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
 }
 
 
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">>, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 
 export interface UseStaggeredChildReturnTypeSelf {
@@ -79,7 +82,7 @@ export interface UseStaggeredChildReturnTypeSelf {
     childUseEffect(): void;
 }
 
-export interface UseStaggeredChildReturnType<ChildElement extends Element> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
@@ -101,8 +104,11 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  */
 export const useStaggeredChildren = monitored(function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
-    staggeredChildrenParameters: { staggered, childCount }
+    staggeredChildrenParameters: { staggered, childCount },
+    refElementReturn: { getElement }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
+
+
 
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -132,7 +138,12 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
             timeoutHandle.current = setTimeout(() => {
                 timeoutHandle.current = -1;
                 let target = getTargetStaggerIndex();
-                setDisplayedStaggerIndex(prev => Math.min(target || 0, (prev || 0) + 1));
+                setDisplayedStaggerIndex(prev => {
+                    let next = Math.min(target || 0, (prev || 0) + 1);
+                    while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+                        ++next;
+                    return next;
+                });
             }, 10)
         }, 100)
     }, [/* Must be empty */])
@@ -217,11 +228,35 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
         }
     }, []);
 
+    const intersectionObserver = useRef<IntersectionObserver | null>(null);
+    const elementToIndex = useRef(new Map<Element, number>());
+    const setElementToIndexMap = useCallback((index: number, element: any) => {
+        elementToIndex.current.set(element, index);
+    }, [])
+
     const staggeredChildContext = useMemo<UseStaggeredChildContext["staggeredChildContext"]>(() => ({
         parentIsStaggered,
         childCallsThisToTellTheParentToMountTheNextOne,
-        getDefaultStaggeredVisible
+        getDefaultStaggeredVisible,
+        getIntersectionObserver: useCallback(() => intersectionObserver.current, []),
+        setElementToIndexMap
     }), [parentIsStaggered]);
+
+    useEffect(() => {
+        const element = getElement();
+        const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+            debugger;
+            for (let entry of entries) {
+                if (entry.isIntersecting) {
+                    const index = elementToIndex.current.get(entry.target)
+                    if (index != null) {
+                        getChildren().getAt(index)?.setStaggeredVisible(true);
+                    }
+                }
+            }
+        });
+        return () => io.disconnect();
+    }, [])
 
     return {
         staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
@@ -243,8 +278,8 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  */
 export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({
     info: { index },
-    refElementReturn: { getElement },
-    context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } }
+    //refElementReturn: { getElement },
+    context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
 }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = useRef(false);
@@ -260,7 +295,7 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
         }
     }), returnFalse)
 
-    useEffect(() => {
+    /*useEffect(() => {
         const element = getElement();
         if (!staggeredVisible && element) {
             let observer = new IntersectionObserver(debounce(((entries) => {
@@ -276,7 +311,9 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
             observer.observe(element);
             return () => observer.disconnect();
         }
-    }, [index, staggeredVisible])
+    }, [index, staggeredVisible])*/
+
+    useLayoutEffect(() => { }, [index])
 
     const childUseEffect = useCallback(() => {
         if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
@@ -291,9 +328,23 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
     }, [index, (parentIsStaggered && staggeredVisible)])
 
 
+    const e = useRef<Element | null>(null)
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
-        info: { setStaggeredVisible, getStaggeredVisible }
+        info: { setStaggeredVisible, getStaggeredVisible },
+        refElementParameters: {
+            onElementChange: useStableCallback((element) => {
+                setElementToIndexMap(index, element);
+                e.current = (element || e.current);
+                const io = getIntersectionObserver();
+                if (element) {
+                    io?.observe(element);
+                }
+                else {
+                    io?.unobserve(e.current!);
+                }
+            })
+        }
     }
 })

@@ -1843,7 +1843,7 @@ interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
     childCount: number | null;
 }
-interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
+interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 interface UseStaggeredChildContextSelf {
@@ -1851,6 +1851,8 @@ interface UseStaggeredChildContextSelf {
     childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
     //childCallsThisToTellTheParentTheHighestIndex(index: number): void;
     getDefaultStaggeredVisible(i: number): boolean;
+    getIntersectionObserver(): IntersectionObserver | null;
+    setElementToIndexMap(index: number, element: any): void;
 }
 interface UseStaggeredChildContext {
     staggeredChildContext: UseStaggeredChildContextSelf;
@@ -1865,7 +1867,7 @@ interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">>, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
+interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -1884,7 +1886,7 @@ interface UseStaggeredChildReturnTypeSelf {
      */
     childUseEffect(): void;
 }
-interface UseStaggeredChildReturnType<ChildElement extends Element> {
+interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
@@ -1902,7 +1904,7 @@ interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -1912,7 +1914,9 @@ declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, s
  *
  * @compositeParams
  */
-declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, 
+//refElementReturn: { getElement },
+context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 interface UseProcessedChildrenReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UseStaggeredChildrenReturnType, never>, OmitStrong<UsePaginatedChildrenReturnType, never> {
     context: UseProcessedChildContext<TabbableChildElement, M>;
 }
@@ -1920,16 +1924,16 @@ interface UseProcessedChildrenReturnType<TabbableChildElement extends Element, M
 type UseProcessedChildInfoKeysParameters = "index";
 // These are the info parameters provided by useRovingTabIndexChild specifically
 type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
-interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseStaggeredChildParameters, "refElementReturn">, Pick<UseManagedChildParameters<M>, never> {
+interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseManagedChildParameters<M>, never> {
 }
 interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UsePaginatedChildContext, UseStaggeredChildContext, UseManagedChildrenContext<M> {
 }
-interface UseProcessedChildReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends Pick<UsePaginatedChildReturnType<TabbableChildElement>, "paginatedChildReturn" | "props">, Pick<UseStaggeredChildReturnType<TabbableChildElement>, "staggeredChildReturn">, Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
+interface UseProcessedChildReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends OmitStrong<UsePaginatedChildReturnType<TabbableChildElement>, "info">, OmitStrong<UseStaggeredChildReturnType<TabbableChildElement>, "info" | "props">, Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
 }
 interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 }
 interface UseProcessedChildrenContext extends UseRearrangedChildrenContext {
-    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">;
+    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused"> & Pick<UseRefElementReturnTypeSelf<any>, "getElement">;
 }
 /**
  * All of these functions **MUST** be stable across renders.
@@ -1984,7 +1988,7 @@ interface UseProcessedChildrenParameters<TabbableChildElement extends Element, M
  * @hasChild {@link useProcessedChild}
  */
 declare const useProcessedChildren: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }: UseProcessedChildrenParameters<TabbableChildElement, M>) => UseProcessedChildrenReturnType<TabbableChildElement, M>;
-declare const useProcessedChild: <TabbableChildElement extends Element>({ context, info: { index }, refElementReturn: { getElement } }: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>) => UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>;
+declare const useProcessedChild: <TabbableChildElement extends Element>({ context, info: { index } }: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>) => UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>;
 interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
@@ -2698,7 +2702,7 @@ interface UseCompleteListNavigationReturnType<ParentElement extends Element, Chi
 }
 interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, UseManagedChildrenContext<M>, RovingTabIndexChildContext {
 }
-interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+interface UseCompleteListNavigationChildrenParameters<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, "refElementReturn"> {
 }
 interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
     context: UseProcessedChildContext<TabbableChildElement, M>;

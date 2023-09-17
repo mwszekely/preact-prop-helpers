@@ -3,7 +3,7 @@
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
+import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/index.js";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -500,7 +500,7 @@ const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, targ
 
     return <div hidden />;
 })
-
+/*
 const StaggeredContext = createContext<UseManagedChildrenContext<UseStaggeredChildrenInfo> & UseStaggeredChildContext>(null!);
 
 const DemoStaggered = memo(() => {
@@ -508,7 +508,7 @@ const DemoStaggered = memo(() => {
     const [checked, setChecked] = useState(false);
     const [childCount, setChildCount] = useState(100);
     const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo>({ managedChildrenParameters: {} })
-    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered, childCount } })
+    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered, childCount }, refElementReturn })
     return (
         <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
             <div class="demo">
@@ -544,7 +544,7 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     return (
         <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{parentIsStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>
     )
-})
+})*/
 
 
 //options.debounceRendering = (f) => f();
@@ -577,8 +577,6 @@ const Component = () => {
         <hr />
         {/*<DemoUseInterval />
         <hr />*/}
-        <DemoStaggered />
-        <hr />
         <DemoUseRovingTabIndex />
         <hr />
 

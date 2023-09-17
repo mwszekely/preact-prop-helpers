@@ -200,7 +200,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const { context: { managedChildContext }, managedChildrenReturn }: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const c2 = useMemoObject({
-        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
         ...contextProcessing
     });
     const context = useMemoObject<CompleteGridNavigationRowContext<RowElement, RM>>({
@@ -260,6 +260,7 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
+        refElementReturn: context.processedChildrenContext,
         context,
     });
 

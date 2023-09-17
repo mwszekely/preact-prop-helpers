@@ -1,4 +1,4 @@
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -13,13 +13,15 @@ export interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
     childCount: number | null;
 }
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
     parentIsStaggered: boolean;
     childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
     getDefaultStaggeredVisible(i: number): boolean;
+    getIntersectionObserver(): IntersectionObserver | null;
+    setElementToIndexMap(index: number, element: any): void;
 }
 export interface UseStaggeredChildContext {
     staggeredChildContext: UseStaggeredChildContextSelf;
@@ -34,7 +36,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">>, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 export interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -53,7 +55,7 @@ export interface UseStaggeredChildReturnTypeSelf {
      */
     childUseEffect(): void;
 }
-export interface UseStaggeredChildReturnType<ChildElement extends Element> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
@@ -71,7 +73,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -81,5 +83,5 @@ export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildr
  *
  * @compositeParams
  */
-export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

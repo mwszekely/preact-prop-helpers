@@ -2658,7 +2658,7 @@ function defaultCompare(lhs, rhs) {
  *
  * @hasChild {@link useStaggeredChild}
  */
-const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
+const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
     // until they fill in.
@@ -2683,7 +2683,12 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({ managedCh
             timeoutHandle.current = setTimeout(() => {
                 timeoutHandle.current = -1;
                 let target = getTargetStaggerIndex();
-                setDisplayedStaggerIndex(prev => Math.min(target || 0, (prev || 0) + 1));
+                setDisplayedStaggerIndex(prev => {
+                    let next = Math.min(target || 0, (prev || 0) + 1);
+                    while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+                        ++next;
+                    return next;
+                });
             }, 10);
         }, 100);
     }, [ /* Must be empty */]);
@@ -2749,11 +2754,33 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({ managedCh
             return true;
         }
     }, []);
+    const intersectionObserver = useRef(null);
+    const elementToIndex = useRef(new Map());
+    const setElementToIndexMap = useCallback((index, element) => {
+        elementToIndex.current.set(element, index);
+    }, []);
     const staggeredChildContext = useMemo(() => ({
         parentIsStaggered,
         childCallsThisToTellTheParentToMountTheNextOne,
-        getDefaultStaggeredVisible
+        getDefaultStaggeredVisible,
+        getIntersectionObserver: useCallback(() => intersectionObserver.current, []),
+        setElementToIndexMap
     }), [parentIsStaggered]);
+    useEffect(() => {
+        getElement();
+        const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+            debugger;
+            for (let entry of entries) {
+                if (entry.isIntersecting) {
+                    const index = elementToIndex.current.get(entry.target);
+                    if (index != null) {
+                        getChildren().getAt(index)?.setStaggeredVisible(true);
+                    }
+                }
+            }
+        });
+        return () => io.disconnect();
+    }, []);
     return {
         staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
         context: useMemo(() => ({
@@ -2770,10 +2797,12 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({ managedCh
  *
  * @compositeParams
  */
-const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, 
+//refElementReturn: { getElement },
+context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = useRef(false);
-    const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
+    usePassiveState(useStableCallback((next, prev, reason) => {
         if (staggeredVisible)
             return;
         if (next) {
@@ -2781,7 +2810,7 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
             becauseScreen.current = true;
         }
     }), returnFalse);
-    useEffect(() => {
+    /*useEffect(() => {
         const element = getElement();
         if (!staggeredVisible && element) {
             let observer = new IntersectionObserver(debounce(((entries) => {
@@ -2793,11 +2822,12 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
                     }
                 }
                 setOnScreen(onScreen);
-            }), 50, { leading: false, trailing: true }), { threshold: [0] });
+            }) satisfies IntersectionObserverCallback, 50, { leading: false, trailing: true }), { threshold: [0] });
             observer.observe(element);
             return () => observer.disconnect();
         }
-    }, [index, staggeredVisible]);
+    }, [index, staggeredVisible])*/
+    useLayoutEffect(() => { }, [index]);
     const childUseEffect = useCallback(() => {
         if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
             if ((parentIsStaggered && staggeredVisible)) {
@@ -2809,10 +2839,24 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
             }
         }
     }, [index, (parentIsStaggered && staggeredVisible)]);
+    const e = useRef(null);
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
-        info: { setStaggeredVisible, getStaggeredVisible }
+        info: { setStaggeredVisible, getStaggeredVisible },
+        refElementParameters: {
+            onElementChange: useStableCallback((element) => {
+                setElementToIndexMap(index, element);
+                e.current = (element || e.current);
+                const io = getIntersectionObserver();
+                if (element) {
+                    io?.observe(element);
+                }
+                else {
+                    io?.unobserve(e.current);
+                }
+            })
+        }
     };
 });
 
@@ -2885,7 +2929,8 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
     });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        staggeredChildrenParameters: { staggered, childCount }
+        staggeredChildrenParameters: { staggered, childCount },
+        refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
         rearrangeableChildrenReturn,
@@ -2898,10 +2943,10 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
         })
     };
 });
-const useProcessedChild = monitored(function useProcessedChild({ context, info: { index }, refElementReturn: { getElement }, }) {
+const useProcessedChild = monitored(function useProcessedChild({ context, info: { index } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
+    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
     const { managedChildReturn } = useManagedChild({
         context,
         info: {
@@ -2917,7 +2962,8 @@ const useProcessedChild = monitored(function useProcessedChild({ context, info: 
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn
+        staggeredChildReturn,
+        refElementParameters
     };
 });
 
@@ -4060,7 +4106,7 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const c2 = useMemoObject({
-        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
         ...contextProcessing
     });
     const context = useMemoObject({
@@ -4099,6 +4145,7 @@ const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigati
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
+        refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
@@ -4302,7 +4349,7 @@ refElementParameters, ...void1 }) {
     return {
         contextChildren,
         contextProcessing: useMemoObject({
-            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
             ...contextProcessing
         }),
         props: useMergedProps(props, propsRef),
@@ -4328,6 +4375,7 @@ const useCompleteListNavigationChildren = monitored(function useCompleteListNavi
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
+        refElementReturn: context.processedChildrenContext,
         context,
     });
     return {

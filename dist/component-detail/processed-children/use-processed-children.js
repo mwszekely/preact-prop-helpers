@@ -75,7 +75,8 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
     });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        staggeredChildrenParameters: { staggered, childCount }
+        staggeredChildrenParameters: { staggered, childCount },
+        refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
         rearrangeableChildrenReturn,
@@ -88,10 +89,10 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index }, refElementReturn: { getElement }, }) {
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
+    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
     const { managedChildReturn } = useManagedChild({
         context,
         info: {
@@ -107,7 +108,8 @@ export const useProcessedChild = monitored(function useProcessedChild({ context,
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn
+        staggeredChildReturn,
+        refElementParameters
     };
 });
 //# sourceMappingURL=use-processed-children.js.map

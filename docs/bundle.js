@@ -3511,7 +3511,7 @@
   }
 
   // ../dist/component-detail/processed-children/use-staggered-children.js
-  var useStaggeredChildren = monitored(function useStaggeredChildren2({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount } }) {
+  var useStaggeredChildren = monitored(function useStaggeredChildren2({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }) {
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
     const timeoutHandle = _2(-1);
@@ -3522,7 +3522,12 @@
         timeoutHandle.current = setTimeout(() => {
           timeoutHandle.current = -1;
           let target = getTargetStaggerIndex();
-          setDisplayedStaggerIndex((prev) => Math.min(target || 0, (prev || 0) + 1));
+          setDisplayedStaggerIndex((prev) => {
+            let next = Math.min(target || 0, (prev || 0) + 1);
+            while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+              ++next;
+            return next;
+          });
         }, 10);
       }, 100);
     }, [
@@ -3580,11 +3585,33 @@
         return true;
       }
     }, []);
+    const intersectionObserver = _2(null);
+    const elementToIndex = _2(/* @__PURE__ */ new Map());
+    const setElementToIndexMap = T2((index, element) => {
+      elementToIndex.current.set(element, index);
+    }, []);
     const staggeredChildContext = F2(() => ({
       parentIsStaggered,
       childCallsThisToTellTheParentToMountTheNextOne,
-      getDefaultStaggeredVisible
+      getDefaultStaggeredVisible,
+      getIntersectionObserver: T2(() => intersectionObserver.current, []),
+      setElementToIndexMap
     }), [parentIsStaggered]);
+    p2(() => {
+      const element = getElement();
+      const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+        debugger;
+        for (let entry of entries) {
+          if (entry.isIntersecting) {
+            const index = elementToIndex.current.get(entry.target);
+            if (index != null) {
+              getChildren().getAt(index)?.setStaggeredVisible(true);
+            }
+          }
+        }
+      });
+      return () => io.disconnect();
+    }, []);
     return {
       staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
       context: F2(() => ({
@@ -3592,7 +3619,11 @@
       }), [staggeredChildContext])
     };
   });
-  var useStaggeredChild = monitored(function useStaggeredChild2({ info: { index }, refElementReturn: { getElement }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+  var useStaggeredChild = monitored(function useStaggeredChild2({
+    info: { index },
+    //refElementReturn: { getElement },
+    context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
+  }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     const becauseScreen = _2(false);
     const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
@@ -3603,23 +3634,8 @@
         becauseScreen.current = true;
       }
     }), returnFalse);
-    p2(() => {
-      const element = getElement();
-      if (!staggeredVisible && element) {
-        let observer = new IntersectionObserver(debounce_default((entries) => {
-          let onScreen = false;
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              onScreen = true;
-              break;
-            }
-          }
-          setOnScreen(onScreen);
-        }, 50, { leading: false, trailing: true }), { threshold: [0] });
-        observer.observe(element);
-        return () => observer.disconnect();
-      }
-    }, [index, staggeredVisible]);
+    y2(() => {
+    }, [index]);
     const childUseEffect = T2(() => {
       if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
         if (parentIsStaggered && staggeredVisible) {
@@ -3629,10 +3645,23 @@
         }
       }
     }, [index, parentIsStaggered && staggeredVisible]);
+    const e3 = _2(null);
     return {
       props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
       staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
-      info: { setStaggeredVisible, getStaggeredVisible }
+      info: { setStaggeredVisible, getStaggeredVisible },
+      refElementParameters: {
+        onElementChange: useStableCallback((element) => {
+          setElementToIndexMap(index, element);
+          e3.current = element || e3.current;
+          const io = getIntersectionObserver();
+          if (element) {
+            io?.observe(element);
+          } else {
+            io?.unobserve(e3.current);
+          }
+        })
+      }
     };
   });
 
@@ -3663,7 +3692,8 @@
     });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
       managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-      staggeredChildrenParameters: { staggered, childCount }
+      staggeredChildrenParameters: { staggered, childCount },
+      refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
       rearrangeableChildrenReturn,
@@ -3676,10 +3706,10 @@
       })
     };
   });
-  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index }, refElementReturn: { getElement } }) {
+  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
+    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
     const { managedChildReturn } = useManagedChild({
       context,
       info: {
@@ -3695,7 +3725,8 @@
       props: propsRet,
       managedChildReturn,
       paginatedChildReturn,
-      staggeredChildReturn
+      staggeredChildReturn,
+      refElementParameters
     };
   });
 
@@ -5547,7 +5578,7 @@
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const c22 = useMemoObject({
-      processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+      processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
       ...contextProcessing
     });
     const context = useMemoObject({
@@ -5584,6 +5615,7 @@
       rearrangeableChildrenParameters,
       staggeredChildrenParameters,
       managedChildrenParameters,
+      refElementReturn: context.processedChildrenContext,
       context
     });
     return {
@@ -5778,7 +5810,7 @@
     return {
       contextChildren,
       contextProcessing: useMemoObject({
-        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused }),
+        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
         ...contextProcessing
       }),
       props: useMergedProps(props, propsRef),
@@ -5799,6 +5831,7 @@
       rearrangeableChildrenParameters,
       staggeredChildrenParameters,
       managedChildrenParameters,
+      refElementReturn: context.processedChildrenContext,
       context
     });
     return {
@@ -7872,6 +7905,7 @@
       typeaheadNavigationReturn: { typeaheadStatus },
       rearrangeableChildrenReturn: { shuffle: shuffle2, reverse, sort: _sort }
     } = r4;
+    const [staggering, setStaggering] = useState(false);
     return /* @__PURE__ */ o3("div", { className: "demo", children: [
       /* @__PURE__ */ o3("h2", { children: "Keyboard & List Navigation" }),
       /* @__PURE__ */ o3("h3", { children: /* @__PURE__ */ o3("code", { children: "useCompleteListNavigation" }) }),
@@ -8012,6 +8046,10 @@
         ] })
       ] }),
       /* @__PURE__ */ o3("div", { children: [
+        "Staggering status: ",
+        staggered ? staggering ? "Staggering..." : "Done staggering" : "Not staggered"
+      ] }),
+      /* @__PURE__ */ o3("div", { children: [
         "Typeahead status: ",
         typeaheadStatus
       ] }),
@@ -8020,10 +8058,10 @@
         Math.round(multiSelectPercent * 100 * 10) / 10,
         "%"
       ] }),
-      /* @__PURE__ */ o3(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o3(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o3(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o3(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(WeirdContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("ol", { start: 0, ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren3, { max, min, staggered, count }) }) }) }) }) }) })
+      /* @__PURE__ */ o3(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o3(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o3(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o3(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(WeirdContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("ol", { start: 0, ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren3, { max, min, staggered, count, setStaggering }) }) }) }) }) }) })
     ] });
   }));
-  var DemoUseRovingTabIndexChildren3 = x3(monitored(function DemoUseRovingTabIndexChildren4({ count, max, min, staggered }) {
+  var DemoUseRovingTabIndexChildren3 = x3(monitored(function DemoUseRovingTabIndexChildren4({ count, max, min, staggered, setStaggering }) {
     const {
       context,
       paginatedChildrenReturn,
@@ -8046,13 +8084,17 @@
       staggeredChildrenParameters: { staggered },
       context: q2(WeirdContext)
     });
+    p2(() => {
+      setStaggering(staggeredChildrenReturn.stillStaggering);
+    }, [staggeredChildrenReturn.stillStaggering]);
     return /* @__PURE__ */ o3(ListChildContext2.Provider, { value: context, children: rearrangeableChildrenReturn.children });
   }));
   var DemoUseRovingTabIndexChildOuter2 = x3(monitored(function DemoUseRovingTabIndexChildOuter3({ index }) {
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
+    const { propsStable, refElementReturn: { getElement } } = useRefElement({ refElementParameters: { onElementChange: useStableCallback((e3, p3, r4) => {
+      onElementChange?.(e3, p3, r4);
+    }) } });
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext2);
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
-      refElementReturn,
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } } = useProcessedChild({
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
       info: { index }
     });
@@ -8727,61 +8769,6 @@
     }, {}, mode || "grouped");
     return /* @__PURE__ */ o3("div", { hidden: true });
   });
-  var StaggeredContext = F(null);
-  var DemoStaggered = x3(() => {
-    const [staggered, setStaggered] = useState(false);
-    const [checked, setChecked] = useState(false);
-    const [childCount, setChildCount] = useState(100);
-    const { context: mcc, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: {} });
-    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered, childCount } });
-    return /* @__PURE__ */ o3(StaggeredContext.Provider, { value: { ...mcc, ...scc }, children: /* @__PURE__ */ o3("div", { class: "demo", children: [
-      /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked, onInput: (e3) => {
-          e3.preventDefault();
-          setChecked(e3.currentTarget.checked);
-        } }),
-        " Children mounted"
-      ] }),
-      /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: staggered, onInput: (e3) => {
-          e3.preventDefault();
-          setStaggered(e3.currentTarget.checked);
-        } }),
-        " Children Staggered"
-      ] }),
-      /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "number", value: childCount, onInput: (e3) => {
-          e3.preventDefault();
-          setChildCount(e3.currentTarget.valueAsNumber);
-        } }),
-        " # of children"
-      ] }),
-      /* @__PURE__ */ o3("div", { children: [
-        /* @__PURE__ */ o3("div", { children: [
-          "Status: ",
-          staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"
-        ] }),
-        /* @__PURE__ */ o3("div", { style: "display:flex;flex-wrap: wrap;", children: checked && /* @__PURE__ */ o3(DemoStaggeredChildren, { childCount }) })
-      ] })
-    ] }) });
-  });
-  var DemoStaggeredChildren = x3(({ childCount }) => {
-    return /* @__PURE__ */ o3(_, { children: Array.from(function* () {
-      for (let i3 = 0; i3 < childCount; ++i3) {
-        yield /* @__PURE__ */ o3(DemoStaggeredChild, { index: i3 }, i3);
-      }
-    }()) });
-  });
-  var DemoStaggeredChild = x3(({ index }) => {
-    const context = q2(StaggeredContext);
-    const { info, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useStaggeredChild({ context, info: { index } });
-    const { managedChildReturn } = useManagedChild({ context, info: { ...info, index } });
-    return /* @__PURE__ */ o3("div", { ...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} }), children: [
-      "Child #",
-      index,
-      parentIsStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"
-    ] });
-  });
   var Component = () => {
     if (1)
       return /* @__PURE__ */ o3(DemoUseRovingTabIndex, {});
@@ -8806,8 +8793,6 @@
       /* @__PURE__ */ o3(DemoUseGrid, {}),
       /* @__PURE__ */ o3("hr", {}),
       /* @__PURE__ */ o3(DemoUseTimeout, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoStaggered, {}),
       /* @__PURE__ */ o3("hr", {}),
       /* @__PURE__ */ o3(DemoUseRovingTabIndex, {}),
       /* @__PURE__ */ o3("hr", {}),

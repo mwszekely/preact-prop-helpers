@@ -1,6 +1,6 @@
 import { createContext } from "preact";
-import { memo, useCallback, useContext } from "preact/compat";
-import { UseProcessedChildrenContext } from "../../dist/component-detail/processed-children/use-processed-children.js";
+import { StateUpdater, memo, useCallback, useContext, useEffect } from "preact/compat";
+import { UseProcessedChildReturnType, UseProcessedChildrenContext } from "../../dist/component-detail/processed-children/use-processed-children.js";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -83,7 +83,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     } = r;
 
 
-
+    const [staggering, setStaggering] = useState(false);
 
     return (
         <div className="demo">
@@ -129,6 +129,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                 <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
+            <div>Staggering status: {staggered? staggering? "Staggering..." : "Done staggering" : "Not staggered"}</div>
             {<div>Typeahead status: {typeaheadStatus}</div>}
             {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
             <UntabbableContext.Provider value={untabbable}>
@@ -137,7 +138,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                         <ListNavigationSingleSelectionChildContext.Provider value={contextChildren}>
                             <WeirdContext.Provider value={contextProcessing}>
                                 <ol start={0} {...props}>
-                                    <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} />
+                                    <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
                                 </ol>
                             </WeirdContext.Provider>
                         </ListNavigationSingleSelectionChildContext.Provider>
@@ -148,7 +149,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     );
 }))
 
-export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered }: { count: number, min: number | null, max: number | null, staggered: boolean }) {
+export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
     const { 
         context,
         paginatedChildrenReturn,
@@ -172,6 +173,10 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
         context: useContext(WeirdContext)
     })
 
+    useEffect(() => {
+        setStaggering(staggeredChildrenReturn.stillStaggering);
+    }, [staggeredChildrenReturn.stillStaggering])
+
     return (
         <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
     )
@@ -185,10 +190,11 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
 const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
+    const { propsStable, refElementReturn: { getElement } } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: useStableCallback((e, p, r) => {
+        onElementChange?.(e, p, r);
+    }) } })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useListChild<HTMLLIElement>({
-        refElementReturn,
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index }
     })
