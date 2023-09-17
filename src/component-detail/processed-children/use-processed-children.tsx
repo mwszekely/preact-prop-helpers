@@ -1,10 +1,9 @@
-import { ComponentChildren } from "preact";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../index.js";
 import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
-import { ElementProps, OmitStrong, TargetedOmit } from "../../util/lib.js";
+import { OmitStrong, TargetedOmit } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
@@ -28,11 +27,6 @@ export interface UseProcessedChildParameters<TabbableChildElement extends Elemen
     Pick<UsePaginatedChildParameters, never>,
     Pick<UseStaggeredChildParameters, "refElementReturn">,
     Pick<UseManagedChildParameters<M>, never> {
-    processedChildParameters: UseProcessedChildParametersSelf;
-}
-
-export interface UseProcessedChildParametersSelf {
-    children: ElementProps<any>["children"];
 }
 
 export interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
@@ -44,11 +38,6 @@ export interface UseProcessedChildReturnType<TabbableChildElement extends Elemen
     Pick<UsePaginatedChildReturnType<TabbableChildElement>, "paginatedChildReturn" | "props">,
     Pick<UseStaggeredChildReturnType<TabbableChildElement>, "staggeredChildReturn">,
     Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
-    processedChildReturn: UseProcessedChildReturnTypeSelf;
-}
-
-export interface UseProcessedChildReturnTypeSelf {
-    children: ComponentChildren | null;
 }
 
 export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
@@ -176,7 +165,6 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
 export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element>({
     context,
     info: { index },
-    processedChildParameters: { children: childrenIn },
     refElementReturn: { getElement },
 }: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>): UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>> {
     type M = UseProcessedChildInfo<TabbableChildElement>;
@@ -194,18 +182,6 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
             getStaggeredVisible
         }
     });
-    const { hideBecausePaginated } = paginatedChildReturn;
-    const { hideBecauseStaggered } = staggeredChildReturn;
-
-
-    let children: ElementProps<any>["children"] = childrenIn;
-
-
-    let hiding = (hideBecausePaginated || hideBecauseStaggered)
-
-    if (hiding) {
-        children = null;
-    }
 
     const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
 
@@ -213,9 +189,6 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn,
-        processedChildReturn: {
-            children
-        }
+        staggeredChildReturn
     }
 })

@@ -1,7 +1,6 @@
-import { ComponentChildren } from "preact";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../index.js";
 import { UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters } from "../../preact-extensions/use-managed-children.js";
-import { ElementProps, OmitStrong, TargetedOmit } from "../../util/lib.js";
+import { OmitStrong, TargetedOmit } from "../../util/lib.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "./use-paginated-children.js";
 import { UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangedChildrenContext } from "./use-rearrangeable-children.js";
@@ -12,18 +11,10 @@ export interface UseProcessedChildrenReturnType<TabbableChildElement extends Ele
 export type UseProcessedChildInfoKeysParameters = "index";
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseStaggeredChildParameters, "refElementReturn">, Pick<UseManagedChildParameters<M>, never> {
-    processedChildParameters: UseProcessedChildParametersSelf;
-}
-export interface UseProcessedChildParametersSelf {
-    children: ElementProps<any>["children"];
 }
 export interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UsePaginatedChildContext, UseStaggeredChildContext, UseManagedChildrenContext<M> {
 }
 export interface UseProcessedChildReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends Pick<UsePaginatedChildReturnType<TabbableChildElement>, "paginatedChildReturn" | "props">, Pick<UseStaggeredChildReturnType<TabbableChildElement>, "staggeredChildReturn">, Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
-    processedChildReturn: UseProcessedChildReturnTypeSelf;
-}
-export interface UseProcessedChildReturnTypeSelf {
-    children: ComponentChildren | null;
 }
 export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 }
@@ -83,5 +74,5 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * @hasChild {@link useProcessedChild}
  */
 export declare const useProcessedChildren: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }: UseProcessedChildrenParameters<TabbableChildElement, M>) => UseProcessedChildrenReturnType<TabbableChildElement, M>;
-export declare const useProcessedChild: <TabbableChildElement extends Element>({ context, info: { index }, processedChildParameters: { children: childrenIn }, refElementReturn: { getElement }, }: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>) => UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>;
+export declare const useProcessedChild: <TabbableChildElement extends Element>({ context, info: { index }, refElementReturn: { getElement }, }: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>) => UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>;
 //# sourceMappingURL=use-processed-children.d.ts.map

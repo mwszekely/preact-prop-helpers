@@ -88,7 +88,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index }, processedChildParameters: { children: childrenIn }, refElementReturn: { getElement }, }) {
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index }, refElementReturn: { getElement }, }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
@@ -102,22 +102,12 @@ export const useProcessedChild = monitored(function useProcessedChild({ context,
             getStaggeredVisible
         }
     });
-    const { hideBecausePaginated } = paginatedChildReturn;
-    const { hideBecauseStaggered } = staggeredChildReturn;
-    let children = childrenIn;
-    let hiding = (hideBecausePaginated || hideBecauseStaggered);
-    if (hiding) {
-        children = null;
-    }
     const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn,
-        processedChildReturn: {
-            children
-        }
+        staggeredChildReturn
     };
 });
 //# sourceMappingURL=use-processed-children.js.map

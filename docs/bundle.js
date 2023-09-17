@@ -3683,7 +3683,7 @@
       })
     };
   });
-  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index }, processedChildParameters: { children: childrenIn }, refElementReturn: { getElement } }) {
+  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index }, refElementReturn: { getElement } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered } = useStaggeredChild({ context: { staggeredChildContext }, info: { index }, refElementReturn: { getElement } });
@@ -3697,22 +3697,12 @@
         getStaggeredVisible
       }
     });
-    const { hideBecausePaginated } = paginatedChildReturn;
-    const { hideBecauseStaggered } = staggeredChildReturn;
-    let children = childrenIn;
-    let hiding = hideBecausePaginated || hideBecauseStaggered;
-    if (hiding) {
-      children = null;
-    }
     const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
       props: propsRet,
       managedChildReturn,
       paginatedChildReturn,
-      staggeredChildReturn,
-      processedChildReturn: {
-        children
-      }
+      staggeredChildReturn
     };
   });
 
