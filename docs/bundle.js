@@ -3620,20 +3620,13 @@
         return () => observer.disconnect();
       }
     }, [index, staggeredVisible]);
-    let timeoutRef = _2(-1);
     const childUseEffect = T2(() => {
       if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
-        if (timeoutRef.current != -1)
-          clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          timeoutRef.current = setTimeout(() => {
-            if (parentIsStaggered && staggeredVisible) {
-              childCallsThisToTellTheParentToMountTheNextOne(index);
-            } else if (!parentIsStaggered) {
-              childCallsThisToTellTheParentToMountTheNextOne(index);
-            }
-          }, 10);
-        }, 100);
+        if (parentIsStaggered && staggeredVisible) {
+          childCallsThisToTellTheParentToMountTheNextOne(index);
+        } else if (!parentIsStaggered) {
+          childCallsThisToTellTheParentToMountTheNextOne(index);
+        }
       }
     }, [index, parentIsStaggered && staggeredVisible]);
     return {

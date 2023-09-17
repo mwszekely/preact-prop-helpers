@@ -2798,22 +2798,15 @@ const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }
             return () => observer.disconnect();
         }
     }, [index, staggeredVisible]);
-    let timeoutRef = useRef(-1);
     const childUseEffect = useCallback(() => {
         if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
-            if (timeoutRef.current != -1)
-                clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(() => {
-                timeoutRef.current = setTimeout(() => {
-                    if ((parentIsStaggered && staggeredVisible)) {
-                        childCallsThisToTellTheParentToMountTheNextOne(index);
-                    }
-                    else if (!parentIsStaggered) {
-                        // Ensure that if we mount unstaggered and change to staggered, we start at the end
-                        childCallsThisToTellTheParentToMountTheNextOne(index);
-                    }
-                }, 10);
-            }, 100);
+            if ((parentIsStaggered && staggeredVisible)) {
+                childCallsThisToTellTheParentToMountTheNextOne(index);
+            }
+            else if (!parentIsStaggered) {
+                // Ensure that if we mount unstaggered and change to staggered, we start at the end
+                childCallsThisToTellTheParentToMountTheNextOne(index);
+            }
         }
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
