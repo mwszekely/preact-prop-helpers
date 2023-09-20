@@ -101,7 +101,7 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
 
     const {
         contextChildren,
-        contextPreprocessing,
+        contextProcessing,
         linearNavigationReturn: { },
         managedChildrenReturn: { getChildren },
         //paginatedChildrenReturn: { refreshPagination },
@@ -134,7 +134,7 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     });
 
     const { context, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useProcessedChildren({
-        context: contextPreprocessing,
+        context: contextProcessing,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             getIndex: useCallback(info => info.props.index, []),
@@ -150,13 +150,13 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             onRearranged: null
         },
         refElementReturn,
-        rovingTabIndexReturn,
+        managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
     });
 
     return (
         <Context1.Provider value={contextChildren}>
-            <Context2.Provider value={contextPreprocessing}>
+            <Context2.Provider value={contextProcessing}>
                 <Context3.Provider value={context}>
                     <ol {...useMergedProps(props, p1, {
                         role: "toolbar",
@@ -188,13 +188,12 @@ function TestBasesListNavChildren({ count }: { count: number }) {
 }*/
 
 function Outer({ index }: { index: number }) {
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { processedChildReturn: { children }, managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
+    const { managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
         context: useContext(Context3),
         info: { index },
-        processedChildParameters: { children: <TestBasesListNavChild index={index} /> },
-        refElementReturn
     });
+
+    const children = (hideBecausePaginated || hideBecauseStaggered)? null : <TestBasesListNavChild index={index} />
 
     return (<>{
         children ??
@@ -203,7 +202,7 @@ function Outer({ index }: { index: number }) {
             data-parent-is-paginated={parentIsPaginated}
             data-hide-because-staggered={hideBecauseStaggered}
             data-parent-is-staggered={parentIsStaggered}
-            {...useMergedProps(propsStable, props)
+            {...(props)
             }>{children ?? "(staggered)"}</li>}</>)
 }
 

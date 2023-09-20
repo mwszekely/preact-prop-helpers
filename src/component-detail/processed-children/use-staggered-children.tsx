@@ -4,7 +4,7 @@ import { returnFalse, returnNull, usePassiveState } from "../../preact-extension
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
+import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -246,7 +246,6 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
     useEffect(() => {
         const element = getElement();
         const io = intersectionObserver.current = new IntersectionObserver((entries) => {
-            debugger;
             for (let entry of entries) {
                 if (entry.isIntersecting) {
                     const index = elementToIndex.current.get(entry.target)
@@ -283,6 +282,10 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
 }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
+
+    // Controls whether we ask the parent to start mounting children after us.
+    // (We don't ask when the child becomes visible due to screen-scrolling,
+    // only when it becomes visible because we were next in line to do so)
     const becauseScreen = useRef(false);
 
     const [getOnScreen, setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, prev, reason) => {
@@ -291,31 +294,18 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
             return;
 
         if (next) {
+            const io = getIntersectionObserver();
+            io?.unobserve(e.current!);
+
             setStaggeredVisible(true);
             becauseScreen.current = true;
         }
-    }), returnFalse)
+    }), returnFalse);
 
-    /*useEffect(() => {
-        const element = getElement();
-        if (!staggeredVisible && element) {
-            let observer = new IntersectionObserver(debounce(((entries) => {
-                let onScreen = false;
-                for (const entry of entries) {
-                    if (entry.isIntersecting) {
-                        onScreen = true;
-                        break;
-                    }
-                }
-                setOnScreen(onScreen);
-            }) satisfies IntersectionObserverCallback, 50, { leading: false, trailing: true }), { threshold: [0] });
-            observer.observe(element);
-            return () => observer.disconnect();
-        }
-    }, [index, staggeredVisible])*/
-
-    useLayoutEffect(() => { }, [index])
-
+    // This isn't called during useEffect here, because we want to wait for the
+    // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
+    // So we return the effect we want to run and let the caller run it as appropriate.
+    // (In theory this could be returned as, like, useStaggeredChildChild instead but I really don't wanna do that)
     const childUseEffect = useCallback(() => {
         if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
             if ((parentIsStaggered && staggeredVisible)) {
@@ -328,8 +318,9 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
         }
     }, [index, (parentIsStaggered && staggeredVisible)])
 
-
-    const e = useRef<Element | null>(null)
+    // This is the element that the IntersectionObserver will watch.
+    const e = useRef<Element | null>(null);
+    
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
@@ -339,8 +330,8 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
                 setElementToIndexMap(index, element);
                 e.current = (element || e.current);
                 const io = getIntersectionObserver();
-                if (element) {
-                    io?.observe(element);
+                if (e.current) {
+                    io?.observe(e.current);
                 }
                 else {
                     io?.unobserve(e.current!);

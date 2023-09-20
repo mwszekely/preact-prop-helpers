@@ -150,7 +150,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             onRearranged: null
         },
         refElementReturn,
-        rovingTabIndexReturn,
+        managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
     });
 
@@ -176,13 +176,17 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
 
 
 function Outer({ index }: { index: number }) {
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { processedChildReturn: { children }, managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
+    const {
+        managedChildReturn,
+        props,
+        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
+        staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
+    } = useProcessedChild({
         context: useContext(ProcessingChildContext),
-        info: { index },
-        processedChildParameters: { children: <TestBaseGridNavRow index={index} /> },
-        refElementReturn
+        info: { index }
     });
+
+    let children = hideBecausePaginated || hideBecauseStaggered? null : <TestBaseGridNavRow index={index} />;
 
     return <>{
         children ??
@@ -191,7 +195,7 @@ function Outer({ index }: { index: number }) {
             data-parent-is-paginated={parentIsPaginated}
             data-hide-because-staggered={hideBecauseStaggered}
             data-parent-is-staggered={parentIsStaggered}
-            {...useMergedProps(propsStable, props)
+            {...(props)
             }>{"(staggered)"}</tr>
     }</>
 }

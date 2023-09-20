@@ -3601,7 +3601,6 @@
     p2(() => {
       const element = getElement();
       const io = intersectionObserver.current = new IntersectionObserver((entries) => {
-        debugger;
         for (let entry of entries) {
           if (entry.isIntersecting) {
             const index = elementToIndex.current.get(entry.target);
@@ -3631,12 +3630,12 @@
       if (staggeredVisible)
         return;
       if (next) {
+        const io = getIntersectionObserver();
+        io?.unobserve(e3.current);
         setStaggeredVisible(true);
         becauseScreen.current = true;
       }
     }), returnFalse);
-    y2(() => {
-    }, [index]);
     const childUseEffect = T2(() => {
       if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
         if (parentIsStaggered && staggeredVisible) {
@@ -3656,8 +3655,8 @@
           setElementToIndexMap(index, element);
           e3.current = element || e3.current;
           const io = getIntersectionObserver();
-          if (element) {
-            io?.observe(element);
+          if (e3.current) {
+            io?.observe(e3.current);
           } else {
             io?.unobserve(e3.current);
           }
@@ -3707,7 +3706,7 @@
       })
     };
   });
-  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index } }) {
+  var useProcessedChild = monitored(function useProcessedChild2({ context, info: { index, ...uinfo } }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
@@ -3718,7 +3717,8 @@
         setChildCountIfPaginated,
         setPaginationVisible,
         setStaggeredVisible,
-        getStaggeredVisible
+        getStaggeredVisible,
+        ...uinfo
       }
     });
     const propsRet = useMergedProps(propsStaggered, propsPaginated);
