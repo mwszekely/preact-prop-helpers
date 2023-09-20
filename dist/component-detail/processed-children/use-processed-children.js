@@ -89,7 +89,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index } }) {
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
@@ -100,7 +100,8 @@ export const useProcessedChild = monitored(function useProcessedChild({ context,
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,
-            getStaggeredVisible
+            getStaggeredVisible,
+            ...uinfo
         }
     });
     const propsRet = useMergedProps(propsStaggered, propsPaginated);

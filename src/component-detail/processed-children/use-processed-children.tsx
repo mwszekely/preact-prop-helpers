@@ -23,7 +23,7 @@ export type UseProcessedChildInfoKeysParameters = "index";
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
 export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
-    UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>>,
+    UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<M, UseProcessedChildInfoKeysParameters>>,
     Pick<UsePaginatedChildParameters, never>,
     Pick<UseManagedChildParameters<M>, never> {
 }
@@ -162,12 +162,10 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     };
 });
 
-export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element>({
+export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
     context,
-    info: { index }
-}: UseProcessedChildParameters<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>>): UseProcessedChildReturnType<TabbableChildElement, UseProcessedChildInfo<TabbableChildElement>> {
-    type M = UseProcessedChildInfo<TabbableChildElement>;
-
+    info: { index, ...uinfo },
+}: UseProcessedChildParameters<TabbableChildElement, M>): UseProcessedChildReturnType<TabbableChildElement, M> {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild<TabbableChildElement>({ context: { staggeredChildContext }, info: { index } });
@@ -178,8 +176,9 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,
-            getStaggeredVisible
-        }
+            getStaggeredVisible,
+            ...uinfo
+        } as M
     });
 
     const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
@@ -188,7 +187,7 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
         props: propsRet,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn, 
+        staggeredChildReturn,
         refElementParameters
     }
 })
