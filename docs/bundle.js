@@ -3883,16 +3883,20 @@
     const changeMultiSelected = useStableCallback((e3, selected) => {
       console.assert(selected != null);
       console.assert(!multiSelectionDisabled);
+      console.assert(multiSelectIsEnabled);
       let prevSelected = getLocalSelected();
       if (prevSelected != selected) {
         setLocalSelected(selected);
         notifyParentOfChildSelectChange(e3, index, selected, prevSelected);
       }
     });
+    const multiSelectIsEnabled = multiSelectionMode != "disabled";
     y2(() => {
-      notifyParentOfChildSelectChange(null, index, getLocalSelected(), void 0);
-      return () => notifyParentOfChildSelectChange(null, index, void 0, getLocalSelected());
-    }, [index]);
+      if (multiSelectIsEnabled) {
+        notifyParentOfChildSelectChange(null, index, getLocalSelected(), void 0);
+        return () => notifyParentOfChildSelectChange(null, index, void 0, getLocalSelected());
+      }
+    }, [index, multiSelectIsEnabled]);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

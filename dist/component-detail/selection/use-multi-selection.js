@@ -194,6 +194,7 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
     const changeMultiSelected = useStableCallback((e, selected) => {
         console.assert(selected != null);
         console.assert(!multiSelectionDisabled);
+        console.assert(multiSelectIsEnabled);
         // We're selected now (because someone told us we are, this hook doesn't call this function directly)
         //
         // So update our own internal state so we can re-render with the correct props,
@@ -204,10 +205,13 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
             notifyParentOfChildSelectChange(e, index, selected, prevSelected);
         }
     });
+    const multiSelectIsEnabled = (multiSelectionMode != 'disabled');
     useLayoutEffect(() => {
-        notifyParentOfChildSelectChange(null, index, getLocalSelected(), undefined);
-        return () => notifyParentOfChildSelectChange(null, index, undefined, getLocalSelected());
-    }, [index]);
+        if (multiSelectIsEnabled) {
+            notifyParentOfChildSelectChange(null, index, getLocalSelected(), undefined);
+            return () => notifyParentOfChildSelectChange(null, index, undefined, getLocalSelected());
+        }
+    }, [index, multiSelectIsEnabled]);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

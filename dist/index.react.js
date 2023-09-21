@@ -3161,10 +3161,13 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
             notifyParentOfChildSelectChange(e, index, selected, prevSelected);
         }
     });
+    const multiSelectIsEnabled = (multiSelectionMode != 'disabled');
     useLayoutEffect(() => {
-        notifyParentOfChildSelectChange(null, index, getLocalSelected(), undefined);
-        return () => notifyParentOfChildSelectChange(null, index, undefined, getLocalSelected());
-    }, [index]);
+        if (multiSelectIsEnabled) {
+            notifyParentOfChildSelectChange(null, index, getLocalSelected(), undefined);
+            return () => notifyParentOfChildSelectChange(null, index, undefined, getLocalSelected());
+        }
+    }, [index, multiSelectIsEnabled]);
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, event) => {
         if (focused) {
             if (multiSelectionMode == "focus") {
