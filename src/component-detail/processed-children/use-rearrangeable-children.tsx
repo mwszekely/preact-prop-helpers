@@ -47,14 +47,15 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
     const shuffle = useStableCallback<(typeof shuffleRef)["current"]>(() => { return (shuffleRef.current ?? identity)()! }, []);
     const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
     const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);
+    const provideManglers = useStableCallback<UseRearrangedChildrenContextSelf["provideManglers"]>(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+        indexManglerRef.current = indexMangler;
+        indexDemanglerRef.current = indexDemangler;
+        reverseRef.current = reverse;
+        shuffleRef.current = shuffle;
+        sortRef.current = sort;
+    });
     const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({
-        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
-            indexManglerRef.current = indexMangler;
-            indexDemanglerRef.current = indexDemangler;
-            reverseRef.current = reverse;
-            shuffleRef.current = shuffle;
-            sortRef.current = sort;
-        })
+        provideManglers
     });
     return {
         context: useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext }),

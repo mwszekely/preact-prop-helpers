@@ -3389,14 +3389,15 @@
     const rearrange = useStableCallback((original, ordered) => {
       (rearrangeRef.current ?? noop_default)(original, ordered);
     }, []);
+    const provideManglers = useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
+      indexManglerRef.current = indexMangler2;
+      indexDemanglerRef.current = indexDemangler2;
+      reverseRef.current = reverse2;
+      shuffleRef.current = shuffle3;
+      sortRef.current = sort2;
+    });
     const rearrangeableChildrenContext = useMemoObject({
-      provideManglers: useStableCallback(({ indexDemangler: indexDemangler2, indexMangler: indexMangler2, reverse: reverse2, shuffle: shuffle3, sort: sort2 }) => {
-        indexManglerRef.current = indexMangler2;
-        indexDemanglerRef.current = indexDemangler2;
-        reverseRef.current = reverse2;
-        shuffleRef.current = shuffle3;
-        sortRef.current = sort2;
-      })
+      provideManglers
     });
     return {
       context: useMemoObject({ rearrangeableChildrenContext }),

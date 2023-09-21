@@ -24,14 +24,15 @@ export function useCreateProcessedChildrenContext() {
     const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
     const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
     const rearrange = useStableCallback((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered); }, []);
+    const provideManglers = useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+        indexManglerRef.current = indexMangler;
+        indexDemanglerRef.current = indexDemangler;
+        reverseRef.current = reverse;
+        shuffleRef.current = shuffle;
+        sortRef.current = sort;
+    });
     const rearrangeableChildrenContext = useMemoObject({
-        provideManglers: useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
-            indexManglerRef.current = indexMangler;
-            indexDemanglerRef.current = indexDemangler;
-            reverseRef.current = reverse;
-            shuffleRef.current = shuffle;
-            sortRef.current = sort;
-        })
+        provideManglers
     });
     return {
         context: useMemoObject({ rearrangeableChildrenContext }),
