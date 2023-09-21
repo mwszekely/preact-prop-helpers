@@ -1,9 +1,9 @@
 //import "preact/debug";
 
-import { Ref, createContext, render } from "preact";
-import { forwardRef, memo } from "preact/compat";
+import { createContext, render } from "preact";
+import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState, useTimeout } from "../dist/index.js";
+import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/index.js";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -550,46 +550,10 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 //options.debounceRendering = (f) => f();
 
 
-const RefStressTest = memo(forwardRef( function RefStressTest({}, ref3: Ref<HTMLDivElement>) {
-    /*const [on, setOn] = useState(false);
-    useInterval({
-        callback: () => setOn(o => !o),
-        interval: 1000
-    })*/
-
-    const { propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { propsStable: p2 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { propsStable: p3 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const ref1 = useRef<HTMLDivElement>(null);
-    const ref2 = null;
-    return ( 
-        <div {...useMergedProps<HTMLDivElement>(p1, p2, p3, { ref: ref1 }, { ref: ref2 }, { ref: ref3 })}>Ref stress test</div>
-    )
-}))
-
-function Outer()  {
-    const [count, setCount] = useState(10);
-    useTimeout({ callback: () => setCount(200), timeout: 1000 });
-    const ref1 = useRef<HTMLDivElement>(null);
-    const ref2 = useRef<HTMLDivElement>(null);
-    const ref3 = useRef<HTMLDivElement>(null);
-    return (
-        <div>
-            <RefStressTest ref={ref1} />
-            {Array.from(function*(){
-                for (let i = 0; i < count; ++i)
-                    yield <RefStressTest ref={i == count - 1? ref2 : null} key={`${i * count}:${(i + 1) * count}`} />
-            }())}
-            <RefStressTest ref={ref3} />
-        </div>
-    )
-    
-}
-
 const Component = () => {
-    if (1)
-        return <Outer />;
-
+    return (
+        <DemoUseRovingTabIndex />
+    )
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

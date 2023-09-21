@@ -2904,7 +2904,8 @@
     });
     const typeaheadComparator = useStableCallback((lhs, rhs) => {
       if (typeof lhs === "string" && typeof rhs.text === "string") {
-        return comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+        let trimmedRet = comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+        return trimmedRet;
       }
       return lhs - rhs;
     });
@@ -2970,15 +2971,15 @@
           let lowestSortedIndexAll = sortedTypeaheadIndex;
           let lowestUnsortedIndexNext = null;
           let lowestSortedIndexNext = sortedTypeaheadIndex;
-          const updateBestFit = (u3) => {
-            if (!isValidForTypeaheadNavigation(u3))
+          const updateBestFit = (unsortedIndex) => {
+            if (!isValidForTypeaheadNavigation(unsortedIndex))
               return;
-            if (lowestUnsortedIndexAll == null || u3 < lowestUnsortedIndexAll) {
-              lowestUnsortedIndexAll = u3;
+            if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
+              lowestUnsortedIndexAll = unsortedIndex;
               lowestSortedIndexAll = i3;
             }
-            if ((lowestUnsortedIndexNext == null || u3 < lowestUnsortedIndexNext) && u3 > (getIndex() ?? -Infinity)) {
-              lowestUnsortedIndexNext = u3;
+            if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
+              lowestUnsortedIndexNext = unsortedIndex;
               lowestSortedIndexNext = i3;
             }
           };
@@ -8784,32 +8785,8 @@
     }, {}, mode || "grouped");
     return /* @__PURE__ */ o3("div", { hidden: true });
   });
-  var RefStressTest = x3(k3(function RefStressTest2({}, ref3) {
-    const { propsStable: p1 } = useRefElement({ refElementParameters: {} });
-    const { propsStable: p22 } = useRefElement({ refElementParameters: {} });
-    const { propsStable: p3 } = useRefElement({ refElementParameters: {} });
-    const ref1 = _2(null);
-    const ref2 = null;
-    return /* @__PURE__ */ o3("div", { ...useMergedProps(p1, p22, p3, { ref: ref1 }, { ref: ref2 }, { ref: ref3 }), children: "Ref stress test" });
-  }));
-  function Outer() {
-    const [count, setCount] = useState(10);
-    useTimeout({ callback: () => setCount(200), timeout: 1e3 });
-    const ref1 = _2(null);
-    const ref2 = _2(null);
-    const ref3 = _2(null);
-    return /* @__PURE__ */ o3("div", { children: [
-      /* @__PURE__ */ o3(RefStressTest, { ref: ref1 }),
-      Array.from(function* () {
-        for (let i3 = 0; i3 < count; ++i3)
-          yield /* @__PURE__ */ o3(RefStressTest, { ref: i3 == count - 1 ? ref2 : null }, `${i3 * count}:${(i3 + 1) * count}`);
-      }()),
-      /* @__PURE__ */ o3(RefStressTest, { ref: ref3 })
-    ] });
-  }
   var Component = () => {
-    if (1)
-      return /* @__PURE__ */ o3(Outer, {});
+    return /* @__PURE__ */ o3(DemoUseRovingTabIndex, {});
     return /* @__PURE__ */ o3("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
       /* @__PURE__ */ o3(DemoPress, { remaining: 2 }),
       /* @__PURE__ */ o3("input", {}),
