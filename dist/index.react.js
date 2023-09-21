@@ -3151,6 +3151,7 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
     const changeMultiSelected = useStableCallback((e, selected) => {
         console.assert(selected != null);
         console.assert(!multiSelectionDisabled);
+        console.assert(multiSelectIsEnabled);
         // We're selected now (because someone told us we are, this hook doesn't call this function directly)
         //
         // So update our own internal state so we can re-render with the correct props,
