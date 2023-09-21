@@ -2597,6 +2597,9 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
     let sorted = children
         .slice()
         .map(child => {
+        if (process.env.NODE_ENV === 'development' && child) {
+            console.assert(getIndex(child) != null, `getIndex(vnode) must return its 0-based numeric index (e.g. its \`index\` prop)`);
+        }
         const mangledIndex = ((child == null ? null : indexMangler(getIndex(child))) ?? null);
         const demangledIndex = ((child == null ? null : getIndex(child))) ?? null;
         return ({
