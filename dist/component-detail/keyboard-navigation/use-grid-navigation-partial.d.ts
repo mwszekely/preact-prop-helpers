@@ -29,6 +29,9 @@ export interface UseGridNavigationParametersSelf {
      * @stable
      */
     onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
+    /**
+     * Which column of cells is initially tabbable the first time the user interacts with the control.
+     */
     initiallyTabbableColumn: number;
 }
 export interface UseGridNavigationRowContextSelf {
