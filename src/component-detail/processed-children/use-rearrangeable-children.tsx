@@ -54,11 +54,12 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
         shuffleRef.current = shuffle;
         sortRef.current = sort;
     });
-    const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({
-        provideManglers
-    });
+    
+    const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({ provideManglers });
+    const context = useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext });
+
     return {
-        context: useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext }),
+        context,
         indexDemangler,
         indexMangler,
         rearrange,

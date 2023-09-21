@@ -31,11 +31,10 @@ export function useCreateProcessedChildrenContext() {
         shuffleRef.current = shuffle;
         sortRef.current = sort;
     });
-    const rearrangeableChildrenContext = useMemoObject({
-        provideManglers
-    });
+    const rearrangeableChildrenContext = useMemoObject({ provideManglers });
+    const context = useMemoObject({ rearrangeableChildrenContext });
     return {
-        context: useMemoObject({ rearrangeableChildrenContext }),
+        context,
         indexDemangler,
         indexMangler,
         rearrange,

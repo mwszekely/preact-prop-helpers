@@ -350,7 +350,7 @@ window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
-let i = 0;
+let i$1 = 0;
 /**
  * Wraps a hook/component that gives it nice devtools timing visualizations, only if process.env.NODE_ENV is "development".
  *
@@ -366,7 +366,7 @@ function monitored(hook) {
     const h = hook;
     if (process.env.NODE_ENV === 'development') {
         return (function (...args) {
-            const r = useRef(++i);
+            const r = useRef(++i$1);
             monitorCallCount(h);
             const start = performance.mark(`${h.name}-start-${r.current}`);
             const ret = h(...args);
@@ -2186,9 +2186,9 @@ const useListNavigationChild = monitored(function useListNavigationChild({ info:
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-const useGridNavigation = monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
+const useGridNavigation = monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
-        let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
+        let t = (initiallyTabbableColumn ?? 0);
         return { actual: t, ideal: t };
     }));
     const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, context: { rovingTabIndexContext, typeaheadNavigationContext }, props, ...void1 } = useListNavigation({
@@ -2497,11 +2497,10 @@ function useCreateProcessedChildrenContext() {
         shuffleRef.current = shuffle;
         sortRef.current = sort;
     });
-    const rearrangeableChildrenContext = useMemoObject({
-        provideManglers
-    });
+    const rearrangeableChildrenContext = useMemoObject({ provideManglers });
+    const context = useMemoObject({ rearrangeableChildrenContext });
     return {
-        context: useMemoObject({ rearrangeableChildrenContext }),
+        context,
         indexDemangler,
         indexMangler,
         rearrange,
@@ -6392,9 +6391,9 @@ const usePersistentState = monitored(function usePersistentState(key, initialVal
     return [localCopy, setValueWrapper, getValue];
 });
 
-var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
+const i={_catchError:function(e,t,n,l){let o,r,i;for(;t=t._parent;)if((o=t._component)&&!o._processingException)try{if(r=o.constructor,r&&null!=r.getDerivedStateFromError&&(o.setState(r.getDerivedStateFromError(e)),i=o._dirty),null!=o.componentDidCatch&&(o.componentDidCatch(e,l||{}),i=o._dirty),i)return o._pendingError=o}catch(t){e=t;}throw e}};"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
 
-var _=0;function o(o,e,n,t,f,l$1){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l$1};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l.vnode&&l.vnode(i),i}
+let n=0;function r(r,t,e,l,i$1,p){let s,_,f={};for(_ in t)"ref"==_?s=t[_]:f[_]=t[_];const c={type:r,props:f,key:e,ref:s,o:null,t:null,l:0,i:null,p:void 0,_:null,u:null,constructor:void 0,m:--n,h:i$1,j:p};if("function"==typeof r&&(s=r.defaultProps))for(_ in s)void 0===f[_]&&(f[_]=s[_]);return i.vnode&&i.vnode(c),c}
 
 function childrenIsVnode(children) {
     if (children && children.type && children.props)
@@ -6414,7 +6413,7 @@ function childrenIsVnode(children) {
  * @returns
  */
 function usePropsOnChildren(children, props, ref, Tag = 'span') {
-    const c = (childrenIsVnode(children) ? children : o(Tag, { children: children }));
+    const c = (childrenIsVnode(children) ? children : r(Tag, { children: children }));
     return createElement(c.type, useMergedProps(c.props, { ref: c.ref }, props, { ref }));
 }
 

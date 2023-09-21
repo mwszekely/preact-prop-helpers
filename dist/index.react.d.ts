@@ -1750,6 +1750,7 @@ interface UseGridNavigationParametersSelf {
      * @stable
      */
     onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
+    initiallyTabbableColumn: number;
 }
 interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
@@ -1809,7 +1810,7 @@ interface UseGridNavigationCellReturnType<CellElement extends Element> extends U
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-declare const useGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>) => UseGridNavigationReturnType<ParentOrRowElement, RowElement>;
+declare const useGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>) => UseGridNavigationReturnType<ParentOrRowElement, RowElement>;
 /**
  * Child hook for {@link useGridNavigation}
  *
@@ -1988,7 +1989,7 @@ interface UseProcessedChildrenParameters<TabbableChildElement extends Element, M
  * @hasChild {@link useProcessedChild}
  */
 declare const useProcessedChildren: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }: UseProcessedChildrenParameters<TabbableChildElement, M>) => UseProcessedChildrenReturnType<TabbableChildElement, M>;
-declare const useProcessedChild: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({ context, info: { index, ...uinfo } }: UseProcessedChildParameters<TabbableChildElement, M>) => UseProcessedChildReturnType<TabbableChildElement, M>;
+declare const useProcessedChild: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({ context, info: { index, ...uinfo } }: UseProcessedChildParameters<TabbableChildElement, M>) => UseProcessedChildReturnType<TabbableChildElement, M>;
 interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.

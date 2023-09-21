@@ -78,7 +78,10 @@ export const DemoUseGrid = memo(() => {
         },
         gridNavigationParameters: {
             // This can be used by you to track which 0-indexed column is currently the one with focus.
-            onTabbableColumnChange: setTabbableColumn
+            onTabbableColumnChange: setTabbableColumn,
+
+            // Which column is tabbable (initially upon mount before the user interacts with it)
+            initiallyTabbableColumn: 0
         },
         // paginatedChildrenParameters: {
         // This must return a VNode's 0-based index from its props
@@ -246,14 +249,14 @@ const GridCellContext = createContext<CompleteGridNavigationCellContext<HTMLTabl
 const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLLIElement, any>;
-    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLLIElement>({
-        refElementReturn,
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index },
-        processedChildParameters: { children: useMemo(() => <DemoUseGridRow index={index} />, [index]) }
+        
     })
+    const ch = useMemo(() => <DemoUseGridRow index={index} />, [index]);
     return (
-        <li {...useMergedProps(props, propsStable)}>{processedChildReturn.children ? processedChildReturn.children : "\xA0"}</li>
+        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : ch}</li>
     )
 }));
 

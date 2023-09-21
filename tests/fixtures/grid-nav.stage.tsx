@@ -114,7 +114,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
     } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
-        gridNavigationParameters: { onTabbableColumnChange: null },
+        gridNavigationParameters: { onTabbableColumnChange: null, initiallyTabbableColumn: 0 },
         //rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },

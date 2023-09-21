@@ -1,687 +1,700 @@
 "use strict";
 (() => {
   // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/dist/preact.module.js
-  var n;
-  var l;
-  var u;
-  var i;
-  var t;
-  var r;
-  var o;
-  var f;
-  var e;
-  var c = {};
-  var s = [];
-  var a = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-  function h(n2, l3) {
-    for (var u3 in l3)
-      n2[u3] = l3[u3];
-    return n2;
+  var e = {};
+  var t = [];
+  var n = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+  function l(e3, t3) {
+    for (let n3 in t3)
+      e3[n3] = t3[n3];
+    return e3;
   }
-  function v(n2) {
-    var l3 = n2.parentNode;
-    l3 && l3.removeChild(n2);
+  function o(e3) {
+    let t3 = e3.parentNode;
+    t3 && t3.removeChild(e3);
   }
-  function y(l3, u3, i3) {
-    var t3, r4, o4, f3 = {};
-    for (o4 in u3)
-      "key" == o4 ? t3 = u3[o4] : "ref" == o4 ? r4 = u3[o4] : f3[o4] = u3[o4];
-    if (arguments.length > 2 && (f3.children = arguments.length > 3 ? n.call(arguments, 2) : i3), "function" == typeof l3 && null != l3.defaultProps)
-      for (o4 in l3.defaultProps)
-        void 0 === f3[o4] && (f3[o4] = l3.defaultProps[o4]);
-    return p(l3, f3, t3, r4, null);
-  }
-  function p(n2, i3, t3, r4, o4) {
-    var f3 = { type: n2, props: i3, key: t3, ref: r4, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == o4 ? ++u : o4 };
-    return null == o4 && null != l.vnode && l.vnode(f3), f3;
-  }
-  function _(n2) {
-    return n2.children;
-  }
-  function k(n2, l3) {
-    this.props = n2, this.context = l3;
-  }
-  function b(n2, l3) {
-    if (null == l3)
-      return n2.__ ? b(n2.__, n2.__.__k.indexOf(n2) + 1) : null;
-    for (var u3; l3 < n2.__k.length; l3++)
-      if (null != (u3 = n2.__k[l3]) && null != u3.__e)
-        return u3.__e;
-    return "function" == typeof n2.type ? b(n2) : null;
-  }
-  function g(n2) {
-    var l3, u3;
-    if (null != (n2 = n2.__) && null != n2.__c) {
-      for (n2.__e = n2.__c.base = null, l3 = 0; l3 < n2.__k.length; l3++)
-        if (null != (u3 = n2.__k[l3]) && null != u3.__e) {
-          n2.__e = n2.__c.base = u3.__e;
-          break;
+  var r = t.slice;
+  var i = { _catchError: function(e3, t3, n3, l3) {
+    let o3, r5, i4;
+    for (; t3 = t3._parent; )
+      if ((o3 = t3._component) && !o3._processingException)
+        try {
+          if (r5 = o3.constructor, r5 && null != r5.getDerivedStateFromError && (o3.setState(r5.getDerivedStateFromError(e3)), i4 = o3._dirty), null != o3.componentDidCatch && (o3.componentDidCatch(e3, l3 || {}), i4 = o3._dirty), i4)
+            return o3._pendingError = o3;
+        } catch (t4) {
+          e3 = t4;
         }
-      return g(n2);
+    throw e3;
+  } };
+  var u = 0;
+  function c(e3, t3, n3) {
+    let l3, o3, i4, u3 = {};
+    for (i4 in t3)
+      "key" == i4 ? l3 = t3[i4] : "ref" == i4 ? o3 = t3[i4] : u3[i4] = t3[i4];
+    if (arguments.length > 2 && (u3.children = arguments.length > 3 ? r.call(arguments, 2) : n3), "function" == typeof e3 && null != e3.defaultProps)
+      for (i4 in e3.defaultProps)
+        void 0 === u3[i4] && (u3[i4] = e3.defaultProps[i4]);
+    return d(e3, u3, l3, o3, null);
+  }
+  function d(e3, t3, n3, l3, o3) {
+    const r5 = { type: e3, props: t3, key: n3, ref: l3, _children: null, _parent: null, _depth: 0, _dom: null, _nextDom: void 0, _component: null, _hydrating: null, constructor: void 0, _original: null == o3 ? ++u : o3 };
+    return null == o3 && null != i.vnode && i.vnode(r5), r5;
+  }
+  function a(e3) {
+    return e3.children;
+  }
+  function p(e3, t3) {
+    this.props = e3, this.context = t3;
+  }
+  function f(e3, t3) {
+    if (null == t3)
+      return e3._parent ? f(e3._parent, e3._parent._children.indexOf(e3) + 1) : null;
+    let n3;
+    for (; t3 < e3._children.length; t3++)
+      if (n3 = e3._children[t3], null != n3 && null != n3._dom)
+        return n3._dom;
+    return "function" == typeof e3.type ? f(e3) : null;
+  }
+  function h(e3) {
+    let t3 = e3._vnode, n3 = t3._dom, o3 = e3._parentDom;
+    if (o3) {
+      let r5 = [];
+      const i4 = l({}, t3);
+      i4._original = t3._original + 1, N(o3, t3, i4, e3._globalContext, void 0 !== o3.ownerSVGElement, null != t3._hydrating ? [n3] : null, r5, null == n3 ? f(t3) : n3, t3._hydrating), W(r5, t3), t3._dom != n3 && m(t3);
     }
   }
-  function m(n2) {
-    (!n2.__d && (n2.__d = true) && t.push(n2) && !w.__r++ || r !== l.debounceRendering) && ((r = l.debounceRendering) || o)(w);
+  function m(e3) {
+    if (null != (e3 = e3._parent) && null != e3._component) {
+      e3._dom = e3._component.base = null;
+      for (let t3 = 0; t3 < e3._children.length; t3++) {
+        let n3 = e3._children[t3];
+        if (null != n3 && null != n3._dom) {
+          e3._dom = e3._component.base = n3._dom;
+          break;
+        }
+      }
+      return m(e3);
+    }
   }
-  function w() {
-    var n2, l3, u3, i3, r4, o4, e3, c3;
-    for (t.sort(f); n2 = t.shift(); )
-      n2.__d && (l3 = t.length, i3 = void 0, r4 = void 0, e3 = (o4 = (u3 = n2).__v).__e, (c3 = u3.__P) && (i3 = [], (r4 = h({}, o4)).__v = o4.__v + 1, L(c3, o4, r4, u3.__n, void 0 !== c3.ownerSVGElement, null != o4.__h ? [e3] : null, i3, null == e3 ? b(o4) : e3, o4.__h), M(i3, o4), o4.__e != e3 && g(o4)), t.length > l3 && t.sort(f));
-    w.__r = 0;
+  p.prototype.setState = function(e3, t3) {
+    let n3;
+    n3 = null != this._nextState && this._nextState !== this.state ? this._nextState : this._nextState = l({}, this.state), "function" == typeof e3 && (e3 = e3(l({}, n3), this.props)), e3 && l(n3, e3), null != e3 && this._vnode && (t3 && this._stateCallbacks.push(t3), x(this));
+  }, p.prototype.forceUpdate = function(e3) {
+    this._vnode && (this._force = true, e3 && this._renderCallbacks.push(e3), x(this));
+  }, p.prototype.render = a;
+  var y;
+  var g = [];
+  var v = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout;
+  function x(e3) {
+    (!e3._dirty && (e3._dirty = true) && g.push(e3) && !C._rerenderCount++ || y !== i.debounceRendering) && (y = i.debounceRendering, (y || v)(C));
   }
-  function x(n2, l3, u3, i3, t3, r4, o4, f3, e3, a3) {
-    var h3, v3, y3, d3, k4, g4, m3, w4 = i3 && i3.__k || s, x4 = w4.length;
-    for (u3.__k = [], h3 = 0; h3 < l3.length; h3++)
-      if (null != (d3 = u3.__k[h3] = null == (d3 = l3[h3]) || "boolean" == typeof d3 || "function" == typeof d3 ? null : "string" == typeof d3 || "number" == typeof d3 || "bigint" == typeof d3 ? p(null, d3, null, null, d3) : Array.isArray(d3) ? p(_, { children: d3 }, null, null, null) : d3.__b > 0 ? p(d3.type, d3.props, d3.key, d3.ref ? d3.ref : null, d3.__v) : d3)) {
-        if (d3.__ = u3, d3.__b = u3.__b + 1, null === (y3 = w4[h3]) || y3 && d3.key == y3.key && d3.type === y3.type)
-          w4[h3] = void 0;
+  var b = (e3, t3) => e3._vnode._depth - t3._vnode._depth;
+  function C() {
+    let e3;
+    for (g.sort(b); e3 = g.shift(); )
+      if (e3._dirty) {
+        let t3 = g.length;
+        h(e3), g.length > t3 && g.sort(b);
+      }
+    C._rerenderCount = 0;
+  }
+  function k(n3, l3, o3, r5, i4, u3, c3, s3, _2, p3) {
+    let h3, m3, y3, g3, v4, x3, b3, C3 = r5 && r5._children || t, k4 = C3.length;
+    for (o3._children = [], h3 = 0; h3 < l3.length; h3++)
+      if (g3 = l3[h3], g3 = o3._children[h3] = null == g3 || "boolean" == typeof g3 || "function" == typeof g3 ? null : "string" == typeof g3 || "number" == typeof g3 || "bigint" == typeof g3 ? d(null, g3, null, null, g3) : Array.isArray(g3) ? d(a, { children: g3 }, null, null, null) : g3._depth > 0 ? d(g3.type, g3.props, g3.key, g3.ref ? g3.ref : null, g3._original) : g3, null != g3) {
+        if (g3._parent = o3, g3._depth = o3._depth + 1, y3 = C3[h3], null === y3 || y3 && g3.key == y3.key && g3.type === y3.type)
+          C3[h3] = void 0;
         else
-          for (v3 = 0; v3 < x4; v3++) {
-            if ((y3 = w4[v3]) && d3.key == y3.key && d3.type === y3.type) {
-              w4[v3] = void 0;
+          for (m3 = 0; m3 < k4; m3++) {
+            if (y3 = C3[m3], y3 && g3.key == y3.key && g3.type === y3.type) {
+              C3[m3] = void 0;
               break;
             }
             y3 = null;
           }
-        L(n2, d3, y3 = y3 || c, t3, r4, o4, f3, e3, a3), k4 = d3.__e, (v3 = d3.ref) && y3.ref != v3 && (m3 || (m3 = []), y3.ref && m3.push(y3.ref, null, d3), m3.push(v3, d3.__c || k4, d3)), null != k4 ? (null == g4 && (g4 = k4), "function" == typeof d3.type && d3.__k === y3.__k ? d3.__d = e3 = A(d3, e3, n2) : e3 = C(n2, d3, y3, w4, k4, e3), "function" == typeof u3.type && (u3.__d = e3)) : e3 && y3.__e == e3 && e3.parentNode != n2 && (e3 = b(y3));
+        y3 = y3 || e, N(n3, g3, y3, i4, u3, c3, s3, _2, p3), v4 = g3._dom, (m3 = g3.ref) && y3.ref != m3 && (b3 || (b3 = []), y3.ref && b3.push(y3.ref, null, g3), b3.push(m3, g3._component || v4, g3)), null != v4 ? (null == x3 && (x3 = v4), "function" == typeof g3.type && g3._children === y3._children ? g3._nextDom = _2 = S(g3, _2, n3) : _2 = E(n3, g3, y3, C3, v4, _2), "function" == typeof o3.type && (o3._nextDom = _2)) : _2 && y3._dom == _2 && _2.parentNode != n3 && (_2 = f(y3));
       }
-    for (u3.__e = g4, h3 = x4; h3--; )
-      null != w4[h3] && ("function" == typeof u3.type && null != w4[h3].__e && w4[h3].__e == u3.__d && (u3.__d = $(i3).nextSibling), S(w4[h3], w4[h3]));
-    if (m3)
-      for (h3 = 0; h3 < m3.length; h3++)
-        O(m3[h3], m3[++h3], m3[++h3]);
+    for (o3._dom = x3, h3 = k4; h3--; )
+      null != C3[h3] && ("function" == typeof o3.type && null != C3[h3]._dom && C3[h3]._dom == o3._nextDom && (o3._nextDom = w(r5).nextSibling), M(C3[h3], C3[h3]));
+    if (b3)
+      for (h3 = 0; h3 < b3.length; h3++)
+        L(b3[h3], b3[++h3], b3[++h3]);
   }
-  function A(n2, l3, u3) {
-    for (var i3, t3 = n2.__k, r4 = 0; t3 && r4 < t3.length; r4++)
-      (i3 = t3[r4]) && (i3.__ = n2, l3 = "function" == typeof i3.type ? A(i3, l3, u3) : C(u3, i3, i3, t3, i3.__e, l3));
-    return l3;
-  }
-  function P(n2, l3) {
-    return l3 = l3 || [], null == n2 || "boolean" == typeof n2 || (Array.isArray(n2) ? n2.some(function(n3) {
-      P(n3, l3);
-    }) : l3.push(n2)), l3;
-  }
-  function C(n2, l3, u3, i3, t3, r4) {
-    var o4, f3, e3;
-    if (void 0 !== l3.__d)
-      o4 = l3.__d, l3.__d = void 0;
-    else if (null == u3 || t3 != r4 || null == t3.parentNode)
-      n:
-        if (null == r4 || r4.parentNode !== n2)
-          n2.appendChild(t3), o4 = null;
-        else {
-          for (f3 = r4, e3 = 0; (f3 = f3.nextSibling) && e3 < i3.length; e3 += 1)
-            if (f3 == t3)
-              break n;
-          n2.insertBefore(t3, r4), o4 = r4;
-        }
-    return void 0 !== o4 ? o4 : t3.nextSibling;
-  }
-  function $(n2) {
-    var l3, u3, i3;
-    if (null == n2.type || "string" == typeof n2.type)
-      return n2.__e;
-    if (n2.__k) {
-      for (l3 = n2.__k.length - 1; l3 >= 0; l3--)
-        if ((u3 = n2.__k[l3]) && (i3 = $(u3)))
-          return i3;
+  function S(e3, t3, n3) {
+    let l3 = e3._children, o3 = 0;
+    for (; l3 && o3 < l3.length; o3++) {
+      let r5 = l3[o3];
+      r5 && (r5._parent = e3, t3 = "function" == typeof r5.type ? S(r5, t3, n3) : E(n3, r5, r5, l3, r5._dom, t3));
     }
+    return t3;
+  }
+  function D(e3, t3) {
+    return t3 = t3 || [], null == e3 || "boolean" == typeof e3 || (Array.isArray(e3) ? e3.some((e4) => {
+      D(e4, t3);
+    }) : t3.push(e3)), t3;
+  }
+  function E(e3, t3, n3, l3, o3, r5) {
+    let i4;
+    if (void 0 !== t3._nextDom)
+      i4 = t3._nextDom, t3._nextDom = void 0;
+    else if (null == n3 || o3 != r5 || null == o3.parentNode)
+      e:
+        if (null == r5 || r5.parentNode !== e3)
+          e3.appendChild(o3), i4 = null;
+        else {
+          for (let e4 = r5, t4 = 0; (e4 = e4.nextSibling) && t4 < l3.length; t4 += 1)
+            if (e4 == o3)
+              break e;
+          e3.insertBefore(o3, r5), i4 = r5;
+        }
+    return void 0 !== i4 ? i4 : o3.nextSibling;
+  }
+  function w(e3) {
+    if (null == e3.type || "string" == typeof e3.type)
+      return e3._dom;
+    if (e3._children)
+      for (let t3 = e3._children.length - 1; t3 >= 0; t3--) {
+        let n3 = e3._children[t3];
+        if (n3) {
+          let e4 = w(n3);
+          if (e4)
+            return e4;
+        }
+      }
     return null;
   }
-  function H(n2, l3, u3, i3, t3) {
-    var r4;
-    for (r4 in u3)
-      "children" === r4 || "key" === r4 || r4 in l3 || T(n2, r4, null, u3[r4], i3);
-    for (r4 in l3)
-      t3 && "function" != typeof l3[r4] || "children" === r4 || "key" === r4 || "value" === r4 || "checked" === r4 || u3[r4] === l3[r4] || T(n2, r4, l3[r4], u3[r4], i3);
+  function P(e3, t3, l3) {
+    "-" === t3[0] ? e3.setProperty(t3, null == l3 ? "" : l3) : e3[t3] = null == l3 ? "" : "number" != typeof l3 || n.test(t3) ? l3 : l3 + "px";
   }
-  function I(n2, l3, u3) {
-    "-" === l3[0] ? n2.setProperty(l3, null == u3 ? "" : u3) : n2[l3] = null == u3 ? "" : "number" != typeof u3 || a.test(l3) ? u3 : u3 + "px";
-  }
-  function T(n2, l3, u3, i3, t3) {
-    var r4;
-    n:
-      if ("style" === l3)
-        if ("string" == typeof u3)
-          n2.style.cssText = u3;
+  function U(e3, t3, n3, l3, o3) {
+    let r5;
+    e:
+      if ("style" === t3)
+        if ("string" == typeof n3)
+          e3.style.cssText = n3;
         else {
-          if ("string" == typeof i3 && (n2.style.cssText = i3 = ""), i3)
-            for (l3 in i3)
-              u3 && l3 in u3 || I(n2.style, l3, "");
-          if (u3)
-            for (l3 in u3)
-              i3 && u3[l3] === i3[l3] || I(n2.style, l3, u3[l3]);
+          if ("string" == typeof l3 && (e3.style.cssText = l3 = ""), l3)
+            for (t3 in l3)
+              n3 && t3 in n3 || P(e3.style, t3, "");
+          if (n3)
+            for (t3 in n3)
+              l3 && n3[t3] === l3[t3] || P(e3.style, t3, n3[t3]);
         }
-      else if ("o" === l3[0] && "n" === l3[1])
-        r4 = l3 !== (l3 = l3.replace(/Capture$/, "")), l3 = l3.toLowerCase() in n2 ? l3.toLowerCase().slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r4] = u3, u3 ? i3 || n2.addEventListener(l3, r4 ? z : j, r4) : n2.removeEventListener(l3, r4 ? z : j, r4);
-      else if ("dangerouslySetInnerHTML" !== l3) {
-        if (t3)
-          l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
-        else if ("width" !== l3 && "height" !== l3 && "href" !== l3 && "list" !== l3 && "form" !== l3 && "tabIndex" !== l3 && "download" !== l3 && l3 in n2)
+      else if ("o" === t3[0] && "n" === t3[1])
+        r5 = t3 !== (t3 = t3.replace(/Capture$/, "")), t3 = t3.toLowerCase() in e3 ? t3.toLowerCase().slice(2) : t3.slice(2), e3._listeners || (e3._listeners = {}), e3._listeners[t3 + r5] = n3, n3 ? l3 || e3.addEventListener(t3, r5 ? A : T, r5) : e3.removeEventListener(t3, r5 ? A : T, r5);
+      else if ("dangerouslySetInnerHTML" !== t3) {
+        if (o3)
+          t3 = t3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
+        else if ("width" !== t3 && "height" !== t3 && "href" !== t3 && "list" !== t3 && "form" !== t3 && "tabIndex" !== t3 && "download" !== t3 && t3 in e3)
           try {
-            n2[l3] = null == u3 ? "" : u3;
-            break n;
-          } catch (n3) {
+            e3[t3] = null == n3 ? "" : n3;
+            break e;
+          } catch (e4) {
           }
-        "function" == typeof u3 || (null == u3 || false === u3 && "-" !== l3[4] ? n2.removeAttribute(l3) : n2.setAttribute(l3, u3));
+        "function" == typeof n3 || (null == n3 || false === n3 && "-" !== t3[4] ? e3.removeAttribute(t3) : e3.setAttribute(t3, n3));
       }
   }
-  function j(n2) {
-    return this.l[n2.type + false](l.event ? l.event(n2) : n2);
+  function T(e3) {
+    return this._listeners[e3.type + false](i.event ? i.event(e3) : e3);
   }
-  function z(n2) {
-    return this.l[n2.type + true](l.event ? l.event(n2) : n2);
+  function A(e3) {
+    return this._listeners[e3.type + true](i.event ? i.event(e3) : e3);
   }
-  function L(n2, u3, i3, t3, r4, o4, f3, e3, c3) {
-    var s3, a3, v3, y3, p3, d3, b3, g4, m3, w4, A3, P3, C3, $3, H3, I3 = u3.type;
-    if (void 0 !== u3.constructor)
+  function N(t3, n3, u3, c3, d3, s3, _2, h3, m3) {
+    let y3, g3 = n3.type;
+    if (void 0 !== n3.constructor)
       return null;
-    null != i3.__h && (c3 = i3.__h, e3 = u3.__e = i3.__e, u3.__h = null, o4 = [e3]), (s3 = l.__b) && s3(u3);
+    null != u3._hydrating && (m3 = u3._hydrating, h3 = n3._dom = u3._dom, n3._hydrating = null, s3 = [h3]), (y3 = i._diff) && y3(n3);
     try {
-      n:
-        if ("function" == typeof I3) {
-          if (g4 = u3.props, m3 = (s3 = I3.contextType) && t3[s3.__c], w4 = s3 ? m3 ? m3.props.value : s3.__ : t3, i3.__c ? b3 = (a3 = u3.__c = i3.__c).__ = a3.__E : ("prototype" in I3 && I3.prototype.render ? u3.__c = a3 = new I3(g4, w4) : (u3.__c = a3 = new k(g4, w4), a3.constructor = I3, a3.render = q), m3 && m3.sub(a3), a3.props = g4, a3.state || (a3.state = {}), a3.context = w4, a3.__n = t3, v3 = a3.__d = true, a3.__h = [], a3._sb = []), null == a3.__s && (a3.__s = a3.state), null != I3.getDerivedStateFromProps && (a3.__s == a3.state && (a3.__s = h({}, a3.__s)), h(a3.__s, I3.getDerivedStateFromProps(g4, a3.__s))), y3 = a3.props, p3 = a3.state, a3.__v = u3, v3)
-            null == I3.getDerivedStateFromProps && null != a3.componentWillMount && a3.componentWillMount(), null != a3.componentDidMount && a3.__h.push(a3.componentDidMount);
+      e:
+        if ("function" == typeof g3) {
+          let e3, o3, r5, f3, v4, x3, b3 = n3.props;
+          y3 = g3.contextType;
+          let C3 = y3 && c3[y3._id], S2 = y3 ? C3 ? C3.props.value : y3._defaultValue : c3;
+          if (u3._component ? (e3 = n3._component = u3._component, x3 = e3._processingException = e3._pendingError) : ("prototype" in g3 && g3.prototype.render ? n3._component = e3 = new g3(b3, S2) : (n3._component = e3 = new p(b3, S2), e3.constructor = g3, e3.render = F), C3 && C3.sub(e3), e3.props = b3, e3.state || (e3.state = {}), e3.context = S2, e3._globalContext = c3, o3 = e3._dirty = true, e3._renderCallbacks = [], e3._stateCallbacks = []), null == e3._nextState && (e3._nextState = e3.state), null != g3.getDerivedStateFromProps && (e3._nextState == e3.state && (e3._nextState = l({}, e3._nextState)), l(e3._nextState, g3.getDerivedStateFromProps(b3, e3._nextState))), r5 = e3.props, f3 = e3.state, e3._vnode = n3, o3)
+            null == g3.getDerivedStateFromProps && null != e3.componentWillMount && e3.componentWillMount(), null != e3.componentDidMount && e3._renderCallbacks.push(e3.componentDidMount);
           else {
-            if (null == I3.getDerivedStateFromProps && g4 !== y3 && null != a3.componentWillReceiveProps && a3.componentWillReceiveProps(g4, w4), !a3.__e && null != a3.shouldComponentUpdate && false === a3.shouldComponentUpdate(g4, a3.__s, w4) || u3.__v === i3.__v) {
-              for (u3.__v !== i3.__v && (a3.props = g4, a3.state = a3.__s, a3.__d = false), a3.__e = false, u3.__e = i3.__e, u3.__k = i3.__k, u3.__k.forEach(function(n3) {
-                n3 && (n3.__ = u3);
-              }), A3 = 0; A3 < a3._sb.length; A3++)
-                a3.__h.push(a3._sb[A3]);
-              a3._sb = [], a3.__h.length && f3.push(a3);
-              break n;
+            if (null == g3.getDerivedStateFromProps && b3 !== r5 && null != e3.componentWillReceiveProps && e3.componentWillReceiveProps(b3, S2), !e3._force && null != e3.shouldComponentUpdate && false === e3.shouldComponentUpdate(b3, e3._nextState, S2) || n3._original === u3._original) {
+              n3._original !== u3._original && (e3.props = b3, e3.state = e3._nextState, e3._dirty = false), e3._force = false, n3._dom = u3._dom, n3._children = u3._children, n3._children.forEach((e4) => {
+                e4 && (e4._parent = n3);
+              });
+              for (let t4 = 0; t4 < e3._stateCallbacks.length; t4++)
+                e3._renderCallbacks.push(e3._stateCallbacks[t4]);
+              e3._stateCallbacks = [], e3._renderCallbacks.length && _2.push(e3);
+              break e;
             }
-            null != a3.componentWillUpdate && a3.componentWillUpdate(g4, a3.__s, w4), null != a3.componentDidUpdate && a3.__h.push(function() {
-              a3.componentDidUpdate(y3, p3, d3);
+            null != e3.componentWillUpdate && e3.componentWillUpdate(b3, e3._nextState, S2), null != e3.componentDidUpdate && e3._renderCallbacks.push(() => {
+              e3.componentDidUpdate(r5, f3, v4);
             });
           }
-          if (a3.context = w4, a3.props = g4, a3.__P = n2, P3 = l.__r, C3 = 0, "prototype" in I3 && I3.prototype.render) {
-            for (a3.state = a3.__s, a3.__d = false, P3 && P3(u3), s3 = a3.render(a3.props, a3.state, a3.context), $3 = 0; $3 < a3._sb.length; $3++)
-              a3.__h.push(a3._sb[$3]);
-            a3._sb = [];
+          e3.context = S2, e3.props = b3, e3._parentDom = t3;
+          let D3 = i._render, E3 = 0;
+          if ("prototype" in g3 && g3.prototype.render) {
+            e3.state = e3._nextState, e3._dirty = false, D3 && D3(n3), y3 = e3.render(e3.props, e3.state, e3.context);
+            for (let t4 = 0; t4 < e3._stateCallbacks.length; t4++)
+              e3._renderCallbacks.push(e3._stateCallbacks[t4]);
+            e3._stateCallbacks = [];
           } else
             do {
-              a3.__d = false, P3 && P3(u3), s3 = a3.render(a3.props, a3.state, a3.context), a3.state = a3.__s;
-            } while (a3.__d && ++C3 < 25);
-          a3.state = a3.__s, null != a3.getChildContext && (t3 = h(h({}, t3), a3.getChildContext())), v3 || null == a3.getSnapshotBeforeUpdate || (d3 = a3.getSnapshotBeforeUpdate(y3, p3)), H3 = null != s3 && s3.type === _ && null == s3.key ? s3.props.children : s3, x(n2, Array.isArray(H3) ? H3 : [H3], u3, i3, t3, r4, o4, f3, e3, c3), a3.base = u3.__e, u3.__h = null, a3.__h.length && f3.push(a3), b3 && (a3.__E = a3.__ = null), a3.__e = false;
+              e3._dirty = false, D3 && D3(n3), y3 = e3.render(e3.props, e3.state, e3.context), e3.state = e3._nextState;
+            } while (e3._dirty && ++E3 < 25);
+          e3.state = e3._nextState, null != e3.getChildContext && (c3 = l(l({}, c3), e3.getChildContext())), o3 || null == e3.getSnapshotBeforeUpdate || (v4 = e3.getSnapshotBeforeUpdate(r5, f3));
+          let w4 = null != y3 && y3.type === a && null == y3.key ? y3.props.children : y3;
+          k(t3, Array.isArray(w4) ? w4 : [w4], n3, u3, c3, d3, s3, _2, h3, m3), e3.base = n3._dom, n3._hydrating = null, e3._renderCallbacks.length && _2.push(e3), x3 && (e3._pendingError = e3._processingException = null), e3._force = false;
         } else
-          null == o4 && u3.__v === i3.__v ? (u3.__k = i3.__k, u3.__e = i3.__e) : u3.__e = N(i3.__e, u3, i3, t3, r4, o4, f3, c3);
-      (s3 = l.diffed) && s3(u3);
-    } catch (n3) {
-      u3.__v = null, (c3 || null != o4) && (u3.__e = e3, u3.__h = !!c3, o4[o4.indexOf(e3)] = null), l.__e(n3, u3, i3);
+          null == s3 && n3._original === u3._original ? (n3._children = u3._children, n3._dom = u3._dom) : n3._dom = function(t4, n4, l3, i4, u4, c4, d4, s4) {
+            let a3 = l3.props, _3 = n4.props, p3 = n4.type, h4 = 0;
+            if ("svg" === p3 && (u4 = true), null != c4)
+              for (; h4 < c4.length; h4++) {
+                const e3 = c4[h4];
+                if (e3 && "setAttribute" in e3 == !!p3 && (p3 ? e3.localName === p3 : 3 === e3.nodeType)) {
+                  t4 = e3, c4[h4] = null;
+                  break;
+                }
+              }
+            if (null == t4) {
+              if (null === p3)
+                return document.createTextNode(_3);
+              t4 = u4 ? document.createElementNS("http://www.w3.org/2000/svg", p3) : document.createElement(p3, _3.is && _3), c4 = null, s4 = false;
+            }
+            if (null === p3)
+              a3 === _3 || s4 && t4.data === _3 || (t4.data = _3);
+            else {
+              c4 = c4 && r.call(t4.childNodes), a3 = l3.props || e;
+              let m4 = a3.dangerouslySetInnerHTML, y4 = _3.dangerouslySetInnerHTML;
+              if (!s4) {
+                if (null != c4)
+                  for (a3 = {}, h4 = 0; h4 < t4.attributes.length; h4++)
+                    a3[t4.attributes[h4].name] = t4.attributes[h4].value;
+                (y4 || m4) && (y4 && (m4 && y4.__html == m4.__html || y4.__html === t4.innerHTML) || (t4.innerHTML = y4 && y4.__html || ""));
+              }
+              if (function(e3, t5, n5, l4, o3) {
+                let r5;
+                for (r5 in n5)
+                  "children" === r5 || "key" === r5 || r5 in t5 || U(e3, r5, null, n5[r5], l4);
+                for (r5 in t5)
+                  o3 && "function" != typeof t5[r5] || "children" === r5 || "key" === r5 || "value" === r5 || "checked" === r5 || n5[r5] === t5[r5] || U(e3, r5, t5[r5], n5[r5], l4);
+              }(t4, _3, a3, u4, s4), y4)
+                n4._children = [];
+              else if (h4 = n4.props.children, k(t4, Array.isArray(h4) ? h4 : [h4], n4, l3, i4, u4 && "foreignObject" !== p3, c4, d4, c4 ? c4[0] : l3._children && f(l3, 0), s4), null != c4)
+                for (h4 = c4.length; h4--; )
+                  null != c4[h4] && o(c4[h4]);
+              s4 || ("value" in _3 && void 0 !== (h4 = _3.value) && (h4 !== t4.value || "progress" === p3 && !h4 || "option" === p3 && h4 !== a3.value) && U(t4, "value", h4, a3.value, false), "checked" in _3 && void 0 !== (h4 = _3.checked) && h4 !== t4.checked && U(t4, "checked", h4, a3.checked, false));
+            }
+            return t4;
+          }(u3._dom, n3, u3, c3, d3, s3, _2, m3);
+      (y3 = i.diffed) && y3(n3);
+    } catch (e3) {
+      n3._original = null, (m3 || null != s3) && (n3._dom = h3, n3._hydrating = !!m3, s3[s3.indexOf(h3)] = null), i._catchError(e3, n3, u3);
     }
   }
-  function M(n2, u3) {
-    l.__c && l.__c(u3, n2), n2.some(function(u4) {
+  function W(e3, t3) {
+    i._commit && i._commit(t3, e3), e3.some((t4) => {
       try {
-        n2 = u4.__h, u4.__h = [], n2.some(function(n3) {
-          n3.call(u4);
+        e3 = t4._renderCallbacks, t4._renderCallbacks = [], e3.some((e4) => {
+          e4.call(t4);
         });
-      } catch (n3) {
-        l.__e(n3, u4.__v);
+      } catch (e4) {
+        i._catchError(e4, t4._vnode);
       }
     });
   }
-  function N(l3, u3, i3, t3, r4, o4, f3, e3) {
-    var s3, a3, h3, y3 = i3.props, p3 = u3.props, d3 = u3.type, _4 = 0;
-    if ("svg" === d3 && (r4 = true), null != o4) {
-      for (; _4 < o4.length; _4++)
-        if ((s3 = o4[_4]) && "setAttribute" in s3 == !!d3 && (d3 ? s3.localName === d3 : 3 === s3.nodeType)) {
-          l3 = s3, o4[_4] = null;
-          break;
-        }
-    }
-    if (null == l3) {
-      if (null === d3)
-        return document.createTextNode(p3);
-      l3 = r4 ? document.createElementNS("http://www.w3.org/2000/svg", d3) : document.createElement(d3, p3.is && p3), o4 = null, e3 = false;
-    }
-    if (null === d3)
-      y3 === p3 || e3 && l3.data === p3 || (l3.data = p3);
-    else {
-      if (o4 = o4 && n.call(l3.childNodes), a3 = (y3 = i3.props || c).dangerouslySetInnerHTML, h3 = p3.dangerouslySetInnerHTML, !e3) {
-        if (null != o4)
-          for (y3 = {}, _4 = 0; _4 < l3.attributes.length; _4++)
-            y3[l3.attributes[_4].name] = l3.attributes[_4].value;
-        (h3 || a3) && (h3 && (a3 && h3.__html == a3.__html || h3.__html === l3.innerHTML) || (l3.innerHTML = h3 && h3.__html || ""));
-      }
-      if (H(l3, p3, y3, r4, e3), h3)
-        u3.__k = [];
-      else if (_4 = u3.props.children, x(l3, Array.isArray(_4) ? _4 : [_4], u3, i3, t3, r4 && "foreignObject" !== d3, o4, f3, o4 ? o4[0] : i3.__k && b(i3, 0), e3), null != o4)
-        for (_4 = o4.length; _4--; )
-          null != o4[_4] && v(o4[_4]);
-      e3 || ("value" in p3 && void 0 !== (_4 = p3.value) && (_4 !== l3.value || "progress" === d3 && !_4 || "option" === d3 && _4 !== y3.value) && T(l3, "value", _4, y3.value, false), "checked" in p3 && void 0 !== (_4 = p3.checked) && _4 !== l3.checked && T(l3, "checked", _4, y3.checked, false));
-    }
-    return l3;
-  }
-  function O(n2, u3, i3) {
+  function L(e3, t3, n3) {
     try {
-      "function" == typeof n2 ? n2(u3) : n2.current = u3;
-    } catch (n3) {
-      l.__e(n3, i3);
+      "function" == typeof e3 ? e3(t3) : e3.current = t3;
+    } catch (e4) {
+      i._catchError(e4, n3);
     }
   }
-  function S(n2, u3, i3) {
-    var t3, r4;
-    if (l.unmount && l.unmount(n2), (t3 = n2.ref) && (t3.current && t3.current !== n2.__e || O(t3, null, u3)), null != (t3 = n2.__c)) {
-      if (t3.componentWillUnmount)
+  function M(e3, t3, n3) {
+    let l3;
+    if (i.unmount && i.unmount(e3), (l3 = e3.ref) && (l3.current && l3.current !== e3._dom || L(l3, null, t3)), null != (l3 = e3._component)) {
+      if (l3.componentWillUnmount)
         try {
-          t3.componentWillUnmount();
-        } catch (n3) {
-          l.__e(n3, u3);
+          l3.componentWillUnmount();
+        } catch (e4) {
+          i._catchError(e4, t3);
         }
-      t3.base = t3.__P = null, n2.__c = void 0;
+      l3.base = l3._parentDom = null, e3._component = void 0;
     }
-    if (t3 = n2.__k)
-      for (r4 = 0; r4 < t3.length; r4++)
-        t3[r4] && S(t3[r4], u3, i3 || "function" != typeof n2.type);
-    i3 || null == n2.__e || v(n2.__e), n2.__ = n2.__e = n2.__d = void 0;
+    if (l3 = e3._children)
+      for (let o3 = 0; o3 < l3.length; o3++)
+        l3[o3] && M(l3[o3], t3, n3 || "function" != typeof e3.type);
+    n3 || null == e3._dom || o(e3._dom), e3._parent = e3._dom = e3._nextDom = void 0;
   }
-  function q(n2, l3, u3) {
-    return this.constructor(n2, u3);
+  function F(e3, t3, n3) {
+    return this.constructor(e3, n3);
   }
-  function B(u3, i3, t3) {
-    var r4, o4, f3;
-    l.__ && l.__(u3, i3), o4 = (r4 = "function" == typeof t3) ? null : t3 && t3.__k || i3.__k, f3 = [], L(i3, u3 = (!r4 && t3 || i3).__k = y(_, null, [u3]), o4 || c, c, void 0 !== i3.ownerSVGElement, !r4 && t3 ? [t3] : o4 ? null : i3.firstChild ? n.call(i3.childNodes) : null, f3, !r4 && t3 ? t3 : o4 ? o4.__e : i3.firstChild, r4), M(f3, u3);
+  function H(t3, n3, l3) {
+    i._root && i._root(t3, n3);
+    let o3 = "function" == typeof l3, u3 = o3 ? null : l3 && l3._children || n3._children, d3 = [];
+    N(n3, t3 = (!o3 && l3 || n3)._children = c(a, null, [t3]), u3 || e, e, void 0 !== n3.ownerSVGElement, !o3 && l3 ? [l3] : u3 ? null : n3.firstChild ? r.call(n3.childNodes) : null, d3, !o3 && l3 ? l3 : u3 ? u3._dom : n3.firstChild, o3), W(d3, t3);
   }
-  function E(l3, u3, i3) {
-    var t3, r4, o4, f3 = h({}, l3.props);
-    for (o4 in u3)
-      "key" == o4 ? t3 = u3[o4] : "ref" == o4 ? r4 = u3[o4] : f3[o4] = u3[o4];
-    return arguments.length > 2 && (f3.children = arguments.length > 3 ? n.call(arguments, 2) : i3), p(l3.type, f3, t3 || l3.key, r4 || l3.ref, null);
+  function I(e3, t3, n3) {
+    let o3, i4, u3, c3 = l({}, e3.props);
+    for (u3 in t3)
+      "key" == u3 ? o3 = t3[u3] : "ref" == u3 ? i4 = t3[u3] : c3[u3] = t3[u3];
+    return arguments.length > 2 && (c3.children = arguments.length > 3 ? r.call(arguments, 2) : n3), d(e3.type, c3, o3 || e3.key, i4 || e3.ref, null);
   }
-  function F(n2, l3) {
-    var u3 = { __c: l3 = "__cC" + e++, __: n2, Consumer: function(n3, l4) {
-      return n3.children(l4);
-    }, Provider: function(n3) {
-      var u4, i3;
-      return this.getChildContext || (u4 = [], (i3 = {})[l3] = this, this.getChildContext = function() {
-        return i3;
-      }, this.shouldComponentUpdate = function(n4) {
-        this.props.value !== n4.value && u4.some(function(n5) {
-          n5.__e = true, m(n5);
-        });
-      }, this.sub = function(n4) {
-        u4.push(n4);
-        var l4 = n4.componentWillUnmount;
-        n4.componentWillUnmount = function() {
-          u4.splice(u4.indexOf(n4), 1), l4 && l4.call(n4);
+  C._rerenderCount = 0;
+  var O = 0;
+  function V(e3, t3) {
+    const n3 = { _id: t3 = "__cC" + O++, _defaultValue: e3, Consumer: (e4, t4) => e4.children(t4), Provider(e4) {
+      if (!this.getChildContext) {
+        let e5 = [], n4 = {};
+        n4[t3] = this, this.getChildContext = () => n4, this.shouldComponentUpdate = function(t4) {
+          this.props.value !== t4.value && e5.some((e6) => {
+            e6._force = true, x(e6);
+          });
+        }, this.sub = (t4) => {
+          e5.push(t4);
+          let n5 = t4.componentWillUnmount;
+          t4.componentWillUnmount = () => {
+            e5.splice(e5.indexOf(t4), 1), n5 && n5.call(t4);
+          };
         };
-      }), n3.children;
+      }
+      return e4.children;
     } };
-    return u3.Provider.__ = u3.Consumer.contextType = u3;
+    return n3.Provider._contextRef = n3.Consumer.contextType = n3;
   }
-  n = s.slice, l = { __e: function(n2, l3, u3, i3) {
-    for (var t3, r4, o4; l3 = l3.__; )
-      if ((t3 = l3.__c) && !t3.__)
-        try {
-          if ((r4 = t3.constructor) && null != r4.getDerivedStateFromError && (t3.setState(r4.getDerivedStateFromError(n2)), o4 = t3.__d), null != t3.componentDidCatch && (t3.componentDidCatch(n2, i3 || {}), o4 = t3.__d), o4)
-            return t3.__E = t3;
-        } catch (l4) {
-          n2 = l4;
-        }
-    throw n2;
-  } }, u = 0, i = function(n2) {
-    return null != n2 && void 0 === n2.constructor;
-  }, k.prototype.setState = function(n2, l3) {
-    var u3;
-    u3 = null != this.__s && this.__s !== this.state ? this.__s : this.__s = h({}, this.state), "function" == typeof n2 && (n2 = n2(h({}, u3), this.props)), n2 && h(u3, n2), null != n2 && this.__v && (l3 && this._sb.push(l3), m(this));
-  }, k.prototype.forceUpdate = function(n2) {
-    this.__v && (this.__e = true, n2 && this.__h.push(n2), m(this));
-  }, k.prototype.render = _, t = [], o = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, f = function(n2, l3) {
-    return n2.__v.__b - l3.__v.__b;
-  }, w.__r = 0, e = 0;
 
   // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/hooks/dist/hooks.module.js
   var t2;
-  var r2;
-  var u2;
+  var o2;
   var i2;
-  var o2 = 0;
-  var f2 = [];
-  var c2 = [];
-  var e2 = l.__b;
-  var a2 = l.__r;
-  var v2 = l.diffed;
-  var l2 = l.__c;
-  var m2 = l.unmount;
-  function d(t3, u3) {
-    l.__h && l.__h(r2, t3, o2 || u3), o2 = 0;
-    var i3 = r2.__H || (r2.__H = { __: [], __h: [] });
-    return t3 >= i3.__.length && i3.__.push({ __V: c2 }), i3.__[t3];
+  var c2;
+  var u2 = 0;
+  var e2 = [];
+  var r2 = [];
+  var f2 = i.t;
+  var l2 = i.o;
+  var s = i.diffed;
+  var a2 = i.i;
+  var d2 = i.unmount;
+  function m2(t3, i4) {
+    i.u && i.u(o2, t3, u2 || i4), u2 = 0;
+    const c3 = o2.l || (o2.l = { m: [], p: [] });
+    return t3 >= c3.m.length && c3.m.push({ v: r2 }), c3.m[t3];
   }
-  function h2(n2) {
-    return o2 = 1, s2(B2, n2);
+  function p2(n3) {
+    return u2 = 1, v2(z, n3);
   }
-  function s2(n2, u3, i3) {
-    var o4 = d(t2++, 2);
-    if (o4.t = n2, !o4.__c && (o4.__ = [i3 ? i3(u3) : B2(void 0, u3), function(n3) {
-      var t3 = o4.__N ? o4.__N[0] : o4.__[0], r4 = o4.t(t3, n3);
-      t3 !== r4 && (o4.__N = [r4, o4.__[1]], o4.__c.setState({}));
-    }], o4.__c = r2, !r2.u)) {
-      var f3 = function(n3, t3, r4) {
-        if (!o4.__c.__H)
+  function v2(n3, i4, c3) {
+    const u3 = m2(t2++, 2);
+    if (u3.h = n3, !u3.A && (u3.F = [c3 ? c3(i4) : z(void 0, i4), (n4) => {
+      const t3 = u3.T ? u3.T[0] : u3.F[0], o3 = u3.h(t3, n4);
+      t3 !== o3 && (u3.T = [o3, u3.F[1]], u3.A.setState({}));
+    }], u3.A = o2, !o2._)) {
+      let e3 = function(n4, t3, o3) {
+        if (!u3.A.l)
           return true;
-        var u4 = o4.__c.__H.__.filter(function(n4) {
-          return n4.__c;
-        });
-        if (u4.every(function(n4) {
-          return !n4.__N;
-        }))
-          return !c3 || c3.call(this, n3, t3, r4);
-        var i4 = false;
-        return u4.forEach(function(n4) {
-          if (n4.__N) {
-            var t4 = n4.__[0];
-            n4.__ = n4.__N, n4.__N = void 0, t4 !== n4.__[0] && (i4 = true);
+        const i5 = u3.A.l.m.filter((n5) => n5.A);
+        if (i5.every((n5) => !n5.T))
+          return !r5 || r5.call(this, n4, t3, o3);
+        let c4 = false;
+        return i5.forEach((n5) => {
+          if (n5.T) {
+            const t4 = n5.F[0];
+            n5.F = n5.T, n5.T = void 0, t4 !== n5.F[0] && (c4 = true);
           }
-        }), !(!i4 && o4.__c.props === n3) && (!c3 || c3.call(this, n3, t3, r4));
+        }), !(!c4 && u3.A.props === n4) && (!r5 || r5.call(this, n4, t3, o3));
       };
-      r2.u = true;
-      var c3 = r2.shouldComponentUpdate, e3 = r2.componentWillUpdate;
-      r2.componentWillUpdate = function(n3, t3, r4) {
-        if (this.__e) {
-          var u4 = c3;
-          c3 = void 0, f3(n3, t3, r4), c3 = u4;
+      o2._ = true;
+      let r5 = o2.shouldComponentUpdate;
+      const f3 = o2.componentWillUpdate;
+      o2.componentWillUpdate = function(n4, t3, o3) {
+        if (this.q) {
+          let i5 = r5;
+          r5 = void 0, e3(n4, t3, o3), r5 = i5;
         }
-        e3 && e3.call(this, n3, t3, r4);
-      }, r2.shouldComponentUpdate = f3;
+        f3 && f3.call(this, n4, t3, o3);
+      }, o2.shouldComponentUpdate = e3;
     }
-    return o4.__N || o4.__;
+    return u3.T || u3.F;
   }
-  function p2(u3, i3) {
-    var o4 = d(t2++, 3);
-    !l.__s && z2(o4.__H, i3) && (o4.__ = u3, o4.i = i3, r2.__H.__h.push(o4));
+  function h2(i4, c3) {
+    const u3 = m2(t2++, 3);
+    !i.P && w2(u3.V, c3) && (u3.F = i4, u3.j = c3, o2.l.p.push(u3));
   }
-  function y2(u3, i3) {
-    var o4 = d(t2++, 4);
-    !l.__s && z2(o4.__H, i3) && (o4.__ = u3, o4.i = i3, r2.__h.push(o4));
+  function y2(i4, c3) {
+    const u3 = m2(t2++, 4);
+    !i.P && w2(u3.V, c3) && (u3.F = i4, u3.j = c3, o2.k.push(u3));
   }
-  function _2(n2) {
-    return o2 = 5, F2(function() {
-      return { current: n2 };
-    }, []);
+  function A2(n3) {
+    return u2 = 5, T2(() => ({ current: n3 }), []);
   }
-  function A2(n2, t3, r4) {
-    o2 = 6, y2(function() {
-      return "function" == typeof n2 ? (n2(t3()), function() {
-        return n2(null);
-      }) : n2 ? (n2.current = t3(), function() {
-        return n2.current = null;
-      }) : void 0;
-    }, null == r4 ? r4 : r4.concat(n2));
+  function F2(n3, t3, o3) {
+    u2 = 6, y2(() => "function" == typeof n3 ? (n3(t3()), () => n3(null)) : n3 ? (n3.current = t3(), () => n3.current = null) : void 0, null == o3 ? o3 : o3.concat(n3));
   }
-  function F2(n2, r4) {
-    var u3 = d(t2++, 7);
-    return z2(u3.__H, r4) ? (u3.__V = n2(), u3.i = r4, u3.__h = n2, u3.__V) : u3.__;
+  function T2(n3, o3) {
+    const i4 = m2(t2++, 7);
+    return w2(i4.V, o3) ? (i4.v = n3(), i4.j = o3, i4.B = n3, i4.v) : i4.F;
   }
-  function T2(n2, t3) {
-    return o2 = 8, F2(function() {
-      return n2;
-    }, t3);
+  function _(n3, t3) {
+    return u2 = 8, T2(() => n3, t3);
   }
-  function q2(n2) {
-    var u3 = r2.context[n2.__c], i3 = d(t2++, 9);
-    return i3.c = n2, u3 ? (null == i3.__ && (i3.__ = true, u3.sub(r2)), u3.props.value) : n2.__;
+  function g2(n3) {
+    const i4 = o2.context[n3.C], c3 = m2(t2++, 9);
+    return c3.D = n3, i4 ? (null == c3.F && (c3.F = true, i4.sub(o2)), i4.props.value) : n3.G;
   }
-  function V() {
-    var n2 = d(t2++, 11);
-    if (!n2.__) {
-      for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; )
-        u3 = u3.__;
-      var i3 = u3.__m || (u3.__m = [0, 0]);
-      n2.__ = "P" + i3[0] + "-" + i3[1]++;
+  function E2() {
+    const n3 = m2(t2++, 11);
+    if (!n3.F) {
+      let t3 = o2.H;
+      for (; null !== t3 && !t3.I && null !== t3.J; )
+        t3 = t3.J;
+      let i4 = t3.I || (t3.I = [0, 0]);
+      n3.F = "P" + i4[0] + "-" + i4[1]++;
     }
-    return n2.__;
+    return n3.F;
   }
-  function b2() {
-    for (var t3; t3 = f2.shift(); )
-      if (t3.__P && t3.__H)
+  function P2() {
+    let t3;
+    for (; t3 = e2.shift(); )
+      if (t3.K && t3.l)
         try {
-          t3.__H.__h.forEach(k2), t3.__H.__h.forEach(w2), t3.__H.__h = [];
-        } catch (r4) {
-          t3.__H.__h = [], l.__e(r4, t3.__v);
+          t3.l.p.forEach(j), t3.l.p.forEach(k2), t3.l.p = [];
+        } catch (o3) {
+          t3.l.p = [], i.L(o3, t3.H);
         }
   }
-  l.__b = function(n2) {
-    r2 = null, e2 && e2(n2);
-  }, l.__r = function(n2) {
-    a2 && a2(n2), t2 = 0;
-    var i3 = (r2 = n2.__c).__H;
-    i3 && (u2 === r2 ? (i3.__h = [], r2.__h = [], i3.__.forEach(function(n3) {
-      n3.__N && (n3.__ = n3.__N), n3.__V = c2, n3.__N = n3.i = void 0;
-    })) : (i3.__h.forEach(k2), i3.__h.forEach(w2), i3.__h = [])), u2 = r2;
-  }, l.diffed = function(t3) {
-    v2 && v2(t3);
-    var o4 = t3.__c;
-    o4 && o4.__H && (o4.__H.__h.length && (1 !== f2.push(o4) && i2 === l.requestAnimationFrame || ((i2 = l.requestAnimationFrame) || j2)(b2)), o4.__H.__.forEach(function(n2) {
-      n2.i && (n2.__H = n2.i), n2.__V !== c2 && (n2.__ = n2.__V), n2.i = void 0, n2.__V = c2;
-    })), u2 = r2 = null;
-  }, l.__c = function(t3, r4) {
-    r4.some(function(t4) {
+  i.t = (n3) => {
+    o2 = null, f2 && f2(n3);
+  }, i.o = (n3) => {
+    l2 && l2(n3), o2 = n3.A, t2 = 0;
+    const c3 = o2.l;
+    c3 && (i2 === o2 ? (c3.p = [], o2.k = [], c3.m.forEach((n4) => {
+      n4.T && (n4.F = n4.T), n4.v = r2, n4.T = n4.j = void 0;
+    })) : (c3.p.forEach(j), c3.p.forEach(k2), c3.p = [])), i2 = o2;
+  }, i.diffed = (t3) => {
+    s && s(t3);
+    const u3 = t3.A;
+    u3 && u3.l && (u3.l.p.length && (1 !== e2.push(u3) && c2 === i.requestAnimationFrame || (c2 = i.requestAnimationFrame, (c2 || b2)(P2))), u3.l.m.forEach((n3) => {
+      n3.j && (n3.V = n3.j), n3.v !== r2 && (n3.F = n3.v), n3.j = void 0, n3.v = r2;
+    })), i2 = o2 = null;
+  }, i.i = (t3, o3) => {
+    o3.some((t4) => {
       try {
-        t4.__h.forEach(k2), t4.__h = t4.__h.filter(function(n2) {
-          return !n2.__ || w2(n2);
-        });
-      } catch (u3) {
-        r4.some(function(n2) {
-          n2.__h && (n2.__h = []);
-        }), r4 = [], l.__e(u3, t4.__v);
+        t4.k.forEach(j), t4.k = t4.k.filter((n3) => !n3.F || k2(n3));
+      } catch (i4) {
+        o3.some((n3) => {
+          n3.k && (n3.k = []);
+        }), o3 = [], i.L(i4, t4.H);
       }
-    }), l2 && l2(t3, r4);
-  }, l.unmount = function(t3) {
-    m2 && m2(t3);
-    var r4, u3 = t3.__c;
-    u3 && u3.__H && (u3.__H.__.forEach(function(n2) {
-      try {
-        k2(n2);
-      } catch (n3) {
-        r4 = n3;
-      }
-    }), u3.__H = void 0, r4 && l.__e(r4, u3.__v));
+    }), a2 && a2(t3, o3);
+  }, i.unmount = (t3) => {
+    d2 && d2(t3);
+    const o3 = t3.A;
+    if (o3 && o3.l) {
+      let t4;
+      o3.l.m.forEach((n3) => {
+        try {
+          j(n3);
+        } catch (n4) {
+          t4 = n4;
+        }
+      }), o3.l = void 0, t4 && i.L(t4, o3.H);
+    }
   };
-  var g2 = "function" == typeof requestAnimationFrame;
-  function j2(n2) {
-    var t3, r4 = function() {
-      clearTimeout(u3), g2 && cancelAnimationFrame(t3), setTimeout(n2);
-    }, u3 = setTimeout(r4, 100);
-    g2 && (t3 = requestAnimationFrame(r4));
+  var V2 = "function" == typeof requestAnimationFrame;
+  function b2(n3) {
+    const t3 = () => {
+      clearTimeout(o3), V2 && cancelAnimationFrame(i4), setTimeout(n3);
+    }, o3 = setTimeout(t3, 100);
+    let i4;
+    V2 && (i4 = requestAnimationFrame(t3));
   }
-  function k2(n2) {
-    var t3 = r2, u3 = n2.__c;
-    "function" == typeof u3 && (n2.__c = void 0, u3()), r2 = t3;
+  function j(n3) {
+    const t3 = o2;
+    let i4 = n3.M;
+    "function" == typeof i4 && (n3.M = void 0, i4()), o2 = t3;
   }
-  function w2(n2) {
-    var t3 = r2;
-    n2.__c = n2.__(), r2 = t3;
+  function k2(n3) {
+    const t3 = o2;
+    n3.M = n3.F(), o2 = t3;
   }
-  function z2(n2, t3) {
-    return !n2 || n2.length !== t3.length || t3.some(function(t4, r4) {
-      return t4 !== n2[r4];
-    });
+  function w2(n3, t3) {
+    return !n3 || n3.length !== t3.length || t3.some((t4, o3) => t4 !== n3[o3]);
   }
-  function B2(n2, t3) {
-    return "function" == typeof t3 ? t3(n2) : t3;
+  function z(n3, t3) {
+    return "function" == typeof t3 ? t3(n3) : t3;
   }
 
   // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/compat/dist/compat.module.js
-  function g3(n2, t3) {
-    for (var e3 in t3)
-      n2[e3] = t3[e3];
-    return n2;
+  function v3(n3, t3) {
+    for (let e3 in t3)
+      n3[e3] = t3[e3];
+    return n3;
   }
-  function C2(n2, t3) {
-    for (var e3 in n2)
+  function C2(n3, t3) {
+    for (let e3 in n3)
       if ("__source" !== e3 && !(e3 in t3))
         return true;
-    for (var r4 in t3)
-      if ("__source" !== r4 && n2[r4] !== t3[r4])
+    for (let e3 in t3)
+      if ("__source" !== e3 && n3[e3] !== t3[e3])
         return true;
     return false;
   }
-  function w3(n2) {
-    this.props = n2;
+  function w3(n3) {
+    this.props = n3;
   }
-  function x3(n2, e3) {
-    function r4(n3) {
-      var t3 = this.props.ref, r5 = t3 == n3.ref;
-      return !r5 && t3 && (t3.call ? t3(null) : t3.current = null), e3 ? !e3(this.props, n3) || !r5 : C2(this.props, n3);
+  function x2(n3, e3) {
+    function o3(n4) {
+      let t3 = this.props.ref, o4 = t3 == n4.ref;
+      return !o4 && t3 && (t3.call ? t3(null) : t3.current = null), e3 ? !e3(this.props, n4) || !o4 : C2(this.props, n4);
     }
     function u3(e4) {
-      return this.shouldComponentUpdate = r4, y(n2, e4);
+      return this.shouldComponentUpdate = o3, c(n3, e4);
     }
-    return u3.displayName = "Memo(" + (n2.displayName || n2.name) + ")", u3.prototype.isReactComponent = true, u3.__f = true, u3;
+    return u3.displayName = "Memo(" + (n3.displayName || n3.name) + ")", u3.prototype.isReactComponent = true, u3.t = true, u3;
   }
-  (w3.prototype = new k()).isPureReactComponent = true, w3.prototype.shouldComponentUpdate = function(n2, t3) {
-    return C2(this.props, n2) || C2(this.state, t3);
+  (w3.prototype = new p()).isPureReactComponent = true, w3.prototype.shouldComponentUpdate = function(n3, t3) {
+    return C2(this.props, n3) || C2(this.state, t3);
   };
-  var R = l.__b;
-  l.__b = function(n2) {
-    n2.type && n2.type.__f && n2.ref && (n2.props.ref = n2.ref, n2.ref = null), R && R(n2);
+  var R2 = i.o;
+  i.o = (n3) => {
+    n3.type && n3.type.t && n3.ref && (n3.props.ref = n3.ref, n3.ref = null), R2 && R2(n3);
   };
   var N2 = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
-  function k3(n2) {
+  function k3(n3) {
     function t3(t4) {
-      var e3 = g3({}, t4);
-      return delete e3.ref, n2(e3, t4.ref || null);
+      let e3 = v3({}, t4);
+      return delete e3.ref, n3(e3, t4.ref || null);
     }
-    return t3.$$typeof = N2, t3.render = t3, t3.prototype.isReactComponent = t3.__f = true, t3.displayName = "ForwardRef(" + (n2.displayName || n2.name) + ")", t3;
+    return t3.$$typeof = N2, t3.render = t3, t3.prototype.isReactComponent = t3.t = true, t3.displayName = "ForwardRef(" + (n3.displayName || n3.name) + ")", t3;
   }
-  var T3 = l.__e;
-  l.__e = function(n2, t3, e3, r4) {
-    if (n2.then) {
-      for (var u3, o4 = t3; o4 = o4.__; )
-        if ((u3 = o4.__c) && u3.__c)
-          return null == t3.__e && (t3.__e = e3.__e, t3.__k = e3.__k), u3.__c(n2, t3);
+  var T3 = i.u;
+  i.u = function(n3, t3, e3, o3) {
+    if (n3.then) {
+      let o4, u3 = t3;
+      for (; u3 = u3.l; )
+        if ((o4 = u3.i) && o4.h)
+          return null == t3.p && (t3.p = e3.p, t3.m = e3.m), o4.h(n3, t3);
     }
-    T3(n2, t3, e3, r4);
+    T3(n3, t3, e3, o3);
   };
-  var I2 = l.unmount;
-  function L2(n2, t3, e3) {
-    return n2 && (n2.__c && n2.__c.__H && (n2.__c.__H.__.forEach(function(n3) {
-      "function" == typeof n3.__c && n3.__c();
-    }), n2.__c.__H = null), null != (n2 = g3({}, n2)).__c && (n2.__c.__P === e3 && (n2.__c.__P = t3), n2.__c = null), n2.__k = n2.__k && n2.__k.map(function(n3) {
-      return L2(n3, t3, e3);
-    })), n2;
+  var I2 = i.unmount;
+  function L2(n3, t3, e3) {
+    return n3 && (n3.i && n3.i._ && (n3.i._.S.forEach((n4) => {
+      "function" == typeof n4.v && n4.v();
+    }), n3.i._ = null), null != (n3 = v3({}, n3)).i && (n3.i.C === e3 && (n3.i.C = t3), n3.i = null), n3.m = n3.m && n3.m.map((n4) => L2(n4, t3, e3))), n3;
   }
-  function U(n2, t3, e3) {
-    return n2 && (n2.__v = null, n2.__k = n2.__k && n2.__k.map(function(n3) {
-      return U(n3, t3, e3);
-    }), n2.__c && n2.__c.__P === t3 && (n2.__e && e3.insertBefore(n2.__e, n2.__d), n2.__c.__e = true, n2.__c.__P = e3)), n2;
+  function U2(n3, t3, e3) {
+    return n3 && (n3.R = null, n3.m = n3.m && n3.m.map((n4) => U2(n4, t3, e3)), n3.i && n3.i.C === t3 && (n3.p && e3.insertBefore(n3.p, n3.N), n3.i.k = true, n3.i.C = e3)), n3;
   }
   function D2() {
-    this.__u = 0, this.t = null, this.__b = null;
+    this.A = 0, this.O = null, this.T = null;
   }
-  function F3(n2) {
-    var t3 = n2.__.__c;
-    return t3 && t3.__a && t3.__a(n2);
+  function F3(n3) {
+    let t3 = n3.l.i;
+    return t3 && t3.I && t3.I(n3);
   }
-  function V2() {
-    this.u = null, this.o = null;
+  function V3() {
+    this.L = null, this.U = null;
   }
-  l.unmount = function(n2) {
-    var t3 = n2.__c;
-    t3 && t3.__R && t3.__R(), t3 && true === n2.__h && (n2.type = null), I2 && I2(n2);
-  }, (D2.prototype = new k()).__c = function(n2, t3) {
-    var e3 = t3.__c, r4 = this;
-    null == r4.t && (r4.t = []), r4.t.push(e3);
-    var u3 = F3(r4.__v), o4 = false, i3 = function() {
-      o4 || (o4 = true, e3.__R = null, u3 ? u3(l3) : l3());
+  i.unmount = function(n3) {
+    const t3 = n3.i;
+    t3 && t3.D && t3.D(), t3 && true === n3.F && (n3.type = null), I2 && I2(n3);
+  }, (D2.prototype = new p()).h = function(n3, t3) {
+    const e3 = t3.i, o3 = this;
+    null == o3.O && (o3.O = []), o3.O.push(e3);
+    const u3 = F3(o3.M);
+    let r5 = false;
+    const l3 = () => {
+      r5 || (r5 = true, e3.D = null, u3 ? u3(i4) : i4());
     };
-    e3.__R = i3;
-    var l3 = function() {
-      if (!--r4.__u) {
-        if (r4.state.__a) {
-          var n3 = r4.state.__a;
-          r4.__v.__k[0] = U(n3, n3.__c.__P, n3.__c.__O);
+    e3.D = l3;
+    const i4 = () => {
+      if (!--o3.A) {
+        if (o3.state.I) {
+          const n5 = o3.state.I;
+          o3.M.m[0] = U2(n5, n5.i.C, n5.i.V);
         }
-        var t4;
-        for (r4.setState({ __a: r4.__b = null }); t4 = r4.t.pop(); )
-          t4.forceUpdate();
+        let n4;
+        for (o3.setState({ I: o3.T = null }); n4 = o3.O.pop(); )
+          n4.forceUpdate();
       }
-    }, c3 = true === t3.__h;
-    r4.__u++ || c3 || r4.setState({ __a: r4.__b = r4.__v.__k[0] }), n2.then(i3, i3);
+    }, c3 = true === t3.F;
+    o3.A++ || c3 || o3.setState({ I: o3.T = o3.M.m[0] }), n3.then(l3, l3);
   }, D2.prototype.componentWillUnmount = function() {
-    this.t = [];
-  }, D2.prototype.render = function(n2, e3) {
-    if (this.__b) {
-      if (this.__v.__k) {
-        var r4 = document.createElement("div"), o4 = this.__v.__k[0].__c;
-        this.__v.__k[0] = L2(this.__b, r4, o4.__O = o4.__P);
+    this.O = [];
+  }, D2.prototype.render = function(n3, e3) {
+    if (this.T) {
+      if (this.M.m) {
+        const n4 = document.createElement("div"), t3 = this.M.m[0].i;
+        this.M.m[0] = L2(this.T, n4, t3.V = t3.C);
       }
-      this.__b = null;
+      this.T = null;
     }
-    var i3 = e3.__a && y(_, null, n2.fallback);
-    return i3 && (i3.__h = null), [y(_, null, e3.__a ? null : n2.children), i3];
+    const o3 = e3.I && c(a, null, n3.fallback);
+    return o3 && (o3.F = null), [c(a, null, e3.I ? null : n3.children), o3];
   };
-  var W = function(n2, t3, e3) {
-    if (++e3[1] === e3[0] && n2.o.delete(t3), n2.props.revealOrder && ("t" !== n2.props.revealOrder[0] || !n2.o.size))
-      for (e3 = n2.u; e3; ) {
+  var W2 = (n3, t3, e3) => {
+    if (++e3[1] === e3[0] && n3.U.delete(t3), n3.props.revealOrder && ("t" !== n3.props.revealOrder[0] || !n3.U.size))
+      for (e3 = n3.L; e3; ) {
         for (; e3.length > 3; )
           e3.pop()();
         if (e3[1] < e3[0])
           break;
-        n2.u = e3 = e3[2];
+        n3.L = e3 = e3[2];
       }
   };
-  function P2(n2) {
-    return this.getChildContext = function() {
-      return n2.context;
-    }, n2.children;
+  function P3(n3) {
+    return this.getChildContext = () => n3.context, n3.children;
   }
-  function j3(n2) {
-    var e3 = this, r4 = n2.i;
+  function j2(n3) {
+    const e3 = this;
+    let o3 = n3.W;
     e3.componentWillUnmount = function() {
-      B(null, e3.l), e3.l = null, e3.i = null;
-    }, e3.i && e3.i !== r4 && e3.componentWillUnmount(), n2.__v ? (e3.l || (e3.i = r4, e3.l = { nodeType: 1, parentNode: r4, childNodes: [], appendChild: function(n3) {
-      this.childNodes.push(n3), e3.i.appendChild(n3);
-    }, insertBefore: function(n3, t3) {
-      this.childNodes.push(n3), e3.i.appendChild(n3);
-    }, removeChild: function(n3) {
-      this.childNodes.splice(this.childNodes.indexOf(n3) >>> 1, 1), e3.i.removeChild(n3);
-    } }), B(y(P2, { context: e3.context }, n2.__v), e3.l)) : e3.l && e3.componentWillUnmount();
+      H(null, e3.P), e3.P = null, e3.W = null;
+    }, e3.W && e3.W !== o3 && e3.componentWillUnmount(), n3.M ? (e3.P || (e3.W = o3, e3.P = { nodeType: 1, parentNode: o3, childNodes: [], appendChild(n4) {
+      this.childNodes.push(n4), e3.W.appendChild(n4);
+    }, insertBefore(n4, t3) {
+      this.childNodes.push(n4), e3.W.appendChild(n4);
+    }, removeChild(n4) {
+      this.childNodes.splice(this.childNodes.indexOf(n4) >>> 1, 1), e3.W.removeChild(n4);
+    } }), H(c(P3, { context: e3.context }, n3.M), e3.P)) : e3.P && e3.componentWillUnmount();
   }
-  function z3(n2, e3) {
-    var r4 = y(j3, { __v: n2, i: e3 });
-    return r4.containerInfo = e3, r4;
+  function z2(n3, e3) {
+    const o3 = c(j2, { M: n3, W: e3 });
+    return o3.containerInfo = e3, o3;
   }
-  (V2.prototype = new k()).__a = function(n2) {
-    var t3 = this, e3 = F3(t3.__v), r4 = t3.o.get(n2);
-    return r4[0]++, function(u3) {
-      var o4 = function() {
-        t3.props.revealOrder ? (r4.push(u3), W(t3, n2, r4)) : u3();
+  (V3.prototype = new p()).I = function(n3) {
+    const t3 = this, e3 = F3(t3.M);
+    let o3 = t3.U.get(n3);
+    return o3[0]++, (u3) => {
+      const r5 = () => {
+        t3.props.revealOrder ? (o3.push(u3), W2(t3, n3, o3)) : u3();
       };
-      e3 ? e3(o4) : o4();
+      e3 ? e3(r5) : r5();
     };
-  }, V2.prototype.render = function(n2) {
-    this.u = null, this.o = /* @__PURE__ */ new Map();
-    var t3 = P(n2.children);
-    n2.revealOrder && "b" === n2.revealOrder[0] && t3.reverse();
-    for (var e3 = t3.length; e3--; )
-      this.o.set(t3[e3], this.u = [1, 0, this.u]);
-    return n2.children;
-  }, V2.prototype.componentDidUpdate = V2.prototype.componentDidMount = function() {
-    var n2 = this;
-    this.o.forEach(function(t3, e3) {
-      W(n2, e3, t3);
+  }, V3.prototype.render = function(n3) {
+    this.L = null, this.U = /* @__PURE__ */ new Map();
+    const t3 = D(n3.children);
+    n3.revealOrder && "b" === n3.revealOrder[0] && t3.reverse();
+    for (let n4 = t3.length; n4--; )
+      this.U.set(t3[n4], this.L = [1, 0, this.L]);
+    return n3.children;
+  }, V3.prototype.componentDidUpdate = V3.prototype.componentDidMount = function() {
+    this.U.forEach((n3, t3) => {
+      W2(this, t3, n3);
     });
   };
-  var B3 = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103;
+  var B = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103;
   var H2 = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/;
   var Z = /^on(Ani|Tra|Tou|BeforeInp|Compo)/;
   var Y = /[A-Z0-9]/g;
-  var $2 = "undefined" != typeof document;
-  var q3 = function(n2) {
-    return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n2);
-  };
-  k.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function(t3) {
-    Object.defineProperty(k.prototype, t3, { configurable: true, get: function() {
+  var $ = "undefined" != typeof document;
+  var q2 = (n3) => ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n3);
+  p.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach((t3) => {
+    Object.defineProperty(p.prototype, t3, { configurable: true, get() {
       return this["UNSAFE_" + t3];
-    }, set: function(n2) {
-      Object.defineProperty(this, t3, { configurable: true, writable: true, value: n2 });
+    }, set(n3) {
+      Object.defineProperty(this, t3, { configurable: true, writable: true, value: n3 });
     } });
   });
-  var K = l.event;
+  var K = i.event;
   function Q() {
   }
   function X() {
@@ -690,40 +703,38 @@
   function nn() {
     return this.defaultPrevented;
   }
-  l.event = function(n2) {
-    return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
-  };
-  var tn;
-  var en = { enumerable: false, configurable: true, get: function() {
+  i.event = (n3) => (K && (n3 = K(n3)), n3.persist = Q, n3.isPropagationStopped = X, n3.isDefaultPrevented = nn, n3.nativeEvent = n3);
+  var tn = { enumerable: false, configurable: true, get() {
     return this.class;
   } };
-  var rn = l.vnode;
-  l.vnode = function(n2) {
-    "string" == typeof n2.type && function(n3) {
-      var t3 = n3.props, e3 = n3.type, u3 = {};
-      for (var o4 in t3) {
-        var i3 = t3[o4];
-        if (!("value" === o4 && "defaultValue" in t3 && null == i3 || $2 && "children" === o4 && "noscript" === e3 || "class" === o4 || "className" === o4)) {
-          var l3 = o4.toLowerCase();
-          "defaultValue" === o4 && "value" in t3 && null == t3.value ? o4 = "value" : "download" === o4 && true === i3 ? i3 = "" : "ondoubleclick" === l3 ? o4 = "ondblclick" : "onchange" !== l3 || "input" !== e3 && "textarea" !== e3 || q3(t3.type) ? "onfocus" === l3 ? o4 = "onfocusin" : "onblur" === l3 ? o4 = "onfocusout" : Z.test(o4) ? o4 = l3 : -1 === e3.indexOf("-") && H2.test(o4) ? o4 = o4.replace(Y, "-$&").toLowerCase() : null === i3 && (i3 = void 0) : l3 = o4 = "oninput", "oninput" === l3 && u3[o4 = l3] && (o4 = "oninputCapture"), u3[o4] = i3;
-        }
+  var en;
+  var on = i.vnode;
+  i.vnode = (n3) => {
+    "string" == typeof n3.type && function(n4) {
+      let t3 = n4.props, e3 = n4.type, u3 = {};
+      for (let n5 in t3) {
+        let o3 = t3[n5];
+        if ("value" === n5 && "defaultValue" in t3 && null == o3 || $ && "children" === n5 && "noscript" === e3 || "class" === n5 || "className" === n5)
+          continue;
+        let r5 = n5.toLowerCase();
+        "defaultValue" === n5 && "value" in t3 && null == t3.value ? n5 = "value" : "download" === n5 && true === o3 ? o3 = "" : "ondoubleclick" === r5 ? n5 = "ondblclick" : "onchange" !== r5 || "input" !== e3 && "textarea" !== e3 || q2(t3.type) ? "onfocus" === r5 ? n5 = "onfocusin" : "onblur" === r5 ? n5 = "onfocusout" : Z.test(n5) ? n5 = r5 : -1 === e3.indexOf("-") && H2.test(n5) ? n5 = n5.replace(Y, "-$&").toLowerCase() : null === o3 && (o3 = void 0) : r5 = n5 = "oninput", "oninput" === r5 && (n5 = r5, u3[n5] && (n5 = "oninputCapture")), u3[n5] = o3;
       }
-      "select" == e3 && u3.multiple && Array.isArray(u3.value) && (u3.value = P(t3.children).forEach(function(n4) {
-        n4.props.selected = -1 != u3.value.indexOf(n4.props.value);
-      })), "select" == e3 && null != u3.defaultValue && (u3.value = P(t3.children).forEach(function(n4) {
-        n4.props.selected = u3.multiple ? -1 != u3.defaultValue.indexOf(n4.props.value) : u3.defaultValue == n4.props.value;
-      })), t3.class && !t3.className ? (u3.class = t3.class, Object.defineProperty(u3, "className", en)) : (t3.className && !t3.class || t3.class && t3.className) && (u3.class = u3.className = t3.className), n3.props = u3;
-    }(n2), n2.$$typeof = B3, rn && rn(n2);
+      "select" == e3 && u3.multiple && Array.isArray(u3.value) && (u3.value = D(t3.children).forEach((n5) => {
+        n5.props.selected = -1 != u3.value.indexOf(n5.props.value);
+      })), "select" == e3 && null != u3.defaultValue && (u3.value = D(t3.children).forEach((n5) => {
+        n5.props.selected = u3.multiple ? -1 != u3.defaultValue.indexOf(n5.props.value) : u3.defaultValue == n5.props.value;
+      })), t3.class && !t3.className ? (u3.class = t3.class, Object.defineProperty(u3, "className", tn)) : (t3.className && !t3.class || t3.class && t3.className) && (u3.class = u3.className = t3.className), n4.props = u3;
+    }(n3), n3.$$typeof = B, on && on(n3);
   };
-  var un = l.__r;
-  l.__r = function(n2) {
-    un && un(n2), tn = n2.__c;
+  var un = i.j;
+  i.j = function(n3) {
+    un && un(n3), en = n3.i;
   };
-  var on = l.diffed;
-  l.diffed = function(n2) {
-    on && on(n2);
-    var t3 = n2.props, e3 = n2.__e;
-    null != e3 && "textarea" === n2.type && "value" in t3 && t3.value !== e3.value && (e3.value = null == t3.value ? "" : t3.value), tn = null;
+  var rn = i.diffed;
+  i.diffed = function(n3) {
+    rn && rn(n3);
+    const t3 = n3.props, e3 = n3.p;
+    null != e3 && "textarea" === n3.type && "value" in t3 && t3.value !== e3.value && (e3.value = null == t3.value ? "" : t3.value), en = null;
   };
 
   // ../dist/util/lib-shared.js
@@ -842,8 +853,8 @@
     toRun.clear();
     originalCommit?.(vnode, ...args);
   };
-  var originalCommit = l[commitName];
-  l[commitName] = newCommit;
+  var originalCommit = i[commitName];
+  i[commitName] = newCommit;
   var incrementingId = 0;
   function nextId() {
     let next = ++incrementingId;
@@ -852,7 +863,7 @@
     return next;
   }
   var useBeforeLayoutEffect = function useBeforeLayoutEffect2(effect, inputs) {
-    const ref = _2(null);
+    const ref = A2(null);
     ref.current ??= nextId();
     const id = ref.current;
     if (effect)
@@ -866,7 +877,7 @@
 
   // ../dist/util/lib-preact.js
   function debounceRendering(f3) {
-    (l.debounceRendering ?? queueMicrotask)(f3);
+    (i.debounceRendering ?? queueMicrotask)(f3);
   }
   var onfocusin = "onfocusin";
   var onfocusout = "onfocusout";
@@ -881,39 +892,39 @@
 
   // ../dist/preact-extensions/use-passive-state.js
   function useEnsureStability(parentHookName, ...values2) {
-    if (true)
+    if (false)
       return;
-    const helperToEnsureStability = _2([]);
-    const shownError = _2([]);
+    const helperToEnsureStability = A2([]);
+    const shownError = A2([]);
     useHelper(values2.length, -1);
     values2.forEach(useHelper);
     return;
-    function useHelper(value, i3) {
-      const index = i3 + 1;
+    function useHelper(value, i4) {
+      const index = i4 + 1;
       if (helperToEnsureStability.current[index] === void 0)
         helperToEnsureStability.current[index] = value;
       if (helperToEnsureStability.current[index] != value) {
         if (!shownError.current[index]) {
           debugger;
-          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i3}-indexed argument (${i3 >= 0 ? JSON.stringify(values2[i3]) : "the number of supposedly stable elements"}).`);
+          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i4}-indexed argument (${i4 >= 0 ? JSON.stringify(values2[i4]) : "the number of supposedly stable elements"}).`);
           shownError.current[index] = true;
         }
       }
     }
   }
   var usePassiveState = function usePassiveState2(onChange, getInitialValue, customDebounceRendering) {
-    const valueRef = _2(Unset);
-    const reasonRef = _2(Unset);
-    const warningRef = _2(false);
-    const dependencyToCompareAgainst = _2(Unset);
-    const cleanupCallbackRef = _2(void 0);
+    const valueRef = A2(Unset);
+    const reasonRef = A2(Unset);
+    const warningRef = A2(false);
+    const dependencyToCompareAgainst = A2(Unset);
+    const cleanupCallbackRef = A2(void 0);
     useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
-    const onShouldCleanUp = T2(() => {
+    const onShouldCleanUp = _(() => {
       const cleanupCallback = cleanupCallbackRef.current;
       if (cleanupCallback)
         cleanupCallback();
     }, []);
-    const tryEnsureValue = T2(() => {
+    const tryEnsureValue = _(() => {
       if (valueRef.current === Unset && getInitialValue != void 0) {
         try {
           const initialValue = getInitialValue();
@@ -925,7 +936,7 @@
     }, [
       /* getInitialValue and onChange intentionally omitted */
     ]);
-    const getValue = T2(() => {
+    const getValue = _(() => {
       if (warningRef.current)
         console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
       if (valueRef.current === Unset)
@@ -935,7 +946,7 @@
     y2(() => {
       tryEnsureValue();
     }, []);
-    const setValue = T2((arg, reason) => {
+    const setValue = _((arg, reason) => {
       const nextValue = arg instanceof Function ? arg(valueRef.current === Unset ? void 0 : valueRef.current) : arg;
       if (
         /*dependencyToCompareAgainst.current === Unset &&*/
@@ -985,11 +996,11 @@
   // ../dist/preact-extensions/use-stable-getter.js
   var Unset2 = Symbol("unset");
   var useStableGetter = function useStableGetter2(value) {
-    const ref = _2(Unset2);
+    const ref = A2(Unset2);
     useBeforeLayoutEffect(() => {
       ref.current = value;
     }, [value]);
-    return T2(() => {
+    return _(() => {
       if (ref.current === Unset2) {
         throw new Error("Value retrieved from useStableGetter() cannot be called during render.");
       }
@@ -997,7 +1008,7 @@
     }, []);
   };
   function useMemoObject(t3) {
-    return F2(() => {
+    return T2(() => {
       return t3;
     }, Object.values(t3));
   }
@@ -1019,19 +1030,19 @@
       return fn;
     if (noDeps == null) {
       const currentCallbackGetter = useStableGetter(fn);
-      return setIsStableGetter(T2((...args) => {
+      return setIsStableGetter(_((...args) => {
         return currentCallbackGetter()(...args);
       }, []));
     } else {
       console.assert(noDeps.length === 0);
-      return setIsStableGetter(T2(fn, []));
+      return setIsStableGetter(_(fn, []));
     }
   };
 
   // ../dist/util/mode.js
   globalThis["process"] ??= {};
   globalThis["process"]["env"] ??= {};
-  globalThis["process"]["env"]["NODE_ENV"] = "production";
+  globalThis["process"]["env"]["NODE_ENV"] = "development";
 
   // ../dist/util/use-call-count.js
   window.requestIdleCallback ??= (callback) => {
@@ -1041,15 +1052,17 @@
       } });
     }, 5);
   };
+  var timeoutHandle = null;
+  var i3 = 0;
   function monitored(hook) {
     const h3 = hook;
-    if (false) {
+    if (true) {
       return function(...args) {
-        const r4 = _2(++i);
+        const r5 = A2(++i3);
         monitorCallCount(h3);
-        const start = performance.mark(`${h3.name}-start-${r4.current}`);
+        const start = performance.mark(`${h3.name}-start-${r5.current}`);
         const ret = h3(...args);
-        const end = performance.mark(`${h3.name}-end-${r4.current}`);
+        const end = performance.mark(`${h3.name}-end-${r5.current}`);
         performance.measure(h3.name, start.name, end.name);
         return ret;
       };
@@ -1057,6 +1070,40 @@
       return hook;
     }
   }
+  function monitorCallCount(hook) {
+    if (false)
+      return;
+    const name = hook.name;
+    if (filterAll || filters.has(name))
+      return;
+    console.assert(name.length > 0);
+    window._hookCallCount ??= { callCounts: {} };
+    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    window._hookCallCount.callCounts[name].moment += 1;
+    window._hookCallCount.callCounts[name].total += 1;
+    if (timeoutHandle == null) {
+      timeoutHandle = requestIdleCallback(() => {
+        const o3 = Object.entries(window._hookCallCount.callCounts).map(([hook2, counts]) => {
+          return { Hook: hook2 || "?", Now: counts?.moment || 0, Total: counts?.total || 0 };
+        }).filter(({ Now }) => {
+          return !!Now;
+        }).sort(({ Now: lhsM }, { Now: rhsM }) => {
+          if (!lhsM && !rhsM)
+            return 0;
+          lhsM ||= Infinity;
+          rhsM ||= Infinity;
+          return lhsM - rhsM;
+        });
+        console.table(o3, ["Hook", "Now", "Total"]);
+        Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => {
+          counts.moment = 0;
+        });
+        timeoutHandle = null;
+      });
+    }
+  }
+  var filterAll = false;
+  var filters = /* @__PURE__ */ new Set();
 
   // ../dist/dom-helpers/use-event-handler.js
   var useGlobalHandler = monitored(function useGlobalHandler2(target, type, handler, options, mode) {
@@ -1100,7 +1147,7 @@
     }));
     if (handler == null)
       stableHandler = null;
-    p2(() => {
+    h2(() => {
       if (stableHandler) {
         addToMapThing(target, type, stableHandler, options);
         return () => removeFromMapThing(target, type, stableHandler, options);
@@ -1112,7 +1159,7 @@
     }));
     if (handler == null)
       stableHandler = null;
-    p2(() => {
+    h2(() => {
       if (stableHandler) {
         target.addEventListener(type, stableHandler, options);
         return () => target.removeEventListener(type, stableHandler, options);
@@ -1131,7 +1178,7 @@
     assertEmptyObject(void3);
     const getOpen = useStableGetter(open);
     const onClose = useStableGetter(onCloseUnstable);
-    const onBackdropClick = T2(function onBackdropClick2(e3) {
+    const onBackdropClick = _(function onBackdropClick2(e3) {
       if (!getOpen())
         return;
       let element = getElement();
@@ -1173,7 +1220,7 @@
     const stableOnClose = useStableGetter(onClose);
     const getDocument4 = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
-    p2(() => {
+    h2(() => {
       const document2 = getDocument4();
       const window2 = document2.defaultView;
       window2[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: /* @__PURE__ */ new Map() };
@@ -1241,7 +1288,7 @@
     assertEmptyObject(void4);
     const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = T2((newElement, _prevElement, e3) => {
+    const onLastActiveElementChange = _((newElement, _prevElement, e3) => {
       const open2 = getOpen();
       const sourceElement = getSourceElement?.();
       const popupElement = getPopupElement();
@@ -1457,9 +1504,9 @@
   var isPrototype_default = isPrototype;
 
   // ../node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseTimes.js
-  function baseTimes(n2, iteratee) {
-    var index = -1, result = Array(n2);
-    while (++index < n2) {
+  function baseTimes(n3, iteratee) {
+    var index = -1, result = Array(n3);
+    while (++index < n3) {
       result[index] = iteratee(index);
     }
     return result;
@@ -1772,7 +1819,7 @@
     } else if (rhs == null) {
       return lhs;
     } else {
-      return y(_, {}, lhs, rhs);
+      return c(a, {}, lhs, rhs);
     }
   };
 
@@ -1809,11 +1856,11 @@
     if (lhs == null && rhs == null) {
       return void 0;
     } else if (lhs == null) {
-      if (false)
+      if (true)
         console.assert(typeof rhs == "function" || "current" in rhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return rhs;
     } else if (rhs == null) {
-      if (false)
+      if (true)
         console.assert(typeof lhs == "function" || "current" in lhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return lhs;
     } else {
@@ -1967,15 +2014,15 @@
     return isInput(node) && node.type === "hidden";
   };
   var isDetailsWithSummary = function isDetailsWithSummary2(node) {
-    var r4 = node.tagName === "DETAILS" && Array.prototype.slice.apply(node.children).some(function(child) {
+    var r5 = node.tagName === "DETAILS" && Array.prototype.slice.apply(node.children).some(function(child) {
       return child.tagName === "SUMMARY";
     });
-    return r4;
+    return r5;
   };
   var getCheckedRadio = function getCheckedRadio2(nodes, form) {
-    for (var i3 = 0; i3 < nodes.length; i3++) {
-      if (nodes[i3].checked && nodes[i3].form === form) {
-        return nodes[i3];
+    for (var i4 = 0; i4 < nodes.length; i4++) {
+      if (nodes[i4].checked && nodes[i4].form === form) {
+        return nodes[i4];
       }
     }
   };
@@ -2072,8 +2119,8 @@
       var parentNode = node.parentElement;
       while (parentNode) {
         if (parentNode.tagName === "FIELDSET" && parentNode.disabled) {
-          for (var i3 = 0; i3 < parentNode.children.length; i3++) {
-            var child = parentNode.children.item(i3);
+          for (var i4 = 0; i4 < parentNode.children.length; i4++) {
+            var child = parentNode.children.item(i4);
             if (child.tagName === "LEGEND") {
               return matches.call(parentNode, "fieldset[disabled] *") ? true : !child.contains(node);
             }
@@ -2124,22 +2171,29 @@
   };
 
   // ../dist/util/stack.js
+  function generateStack() {
+    if (window._generate_setState_stacks) {
+      try {
+        throw new Error();
+      } catch (e3) {
+        return e3.stack;
+      }
+    }
+    return void 0;
+  }
   function useStack() {
-    if (false) {
-      const stack = F2(generateStack, []);
-      const getStack = T2(() => stack, []);
+    if (true) {
+      const stack = T2(generateStack, []);
+      const getStack = _(() => stack, []);
       return getStack;
     } else {
       return returnEmptyString;
     }
   }
-  function returnEmptyString() {
-    return "";
-  }
 
   // ../dist/util/focus.js
   function focus(e3) {
-    if (false) {
+    if (window.LOG_FOCUS_CHANGES === true) {
       console.log(`Focus changed to ${(e3?.tagName || "").toLowerCase().padStart(6)}:`, e3);
       console.log(generateStack());
     }
@@ -2187,9 +2241,9 @@
       callback();
     });
     const getTimeout = useStableGetter(timeout);
-    const startTimeRef = _2(null);
+    const startTimeRef = A2(null);
     const timeoutIsNull = timeout == null;
-    p2(() => {
+    h2(() => {
       if (!timeoutIsNull) {
         const timeout2 = getTimeout();
         console.assert(timeoutIsNull == (timeout2 == null));
@@ -2200,10 +2254,10 @@
         }
       }
     }, [triggerIndex, timeoutIsNull]);
-    const getElapsedTime = T2(() => {
+    const getElapsedTime = _(() => {
       return +/* @__PURE__ */ new Date() - +(startTimeRef.current ?? /* @__PURE__ */ new Date());
     }, []);
-    const getRemainingTime = T2(() => {
+    const getRemainingTime = _(() => {
       const timeout2 = getTimeout();
       return timeout2 == null ? null : Math.max(0, timeout2 - getElapsedTime());
     }, []);
@@ -2211,9 +2265,10 @@
   });
 
   // ../dist/util/use-tag-props.js
+  var idIndex = 0;
   function useTagProps(props, tag) {
-    if (false) {
-      const [id] = h2(() => ++idIndex);
+    if (window._generate_useTagProps_tags) {
+      const [id] = p2(() => ++idIndex);
       const propsIdTag = `data-props-${tag}-${id}`;
       const getStack = useStack();
       console.assert(!(props && typeof props == "object" && tag in props));
@@ -2229,7 +2284,7 @@
         timeout: 250,
         triggerIndex: tag
       });
-      return F2(() => {
+      return T2(() => {
         return {
           ...props,
           [propsIdTag]: true
@@ -2250,7 +2305,7 @@
     assertEmptyObject(void4);
     assertEmptyObject(void5);
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
-    const navigateAbsolute = T2((requestedIndexMangled, searchDirection, e3, fromUserInteraction, mode) => {
+    const navigateAbsolute = _((requestedIndexMangled, searchDirection, e3, fromUserInteraction, mode) => {
       const highestChildIndex = getHighestIndex();
       const lowestChildIndex = getLowestIndex();
       const original = getTabbableIndex() ?? 0;
@@ -2315,7 +2370,7 @@
     const navigateToPrev = useStableCallback((e3, fromUserInteraction) => {
       return navigateRelative2(e3, -1, fromUserInteraction, "single");
     });
-    const stableProps = _2(useTagProps({
+    const stableProps = A2(useTagProps({
       onKeyDown: useStableCallback((e3) => {
         if (e3.metaKey)
           return;
@@ -2424,14 +2479,14 @@
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
-    const getHighestIndex = T2(() => {
+    const getHighestIndex = _(() => {
       return managedChildrenArray.current.highestIndex;
     }, []);
-    const getLowestIndex = T2(() => {
+    const getLowestIndex = _(() => {
       return managedChildrenArray.current.lowestIndex;
     }, []);
-    const managedChildrenArray = _2({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
-    const forEachChild = T2((f3) => {
+    const managedChildrenArray = A2({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+    const forEachChild = _((f3) => {
       for (const child of managedChildrenArray.current.arr) {
         if (child) {
           if (f3(child) == "break")
@@ -2446,14 +2501,14 @@
         }
       }
     }, []);
-    const getManagedChildInfo = T2((index) => {
+    const getManagedChildInfo = _((index) => {
       if (typeof index == "number")
         return managedChildrenArray.current.arr[index];
       else
         return managedChildrenArray.current.rec[index];
     }, []);
-    const hasRemoteULEChildMounted = _2(null);
-    const remoteULEChildMounted = T2((index, mounted) => {
+    const hasRemoteULEChildMounted = A2(null);
+    const remoteULEChildMounted = _((index, mounted) => {
       if (!hasRemoteULEChildMounted.current) {
         hasRemoteULEChildMounted.current = {
           mounts: /* @__PURE__ */ new Set(),
@@ -2496,17 +2551,17 @@
       getAt: getManagedChildInfo,
       getHighestIndex,
       getLowestIndex,
-      _arraySlice: T2(() => {
+      _arraySlice: _(() => {
         let ret = managedChildrenArray.current.arr.slice();
         const max = getHighestIndex();
-        for (let i3 = 0; i3 <= max; ++i3) {
-          if (ret[i3] == null)
-            ret[i3] = { index: i3 };
+        for (let i4 = 0; i4 <= max; ++i4) {
+          if (ret[i4] == null)
+            ret[i4] = { index: i4 };
         }
         return ret;
       }, [])
     });
-    const getChildren = T2(() => managedChildren, []);
+    const getChildren = _(() => managedChildren, []);
     return {
       context: useMemoObject({
         managedChildContext: useMemoObject({
@@ -2543,7 +2598,7 @@
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
     const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
     const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
-    const getClosestFit = T2((requestedIndex) => {
+    const getClosestFit = _((requestedIndex) => {
       const children = getChildren();
       let closestDistance = Infinity;
       let closestIndex = null;
@@ -2585,8 +2640,8 @@
         }
       }
     });
-    const reasonRef = _2(void 0);
-    const changeIndex = T2((arg, reason) => {
+    const reasonRef = A2(void 0);
+    const changeIndex = _((arg, reason) => {
       const children = getChildren();
       const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
       reasonRef.current = reason;
@@ -2639,10 +2694,10 @@
   // ../dist/preact-extensions/use-state.js
   var useState = function useState2(initialState) {
     const getStack = useStack();
-    const [state, setStateP] = h2(initialState);
-    const ref = _2(state);
-    const setState = _2((value) => {
-      if (false) {
+    const [state, setStateP] = p2(initialState);
+    const ref = A2(state);
+    const setState = A2((value) => {
+      if (true) {
         window._setState_stack = getStack();
       }
       if (typeof value === "function") {
@@ -2663,7 +2718,7 @@
         setStateP(value);
       }
     });
-    const getState = T2(() => {
+    const getState = _(() => {
       return ref.current;
     }, []);
     return [state, setState.current, getState];
@@ -2673,7 +2728,7 @@
   var useRovingTabIndex = monitored(function useRovingTabIndex2({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
-    const lastFocused = _2(null);
+    const lastFocused = A2(null);
     assertEmptyObject(void1);
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
@@ -2712,8 +2767,8 @@
         return nextIndex ?? 0;
       }, reason);
     });
-    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, T2(() => initiallyTabbedIndex ?? 0, []));
-    p2(() => {
+    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, _(() => initiallyTabbedIndex ?? 0, []));
+    h2(() => {
       let shouldFocusParentAfterwards = getElement()?.contains(document.activeElement);
       if (untabbable)
         changeTabbableIndex(null, void 0);
@@ -2724,10 +2779,10 @@
         focusSelf(true);
       }
     }, [untabbable]);
-    const getTabbableAt = T2((child) => {
+    const getTabbableAt = _((child) => {
       return child.getLocallyTabbable();
     }, []);
-    const setTabbableAt = T2((child, t3) => {
+    const setTabbableAt = _((child, t3) => {
       child.setLocallyTabbable(t3);
     }, []);
     const isTabbableValid = useStableCallback((child) => {
@@ -2735,9 +2790,9 @@
     });
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
       initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
-      onIndexChange: useStableCallback((n2, p3, r4) => {
-        if (!(n2 == null && untabbable) && n2 != getLastNonNullIndex())
-          onTabbableIndexChange?.(n2, p3, r4);
+      onIndexChange: useStableCallback((n3, p3, r5) => {
+        if (!(n3 == null && untabbable) && n3 != getLastNonNullIndex())
+          onTabbableIndexChange?.(n3, p3, r5);
       }),
       getChildren,
       closestFit: true,
@@ -2754,7 +2809,7 @@
         }
       }
     });
-    const focusSelf = T2((force, reason) => {
+    const focusSelf = _((force, reason) => {
       const children = getChildren();
       let index = getTabbableIndex();
       const untabbable2 = getUntabbable();
@@ -2774,18 +2829,18 @@
     const rovingTabIndexContext = useMemoObject({
       setTabbableIndex,
       parentFocusSelf: focusSelf,
-      getInitiallyTabbedIndex: T2(() => {
+      getInitiallyTabbedIndex: _(() => {
         return initiallyTabbedIndex ?? (untabbable ? null : 0);
       }, []),
       reevaluateClosestFit,
       getUntabbable: useStableGetter(untabbable),
       getUntabbableBehavior: useStableGetter(untabbableBehavior),
-      giveParentFocusedElement: T2((e3) => {
+      giveParentFocusedElement: _((e3) => {
         lastFocused.current = e3;
       }, [])
     });
     return {
-      managedChildrenParameters: { onChildrenMountChange: T2(() => {
+      managedChildrenParameters: { onChildrenMountChange: _(() => {
         reevaluateClosestFit(void 0);
       }, [reevaluateClosestFit]) },
       rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
@@ -2812,12 +2867,12 @@
   });
   var useRovingTabIndexChild = monitored(function useRovingTabIndexChild2({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
-    p2(() => {
+    h2(() => {
       reevaluateClosestFit(void 0);
     }, [!!iAmUntabbable]);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
-    p2(() => {
+    h2(() => {
       if (tabbable) {
         giveParentFocusedElement(getElement());
       }
@@ -2851,7 +2906,7 @@
   // ../dist/dom-helpers/use-text-content.js
   var useTextContent = monitored(function useTextContent2({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
-    p2(() => {
+    h2(() => {
       const element = getElement();
       if (element) {
         const textContent = getText(element);
@@ -2876,7 +2931,7 @@
       updateBasedOnTypeaheadChange(currentTypeahead, reason);
       return () => clearTimeout(handle);
     }));
-    const sortedTypeaheadInfo = _2([]);
+    const sortedTypeaheadInfo = A2([]);
     const [typeaheadStatus, setTypeaheadStatus] = useState("none");
     const [, setImeActive, getImeActive] = useState(false);
     const [nextTypeaheadChar, setNextTypeaheadChar] = useState(null);
@@ -2910,7 +2965,7 @@
       return lhs - rhs;
     });
     const isDisabled = useStableGetter(noTypeahead);
-    const propsStable = _2(useTagProps({
+    const propsStable = A2(useTagProps({
       onKeyDown: useStableCallback((e3) => {
         if (isDisabled())
           return;
@@ -2976,22 +3031,22 @@
               return;
             if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
               lowestUnsortedIndexAll = unsortedIndex;
-              lowestSortedIndexAll = i3;
+              lowestSortedIndexAll = i4;
             }
             if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
               lowestUnsortedIndexNext = unsortedIndex;
-              lowestSortedIndexNext = i3;
+              lowestSortedIndexNext = i4;
             }
           };
-          let i3 = sortedTypeaheadIndex;
-          while (i3 >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i3]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i3].unsortedIndex);
-            --i3;
+          let i4 = sortedTypeaheadIndex;
+          while (i4 >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i4]) == 0) {
+            updateBestFit(sortedTypeaheadInfo.current[i4].unsortedIndex);
+            --i4;
           }
-          i3 = sortedTypeaheadIndex;
-          while (i3 < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i3]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i3].unsortedIndex);
-            ++i3;
+          i4 = sortedTypeaheadIndex;
+          while (i4 < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i4]) == 0) {
+            updateBestFit(sortedTypeaheadInfo.current[i4].unsortedIndex);
+            ++i4;
           }
           let toSet = null;
           if (lowestUnsortedIndexNext !== null)
@@ -3016,7 +3071,7 @@
       refElementReturn: { getElement },
       textContentParameters: {
         getText,
-        onTextContentChange: T2((text) => {
+        onTextContentChange: _((text) => {
           if (text) {
             const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
             console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
@@ -3068,7 +3123,7 @@
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     const p3 = useMergedProps(propsStableTN, propsStableLN);
-    const propsStable = _2(p3);
+    const propsStable = A2(p3);
     return {
       managedChildrenParameters,
       rovingTabIndexReturn,
@@ -3094,9 +3149,9 @@
   });
 
   // ../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js
-  var useGridNavigation = monitored(function useGridNavigation2({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
+  var useGridNavigation = monitored(function useGridNavigation2({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
-      let t3 = listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0;
+      let t3 = initiallyTabbableColumn ?? 0;
       return { actual: t3, ideal: t3 };
     }));
     const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, context: { rovingTabIndexContext, typeaheadNavigationContext }, props, ...void1 } = useListNavigation({
@@ -3181,9 +3236,9 @@
         focusSelfParent: whenThisRowIsFocused,
         untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
         initiallyTabbedIndex,
-        onTabbableIndexChange: useStableCallback((v3, p3, r4) => {
-          setTabbableColumn({ ideal: v3, actual: v3 }, r4);
-          onTabbableIndexChange?.(v3, p3, r4);
+        onTabbableIndexChange: useStableCallback((v4, p3, r5) => {
+          setTabbableColumn({ ideal: v4, actual: v4 }, r5);
+          onTabbableIndexChange?.(v4, p3, r5);
         })
       },
       linearNavigationParameters: {
@@ -3279,20 +3334,20 @@
   // ../dist/component-detail/processed-children/use-paginated-children.js
   var usePaginatedChildren = monitored(function usePaginatedChildren2({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
     const parentIsPaginated = paginationMin != null || paginationMax != null;
-    const lastPagination = _2({ paginationMax: null, paginationMin: null });
-    const refreshPagination = T2((paginationMin2, paginationMax2) => {
+    const lastPagination = A2({ paginationMax: null, paginationMin: null });
+    const refreshPagination = _((paginationMin2, paginationMax2) => {
       const childMax = getChildren().getHighestIndex() + 1;
       const childMin = getChildren().getLowestIndex();
-      for (let i3 = childMin; i3 <= childMax; ++i3) {
-        const visible = i3 >= (paginationMin2 ?? -Infinity) && i3 < (paginationMax2 ?? Infinity);
-        getChildren().getAt(indexDemangler(i3))?.setPaginationVisible(visible);
+      for (let i4 = childMin; i4 <= childMax; ++i4) {
+        const visible = i4 >= (paginationMin2 ?? -Infinity) && i4 < (paginationMax2 ?? Infinity);
+        getChildren().getAt(indexDemangler(i4))?.setPaginationVisible(visible);
         if (visible && (paginationMax2 != null || paginationMin2 != null))
-          getChildren().getAt(indexDemangler(i3))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+          getChildren().getAt(indexDemangler(i4))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [
       /* Must be empty */
     ]);
-    p2(() => {
+    h2(() => {
       let tabbableIndex = getTabbableIndex();
       if (tabbableIndex != null) {
         let shouldFocus = getAnyFocused() || false;
@@ -3311,14 +3366,14 @@
       lastPagination.current.paginationMax = paginationMax ?? null;
       lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
-    const pmin = _2(paginationMin);
-    const pmax = _2(paginationMax);
+    const pmin = A2(paginationMin);
+    const pmax = A2(paginationMax);
     pmin.current = paginationMin;
     pmax.current = paginationMax;
-    const getDefaultPaginationVisible = T2((i3) => {
-      return i3 >= (pmin.current ?? -Infinity) && i3 < (pmax.current ?? Infinity);
+    const getDefaultPaginationVisible = _((i4) => {
+      return i4 >= (pmin.current ?? -Infinity) && i4 < (pmax.current ?? Infinity);
     }, []);
-    const paginatedChildContext = F2(() => ({
+    const paginatedChildContext = T2(() => ({
       parentIsPaginated,
       getDefaultPaginationVisible
     }), [parentIsPaginated]);
@@ -3331,13 +3386,13 @@
       if (paginationMax2 != null || paginationMin2 != null) {
         const min = paginationMin2 ?? 0;
         const max = paginationMax2 ?? count;
-        for (let i3 = min; i3 < max; ++i3) {
-          getChildren().getAt(i3)?.setChildCountIfPaginated(count);
+        for (let i4 = min; i4 < max; ++i4) {
+          getChildren().getAt(i4)?.setChildCountIfPaginated(count);
         }
       }
     }, [childCount]);
     return {
-      context: F2(() => ({ paginatedChildContext }), [paginatedChildContext]),
+      context: T2(() => ({ paginatedChildContext }), [paginatedChildContext]),
       paginatedChildrenReturn: { refreshPagination }
     };
   });
@@ -3360,26 +3415,26 @@
 
   // ../dist/preact-extensions/use-force-update.js
   var useForceUpdate = monitored(function useForceUpdate2() {
-    const [, set] = h2(0);
-    return _2(() => set((i3) => ++i3)).current;
+    const [, set] = p2(0);
+    return A2(() => set((i4) => ++i4)).current;
   });
 
   // ../dist/component-detail/processed-children/use-rearrangeable-children.js
   function useCreateProcessedChildrenContext() {
-    const sortRef = _2(null);
-    const shuffleRef = _2(null);
-    const reverseRef = _2(null);
-    const rearrangeRef = _2(null);
-    const indexManglerRef = _2(null);
-    const indexDemanglerRef = _2(null);
-    const indexMangler = useStableCallback((i3) => {
-      return (indexManglerRef.current ?? identity_default)(i3);
+    const sortRef = A2(null);
+    const shuffleRef = A2(null);
+    const reverseRef = A2(null);
+    const rearrangeRef = A2(null);
+    const indexManglerRef = A2(null);
+    const indexDemanglerRef = A2(null);
+    const indexMangler = useStableCallback((i4) => {
+      return (indexManglerRef.current ?? identity_default)(i4);
     }, []);
-    const indexDemangler = useStableCallback((i3) => {
-      return (indexDemanglerRef.current ?? identity_default)(i3);
+    const indexDemangler = useStableCallback((i4) => {
+      return (indexDemanglerRef.current ?? identity_default)(i4);
     }, []);
-    const sort = useStableCallback((i3) => {
-      return (sortRef.current ?? identity_default)(i3);
+    const sort = useStableCallback((i4) => {
+      return (sortRef.current ?? identity_default)(i4);
     }, []);
     const shuffle2 = useStableCallback(() => {
       return (shuffleRef.current ?? identity_default)();
@@ -3397,11 +3452,10 @@
       shuffleRef.current = shuffle3;
       sortRef.current = sort2;
     });
-    const rearrangeableChildrenContext = useMemoObject({
-      provideManglers
-    });
+    const rearrangeableChildrenContext = useMemoObject({ provideManglers });
+    const context = useMemoObject({ rearrangeableChildrenContext });
     return {
-      context: useMemoObject({ rearrangeableChildrenContext }),
+      context,
       indexDemangler,
       indexMangler,
       rearrange,
@@ -3412,12 +3466,12 @@
   }
   var useRearrangeableChildren = monitored(function useRearrangeableChildren2({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
-    const mangleMap = _2(/* @__PURE__ */ new Map());
-    const demangleMap = _2(/* @__PURE__ */ new Map());
-    const indexMangler = T2((n2) => mangleMap.current.get(n2) ?? n2, []);
-    const indexDemangler = T2((n2) => demangleMap.current.get(n2) ?? n2, []);
+    const mangleMap = A2(/* @__PURE__ */ new Map());
+    const demangleMap = A2(/* @__PURE__ */ new Map());
+    const indexMangler = _((n3) => mangleMap.current.get(n3) ?? n3, []);
+    const indexDemangler = _((n3) => demangleMap.current.get(n3) ?? n3, []);
     const onRearrangedGetter = useStableGetter(onRearranged);
-    const shuffle2 = T2(() => {
+    const shuffle2 = _(() => {
       const managedRows = getChildren();
       const originalRows = managedRows._arraySlice();
       const shuffledRows = shuffle_default(originalRows);
@@ -3425,7 +3479,7 @@
     }, [
       /* Must remain stable */
     ]);
-    const reverse = T2(() => {
+    const reverse = _(() => {
       const managedRows = getChildren();
       const originalRows = managedRows._arraySlice();
       const reversedRows = managedRows._arraySlice().reverse();
@@ -3433,8 +3487,8 @@
     }, [
       /* Must remain stable */
     ]);
-    const forceUpdateRef = _2(null);
-    const rearrange = T2((originalRows, sortedRows) => {
+    const forceUpdateRef = A2(null);
+    const rearrange = _((originalRows, sortedRows) => {
       mangleMap.current.clear();
       demangleMap.current.clear();
       for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
@@ -3448,7 +3502,7 @@
       forceUpdateRef.current?.();
     }, []);
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
-    const sort = T2((direction) => {
+    const sort = _((direction) => {
       const managedRows = getChildren();
       const compare = getCompare();
       const originalRows = managedRows._arraySlice();
@@ -3469,7 +3523,7 @@
     console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
     forceUpdateRef.current = forceUpdate;
     let sorted = children.slice().map((child) => {
-      if (false) {
+      if (child) {
         console.assert(getIndex(child) != null, `getIndex(vnode) must return its 0-based numeric index (e.g. its \`index\` prop)`);
       }
       const mangledIndex = (child == null ? null : indexMangler(getIndex(child))) ?? null;
@@ -3482,7 +3536,7 @@
       };
     }).sort((lhs, rhs) => lhs.sort - rhs.sort).map(({ child, mangledIndex, demangledIndex }) => {
       if (child)
-        return (adjust || identity_default)(y(child.type, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex }) ?? null;
+        return (adjust || identity_default)(c(child.type, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex }) ?? null;
       return null;
     });
     y2(() => {
@@ -3523,13 +3577,13 @@
   var useStaggeredChildren = monitored(function useStaggeredChildren2({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }) {
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
-    const timeoutHandle = _2(-1);
-    const resetEmergencyTimeout = T2(() => {
-      if (timeoutHandle.current != -1)
-        clearTimeout(timeoutHandle.current);
-      timeoutHandle.current = setTimeout(() => {
-        timeoutHandle.current = setTimeout(() => {
-          timeoutHandle.current = -1;
+    const timeoutHandle2 = A2(-1);
+    const resetEmergencyTimeout = _(() => {
+      if (timeoutHandle2.current != -1)
+        clearTimeout(timeoutHandle2.current);
+      timeoutHandle2.current = setTimeout(() => {
+        timeoutHandle2.current = setTimeout(() => {
+          timeoutHandle2.current = -1;
           let target = getTargetStaggerIndex();
           setDisplayedStaggerIndex((prev) => {
             let next = Math.min(target || 0, (prev || 0) + 1);
@@ -3542,22 +3596,22 @@
     }, [
       /* Must be empty */
     ]);
-    p2(() => {
-      if (timeoutHandle.current == -1) {
+    h2(() => {
+      if (timeoutHandle2.current == -1) {
         resetEmergencyTimeout();
         let current = getDisplayedStaggerIndex();
         let next = Math.min(childCount ?? 0, (current ?? 0) + 1);
         setDisplayedStaggerIndex(next);
       }
     }, [childCount]);
-    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T2((newIndex, prevIndex) => {
+    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(_((newIndex, prevIndex) => {
       if (newIndex == null || !s3.current) {
         return;
       }
       setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
       queueMicrotask(() => {
-        for (let i3 = (prevIndex ?? 0) - 1; i3 <= newIndex; ++i3) {
-          getChildren().getAt(i3)?.setStaggeredVisible(true);
+        for (let i4 = (prevIndex ?? 0) - 1; i4 <= newIndex; ++i4) {
+          getChildren().getAt(i4)?.setStaggeredVisible(true);
         }
       });
       resetEmergencyTimeout();
@@ -3566,7 +3620,7 @@
     ]), returnNull);
     const parentIsStaggered = !!staggered;
     const getChildCount = useStableGetter(childCount);
-    const childCallsThisToTellTheParentToMountTheNextOne = T2((justMountedChildIndex) => {
+    const childCallsThisToTellTheParentToMountTheNextOne = _((justMountedChildIndex) => {
       setDisplayedStaggerIndex((prevIndex) => {
         let next = Math.min(
           getTargetStaggerIndex() ?? 0,
@@ -3582,32 +3636,32 @@
         return next;
       });
     }, []);
-    const s3 = _2(parentIsStaggered);
+    const s3 = A2(parentIsStaggered);
     s3.current = parentIsStaggered;
-    const getDefaultStaggeredVisible = T2((i3) => {
+    const getDefaultStaggeredVisible = _((i4) => {
       if (s3.current) {
         const staggerIndex = getDisplayedStaggerIndex();
         if (staggerIndex == null)
           return false;
-        return i3 < staggerIndex;
+        return i4 < staggerIndex;
       } else {
         return true;
       }
     }, []);
-    const intersectionObserver = _2(null);
-    const elementToIndex = _2(/* @__PURE__ */ new Map());
-    const setElementToIndexMap = T2((index, element) => {
+    const intersectionObserver = A2(null);
+    const elementToIndex = A2(/* @__PURE__ */ new Map());
+    const setElementToIndexMap = _((index, element) => {
       elementToIndex.current.set(element, index);
     }, []);
-    const getIntersectionObserver = T2(() => intersectionObserver.current, []);
-    const staggeredChildContext = F2(() => ({
+    const getIntersectionObserver = _(() => intersectionObserver.current, []);
+    const staggeredChildContext = T2(() => ({
       parentIsStaggered,
       childCallsThisToTellTheParentToMountTheNextOne,
       getDefaultStaggeredVisible,
       getIntersectionObserver,
       setElementToIndexMap
     }), [parentIsStaggered]);
-    p2(() => {
+    h2(() => {
       const element = getElement();
       const io = intersectionObserver.current = new IntersectionObserver((entries) => {
         for (let entry of entries) {
@@ -3623,7 +3677,7 @@
     }, []);
     return {
       staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
-      context: F2(() => ({
+      context: T2(() => ({
         staggeredChildContext
       }), [staggeredChildContext])
     };
@@ -3634,7 +3688,7 @@
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
   }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
-    const becauseScreen = _2(false);
+    const becauseScreen = A2(false);
     const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
       if (staggeredVisible)
         return;
@@ -3645,7 +3699,7 @@
         becauseScreen.current = true;
       }
     }), returnFalse);
-    const childUseEffect = T2(() => {
+    const childUseEffect = _(() => {
       if (!becauseScreen.current && (parentIsStaggered && staggeredVisible)) {
         if (parentIsStaggered && staggeredVisible) {
           childCallsThisToTellTheParentToMountTheNextOne(index);
@@ -3654,7 +3708,7 @@
         }
       }
     }, [index, parentIsStaggered && staggeredVisible]);
-    const e3 = _2(null);
+    const e3 = A2(null);
     return {
       props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
       staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
@@ -3742,15 +3796,15 @@
 
   // ../dist/component-detail/selection/use-multi-selection.js
   function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
-    const selectedIndices = _2(/* @__PURE__ */ new Set());
-    const unselectedIndices = _2(/* @__PURE__ */ new Set());
+    const selectedIndices = A2(/* @__PURE__ */ new Set());
+    const unselectedIndices = A2(/* @__PURE__ */ new Set());
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    const startOfShiftSelect = _2(null);
-    let shiftKeyHeld = _2(false);
-    let ctrlKeyHeld = _2(false);
+    const startOfShiftSelect = A2(null);
+    let shiftKeyHeld = A2(false);
+    let ctrlKeyHeld = A2(false);
     const notifyParentOfChildSelectChange = useStableCallback((event, index, selected, previous) => {
       console.assert(selected != previous);
       if (selected == void 0) {
@@ -3820,7 +3874,7 @@
         ctrlKeyHeld.current = shiftKeyHeld.current = false;
       }
     });
-    let nextCtrlAIsUndo = _2(false);
+    let nextCtrlAIsUndo = A2(false);
     useGlobalHandler(document, "keydown", useStableCallback((e3) => {
       shiftKeyHeld.current = e3.shiftKey || e3.key == "Shift";
       ctrlKeyHeld.current = e3.ctrlKey || e3.key == "Control";
@@ -3849,8 +3903,8 @@
           multiSelectionAriaPropName,
           multiSelectionMode,
           changeAllChildren,
-          getCtrlKeyDown: T2(() => ctrlKeyHeld.current, []),
-          getShiftKeyDown: T2(() => shiftKeyHeld.current, []),
+          getCtrlKeyDown: _(() => ctrlKeyHeld.current, []),
+          getShiftKeyDown: _(() => shiftKeyHeld.current, []),
           getAnyFocused
         })
       }),
@@ -3860,7 +3914,7 @@
     };
   }
   function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
-    const pressFreebie = _2(false);
+    const pressFreebie = A2(false);
     const onPressSync = (e3) => {
       if (!multiSelectionDisabled) {
         if (multiSelectionMode == "activation") {
@@ -3954,8 +4008,8 @@
   }
   function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }) {
     let s3 = multiSelected || false;
-    let reasonRef = _2(void 0);
-    p2(() => {
+    let reasonRef = A2(void 0);
+    h2(() => {
       changeMultiSelected(reasonRef.current, s3);
     }, [s3]);
     const omsc = useStableCallback((e3) => {
@@ -3983,10 +4037,10 @@
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop_default);
-    const getSelectedAt = T2((m3) => {
+    const getSelectedAt = _((m3) => {
       return m3.getSingleSelected();
     }, []);
-    const setSelectedAt = T2((m3, t3, newSelectedIndex, prevSelectedIndex) => {
+    const setSelectedAt = _((m3, t3, newSelectedIndex, prevSelectedIndex) => {
       if (m3.untabbable) {
         console.assert(false);
       }
@@ -3998,7 +4052,7 @@
         console.assert(newSelectedIndex === m3.index);
       m3.setLocalSingleSelected(t3, direction);
     }, []);
-    const isSelectedValid = T2((m3) => {
+    const isSelectedValid = _((m3) => {
       return !m3.untabbable;
     }, []);
     const { changeIndex: changeSingleSelectedIndex, getCurrentIndex: getSingleSelectedIndex } = useChildrenFlag({
@@ -4083,11 +4137,11 @@
   });
   function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
     let s3 = singleSelectedIndex ?? null;
-    let reasonRef = _2(void 0);
-    p2(() => {
+    let reasonRef = A2(void 0);
+    h2(() => {
       changeSingleSelectedIndex(s3, reasonRef.current);
     }, [s3]);
-    const osic = T2((e3) => {
+    const osic = _((e3) => {
       reasonRef.current = e3;
       return onSingleSelectedIndexChange?.(e3);
     }, [onSingleSelectedIndexChange]);
@@ -4152,14 +4206,14 @@
 
   // ../dist/dom-helpers/use-ref-element.js
   var useRefElement = monitored(function useRefElement2(args) {
-    const nonElementWarn = _2(false);
+    const nonElementWarn = A2(false);
     if (nonElementWarn.current) {
       nonElementWarn.current = false;
       console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
     }
     const { onElementChange, onMount, onUnmount } = args.refElementParameters || {};
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
-    const handler = T2((e3, prevValue) => {
+    const handler = _((e3, prevValue) => {
       if (!(e3 == null || e3 instanceof Element)) {
         console.assert(e3 == null || e3 instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
         nonElementWarn.current = true;
@@ -4172,7 +4226,7 @@
       return cleanup;
     }, []);
     const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
-    const propsStable = _2(useTagProps({ ref: setElement }, "data-use-ref-element"));
+    const propsStable = A2(useTagProps({ ref: setElement }, "data-use-ref-element"));
     return {
       propsStable: propsStable.current,
       refElementReturn: {
@@ -4245,7 +4299,7 @@
   }
   var useActiveElement = monitored(function useActiveElement2({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument: getDocument4 } }) {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument4);
-    p2(() => {
+    h2(() => {
       const document2 = getDocument4();
       const window2 = document2?.defaultView;
       if ((activeElementUpdaters.get(window2)?.size ?? 0) === 0) {
@@ -4317,9 +4371,9 @@
     });
     const { activeElementReturn: { getActiveElement: _getActiveElement, getLastActiveElement: _getLastActiveElement, getWindowFocused: _getWindowFocused } } = useActiveElement({
       activeElementParameters: {
-        onLastActiveElementChange: useStableCallback((a3, b3, r4) => {
-          olaec2?.(a3, b3, r4);
-          olaec1?.(a3, b3, r4);
+        onLastActiveElementChange: useStableCallback((a3, b3, r5) => {
+          olaec2?.(a3, b3, r5);
+          olaec1?.(a3, b3, r5);
         }),
         onActiveElementChange,
         onWindowFocusedChange,
@@ -4385,12 +4439,12 @@
         this[_blockingElements].push(element);
       }
       remove(element) {
-        const i3 = this[_blockingElements].indexOf(element);
-        if (i3 === -1) {
+        const i4 = this[_blockingElements].indexOf(element);
+        if (i4 === -1) {
           return false;
         }
-        this[_blockingElements].splice(i3, 1);
-        if (i3 === this[_blockingElements].length) {
+        this[_blockingElements].splice(i4, 1);
+        if (i4 === this[_blockingElements].length) {
           this[_topChanged](this.top);
         }
         return true;
@@ -4426,17 +4480,17 @@
           this[_inertSiblings](newParents, toSkip, toKeepInert);
           return;
         }
-        let i3 = oldParents.length - 1;
-        let j4 = newParents.length - 1;
-        while (i3 > 0 && j4 > 0 && oldParents[i3] === newParents[j4]) {
-          i3--;
-          j4--;
+        let i4 = oldParents.length - 1;
+        let j3 = newParents.length - 1;
+        while (i4 > 0 && j3 > 0 && oldParents[i4] === newParents[j3]) {
+          i4--;
+          j3--;
         }
-        if (oldParents[i3] !== newParents[j4]) {
-          this[_swapInertedSibling](oldParents[i3], newParents[j4]);
+        if (oldParents[i4] !== newParents[j3]) {
+          this[_swapInertedSibling](oldParents[i4], newParents[j3]);
         }
-        i3 > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i3));
-        j4 > 0 && this[_inertSiblings](newParents.slice(0, j4), toSkip, null);
+        i4 > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i4));
+        j3 > 0 && this[_inertSiblings](newParents.slice(0, j3), toSkip, null);
       }
       /**
        * Swaps inertness between two sibling elements.
@@ -4490,8 +4544,8 @@
           const parent = element.parentNode;
           const children = parent.children;
           const inertedSiblings = /* @__PURE__ */ new Set();
-          for (let j4 = 0; j4 < children.length; j4++) {
-            const sibling = children[j4];
+          for (let j3 = 0; j3 < children.length; j3++) {
+            const sibling = children[j3];
             if (sibling === element || !this[_isInertable](sibling) || toSkip && toSkip.has(sibling)) {
               continue;
             }
@@ -4528,8 +4582,8 @@
           const idx = target === document.body ? parents.length : parents.indexOf(target);
           const inertedChild = parents[idx - 1];
           const inertedSiblings = inertedChild[_siblingsToRestore];
-          for (let i3 = 0; i3 < mutation.removedNodes.length; i3++) {
-            const sibling = mutation.removedNodes[i3];
+          for (let i4 = 0; i4 < mutation.removedNodes.length; i4++) {
+            const sibling = mutation.removedNodes[i4];
             if (sibling === inertedChild) {
               console.info("Detected removal of the top Blocking Element.");
               this.pop();
@@ -4540,8 +4594,8 @@
               inertedSiblings.delete(sibling);
             }
           }
-          for (let i3 = 0; i3 < mutation.addedNodes.length; i3++) {
-            const sibling = mutation.addedNodes[i3];
+          for (let i4 = 0; i4 < mutation.addedNodes.length; i4++) {
+            const sibling = mutation.addedNodes[i4];
             if (!this[_isInertable](sibling)) {
               continue;
             }
@@ -4592,18 +4646,18 @@
           return null;
         }
         const result = /* @__PURE__ */ new Set();
-        let i3;
-        let j4;
+        let i4;
+        let j3;
         let nodes;
         const slots = shadowRoot.querySelectorAll("slot");
         if (slots.length && slots[0].assignedNodes) {
-          for (i3 = 0; i3 < slots.length; i3++) {
-            nodes = slots[i3].assignedNodes({
+          for (i4 = 0; i4 < slots.length; i4++) {
+            nodes = slots[i4].assignedNodes({
               flatten: true
             });
-            for (j4 = 0; j4 < nodes.length; j4++) {
-              if (nodes[j4].nodeType === Node.ELEMENT_NODE) {
-                result.add(nodes[j4]);
+            for (j3 = 0; j3 < nodes.length; j3++) {
+              if (nodes[j3].nodeType === Node.ELEMENT_NODE) {
+                result.add(nodes[j3]);
               }
             }
           }
@@ -4617,8 +4671,8 @@
   // ../node_modules/.pnpm/wicg-inert@3.1.2/node_modules/wicg-inert/dist/inert.esm.js
   var _createClass = function() {
     function defineProperties(target, props) {
-      for (var i3 = 0; i3 < props.length; i3++) {
-        var descriptor = props[i3];
+      for (var i4 = 0; i4 < props.length; i4++) {
+        var descriptor = props[i4];
         descriptor.enumerable = descriptor.enumerable || false;
         descriptor.configurable = true;
         if ("value" in descriptor)
@@ -5166,8 +5220,8 @@
             element
           );
           var distributedNodes = content.getDistributedNodes ? content.getDistributedNodes() : [];
-          for (var i3 = 0; i3 < distributedNodes.length; i3++) {
-            composedTreeWalk(distributedNodes[i3], callback, shadowRootAncestor);
+          for (var i4 = 0; i4 < distributedNodes.length; i4++) {
+            composedTreeWalk(distributedNodes[i4], callback, shadowRootAncestor);
           }
           return;
         }
@@ -5216,22 +5270,22 @@
 
   // ../node_modules/.pnpm/clsx@2.0.0/node_modules/clsx/dist/clsx.mjs
   function r3(e3) {
-    var t3, f3, n2 = "";
+    var t3, f3, n3 = "";
     if ("string" == typeof e3 || "number" == typeof e3)
-      n2 += e3;
+      n3 += e3;
     else if ("object" == typeof e3)
       if (Array.isArray(e3))
         for (t3 = 0; t3 < e3.length; t3++)
-          e3[t3] && (f3 = r3(e3[t3])) && (n2 && (n2 += " "), n2 += f3);
+          e3[t3] && (f3 = r3(e3[t3])) && (n3 && (n3 += " "), n3 += f3);
       else
         for (t3 in e3)
-          e3[t3] && (n2 && (n2 += " "), n2 += t3);
-    return n2;
+          e3[t3] && (n3 && (n3 += " "), n3 += t3);
+    return n3;
   }
   function clsx() {
-    for (var e3, t3, f3 = 0, n2 = ""; f3 < arguments.length; )
-      (e3 = arguments[f3++]) && (t3 = r3(e3)) && (n2 && (n2 += " "), n2 += t3);
-    return n2;
+    for (var e3, t3, f3 = 0, n3 = ""; f3 < arguments.length; )
+      (e3 = arguments[f3++]) && (t3 = r3(e3)) && (n3 && (n3 += " "), n3 += t3);
+    return n3;
   }
 
   // ../dist/dom-helpers/use-document-class.js
@@ -5241,7 +5295,7 @@
   var useDocumentClass = monitored(function useDocumentClass2(className, active, element) {
     element ??= getDocument().documentElement;
     className = clsx(className);
-    p2(() => {
+    h2(() => {
       if (element) {
         if (active !== false) {
           element.classList.add(className);
@@ -5297,7 +5351,7 @@
   var useFocusTrap = monitored(function useFocusTrap2({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
-    p2(() => {
+    h2(() => {
       if (trapActive) {
         let top = getTop();
         const lastFocusedInThisComponent = getLastActiveWhenOpen();
@@ -5530,21 +5584,21 @@
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
     const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
-    const onFocusIn = T2((e3) => {
+    const onFocusIn = _((e3) => {
       setFocusedInner(true, e3);
       setFocused(e3.target == getElement(), e3);
     }, []);
-    const onFocusOut = T2((e3) => {
+    const onFocusOut = _((e3) => {
       setFocusedInner(false, e3);
       setFocused(false, e3);
     }, []);
-    p2(() => {
+    h2(() => {
       return () => {
         setFocused(false, void 0);
         setFocusedInner(false, void 0);
       };
     }, []);
-    const propsStable = _2({
+    const propsStable = A2({
       [onfocusin]: onFocusIn,
       [onfocusout]: onFocusOut
     });
@@ -5560,11 +5614,11 @@
   // ../dist/component-use/use-grid-navigation-complete.js
   var useCompleteGridNavigation = monitored(function useCompleteGridNavigation2({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, ...void1 }) {
     assertEmptyObject(void1);
-    const getChildren = T2(() => managedChildrenReturn.getChildren(), []);
-    const getLowestChildIndex = T2(() => getChildren().getLowestIndex(), []);
-    const getHighestChildIndex = T2(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = T2((i3) => {
-      const child = getChildren().getAt(i3);
+    const getChildren = _(() => managedChildrenReturn.getChildren(), []);
+    const getLowestChildIndex = _(() => getChildren().getLowestIndex(), []);
+    const getHighestChildIndex = _(() => getChildren().getHighestIndex(), []);
+    const isValidForNavigation = _((i4) => {
+      const child = getChildren().getAt(i4);
       if (child == null)
         return false;
       if (child.untabbable)
@@ -5640,11 +5694,11 @@
     };
   });
   var useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow2({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
-    const getChildren = T2(() => managedChildrenReturn.getChildren(), []);
-    const getHighestChildIndex = T2(() => getChildren().getHighestIndex(), []);
-    const getLowestChildIndex = T2(() => getChildren().getLowestIndex(), []);
-    const isValidForNavigation = T2((i3) => {
-      const child = getChildren().getAt(i3);
+    const getChildren = _(() => managedChildrenReturn.getChildren(), []);
+    const getHighestChildIndex = _(() => getChildren().getHighestIndex(), []);
+    const getLowestChildIndex = _(() => getChildren().getLowestIndex(), []);
+    const isValidForNavigation = _((i4) => {
+      const child = getChildren().getAt(i4);
       if (child == null)
         return false;
       if (child.untabbable)
@@ -5777,11 +5831,11 @@
     refElementParameters,
     ...void1
   }) {
-    const getChildren = T2(() => managedChildrenReturn.getChildren(), []);
-    const getLowestIndex = T2(() => getChildren().getLowestIndex(), []);
-    const getHighestIndex = T2(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = T2((i3) => {
-      const child = getChildren().getAt(i3);
+    const getChildren = _(() => managedChildrenReturn.getChildren(), []);
+    const getLowestIndex = _(() => getChildren().getLowestIndex(), []);
+    const getHighestIndex = _(() => getChildren().getHighestIndex(), []);
+    const isValidForNavigation = _((i4) => {
+      const child = getChildren().getAt(i4);
       if (!child)
         return false;
       if (child.untabbable)
@@ -6032,11 +6086,11 @@
       }
       if (isPromise(promiseOrReturn)) {
         onInvoked?.("async");
-        promiseOrReturn.then((r4) => {
+        promiseOrReturn.then((r5) => {
           onResolve?.();
           onHasResult?.(true);
-          onReturnValue?.(r4);
-          return r4;
+          onReturnValue?.(r5);
+          return r5;
         }).catch((e3) => {
           onReject?.();
           onHasError?.(true);
@@ -6111,22 +6165,22 @@
     const [settleCount, setSettleCount] = useState(0);
     const [resolveCount, setResolveCount] = useState(0);
     const [rejectCount, setRejectCount] = useState(0);
-    const incrementCallCount = T2(() => {
+    const incrementCallCount = _(() => {
       setRunCount((c3) => c3 + 1);
     }, []);
-    const incrementResolveCount = T2(() => {
+    const incrementResolveCount = _(() => {
       setResolveCount((c3) => c3 + 1);
     }, []);
-    const incrementRejectCount = T2(() => {
+    const incrementRejectCount = _(() => {
       setRejectCount((c3) => c3 + 1);
     }, []);
-    const incrementFinallyCount = T2(() => {
+    const incrementFinallyCount = _(() => {
       setSettleCount((c3) => c3 + 1);
     }, []);
     let { throttle, debounce: debounce2, capture: captureUnstable } = options ?? {};
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback(asyncHandler ?? identity_default);
-    const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = F2(() => {
+    const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = T2(() => {
       return asyncToSync({
         asyncInput: asyncHandlerStable,
         capture: captureStable,
@@ -6146,7 +6200,7 @@
         wait: options?.debounce ?? void 0
       });
     }, [throttle, debounce2]);
-    p2(() => {
+    h2(() => {
       return () => cancelSyncDebounce();
     }, [cancelSyncDebounce]);
     return {
@@ -6243,7 +6297,7 @@
       if (element)
         focusSelf(element);
     });
-    const onTouchMove = T2((e3) => {
+    const onTouchMove = _((e3) => {
       pressLog("touchmove", e3);
       e3.preventDefault();
       e3.stopPropagation();
@@ -6257,14 +6311,14 @@
         [+touch.radiusX || 0, +touch.radiusY || 0]
       ];
       let hoveringAtAnyPoint = false;
-      for (const [x4, y3] of offsets) {
-        const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x4, (touch?.clientY ?? 0) + y3);
+      for (const [x3, y3] of offsets) {
+        const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x3, (touch?.clientY ?? 0) + y3);
         hoveringAtAnyPoint ||= element?.contains(elementAtTouch) ?? false;
       }
       setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e3);
       setHovering(hoveringAtAnyPoint);
     }, []);
-    const onTouchEnd = T2((e3) => {
+    const onTouchEnd = _((e3) => {
       pressLog("touchend", e3);
       e3.preventDefault();
       e3.stopPropagation();
@@ -6308,7 +6362,7 @@
         setIsPressing(hovering2 && getPointerDownStartedHere(), e3);
       }
     });
-    const onPointerUp = T2((e3) => {
+    const onPointerUp = _((e3) => {
       pressLog("pointerup", e3);
       const hovering2 = getHovering();
       const pointerDownStartedHere2 = getPointerDownStartedHere();
@@ -6326,11 +6380,11 @@
       setLongPress(false);
       setIsPressing(false, e3);
     }, []);
-    const onPointerEnter = T2((_e) => {
+    const onPointerEnter = _((_e) => {
       pressLog("pointerenter", _e);
       setHovering(true);
     }, []);
-    const onPointerLeave = T2((_e) => {
+    const onPointerLeave = _((_e) => {
       pressLog("pointerleave", _e);
       setHovering(false);
       setLongPress(false);
@@ -6460,10 +6514,10 @@
 
   // ../dist/component-use/use-random-id.js
   var useRandomId = monitored(function useRandomId2({ randomIdParameters: { prefix, otherReferencerProp } }) {
-    const id = prefix + V();
+    const id = prefix + E2();
     useEnsureStability("useRandomId", prefix, id);
-    const referencerElementProps = _2(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-    const sourceElementProps = _2({ id });
+    const referencerElementProps = A2(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+    const sourceElementProps = A2({ id });
     useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
     return {
       propsReferencer: referencerElementProps.current,
@@ -6543,19 +6597,19 @@
     const [droppedFiles, setDroppedFiles] = useState(null);
     const [droppedStrings, setDroppedStrings] = useState(null);
     const [dropError, setDropError] = useState(void 0);
-    const dropPromisesRef = _2([]);
+    const dropPromisesRef = A2([]);
     const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
     const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-    p2(() => {
+    h2(() => {
       const currentPromiseIndex2 = getCurrentPromiseIndex();
       const promiseCount2 = getPromiseCount();
       if (promiseCount2 > 0) {
         if (currentPromiseIndex2 + 1 < promiseCount2) {
-          setCurrentPromiseIndex((i3) => ++i3);
+          setCurrentPromiseIndex((i4) => ++i4);
         }
       }
     }, [promiseCount]);
-    p2(() => {
+    h2(() => {
       if (currentPromiseIndex >= 0) {
         const currentPromise = dropPromisesRef.current[currentPromiseIndex];
         currentPromise.then((info) => {
@@ -6567,7 +6621,7 @@
           const currentPromiseIndex2 = getCurrentPromiseIndex();
           const promiseCount2 = getPromiseCount();
           if (currentPromiseIndex2 + 1 < promiseCount2) {
-            setCurrentPromiseIndex((i3) => ++i3);
+            setCurrentPromiseIndex((i4) => ++i4);
           }
         });
       }
@@ -6614,15 +6668,15 @@
           if (file) {
             allPromises.push(new Promise((resolve, reject) => {
               const reader = new FileReader();
-              reader.onload = (_4) => {
+              reader.onload = (_2) => {
                 resolve();
                 const data = reader.result;
                 dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
               };
-              reader.onerror = (_4) => {
+              reader.onerror = (_2) => {
                 reject(new DroppableFileError(file.name, reader.error));
               };
-              reader.onabort = (_4) => {
+              reader.onabort = (_2) => {
                 reject(new DroppableFileError(file.name, reader.error));
               };
               reader.readAsArrayBuffer(file);
@@ -6632,7 +6686,7 @@
         }
       }
       dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-        setPromiseCount((i3) => ++i3);
+        setPromiseCount((i4) => ++i4);
         setDropError(null);
         return {
           strings: dropData,
@@ -6640,12 +6694,12 @@
         };
       }).catch((ex) => {
         debugger;
-        setPromiseCount((i3) => ++i3);
+        setPromiseCount((i4) => ++i4);
         setDropError(ex);
         return null;
       }));
     });
-    const propsStable = _2({ onDragEnter, onDragLeave, onDragOver, onDrop });
+    const propsStable = A2({ onDragEnter, onDragLeave, onDragOver, onDrop });
     return {
       propsStable: propsStable.current,
       filesForConsideration,
@@ -6660,7 +6714,7 @@
   var useHideScroll = monitored(function useHideScroll2(hideScroll) {
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
-    p2(() => {
+    h2(() => {
       if (hideScroll) {
         const originalScrollTop = document.documentElement.scrollTop;
         const originalScrollLeft = document.documentElement.scrollLeft;
@@ -6706,19 +6760,19 @@
     templateElement.innerHTML = html.trim();
     return templateElement.content.firstChild;
   }
-  var ImperativeElement = x3(k3(ImperativeElementU));
+  var ImperativeElement = x2(k3(ImperativeElementU));
   var useImperativeProps = monitored(function useImperativeProps2({ refElementReturn: { getElement } }) {
-    const currentImperativeProps = _2({ className: /* @__PURE__ */ new Set(), style: {}, children: null, html: null, others: {} });
-    const hasClass = T2((cls) => {
+    const currentImperativeProps = A2({ className: /* @__PURE__ */ new Set(), style: {}, children: null, html: null, others: {} });
+    const hasClass = _((cls) => {
       return currentImperativeProps.current.className.has(cls);
     }, []);
-    const setClass = T2((cls, enabled) => {
+    const setClass = _((cls, enabled) => {
       if (hasClass(cls) == !enabled) {
         getElement()?.classList[enabled ? "add" : "remove"](cls);
         currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
       }
     }, []);
-    const setStyle = T2((prop, value) => {
+    const setStyle = _((prop, value) => {
       const element = getElement();
       if (element) {
         if (currentImperativeProps.current.style[prop] != value) {
@@ -6734,7 +6788,7 @@
         }
       }
     }, []);
-    const setChildren = T2((children) => {
+    const setChildren = _((children) => {
       let e3 = getElement();
       if (e3 && currentImperativeProps.current.children != children) {
         currentImperativeProps.current.children = children;
@@ -6742,7 +6796,7 @@
         e3.textContent = children;
       }
     }, []);
-    const dangerouslySetInnerHTML = T2((children) => {
+    const dangerouslySetInnerHTML = _((children) => {
       let e3 = getElement();
       if (e3 && currentImperativeProps.current.html != children) {
         currentImperativeProps.current.children = null;
@@ -6750,7 +6804,7 @@
         e3.innerHTML = children;
       }
     }, []);
-    const dangerouslyAppendHTML = T2((children) => {
+    const dangerouslyAppendHTML = _((children) => {
       let e3 = getElement();
       if (e3 && children) {
         const newChild = htmlToElement(e3, children);
@@ -6765,10 +6819,10 @@
       }
       return null;
     }, []);
-    const getAttribute = T2((prop) => {
+    const getAttribute = _((prop) => {
       return currentImperativeProps.current.others[prop];
     }, []);
-    const setAttribute = T2((prop, value) => {
+    const setAttribute = _((prop, value) => {
       if (value != null) {
         if (getAttribute(prop) != value) {
           currentImperativeProps.current.others[prop] = value;
@@ -6781,7 +6835,7 @@
         }
       }
     }, []);
-    const setEventHandler = T2((type, handler, options) => {
+    const setEventHandler = _((type, handler, options) => {
       const element = getElement();
       const mappedKey = EventMapping2[type];
       if (element) {
@@ -6795,7 +6849,7 @@
       }
     }, []);
     return {
-      imperativePropsReturn: _2({
+      imperativePropsReturn: A2({
         hasClass,
         setClass,
         setStyle,
@@ -6812,8 +6866,8 @@
   function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });
-    A2(handle, () => imperativeHandle);
-    return y(Tag, useMergedProps(propsStable, imperativeProps, props, { ref }));
+    F2(handle, () => imperativeHandle);
+    return c(Tag, useMergedProps(propsStable, imperativeProps, props, { ref }));
   }
 
   // ../dist/util/random-id.js
@@ -6828,7 +6882,7 @@
     return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()];
   }
   function generateRandomId(prefix) {
-    return `${prefix ?? "id-"}${random64Bits().map((n2) => base64(n2)).join("")}`;
+    return `${prefix ?? "id-"}${random64Bits().map((n3) => base64(n3)).join("")}`;
   }
 
   // ../dist/dom-helpers/use-portal-children.js
@@ -6845,10 +6899,10 @@
     const removeChildStable = useStableCallback((index) => {
       return removeChild?.(index);
     });
-    const element = F2(() => {
+    const element = T2(() => {
       return target == null ? null : typeof target == "string" ? document.getElementById(target) : target;
     }, [target]);
-    const children = !element ? null : z3(y(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
+    const children = !element ? null : z2(c(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
     return {
       children,
       pushChild: pushChildStable,
@@ -6859,25 +6913,25 @@
   });
   function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     const [children, setChildren, getChildren] = useState([]);
-    const pushChild = T2((child) => {
+    const pushChild = _((child) => {
       const randomKey = generateRandomId();
       let index = getChildren().length;
-      setChildren((prev) => [...prev, E(child, { key: randomKey, index })]);
+      setChildren((prev) => [...prev, I(child, { key: randomKey, index })]);
       return index;
     }, []);
-    const updateChild = T2((index, child) => {
+    const updateChild = _((index, child) => {
       const key = getChildren()[index]?.key;
       console.assert(!!key);
       if (key) {
         setChildren((prev) => {
           let newChildren = prev.slice();
-          newChildren.splice(index, 1, E(child, { key, index }));
+          newChildren.splice(index, 1, I(child, { key, index }));
           return newChildren;
         });
         return index;
       }
     }, []);
-    const removeChild = T2((index) => {
+    const removeChild = _((index) => {
       const key = getChildren()[index]?.key;
       console.assert(!!key);
       if (key) {
@@ -6890,15 +6944,15 @@
       }
     }, []);
     y2(() => {
-      setPushChild((_4) => pushChild);
+      setPushChild((_2) => pushChild);
     }, [pushChild]);
     y2(() => {
-      setUpdateChild((_4) => updateChild);
+      setUpdateChild((_2) => updateChild);
     }, [updateChild]);
     y2(() => {
-      setRemoveChild((_4) => removeChild);
+      setRemoveChild((_2) => removeChild);
     }, [removeChild]);
-    return y(_, {}, children);
+    return c(a, {}, children);
   }
 
   // ../dist/observers/use-element-size.js
@@ -6906,8 +6960,8 @@
     const { onElementChange, onMount, onUnmount } = refElementParameters || {};
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
     const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, runImmediately);
-    const currentObserveBox = _2(void 0);
-    const needANewObserver = T2((element, observeBox) => {
+    const currentObserveBox = A2(void 0);
+    const needANewObserver = _((element, observeBox) => {
       if (element) {
         const document2 = getDocument(element);
         const window2 = document2.defaultView;
@@ -6931,16 +6985,16 @@
     }, []);
     const { refElementReturn, ...rest } = useRefElement({
       refElementParameters: {
-        onElementChange: T2((e3, p3, r4) => {
+        onElementChange: _((e3, p3, r5) => {
           needANewObserver(e3, getObserveBox?.());
-          onElementChange?.(e3, p3, r4);
+          onElementChange?.(e3, p3, r5);
         }, []),
         onMount,
         onUnmount
       }
     });
     const { getElement } = refElementReturn;
-    p2(() => {
+    h2(() => {
       if (getObserveBox) {
         if (currentObserveBox.current !== getObserveBox())
           needANewObserver(getElement(), getObserveBox());
@@ -6962,7 +7016,7 @@
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, runImmediately);
     const { activeElementReturn } = useActiveElement({
       activeElementParameters: {
-        onLastActiveElementChange: T2((lastActiveElement, prevLastActiveElement, e3) => {
+        onLastActiveElementChange: _((lastActiveElement, prevLastActiveElement, e3) => {
           const selfElement = getElement();
           const focused = selfElement != null && selfElement == lastActiveElement;
           const focusedInner = !!selfElement?.contains(lastActiveElement);
@@ -6973,7 +7027,7 @@
         ...activeElementParameters
       }
     });
-    p2(() => {
+    h2(() => {
       return () => {
         setLastFocused(false, void 0);
         setLastFocusedInner(false, void 0);
@@ -6993,7 +7047,7 @@
     return str[0].toUpperCase() + str.substring(1);
   }
   var useLogicalDirection = monitored(function useLogicalDirection2({}) {
-    const getLogicalDirectionInfo = T2((computedStyles) => {
+    const getLogicalDirectionInfo = _((computedStyles) => {
       if (computedStyles) {
         const w4 = computedStyles.writingMode;
         let d3 = computedStyles.direction;
@@ -7004,13 +7058,13 @@
       }
       return null;
     }, []);
-    const convertToLogicalOrientation = T2((computedStyles, elementOrientation, direction) => {
+    const convertToLogicalOrientation = _((computedStyles, elementOrientation, direction) => {
       direction ??= getLogicalDirectionInfo(computedStyles);
       if (direction?.inlineOrientation === elementOrientation)
         return "inline";
       return "block";
     }, []);
-    const convertToPhysicalSide = T2((computedStyles, side, direction) => {
+    const convertToPhysicalSide = _((computedStyles, side, direction) => {
       direction ??= getLogicalDirectionInfo(computedStyles);
       switch (side) {
         case "block-start":
@@ -7023,7 +7077,7 @@
           return M2[(direction?.inlineDirection ?? "ltr")[2]];
       }
     }, []);
-    const convertToLogicalSide = T2((computedStyles, side, direction) => {
+    const convertToLogicalSide = _((computedStyles, side, direction) => {
       direction ??= getLogicalDirectionInfo(computedStyles);
       if (direction?.inlineOrientation === "vertical") {
         switch (side) {
@@ -7052,7 +7106,7 @@
       console.assert(false);
       return "inline-start";
     }, []);
-    const convertToPhysicalOrientation = T2((computedStyles, elementOrientation, direction) => {
+    const convertToPhysicalOrientation = _((computedStyles, elementOrientation, direction) => {
       direction ??= getLogicalDirectionInfo(computedStyles);
       if (elementOrientation == "inline") {
         if (direction?.inlineOrientation == "horizontal")
@@ -7064,7 +7118,7 @@
         return "horizontal";
       }
     }, []);
-    const convertElementSize = T2((computedStyles, elementSize, direction) => {
+    const convertElementSize = _((computedStyles, elementSize, direction) => {
       direction ??= getLogicalDirectionInfo(computedStyles);
       if (direction) {
         const { inlineSize, blockSize, inlineDirection, blockDirection } = direction;
@@ -7208,7 +7262,7 @@
 
   // ../dist/observers/use-media-query.js
   var useMediaQuery = monitored(function useMediaQuery2(query, defaultGuess) {
-    const queryList = _2();
+    const queryList = A2();
     const [matches2, setMatches, getMatches] = useState(defaultGuess ?? null);
     console.assert(!query || query.startsWith("("));
     y2(() => {
@@ -7258,7 +7312,7 @@
         return () => observer.disconnect();
       }
     }), returnNull, runImmediately);
-    const onNeedMutationObserverReset = T2((element) => {
+    const onNeedMutationObserverReset = _((element) => {
       if (element) {
         queueMicrotask(() => {
           setMo(new MutationObserver((a3) => {
@@ -7279,13 +7333,13 @@
         });
       }
     }, []);
-    p2(() => {
+    h2(() => {
       onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
     const { refElementReturn, propsStable } = useRefElement({
       refElementParameters: {
-        onElementChange: useStableCallback((e3, p3, r4) => {
-          onElementChange?.(e3, p3, r4);
+        onElementChange: useStableCallback((e3, p3, r5) => {
+          onElementChange?.(e3, p3, r5);
           onNeedMutationObserverReset(e3);
         }),
         ...rest
@@ -7300,7 +7354,7 @@
 
   // ../dist/observers/use-url.js
   var useUrl = monitored(function useUrl2(onUrlChange) {
-    const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), T2(() => window.location.toString(), []));
+    const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), _(() => window.location.toString(), []));
     useGlobalHandler(window, "hashchange", (e3) => {
       setUrl(window.location.toString(), e3);
     });
@@ -7308,7 +7362,7 @@
       console.assert(window.location.toString() === document.location.toString());
       setUrl(window.location.toString(), e3);
     });
-    return [getUrl, T2((newUrlOrSetter, action) => {
+    return [getUrl, _((newUrlOrSetter, action) => {
       if (typeof newUrlOrSetter == "function") {
         setUrl((prev) => {
           let newUrl = newUrlOrSetter(prev);
@@ -7325,19 +7379,19 @@
   // ../dist/preact-extensions/use-async-effect.js
   var useAsyncEffect = monitored(function useAsyncEffect2(effect, inputs, options) {
     const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
-    p2(syncHandler, inputs);
+    h2(syncHandler, inputs);
     return rest;
   });
 
   // ../dist/preact-extensions/use-effect-debug.js
-  var useEffectDebug = monitored(function useEffectDebug2(effect, inputs, impl = p2) {
-    const prevInputs = _2(void 0);
+  var useEffectDebug = monitored(function useEffectDebug2(effect, inputs, impl = h2) {
+    const prevInputs = A2(void 0);
     const effect2 = () => {
       const changes = [];
       if (inputs && prevInputs.current) {
-        for (let i3 = 0; i3 < Math.max(prevInputs.current.length, inputs.length); ++i3) {
-          if (prevInputs.current[i3] != inputs[i3])
-            changes[i3] = { from: prevInputs.current[i3], to: inputs[i3] };
+        for (let i4 = 0; i4 < Math.max(prevInputs.current.length, inputs.length); ++i4) {
+          if (prevInputs.current[i4] != inputs[i4])
+            changes[i4] = { from: prevInputs.current[i4], to: inputs[i4] };
         }
       }
       const ret = effect(prevInputs.current, changes);
@@ -7410,25 +7464,25 @@
   });
 
   // ../node_modules/.pnpm/preact@10.13.2/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
-  var _3 = 0;
-  function o3(o4, e3, n2, t3, f3, l3) {
-    var s3, u3, a3 = {};
-    for (u3 in e3)
-      "ref" == u3 ? s3 = e3[u3] : a3[u3] = e3[u3];
-    var i3 = { type: o4, props: a3, key: n2, ref: s3, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_3, __source: f3, __self: l3 };
-    if ("function" == typeof o4 && (s3 = o4.defaultProps))
-      for (u3 in s3)
-        void 0 === a3[u3] && (a3[u3] = s3[u3]);
-    return l.vnode && l.vnode(i3), i3;
+  var n2 = 0;
+  function r4(r5, t3, e3, l3, i4, p3) {
+    let s3, _2, f3 = {};
+    for (_2 in t3)
+      "ref" == _2 ? s3 = t3[_2] : f3[_2] = t3[_2];
+    const c3 = { type: r5, props: f3, key: e3, ref: s3, o: null, t: null, l: 0, i: null, p: void 0, _: null, u: null, constructor: void 0, m: --n2, h: i4, j: p3 };
+    if ("function" == typeof r5 && (s3 = r5.defaultProps))
+      for (_2 in s3)
+        void 0 === f3[_2] && (f3[_2] = s3[_2]);
+    return i.vnode && i.vnode(c3), c3;
   }
 
   // ../dist/timing/use-animation-frame.js
-  var SharedAnimationFrameContext = F(null);
+  var SharedAnimationFrameContext = V(null);
   var useAnimationFrame = monitored(function useAnimationFrame2({ callback }) {
     const stableCallback = useStableCallback(callback ?? noop_default);
     const hasCallback = callback != null;
-    const sharedAnimationFrameContext = q2(SharedAnimationFrameContext);
-    p2(() => {
+    const sharedAnimationFrameContext = g2(SharedAnimationFrameContext);
+    h2(() => {
       if (sharedAnimationFrameContext) {
         if (hasCallback) {
           sharedAnimationFrameContext.addCallback(stableCallback);
@@ -7452,7 +7506,7 @@
   var useInterval = monitored(function useInterval2({ interval, callback }) {
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
-    p2(() => {
+    h2(() => {
       const interval2 = getInterval();
       let lastDelayUsed = interval2;
       if (interval2 == null)
@@ -7473,12 +7527,12 @@
 
   // demos/use-grid.tsx
   var RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-  var SortableColumnContext = F(null);
-  var SetSortableColumnContext = F(null);
-  var GetSortableColumnContext = F(null);
-  var ListChildrenContext = F(null);
-  var ListChildContext = F(null);
-  var DemoUseGrid = x3(() => {
+  var SortableColumnContext = V(null);
+  var SetSortableColumnContext = V(null);
+  var GetSortableColumnContext = V(null);
+  var ListChildrenContext = V(null);
+  var ListChildContext = V(null);
+  var DemoUseGrid = x2(() => {
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
     const [tabbableRow, setTabbableRow] = useState(null);
@@ -7539,7 +7593,9 @@
       },
       gridNavigationParameters: {
         // This can be used by you to track which 0-indexed column is currently the one with focus.
-        onTabbableColumnChange: setTabbableColumn
+        onTabbableColumnChange: setTabbableColumn,
+        // Which column is tabbable (initially upon mount before the user interacts with it)
+        initiallyTabbableColumn: 0
       },
       // paginatedChildrenParameters: {
       // This must return a VNode's 0-based index from its props
@@ -7626,34 +7682,34 @@
         getAnyFocused
       }
     } = allReturnInfo;
-    return /* @__PURE__ */ o3("div", { class: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "useGridNavigationComplete" }),
-      /* @__PURE__ */ o3("p", { children: [
+    return /* @__PURE__ */ r4("div", { class: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "useGridNavigationComplete" }),
+      /* @__PURE__ */ r4("p", { children: [
         "Like ",
-        /* @__PURE__ */ o3("code", { children: "useCompleteListNavigation" }),
+        /* @__PURE__ */ r4("code", { children: "useCompleteListNavigation" }),
         " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Current row: ",
         tabbableRow
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Current column: ",
         tabbableColumn?.actual,
         tabbableColumn?.ideal != tabbableColumn?.actual ? ` (wanted: ${tabbableColumn?.ideal})` : ""
       ] }),
-      /* @__PURE__ */ o3("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [
-        /* @__PURE__ */ o3("thead", { children: /* @__PURE__ */ o3("tr", { children: [
-          /* @__PURE__ */ o3("th", { children: "Row is tabbable?" }),
-          /* @__PURE__ */ o3("th", { children: "Column 1" }),
-          /* @__PURE__ */ o3("th", { children: "Column 2" }),
-          /* @__PURE__ */ o3("th", { children: "Column 3" })
+      /* @__PURE__ */ r4("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [
+        /* @__PURE__ */ r4("thead", { children: /* @__PURE__ */ r4("tr", { children: [
+          /* @__PURE__ */ r4("th", { children: "Row is tabbable?" }),
+          /* @__PURE__ */ r4("th", { children: "Column 1" }),
+          /* @__PURE__ */ r4("th", { children: "Column 2" }),
+          /* @__PURE__ */ r4("th", { children: "Column 3" })
         ] }) }),
-        /* @__PURE__ */ o3(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ o3(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ o3(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ o3(GridRowContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(ListChildrenContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("tbody", { ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren, { count: 100, min: null, max: null, staggered: true }) }) }) }) }) }) })
+        /* @__PURE__ */ r4(SortableColumnContext.Provider, { value: sortableColumn, children: /* @__PURE__ */ r4(GetSortableColumnContext.Provider, { value: getSortableColumn, children: /* @__PURE__ */ r4(SetSortableColumnContext.Provider, { value: setSortableColumn, children: /* @__PURE__ */ r4(GridRowContext.Provider, { value: contextChildren, children: /* @__PURE__ */ r4(ListChildrenContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ r4("tbody", { ...props, children: /* @__PURE__ */ r4(DemoUseRovingTabIndexChildren, { count: 100, min: null, max: null, staggered: true }) }) }) }) }) }) })
       ] })
     ] });
   });
-  var DemoUseRovingTabIndexChildren = x3(monitored(function DemoUseRovingTabIndexChildren2({ count, max, min, staggered }) {
+  var DemoUseRovingTabIndexChildren = x2(monitored(function DemoUseRovingTabIndexChildren2({ count, max, min, staggered }) {
     const {
       context,
       paginatedChildrenReturn,
@@ -7662,36 +7718,35 @@
     } = useCompleteGridNavigationRows({
       paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
       rearrangeableChildrenParameters: {
-        getIndex: T2((a3) => a3.props.index, []),
+        getIndex: _((a3) => a3.props.index, []),
         onRearranged: null,
         compare: null,
         adjust: null,
-        children: F2(() => Array.from(function* () {
-          for (let i3 = 0; i3 < count; ++i3) {
-            yield /* @__PURE__ */ o3(DemoUseGridRowOuter, { index: i3 }, i3);
+        children: T2(() => Array.from(function* () {
+          for (let i4 = 0; i4 < count; ++i4) {
+            yield /* @__PURE__ */ r4(DemoUseGridRowOuter, { index: i4 }, i4);
           }
         }()), [count])
       },
       managedChildrenParameters: {},
       staggeredChildrenParameters: { staggered },
-      context: q2(ListChildrenContext)
+      context: g2(ListChildrenContext)
     });
-    return /* @__PURE__ */ o3(ListChildContext.Provider, { value: context, children: rearrangeableChildrenReturn.children });
+    return /* @__PURE__ */ r4(ListChildContext.Provider, { value: context, children: rearrangeableChildrenReturn.children });
   }));
-  var GridRowContext = F(null);
-  var GridCellContext = F(null);
-  var DemoUseGridRowOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter({ index }) {
+  var GridRowContext = V(null);
+  var GridCellContext = V(null);
+  var DemoUseGridRowOuter = x2(monitored(function DemoUseRovingTabIndexChildOuter({ index }) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
-    const { props, processedChildReturn, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
-      refElementReturn,
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = g2(ListChildContext);
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-      info: { index },
-      processedChildParameters: { children: F2(() => /* @__PURE__ */ o3(DemoUseGridRow, { index }), [index]) }
+      info: { index }
     });
-    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: processedChildReturn.children ? processedChildReturn.children : "\xA0" });
+    const ch = T2(() => /* @__PURE__ */ r4(DemoUseGridRow, { index }), [index]);
+    return /* @__PURE__ */ r4("li", { ...useMergedProps(props, propsStable), children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : ch });
   }));
-  var DemoUseGridRow = x3(({ index }) => {
+  var DemoUseGridRow = x2(({ index }) => {
     const [_randomWord] = useState(() => RandomWords[
       index
       /*Math.floor(Math.random() * (RandomWords.length - 1))*/
@@ -7699,17 +7754,17 @@
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const hidden = index === 3;
     const disabled = hidden;
-    const getSortableColumnIndex = q2(GetSortableColumnContext);
-    const contextFromParent = q2(GridRowContext);
+    const getSortableColumnIndex = g2(GetSortableColumnContext);
+    const contextFromParent = g2(GridRowContext);
     const ret = useCompleteGridNavigationRow({
       context: contextFromParent,
       info: { index, foo: "bar", untabbable: hidden },
-      textContentParameters: { getText: T2((e3) => {
+      textContentParameters: { getText: _((e3) => {
         return e3?.textContent ?? "";
       }, []) },
       linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-      rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i3) => {
-        setTabbableColumn(i3);
+      rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i4) => {
+        setTabbableColumn(i4);
       }), untabbable: false, initiallyTabbedIndex: 0 },
       typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1e3, onNavigateTypeahead: null },
       hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
@@ -7722,15 +7777,15 @@
       context: contextToChild,
       rovingTabIndexChildReturn: { tabbable }
     } = ret;
-    return /* @__PURE__ */ o3("tr", { ...props, "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ o3(GridCellContext.Provider, { value: contextToChild, children: [
-      /* @__PURE__ */ o3("td", { children: [
+    return /* @__PURE__ */ r4("tr", { ...props, "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ r4(GridCellContext.Provider, { value: contextToChild, children: [
+      /* @__PURE__ */ r4("td", { children: [
         _tabbableColumn,
         ", ",
         tabbable.toString()
       ] }),
       Array.from(function* () {
-        for (let i3 = 0; i3 < 3; ++i3) {
-          yield /* @__PURE__ */ o3(DemoUseGridCell, { index: i3, row: index, rowIsTabbable: tabbable }, i3);
+        for (let i4 = 0; i4 < 3; ++i4) {
+          yield /* @__PURE__ */ r4(DemoUseGridCell, { index: i4, row: index, rowIsTabbable: tabbable }, i4);
         }
       }())
     ] }) });
@@ -7739,7 +7794,7 @@
     if (row >= 6 && row % 2 == 0 && index > 1)
       return null;
     let hiddenText = row === 3 ? " (row hidden)" : "";
-    const context = q2(GridCellContext);
+    const context = g2(GridCellContext);
     const {
       props,
       rovingTabIndexChildReturn: { tabbable }
@@ -7747,17 +7802,17 @@
       gridNavigationCellParameters: { colSpan: 1 },
       info: { index, bar: "baz", focusSelf: useStableCallback((e3) => e3.focus()), untabbable: false },
       context,
-      textContentParameters: { getText: T2((e3) => {
+      textContentParameters: { getText: _((e3) => {
         return e3?.textContent ?? "";
       }, []) }
     });
     const t3 = tabbable ? "(Tabbable)" : "(Not tabbable)";
     if (index === 0)
-      return /* @__PURE__ */ o3("td", { ...props, children: rowIsTabbable.toString() });
+      return /* @__PURE__ */ r4("td", { ...props, children: rowIsTabbable.toString() });
     else {
       if (row < 6 || row % 2 != 0) {
         if (index === 1)
-          return /* @__PURE__ */ o3("td", { ...props, children: [
+          return /* @__PURE__ */ r4("td", { ...props, children: [
             "Grid cell #",
             index + 1,
             " ",
@@ -7765,15 +7820,15 @@
             hiddenText
           ] });
         else
-          return /* @__PURE__ */ o3("td", { children: /* @__PURE__ */ o3("label", { children: [
-            /* @__PURE__ */ o3("button", { ...props, type: "button", children: "Select row" }),
+          return /* @__PURE__ */ r4("td", { children: /* @__PURE__ */ r4("label", { children: [
+            /* @__PURE__ */ r4("button", { ...props, type: "button", children: "Select row" }),
             " ",
             t3,
             hiddenText
           ] }) });
       } else {
         if (index === 1)
-          return /* @__PURE__ */ o3("td", { ...props, colSpan: 2, children: [
+          return /* @__PURE__ */ r4("td", { ...props, colSpan: 2, children: [
             "Grid cell #",
             index + 1,
             ", span 2 ",
@@ -7793,14 +7848,14 @@
   function DemoUseModal(props) {
     const parentDepth = props.parentDepth ?? 0;
     const depth = parentDepth + 1;
-    const buttonRef = _2(null);
-    const [closeOnBackdrop, setCloseOnBackdrop] = h2(true);
-    const [closeOnEscape, setCloseOnEscape] = h2(true);
-    const [closeOnLostFocus, setCloseOnLostFocus] = h2(true);
-    const [focusTrapActive, setFocusTrapActive] = h2(true);
-    const [hasChild, setHasChild] = h2(false);
-    const [closeReason, setCloseReason] = h2(null);
-    const [open, setOpen] = h2(false);
+    const buttonRef = A2(null);
+    const [closeOnBackdrop, setCloseOnBackdrop] = p2(true);
+    const [closeOnEscape, setCloseOnEscape] = p2(true);
+    const [closeOnLostFocus, setCloseOnLostFocus] = p2(true);
+    const [focusTrapActive, setFocusTrapActive] = p2(true);
+    const [hasChild, setHasChild] = p2(false);
+    const [closeReason, setCloseReason] = p2(null);
+    const [open, setOpen] = p2(false);
     const focusOpener = () => buttonRef.current?.focus();
     const {
       propsStablePopup,
@@ -7827,63 +7882,63 @@
       refElementParameters: {},
       activeElementParameters: { getDocument: getDocument2, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null }
     });
-    return /* @__PURE__ */ o3("div", { style: { border: `${depth}px solid black` }, children: [
-      /* @__PURE__ */ o3("div", { children: "useModal demo:" }),
-      /* @__PURE__ */ o3("div", { style: "display: flex; flex-direction: column", children: [
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", disabled: true, checked: true }),
+    return /* @__PURE__ */ r4("div", { style: { border: `${depth}px solid black` }, children: [
+      /* @__PURE__ */ r4("div", { children: "useModal demo:" }),
+      /* @__PURE__ */ r4("div", { style: "display: flex; flex-direction: column", children: [
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", disabled: true, checked: true }),
           " Close by setting open to false"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", checked: closeOnBackdrop, onInput: (e3) => setCloseOnBackdrop(e3.currentTarget.checked) }),
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", checked: closeOnBackdrop, onInput: (e3) => setCloseOnBackdrop(e3.currentTarget.checked) }),
           " Close on backdrop click"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", checked: closeOnEscape, onInput: (e3) => setCloseOnEscape(e3.currentTarget.checked) }),
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", checked: closeOnEscape, onInput: (e3) => setCloseOnEscape(e3.currentTarget.checked) }),
           " Close on Escape key press"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", checked: closeOnLostFocus, onInput: (e3) => setCloseOnLostFocus(e3.currentTarget.checked) }),
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", checked: closeOnLostFocus, onInput: (e3) => setCloseOnLostFocus(e3.currentTarget.checked) }),
           " Close on focus lost"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", checked: focusTrapActive, onInput: (e3) => setFocusTrapActive(e3.currentTarget.checked) }),
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", checked: focusTrapActive, onInput: (e3) => setFocusTrapActive(e3.currentTarget.checked) }),
           " Trap focus"
         ] }),
-        /* @__PURE__ */ o3("br", {})
+        /* @__PURE__ */ r4("br", {})
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Last reason for closing: ",
         closeReason ?? "(hasn't been closed yet)"
       ] }),
-      /* @__PURE__ */ o3("button", { ...propsStableSource, onClick: () => setOpen(true), children: "Open Modal" }),
-      /* @__PURE__ */ o3("div", { ...useMergedProps(propsFocusContainer, propsStablePopup), style: `border: ${depth}px dotted red; background: #ccc`, children: /* @__PURE__ */ o3("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [
-        /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("button", { ...propsStableSource, onClick: () => setOpen(true), children: "Open Modal" }),
+      /* @__PURE__ */ r4("div", { ...useMergedProps(propsFocusContainer, propsStablePopup), style: `border: ${depth}px dotted red; background: #ccc`, children: /* @__PURE__ */ r4("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [
+        /* @__PURE__ */ r4("div", { children: [
           "Modal element at depth ",
           depth,
           " with ",
           hasChild ? "a" : "no",
           " child"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { type: "checkbox", checked: hasChild, onInput: (e3) => setHasChild(e3.currentTarget.checked), ref: buttonRef }),
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { type: "checkbox", checked: hasChild, onInput: (e3) => setHasChild(e3.currentTarget.checked), ref: buttonRef }),
           " Add a child modal"
         ] }),
-        hasChild && /* @__PURE__ */ o3(DemoUseModal, { parentDepth: depth }),
-        /* @__PURE__ */ o3("button", { ...propsStableSource, onClick: () => setOpen(false), children: "Close modal programmatically" })
+        hasChild && /* @__PURE__ */ r4(DemoUseModal, { parentDepth: depth }),
+        /* @__PURE__ */ r4("button", { ...propsStableSource, onClick: () => setOpen(false), children: "Close modal programmatically" })
       ] }) })
     ] });
   }
 
   // demos/use-roving-tab-index.tsx
   var RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-  var SingleSelectionModeContext = F("focus");
-  var MultiSelectionModeContext = F("activation");
-  var UntabbableContext = F(false);
-  var ListNavigationSingleSelectionChildContext = F(null);
-  var ListChildContext2 = F(null);
-  var WeirdContext = F(null);
-  var DemoUseRovingTabIndex = x3(monitored(function DemoUseRovingTabIndex2() {
+  var SingleSelectionModeContext = V("focus");
+  var MultiSelectionModeContext = V("activation");
+  var UntabbableContext = V(false);
+  var ListNavigationSingleSelectionChildContext = V(null);
+  var ListChildContext2 = V(null);
+  var WeirdContext = V(null);
+  var DemoUseRovingTabIndex = x2(monitored(function DemoUseRovingTabIndex2() {
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
     const [singleSelectedIndex, setSingleSelectedIndex] = useState(null);
     const [singleSelectionMode, setSingleSelectionMode] = useState("focus");
@@ -7900,7 +7955,7 @@
     const onSelectionChange = (e3) => {
       setMultiSelectPercent(e3[EventDetail].selectedPercent);
     };
-    const r4 = useCompleteListNavigationDeclarative({
+    const r5 = useCompleteListNavigationDeclarative({
       rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
       singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e3) => {
         setSingleSelectedIndex(e3[EventDetail].selectedIndex);
@@ -7920,71 +7975,71 @@
       managedChildrenReturn: { getChildren },
       typeaheadNavigationReturn: { typeaheadStatus },
       rearrangeableChildrenReturn: { shuffle: shuffle2, reverse, sort: _sort }
-    } = r4;
+    } = r5;
     const [staggering, setStaggering] = useState(false);
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "Keyboard & List Navigation" }),
-      /* @__PURE__ */ o3("h3", { children: /* @__PURE__ */ o3("code", { children: "useCompleteListNavigation" }) }),
-      /* @__PURE__ */ o3("p", { children: "This hook accomplishes a few things:" }),
-      /* @__PURE__ */ o3("ul", { children: [
-        /* @__PURE__ */ o3("li", { children: [
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "Keyboard & List Navigation" }),
+      /* @__PURE__ */ r4("h3", { children: /* @__PURE__ */ r4("code", { children: "useCompleteListNavigation" }) }),
+      /* @__PURE__ */ r4("p", { children: "This hook accomplishes a few things:" }),
+      /* @__PURE__ */ r4("ul", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Turns a group of widgets into one singular composite widget with only ",
-          /* @__PURE__ */ o3("strong", { children: "a single tab stop" }),
+          /* @__PURE__ */ r4("strong", { children: "a single tab stop" }),
           ' shared between them (a "roving" tab stop, because it wanders back and forth).'
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Navigation within this composite widget is done via:",
-          /* @__PURE__ */ o3("ul", { children: [
-            /* @__PURE__ */ o3("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }),
-            /* @__PURE__ */ o3("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }),
-            /* @__PURE__ */ o3("li", { children: "Home/End to jump to the first or last item" })
+          /* @__PURE__ */ r4("ul", { children: [
+            /* @__PURE__ */ r4("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }),
+            /* @__PURE__ */ r4("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }),
+            /* @__PURE__ */ r4("li", { children: "Home/End to jump to the first or last item" })
           ] })
         ] }),
-        /* @__PURE__ */ o3("li", { children: 'Items can be marked as "hidden", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead.' }),
-        /* @__PURE__ */ o3("li", { children: 'Items can be marked as "disabled" to prevent selection (with or without also marking them as "hidden", though "hidden" implies "disabled").' }),
-        /* @__PURE__ */ o3("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: 'Items can be marked as "hidden", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead.' }),
+        /* @__PURE__ */ r4("li", { children: 'Items can be marked as "disabled" to prevent selection (with or without also marking them as "hidden", though "hidden" implies "disabled").' }),
+        /* @__PURE__ */ r4("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }),
+        /* @__PURE__ */ r4("li", { children: [
           "The parent's selected index is ",
-          /* @__PURE__ */ o3("strong", { children: "uncontrolled" }),
+          /* @__PURE__ */ r4("strong", { children: "uncontrolled" }),
           " and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See ",
-          /* @__PURE__ */ o3("code", { children: "useSingleSelectionDeclarative" }),
+          /* @__PURE__ */ r4("code", { children: "useSingleSelectionDeclarative" }),
           " for a shortcut to do exactly that)"
         ] }),
-        /* @__PURE__ */ o3("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }),
+        /* @__PURE__ */ r4("li", { children: [
           "Lists can be nested, and there is no strict requirement on DOM structure (except for sorting/rearranging children, if you use that).",
-          /* @__PURE__ */ o3("ul", { children: /* @__PURE__ */ o3("li", { children: [
+          /* @__PURE__ */ r4("ul", { children: /* @__PURE__ */ r4("li", { children: [
             "If you don't need sorting/rearranging this DOM requirement is ",
-            /* @__PURE__ */ o3("strong", { children: "optional" }),
+            /* @__PURE__ */ r4("strong", { children: "optional" }),
             "; rearranging requires all children be in one contiguous array of VNodes so that their ",
-            /* @__PURE__ */ o3("code", { children: "key" }),
+            /* @__PURE__ */ r4("code", { children: "key" }),
             " props can be manipulated."
           ] }) })
         ] })
       ] }),
-      /* @__PURE__ */ o3("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }),
+      /* @__PURE__ */ r4("label", { children: [
         "# of items",
-        /* @__PURE__ */ o3("input", { type: "number", value: count, min: 0, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", value: count, min: 0, onInput: (e3) => {
           e3.preventDefault();
           setCount(e3.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o3("button", { onClick: () => shuffle2(), children: "Shuffle" }),
-      /* @__PURE__ */ o3("button", { onClick: () => {
+      /* @__PURE__ */ r4("button", { onClick: () => shuffle2(), children: "Shuffle" }),
+      /* @__PURE__ */ r4("button", { onClick: () => {
         debugger;
         reverse();
       }, children: "Reverse" }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Imperatively set the tabbable index to: ",
-        /* @__PURE__ */ o3("input", { type: "number", onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", onInput: (e3) => {
           e3.preventDefault();
           setTabbableIndex(e3.currentTarget.valueAsNumber, e3, false);
         } })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Imperatively set the selected index to: ",
-        /* @__PURE__ */ o3("input", { type: "number", onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", onInput: (e3) => {
           e3.preventDefault();
           setSingleSelectedIndex(e3.currentTarget.valueAsNumber);
         } }),
@@ -7992,92 +8047,92 @@
         singleSelectedIndex,
         ")"
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Pagination window starts at: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: min ?? void 0, min: 0, max: max ?? void 0, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", value: min ?? void 0, min: 0, max: max ?? void 0, onInput: (e3) => {
           e3.preventDefault();
           setMin(e3.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Pagination window ends at: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: max ?? void 0, min: min ?? void 0, max: count, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", value: max ?? void 0, min: min ?? void 0, max: count, onInput: (e3) => {
           e3.preventDefault();
           setMax(e3.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Stagger delay: ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: staggered, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: staggered, onInput: (e3) => {
           e3.preventDefault();
           setStaggered(e3.currentTarget.checked);
         } })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Single-Selection mode:",
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "disabled", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "disabled", onInput: (e3) => {
             e3.preventDefault();
             setSingleSelectionMode("disabled");
           } }),
           " Off"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "focus", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "focus", onInput: (e3) => {
             e3.preventDefault();
             setSingleSelectionMode("focus");
           } }),
           " On focus"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "activation", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-single-selection-mode", type: "radio", checked: singleSelectionMode == "activation", onInput: (e3) => {
             e3.preventDefault();
             setSingleSelectionMode("activation");
           } }),
           " On activation (click, tap, Enter, Space, etc.)"
         ] })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Multi-Selection mode:",
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "disabled", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "disabled", onInput: (e3) => {
             e3.preventDefault();
             setMultiSelectionMode("disabled");
           } }),
           " Off"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "focus", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "focus", onInput: (e3) => {
             e3.preventDefault();
             setMultiSelectionMode("focus");
           } }),
           " On focus"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "activation", onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { name: "rti-demo-multi-selection-mode", type: "radio", checked: multiSelectionMode == "activation", onInput: (e3) => {
             e3.preventDefault();
             setMultiSelectionMode("activation");
           } }),
           " On activation (click, tap, Enter, Space, etc.)"
         ] })
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Staggering status: ",
         staggered ? staggering ? "Staggering..." : "Done staggering" : "Not staggered"
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Typeahead status: ",
         typeaheadStatus
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Multi-select: ",
         Math.round(multiSelectPercent * 100 * 10) / 10,
         "%"
       ] }),
-      /* @__PURE__ */ o3(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ o3(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ o3(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ o3(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ o3(WeirdContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ o3("ol", { start: 0, ...props, children: /* @__PURE__ */ o3(DemoUseRovingTabIndexChildren3, { max, min, staggered, count, setStaggering }) }) }) }) }) }) })
+      /* @__PURE__ */ r4(UntabbableContext.Provider, { value: untabbable, children: /* @__PURE__ */ r4(SingleSelectionModeContext.Provider, { value: singleSelectionMode, children: /* @__PURE__ */ r4(MultiSelectionModeContext.Provider, { value: multiSelectionMode, children: /* @__PURE__ */ r4(ListNavigationSingleSelectionChildContext.Provider, { value: contextChildren, children: /* @__PURE__ */ r4(WeirdContext.Provider, { value: contextProcessing, children: /* @__PURE__ */ r4("ol", { start: 0, ...props, children: /* @__PURE__ */ r4(DemoUseRovingTabIndexChildren3, { max, min, staggered, count, setStaggering }) }) }) }) }) }) })
     ] });
   }));
-  var DemoUseRovingTabIndexChildren3 = x3(monitored(function DemoUseRovingTabIndexChildren4({ count, max, min, staggered, setStaggering }) {
+  var DemoUseRovingTabIndexChildren3 = x2(monitored(function DemoUseRovingTabIndexChildren4({ count, max, min, staggered, setStaggering }) {
     const {
       context,
       paginatedChildrenReturn,
@@ -8086,44 +8141,44 @@
     } = useCompleteListNavigationChildren({
       paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
       rearrangeableChildrenParameters: {
-        getIndex: T2((a3) => a3.props.index, []),
+        getIndex: _((a3) => a3.props.index, []),
         onRearranged: null,
         compare: null,
         adjust: null,
-        children: F2(() => Array.from(function* () {
-          for (let i3 = 0; i3 < count; ++i3) {
-            yield /* @__PURE__ */ o3(DemoUseRovingTabIndexChildOuter2, { index: i3 }, i3);
+        children: T2(() => Array.from(function* () {
+          for (let i4 = 0; i4 < count; ++i4) {
+            yield /* @__PURE__ */ r4(DemoUseRovingTabIndexChildOuter2, { index: i4 }, i4);
           }
         }()), [count])
       },
       managedChildrenParameters: {},
       staggeredChildrenParameters: { staggered },
-      context: q2(WeirdContext)
+      context: g2(WeirdContext)
     });
-    p2(() => {
+    h2(() => {
       setStaggering(staggeredChildrenReturn.stillStaggering);
     }, [staggeredChildrenReturn.stillStaggering]);
-    return /* @__PURE__ */ o3(ListChildContext2.Provider, { value: context, children: rearrangeableChildrenReturn.children });
+    return /* @__PURE__ */ r4(ListChildContext2.Provider, { value: context, children: rearrangeableChildrenReturn.children });
   }));
-  var DemoUseRovingTabIndexChildOuter2 = x3(monitored(function DemoUseRovingTabIndexChildOuter3({ index }) {
-    const { propsStable, refElementReturn: { getElement } } = useRefElement({ refElementParameters: { onElementChange: useStableCallback((e3, p3, r4) => {
-      onElementChange?.(e3, p3, r4);
+  var DemoUseRovingTabIndexChildOuter2 = x2(monitored(function DemoUseRovingTabIndexChildOuter3({ index }) {
+    const { propsStable, refElementReturn: { getElement } } = useRefElement({ refElementParameters: { onElementChange: useStableCallback((e3, p3, r5) => {
+      onElementChange?.(e3, p3, r5);
     }) } });
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext2);
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = g2(ListChildContext2);
     const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } } = useProcessedChild({
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
       info: { index }
     });
-    const c3 = F2(() => /* @__PURE__ */ o3(DemoUseRovingTabIndexChild, { index }), [index]);
-    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c3 });
+    const c3 = T2(() => /* @__PURE__ */ r4(DemoUseRovingTabIndexChild, { index }), [index]);
+    return /* @__PURE__ */ r4("li", { ...useMergedProps(props, propsStable), children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c3 });
   }));
-  var DemoUseRovingTabIndexChild = x3(monitored(function DemoUseRovingTabIndexChild2({ index }) {
+  var DemoUseRovingTabIndexChild = x2(monitored(function DemoUseRovingTabIndexChild2({ index }) {
     if (index == 1)
-      return /* @__PURE__ */ o3("span", { children: [
+      return /* @__PURE__ */ r4("span", { children: [
         "(Item ",
         index,
         " is a ",
-        /* @__PURE__ */ o3("strong", { children: "hole in the array" }),
+        /* @__PURE__ */ r4("strong", { children: "hole in the array" }),
         " and does not exist)"
       ] });
     let disabled = index == 6;
@@ -8133,8 +8188,8 @@
     }
     const [multiSelected, setMultiSelected] = useState(false);
     const [randomWord] = useState(() => RandomWords2[index]);
-    const context = q2(ListNavigationSingleSelectionChildContext);
-    const focusSelf = T2((e3) => {
+    const context = g2(ListNavigationSingleSelectionChildContext);
+    const focusSelf = _((e3) => {
       e3.focus();
     }, []);
     const getSortValue = useStableCallback(() => index);
@@ -8152,7 +8207,7 @@
     } = useCompleteListNavigationChildDeclarative({
       info: { index, focusSelf, foo: "bar", untabbable: hidden },
       context,
-      textContentParameters: { getText: T2((e3) => {
+      textContentParameters: { getText: _((e3) => {
         return e3?.textContent ?? "";
       }, []) },
       hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
@@ -8164,33 +8219,33 @@
     const { pressReturn, props: p22 } = usePress({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn });
     let s3 = singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "";
     const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s3} (${tabbable ? "Tabbable" : "Not tabbable"})`;
-    return /* @__PURE__ */ o3("span", { ...useMergedProps(propsChild, propsTabbable, p22), children: [
+    return /* @__PURE__ */ r4("span", { ...useMergedProps(propsChild, propsTabbable, p22), children: [
       text,
-      /* @__PURE__ */ o3("input", { ...useMergedProps(propsTabbable, { type: "number" }), style: { width: "5ch" } })
+      /* @__PURE__ */ r4("input", { ...useMergedProps(propsTabbable, { type: "number" }), style: { width: "5ch" } })
     ] });
   }));
 
   // demos/use-timeout.tsx
   var DemoUseTimeout = () => {
-    const [timeout, setTimeout2] = h2(1e3);
-    const [triggerIndex, setTriggerIndex] = h2("");
-    const [fireCount, setFireCount] = h2(0);
-    useTimeout({ timeout, triggerIndex, callback: () => setFireCount((i3) => ++i3) });
-    return /* @__PURE__ */ o3("div", { class: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "useTimeout" }),
-      /* @__PURE__ */ o3("p", { children: [
-        /* @__PURE__ */ o3("code", { children: "useEffect" }),
+    const [timeout, setTimeout2] = p2(1e3);
+    const [triggerIndex, setTriggerIndex] = p2("");
+    const [fireCount, setFireCount] = p2(0);
+    useTimeout({ timeout, triggerIndex, callback: () => setFireCount((i4) => ++i4) });
+    return /* @__PURE__ */ r4("div", { class: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "useTimeout" }),
+      /* @__PURE__ */ r4("p", { children: [
+        /* @__PURE__ */ r4("code", { children: "useEffect" }),
         " but on a timer"
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Timeout duration: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Refresh key: ",
-        /* @__PURE__ */ o3("input", { type: "text", value: triggerIndex, onInput: (e3) => setTriggerIndex(e3.currentTarget.value) })
+        /* @__PURE__ */ r4("input", { type: "text", value: triggerIndex, onInput: (e3) => setTriggerIndex(e3.currentTarget.value) })
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "The callback has been called ",
         fireCount,
         " time",
@@ -8204,52 +8259,52 @@
   window._generate_setState_stacks = false;
   var DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable({ effect: "copy" });
-    const { ref: _ref } = useMergedProps({}, { ref: _2(null) });
+    const { ref: _ref } = useMergedProps({}, { ref: A2(null) });
     const p3 = useMergedProps(props, { className: "demo droppable" });
-    return /* @__PURE__ */ o3("div", { ...p3, children: [
-      droppedStrings != null && /* @__PURE__ */ o3("div", { children: [
+    return /* @__PURE__ */ r4("div", { ...p3, children: [
+      droppedStrings != null && /* @__PURE__ */ r4("div", { children: [
         "Data dropped: ",
-        /* @__PURE__ */ o3("ul", { children: Object.entries(droppedStrings).map(([type, value]) => /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("ul", { children: Object.entries(droppedStrings).map(([type, value]) => /* @__PURE__ */ r4("li", { children: [
           type,
           ": ",
           value
         ] })) })
       ] }),
-      droppedFiles != null && /* @__PURE__ */ o3("div", { children: [
+      droppedFiles != null && /* @__PURE__ */ r4("div", { children: [
         "Files dropped: ",
-        /* @__PURE__ */ o3("table", { children: [
-          /* @__PURE__ */ o3("thead", { children: /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("th", { children: "Name" }),
-            /* @__PURE__ */ o3("th", { children: "Size" }),
-            /* @__PURE__ */ o3("th", { children: "Type" }),
-            /* @__PURE__ */ o3("th", { children: "Last modified" })
+        /* @__PURE__ */ r4("table", { children: [
+          /* @__PURE__ */ r4("thead", { children: /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("th", { children: "Name" }),
+            /* @__PURE__ */ r4("th", { children: "Size" }),
+            /* @__PURE__ */ r4("th", { children: "Type" }),
+            /* @__PURE__ */ r4("th", { children: "Last modified" })
           ] }) }),
-          /* @__PURE__ */ o3("tbody", { children: droppedFiles.map((f3) => /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: f3.name }),
+          /* @__PURE__ */ r4("tbody", { children: droppedFiles.map((f3) => /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: f3.name }),
             f3.data.byteLength,
-            /* @__PURE__ */ o3("td", { children: f3.type }),
-            /* @__PURE__ */ o3("td", { children: new Date(f3.lastModified ?? 0) })
+            /* @__PURE__ */ r4("td", { children: f3.type }),
+            /* @__PURE__ */ r4("td", { children: new Date(f3.lastModified ?? 0) })
           ] })) })
         ] })
       ] }),
-      /* @__PURE__ */ o3("hr", {}),
-      stringsForConsideration != null && /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("hr", {}),
+      stringsForConsideration != null && /* @__PURE__ */ r4("div", { children: [
         "Data being considered: ",
-        /* @__PURE__ */ o3("ul", { children: Array.from(stringsForConsideration).map((type) => /* @__PURE__ */ o3("li", { children: type })) })
+        /* @__PURE__ */ r4("ul", { children: Array.from(stringsForConsideration).map((type) => /* @__PURE__ */ r4("li", { children: type })) })
       ] }),
-      filesForConsideration != null && /* @__PURE__ */ o3("div", { children: [
+      filesForConsideration != null && /* @__PURE__ */ r4("div", { children: [
         "Files being considered: ",
-        /* @__PURE__ */ o3("ul", { children: filesForConsideration.map((f3) => /* @__PURE__ */ o3("li", { children: JSON.stringify(f3) })) })
+        /* @__PURE__ */ r4("ul", { children: filesForConsideration.map((f3) => /* @__PURE__ */ r4("li", { children: JSON.stringify(f3) })) })
       ] }),
-      /* @__PURE__ */ o3("hr", {}),
-      dropError ? /* @__PURE__ */ o3("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) }) : null
+      /* @__PURE__ */ r4("hr", {}),
+      dropError ? /* @__PURE__ */ r4("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) }) : null
     ] });
   };
   var DemoUseDraggable = () => {
     const { propsUnstable: props } = useDraggable({ data: { "text/plain": "This is custom draggable content of type text/plain." }, dragImage: null, dragImageXOffset: null, dragImageYOffset: null, effectAllowed: null });
-    return /* @__PURE__ */ o3("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" });
+    return /* @__PURE__ */ r4("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" });
   };
-  var ChildrenHaveFocusContext = F(null);
+  var ChildrenHaveFocusContext = V(null);
   var DemoUseChildrenHaveFocus = () => {
     const [animate, setAnimate] = useState(false);
     const [maxChildCount, setMaxChildCount] = useState(10);
@@ -8268,60 +8323,60 @@
     });
     const [anyFocused, setAnyFocused] = useState(false);
     const { context } = useChildrenHaveFocus({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
-    return /* @__PURE__ */ o3("div", { ...useMergedProps({}, { className: "demo" }), children: [
-      /* @__PURE__ */ o3("h2", { children: "useChildrenHaveFocus" }),
-      /* @__PURE__ */ o3("p", { children: [
+    return /* @__PURE__ */ r4("div", { ...useMergedProps({}, { className: "demo" }), children: [
+      /* @__PURE__ */ r4("h2", { children: "useChildrenHaveFocus" }),
+      /* @__PURE__ */ r4("p", { children: [
         "If you want to see if any of your children have focus, the easiest way is to just attach a ",
-        /* @__PURE__ */ o3("code", { children: "focusIn" }),
+        /* @__PURE__ */ r4("code", { children: "focusIn" }),
         " handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route."
       ] }),
-      /* @__PURE__ */ o3("div", { children: /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "number", min: 0, value: minChildCount, onInput: (e3) => {
+      /* @__PURE__ */ r4("div", { children: /* @__PURE__ */ r4("label", { children: [
+        /* @__PURE__ */ r4("input", { type: "number", min: 0, value: minChildCount, onInput: (e3) => {
           e3.preventDefault();
           setMinChildCount(e3.currentTarget.valueAsNumber);
         } }),
         " Min # of children"
       ] }) }),
-      /* @__PURE__ */ o3("div", { children: /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "number", min: minChildCount, value: maxChildCount, onInput: (e3) => {
+      /* @__PURE__ */ r4("div", { children: /* @__PURE__ */ r4("label", { children: [
+        /* @__PURE__ */ r4("input", { type: "number", min: minChildCount, value: maxChildCount, onInput: (e3) => {
           e3.preventDefault();
           setMaxChildCount(e3.currentTarget.valueAsNumber);
         } }),
         " Max # of children"
       ] }) }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Current # of children: ",
         currentChildCount
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
-        /* @__PURE__ */ o3("input", { type: "checkbox", onInput: (e3) => setAnimate(e3.currentTarget.checked) }),
+      /* @__PURE__ */ r4("label", { children: [
+        /* @__PURE__ */ r4("input", { type: "checkbox", onInput: (e3) => setAnimate(e3.currentTarget.checked) }),
         " Mount & unmount children on a cycle"
       ] }),
-      /* @__PURE__ */ o3(ChildrenHaveFocusContext.Provider, { value: context, children: [
-        /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4(ChildrenHaveFocusContext.Provider, { value: context, children: [
+        /* @__PURE__ */ r4("div", { children: [
           "Any children focused: ",
           anyFocused.toString()
         ] }),
-        /* @__PURE__ */ o3("div", { children: Array.from(function* () {
-          for (let i3 = 0; i3 < currentChildCount; ++i3) {
-            yield /* @__PURE__ */ o3(DemoUseChildrenHaveFocusChild, { index: i3 }, i3);
+        /* @__PURE__ */ r4("div", { children: Array.from(function* () {
+          for (let i4 = 0; i4 < currentChildCount; ++i4) {
+            yield /* @__PURE__ */ r4(DemoUseChildrenHaveFocusChild, { index: i4 }, i4);
           }
         }()) })
       ] })
     ] });
   };
   var DemoUseChildrenHaveFocusChild = ({ index }) => {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild({ context: q2(ChildrenHaveFocusContext) });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild({ context: g2(ChildrenHaveFocusContext) });
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
-    return /* @__PURE__ */ o3("div", { tabIndex: 0, ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable), children: [
+    return /* @__PURE__ */ r4("div", { tabIndex: 0, ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable), children: [
       "Focusable child #",
       index,
-      /* @__PURE__ */ o3("input", {}),
-      /* @__PURE__ */ o3("input", {})
+      /* @__PURE__ */ r4("input", {}),
+      /* @__PURE__ */ r4("input", {})
     ] });
   };
-  var DemoUseFocusTrap = x3(({ depth }) => {
+  var DemoUseFocusTrap = x2(({ depth }) => {
     const [active, setActive] = useState(false);
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { props } = useFocusTrap({
@@ -8336,33 +8391,33 @@
     });
     const divProps = useMergedProps(props, propsStable, { ref: void 0, className: "focus-trap-demo" });
     if (depth == 2)
-      return /* @__PURE__ */ o3("div", {});
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("label", { children: [
+      return /* @__PURE__ */ r4("div", {});
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Active: ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: active, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: active, onInput: (e3) => {
           e3.preventDefault();
           setActive(e3.currentTarget.checked);
         } })
       ] }),
-      /* @__PURE__ */ o3("div", { ...divProps, children: /* @__PURE__ */ o3(DemoUseFocusTrapChild, { active, setActive, depth: depth ?? 0 }) })
+      /* @__PURE__ */ r4("div", { ...divProps, children: /* @__PURE__ */ r4(DemoUseFocusTrapChild, { active, setActive, depth: depth ?? 0 }) })
     ] });
   });
-  var DemoUseFocusTrapChild = x3(({ setActive, active }) => {
-    return /* @__PURE__ */ o3(_, { children: [
-      /* @__PURE__ */ o3("button", { children: "Button 1" }),
-      /* @__PURE__ */ o3("button", { children: "Button 2" }),
-      /* @__PURE__ */ o3("button", { children: "Button 3" }),
-      /* @__PURE__ */ o3("label", { children: [
+  var DemoUseFocusTrapChild = x2(({ setActive, active }) => {
+    return /* @__PURE__ */ r4(a, { children: [
+      /* @__PURE__ */ r4("button", { children: "Button 1" }),
+      /* @__PURE__ */ r4("button", { children: "Button 2" }),
+      /* @__PURE__ */ r4("button", { children: "Button 3" }),
+      /* @__PURE__ */ r4("label", { children: [
         "Active: ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: active, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: active, onInput: (e3) => {
           e3.preventDefault();
           setActive(e3.currentTarget.checked);
         } })
       ] })
     ] });
   });
-  var DemoUseAsyncHandler1 = x3(() => {
+  var DemoUseAsyncHandler1 = x2(() => {
     const [timeout, setTimeout2] = useState(1e3);
     const [debounce2, setDebounce] = useState(0);
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -8385,70 +8440,70 @@
       throttle: null
     });
     const onClick = pending ? void 0 : syncHandler;
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("button", { disabled: pending && disableConsecutive, onClick, children: "Click me!" }),
-      /* @__PURE__ */ o3("label", { children: [
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("button", { disabled: pending && disableConsecutive, onClick, children: "Click me!" }),
+      /* @__PURE__ */ r4("label", { children: [
         "Sleep for: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Throw an error ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: shouldThrow, onInput: (e3) => setShouldThrow(e3.currentTarget.checked) })
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: shouldThrow, onInput: (e3) => setShouldThrow(e3.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Disabled while pending ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: disableConsecutive, onInput: (e3) => setDisableConsecutive(e3.currentTarget.checked) })
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: disableConsecutive, onInput: (e3) => setDisableConsecutive(e3.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Debounce: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: debounce2, onInput: (e3) => setDebounce(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: debounce2, onInput: (e3) => setDebounce(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("table", { children: [
-        /* @__PURE__ */ o3("thead", { children: /* @__PURE__ */ o3("tr", { children: [
-          /* @__PURE__ */ o3("th", { children: "Field" }),
-          /* @__PURE__ */ o3("th", { children: "Value" })
+      /* @__PURE__ */ r4("table", { children: [
+        /* @__PURE__ */ r4("thead", { children: /* @__PURE__ */ r4("tr", { children: [
+          /* @__PURE__ */ r4("th", { children: "Field" }),
+          /* @__PURE__ */ r4("th", { children: "Value" })
         ] }) }),
-        /* @__PURE__ */ o3("tbody", { children: [
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "callCount" }),
-            /* @__PURE__ */ o3("td", { children: callCount })
+        /* @__PURE__ */ r4("tbody", { children: [
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "callCount" }),
+            /* @__PURE__ */ r4("td", { children: callCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "settleCount" }),
-            /* @__PURE__ */ o3("td", { children: settleCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "settleCount" }),
+            /* @__PURE__ */ r4("td", { children: settleCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "resolveCount" }),
-            /* @__PURE__ */ o3("td", { children: resolveCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "resolveCount" }),
+            /* @__PURE__ */ r4("td", { children: resolveCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "rejectCount" }),
-            /* @__PURE__ */ o3("td", { children: rejectCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "rejectCount" }),
+            /* @__PURE__ */ r4("td", { children: rejectCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "hasError" }),
-            /* @__PURE__ */ o3("td", { children: hasError.toString() })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "hasError" }),
+            /* @__PURE__ */ r4("td", { children: hasError.toString() })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "hasCapture" }),
-            /* @__PURE__ */ o3("td", { children: hasCapture.toString() })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "hasCapture" }),
+            /* @__PURE__ */ r4("td", { children: hasCapture.toString() })
           ] })
         ] })
       ] })
     ] });
   });
-  var DemoUseAsyncHandler2 = x3(() => {
+  var DemoUseAsyncHandler2 = x2(() => {
     const [timeout, setTimeout2] = useState(1e3);
     const [debounce2, setDebounce] = useState(0);
     const [throttle, setThrottle] = useState(0);
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
     const [text, setText] = useState("");
-    const onInputAsync = async (v3, _e) => new Promise((resolve, reject) => window.setTimeout(() => {
+    const onInputAsync = async (v4, _e) => new Promise((resolve, reject) => window.setTimeout(() => {
       if (getShouldThrow()) {
         reject();
       } else {
-        setText(v3);
+        setText(v4);
         resolve();
       }
     }, timeout));
@@ -8474,81 +8529,81 @@
       throttle: throttle == 0 ? void 0 : throttle
     });
     let anyWaiting = pending || debouncingAsync || debouncingSync;
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("label", { children: [
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Demo text: ",
-        /* @__PURE__ */ o3("input", { value: hasCapture ? currentCapture : text, disabled: pending && disableConsecutive, onInput: syncHandler })
+        /* @__PURE__ */ r4("input", { value: hasCapture ? currentCapture : text, disabled: pending && disableConsecutive, onInput: syncHandler })
       ] }),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4("label", { children: [
         "# of milliseconds the async handler takes to run: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: timeout, onInput: (e3) => setTimeout2(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Throw an error ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: shouldThrow, onInput: (e3) => setShouldThrow(e3.currentTarget.checked) })
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: shouldThrow, onInput: (e3) => setShouldThrow(e3.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Disabled while pending ",
-        /* @__PURE__ */ o3("input", { type: "checkbox", checked: disableConsecutive, onInput: (e3) => setDisableConsecutive(e3.currentTarget.checked) })
+        /* @__PURE__ */ r4("input", { type: "checkbox", checked: disableConsecutive, onInput: (e3) => setDisableConsecutive(e3.currentTarget.checked) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Debounce: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: debounce2, onInput: (e3) => setDebounce(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: debounce2, onInput: (e3) => setDebounce(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("label", { children: [
+      /* @__PURE__ */ r4("label", { children: [
         "Throttle: ",
-        /* @__PURE__ */ o3("input", { type: "number", value: throttle, onInput: (e3) => setThrottle(e3.currentTarget.valueAsNumber) })
+        /* @__PURE__ */ r4("input", { type: "number", value: throttle, onInput: (e3) => setThrottle(e3.currentTarget.valueAsNumber) })
       ] }),
-      /* @__PURE__ */ o3("table", { children: [
-        /* @__PURE__ */ o3("thead", { children: /* @__PURE__ */ o3("tr", { children: [
-          /* @__PURE__ */ o3("th", { children: "Field" }),
-          /* @__PURE__ */ o3("th", { children: "Value" })
+      /* @__PURE__ */ r4("table", { children: [
+        /* @__PURE__ */ r4("thead", { children: /* @__PURE__ */ r4("tr", { children: [
+          /* @__PURE__ */ r4("th", { children: "Field" }),
+          /* @__PURE__ */ r4("th", { children: "Value" })
         ] }) }),
-        /* @__PURE__ */ o3("tbody", { children: [
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "showSpinner" }),
-            /* @__PURE__ */ o3("td", { children: `${anyWaiting}` })
+        /* @__PURE__ */ r4("tbody", { children: [
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "showSpinner" }),
+            /* @__PURE__ */ r4("td", { children: `${anyWaiting}` })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "pending" }),
-            /* @__PURE__ */ o3("td", { children: `${pending}` })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "pending" }),
+            /* @__PURE__ */ r4("td", { children: `${pending}` })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "debouncingSync" }),
-            /* @__PURE__ */ o3("td", { children: `${debouncingSync}` })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "debouncingSync" }),
+            /* @__PURE__ */ r4("td", { children: `${debouncingSync}` })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "debouncingAsync" }),
-            /* @__PURE__ */ o3("td", { children: `${debouncingAsync}` })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "debouncingAsync" }),
+            /* @__PURE__ */ r4("td", { children: `${debouncingAsync}` })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "callCount" }),
-            /* @__PURE__ */ o3("td", { children: callCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "callCount" }),
+            /* @__PURE__ */ r4("td", { children: callCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "settleCount" }),
-            /* @__PURE__ */ o3("td", { children: settleCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "settleCount" }),
+            /* @__PURE__ */ r4("td", { children: settleCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "resolveCount" }),
-            /* @__PURE__ */ o3("td", { children: resolveCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "resolveCount" }),
+            /* @__PURE__ */ r4("td", { children: resolveCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "rejectCount" }),
-            /* @__PURE__ */ o3("td", { children: rejectCount })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "rejectCount" }),
+            /* @__PURE__ */ r4("td", { children: rejectCount })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "hasError" }),
-            /* @__PURE__ */ o3("td", { children: hasError.toString() })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "hasError" }),
+            /* @__PURE__ */ r4("td", { children: hasError.toString() })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: "currentCapture" }),
-            /* @__PURE__ */ o3("td", { children: currentCapture })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: "currentCapture" }),
+            /* @__PURE__ */ r4("td", { children: currentCapture })
           ] }),
-          /* @__PURE__ */ o3("tr", { children: [
-            /* @__PURE__ */ o3("td", { children: '"Saved" input' }),
-            /* @__PURE__ */ o3("td", { children: text })
+          /* @__PURE__ */ r4("tr", { children: [
+            /* @__PURE__ */ r4("td", { children: '"Saved" input' }),
+            /* @__PURE__ */ r4("td", { children: text })
           ] })
         ] })
       ] })
@@ -8557,7 +8612,7 @@
   function getDocument3() {
     return window.document;
   }
-  var DemoFocus = x3(() => {
+  var DemoFocus = x2(() => {
     const [focusCount, setFocusCount] = useState(0);
     const [innerFocusCount, setInnerFocusCount] = useState(0);
     const [lastActiveElement, setLastActiveElement] = useState(null);
@@ -8598,60 +8653,60 @@
         onLastFocusedInnerChanged: setLastFocusedInner
       }
     });
-    return /* @__PURE__ */ o3("div", { class: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "useHasFocus" }),
-      /* @__PURE__ */ o3("p", { children: "Tracks focus related to the component:" }),
-      /* @__PURE__ */ o3("ul", { children: [
-        /* @__PURE__ */ o3("li", { children: "Is this element (or, optionally, any element within it) focused?" }),
-        /* @__PURE__ */ o3("li", { children: [
+    return /* @__PURE__ */ r4("div", { class: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "useHasFocus" }),
+      /* @__PURE__ */ r4("p", { children: "Tracks focus related to the component:" }),
+      /* @__PURE__ */ r4("ul", { children: [
+        /* @__PURE__ */ r4("li", { children: "Is this element (or, optionally, any element within it) focused?" }),
+        /* @__PURE__ */ r4("li", { children: [
           "Regardless of if focus was lost because the ",
-          /* @__PURE__ */ o3("code", { children: "body" }),
+          /* @__PURE__ */ r4("code", { children: "body" }),
           " was clicked, was this element (or, optionally, any element within it), the last to be actually focused?"
         ] }),
-        /* @__PURE__ */ o3("li", { children: "Does the window have focus?" })
+        /* @__PURE__ */ r4("li", { children: "Does the window have focus?" })
       ] }),
-      /* @__PURE__ */ o3("div", { ...useMergedProps(p22, p1, { style: { border: "1px solid black" }, tabIndex: 0 }), children: [
-        /* @__PURE__ */ o3("span", { children: "Outer element" }),
-        /* @__PURE__ */ o3("input", {}),
-        /* @__PURE__ */ o3("input", {}),
-        /* @__PURE__ */ o3("div", { tabIndex: 0, style: { border: "1px solid black" }, children: [
-          /* @__PURE__ */ o3("span", { children: "Inner element" }),
-          /* @__PURE__ */ o3("input", {}),
-          /* @__PURE__ */ o3("input", {})
+      /* @__PURE__ */ r4("div", { ...useMergedProps(p22, p1, { style: { border: "1px solid black" }, tabIndex: 0 }), children: [
+        /* @__PURE__ */ r4("span", { children: "Outer element" }),
+        /* @__PURE__ */ r4("input", {}),
+        /* @__PURE__ */ r4("input", {}),
+        /* @__PURE__ */ r4("div", { tabIndex: 0, style: { border: "1px solid black" }, children: [
+          /* @__PURE__ */ r4("span", { children: "Inner element" }),
+          /* @__PURE__ */ r4("input", {}),
+          /* @__PURE__ */ r4("input", {})
         ] })
       ] }),
-      /* @__PURE__ */ o3("div", { children: /* @__PURE__ */ o3("ul", { children: [
-        /* @__PURE__ */ o3("li", { children: [
+      /* @__PURE__ */ r4("div", { children: /* @__PURE__ */ r4("ul", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Focus count: ",
           focusCount
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Inner focus count: ",
           innerFocusCount
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Strictly focused: ",
           focused.toString(),
           ", ",
           lastFocused.toString(),
           " (focused, lastFocused)"
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Inner focused: ",
           focusedInner.toString(),
           ", ",
           lastFocusedInner.toString(),
           " (focusedInner, lastFocusedInner)"
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "Window focused: ",
           windowFocused.toString()
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "activeElement: ",
           activeElement?.textContent
         ] }),
-        /* @__PURE__ */ o3("li", { children: [
+        /* @__PURE__ */ r4("li", { children: [
           "lastActiveElement: ",
           lastActiveElement?.textContent
         ] })
@@ -8660,10 +8715,10 @@
   });
   function DemoLabel() {
     const { propsInput, propsLabel } = useRandomDualIds({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" } });
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "Labels" }),
-      /* @__PURE__ */ o3("input", { ...propsInput }),
-      /* @__PURE__ */ o3("label", { ...propsLabel, children: "Label" })
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "Labels" }),
+      /* @__PURE__ */ r4("input", { ...propsInput }),
+      /* @__PURE__ */ r4("label", { ...propsLabel, children: "Label" })
     ] });
   }
   function DemoPress({ remaining }) {
@@ -8686,72 +8741,72 @@
       },
       refElementReturn
     });
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "Press" }),
-      /* @__PURE__ */ o3("div", { children: [
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "Press" }),
+      /* @__PURE__ */ r4("div", { children: [
         "Press count: ",
         count
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Active: ",
         pressing.toString()
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
+      /* @__PURE__ */ r4("div", { children: [
         "Long press: ",
         (longPress ?? "null").toString()
       ] }),
-      /* @__PURE__ */ o3("div", { style: { border: "1px solid black", touchAction: "none" }, tabIndex: 0, ...useMergedProps(p1, p22), children: [
-        /* @__PURE__ */ o3("div", { children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child." }),
-        /* @__PURE__ */ o3("div", { children: remaining > 0 && /* @__PURE__ */ o3(DemoPress, { remaining: remaining - 1 }) })
+      /* @__PURE__ */ r4("div", { style: { border: "1px solid black", touchAction: "none" }, tabIndex: 0, ...useMergedProps(p1, p22), children: [
+        /* @__PURE__ */ r4("div", { children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child." }),
+        /* @__PURE__ */ r4("div", { children: remaining > 0 && /* @__PURE__ */ r4(DemoPress, { remaining: remaining - 1 }) })
       ] })
     ] });
   }
   function DemoPortalChildrenChild() {
     console.log("Render portal child");
-    return /* @__PURE__ */ o3("p", { children: "Portal child" });
+    return /* @__PURE__ */ r4("p", { children: "Portal child" });
   }
   function DemoPortalChildren() {
     const [element, setElement] = useState(null);
     const { children, pushChild, removeChild, updateChild } = usePortalChildren({ target: element });
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("h2", { children: "Portal children" }),
-      /* @__PURE__ */ o3("button", { onClick: () => pushChild(/* @__PURE__ */ o3(DemoPortalChildrenChild, {})), children: "Push child" }),
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("h2", { children: "Portal children" }),
+      /* @__PURE__ */ r4("button", { onClick: () => pushChild(/* @__PURE__ */ r4(DemoPortalChildrenChild, {})), children: "Push child" }),
       children,
-      /* @__PURE__ */ o3("div", { id: "demo-portal-target", ref: setElement })
+      /* @__PURE__ */ r4("div", { id: "demo-portal-target", ref: setElement })
     ] });
   }
   function DemoGlobalHandler() {
     const [count, setCount] = useState(10);
     const [mode, setMode] = useState("single");
     const [testTime, setTestTime] = useState("");
-    return /* @__PURE__ */ o3("div", { className: "demo", children: [
-      /* @__PURE__ */ o3("div", { children: "Global event handlers:" }),
-      /* @__PURE__ */ o3("label", { children: [
+    return /* @__PURE__ */ r4("div", { className: "demo", children: [
+      /* @__PURE__ */ r4("div", { children: "Global event handlers:" }),
+      /* @__PURE__ */ r4("label", { children: [
         "# of event handlers",
-        /* @__PURE__ */ o3("input", { type: "number", value: count, min: 0, onInput: (e3) => {
+        /* @__PURE__ */ r4("input", { type: "number", value: count, min: 0, onInput: (e3) => {
           e3.preventDefault();
           setCount(e3.currentTarget.valueAsNumber);
         } })
       ] }),
-      /* @__PURE__ */ o3("div", { children: [
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { onInput: (e3) => {
+      /* @__PURE__ */ r4("div", { children: [
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { onInput: (e3) => {
             e3.preventDefault();
             if (e3.currentTarget.checked)
               setMode("grouped");
           }, type: "radio", name: "global-handler-mode" }),
           " Grouped"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { onInput: (e3) => {
             e3.preventDefault();
             if (e3.currentTarget.checked)
               setMode("single");
           }, type: "radio", name: "global-handler-mode" }),
           " Single"
         ] }),
-        /* @__PURE__ */ o3("label", { children: [
-          /* @__PURE__ */ o3("input", { onInput: (e3) => {
+        /* @__PURE__ */ r4("label", { children: [
+          /* @__PURE__ */ r4("input", { onInput: (e3) => {
             e3.preventDefault();
             if (e3.currentTarget.checked)
               setMode(null);
@@ -8759,72 +8814,72 @@
           " Off"
         ] })
       ] }),
-      /* @__PURE__ */ o3("button", { id: "global-handler-test", onClick: () => {
+      /* @__PURE__ */ r4("button", { id: "global-handler-test", onClick: () => {
         const now2 = /* @__PURE__ */ new Date();
         document.getElementById("global-handler-test2")?.click();
         const then = /* @__PURE__ */ new Date();
         setTestTime((+then - +now2) / 1e3 + "s passed");
       }, children: "Run test" }),
-      /* @__PURE__ */ o3("button", { id: "global-handler-test2", children: "Run test 2" }),
-      /* @__PURE__ */ o3("div", { children: testTime }),
-      /* @__PURE__ */ o3(DemoGlobalHandlerChildren, { count, mode }, mode)
+      /* @__PURE__ */ r4("button", { id: "global-handler-test2", children: "Run test 2" }),
+      /* @__PURE__ */ r4("div", { children: testTime }),
+      /* @__PURE__ */ r4(DemoGlobalHandlerChildren, { count, mode }, mode)
     ] });
   }
-  var DemoGlobalHandlerChildren = x3(function DemoGlobalHandlerChildren2({ count, mode }) {
-    return /* @__PURE__ */ o3(_, { children: [...function* () {
-      for (let i3 = 0; i3 < count; ++i3) {
-        yield /* @__PURE__ */ o3(DemoGlobalHandlerChild, { mode, target: window }, i3);
+  var DemoGlobalHandlerChildren = x2(function DemoGlobalHandlerChildren2({ count, mode }) {
+    return /* @__PURE__ */ r4(a, { children: [...function* () {
+      for (let i4 = 0; i4 < count; ++i4) {
+        yield /* @__PURE__ */ r4(DemoGlobalHandlerChild, { mode, target: window }, i4);
       }
     }()] });
   });
-  var DemoGlobalHandlerChild = x3(function DemoGlobalHandlerChild2({ mode, target }) {
+  var DemoGlobalHandlerChild = x2(function DemoGlobalHandlerChild2({ mode, target }) {
     useGlobalHandler(target, "click", mode == null ? null : (e3) => {
       if (e3.target?.id != "global-handler-test2")
         return;
       window._demo_event = (window._demo_event || 0) + 1;
     }, {}, mode || "grouped");
-    return /* @__PURE__ */ o3("div", { hidden: true });
+    return /* @__PURE__ */ r4("div", { hidden: true });
   });
   var Component = () => {
-    return /* @__PURE__ */ o3(DemoUseRovingTabIndex, {});
-    return /* @__PURE__ */ o3("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
-      /* @__PURE__ */ o3(DemoPress, { remaining: 2 }),
-      /* @__PURE__ */ o3("input", {}),
-      /* @__PURE__ */ o3("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [
-        /* @__PURE__ */ o3(DemoUseModal, {}),
-        /* @__PURE__ */ o3(DemoUseModal, {})
+    return /* @__PURE__ */ r4(DemoUseRovingTabIndex, {});
+    return /* @__PURE__ */ r4("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
+      /* @__PURE__ */ r4(DemoPress, { remaining: 2 }),
+      /* @__PURE__ */ r4("input", {}),
+      /* @__PURE__ */ r4("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [
+        /* @__PURE__ */ r4(DemoUseModal, {}),
+        /* @__PURE__ */ r4(DemoUseModal, {})
       ] }),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoLabel, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoGlobalHandler, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoPortalChildren, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoFocus, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseChildrenHaveFocus, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseGrid, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseTimeout, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseRovingTabIndex, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseFocusTrap, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseAsyncHandler1, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseAsyncHandler2, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseDroppable, {}),
-      /* @__PURE__ */ o3("hr", {}),
-      /* @__PURE__ */ o3(DemoUseDraggable, {}),
-      /* @__PURE__ */ o3("hr", {})
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoLabel, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoGlobalHandler, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoPortalChildren, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoFocus, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseChildrenHaveFocus, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseGrid, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseTimeout, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseRovingTabIndex, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseFocusTrap, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseAsyncHandler1, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseAsyncHandler2, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseDroppable, {}),
+      /* @__PURE__ */ r4("hr", {}),
+      /* @__PURE__ */ r4(DemoUseDraggable, {}),
+      /* @__PURE__ */ r4("hr", {})
     ] });
   };
   requestAnimationFrame(() => {
-    B(/* @__PURE__ */ o3(Component, {}), document.getElementById("root"));
+    H(/* @__PURE__ */ r4(Component, {}), document.getElementById("root"));
   });
 })();
 /*! Bundled license information:

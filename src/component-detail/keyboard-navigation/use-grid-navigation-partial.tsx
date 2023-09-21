@@ -40,6 +40,7 @@ export interface UseGridNavigationParametersSelf {
      * @stable
      */
     onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
+    initiallyTabbableColumn: number;
 }
 
 export interface UseGridNavigationRowContextSelf {
@@ -135,12 +136,12 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element> ex
  * @hasChild {@link useGridNavigationCell}
  */
 export const useGridNavigation = monitored(function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
-    gridNavigationParameters: { onTabbableColumnChange, ...void3 },
+    gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 },
     linearNavigationParameters,
     ...listNavigationParameters
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState<TabbableColumnInfo, EventType<any, any> | undefined>(onTabbableColumnChange, useStableCallback(() => {
-        let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
+        let t = (initiallyTabbableColumn ?? 0);
         return { actual: t, ideal: t }
     }));
 
