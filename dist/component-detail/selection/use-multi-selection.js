@@ -69,7 +69,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
             unselectedIndices.current.add(index);
         }
         const childCount = (selectedIndices.current.size + unselectedIndices.current.size);
-        const selectedPercent = (selectedIndices.current.size / (childCount));
+        const selectedPercent = (childCount == 0 ? 0 : (selectedIndices.current.size / (childCount)));
         console.assert(selectedPercent >= 0 && selectedPercent <= 1);
         onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
     });

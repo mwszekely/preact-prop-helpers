@@ -244,7 +244,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         }
 
         const childCount = (selectedIndices.current.size + unselectedIndices.current.size);
-        const selectedPercent = (selectedIndices.current.size / (childCount))
+        const selectedPercent = (childCount == 0 ? 0 : (selectedIndices.current.size / (childCount)));
         console.assert(selectedPercent >= 0 && selectedPercent <= 1);
 
         onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
@@ -341,7 +341,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             })
         }),
         childrenHaveFocusParameters: { onCompositeFocusChange },
-        multiSelectionReturn: {  },
+        multiSelectionReturn: {},
         propsStable: useMemoObject({})
     }
 }
@@ -489,7 +489,7 @@ export function useMultiSelectionChild<E extends Element>({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged
         },
-        props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled"? undefined : (localSelected ? "true" : "false") },
+        props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled" ? undefined : (localSelected ? "true" : "false") },
         info: {
             getMultiSelected: getLocalSelected,
             setSelectedFromParent,
