@@ -3119,7 +3119,6 @@ function useMultiSelection({ multiSelectionParameters: { onSelectionChange, mult
  * @compositeParams
  */
 function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
-    //const getIndex = useStableGetter(index);
     // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
     // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
     // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
