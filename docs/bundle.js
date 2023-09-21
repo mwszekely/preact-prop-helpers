@@ -3859,7 +3859,6 @@
     };
   }
   function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
-    const getIndex = useStableGetter(index);
     const pressFreebie = _2(false);
     const onPressSync = (e3) => {
       if (!multiSelectionDisabled) {
@@ -3891,9 +3890,9 @@
       }
     });
     y2(() => {
-      notifyParentOfChildSelectChange(null, getIndex(), getLocalSelected(), void 0);
-      return () => notifyParentOfChildSelectChange(null, getIndex(), void 0, getLocalSelected());
-    }, []);
+      notifyParentOfChildSelectChange(null, index, getLocalSelected(), void 0);
+      return () => notifyParentOfChildSelectChange(null, index, void 0, getLocalSelected());
+    }, [index]);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

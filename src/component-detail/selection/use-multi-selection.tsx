@@ -374,8 +374,7 @@ export function useMultiSelectionChild<E extends Element>({
     },
     ...void2
 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
-    const getIndex = useStableGetter(index);
-
+    
     // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
     // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
     // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
@@ -424,9 +423,9 @@ export function useMultiSelectionChild<E extends Element>({
     });
 
     useLayoutEffect(() => {
-        notifyParentOfChildSelectChange(null!, getIndex(), getLocalSelected(), undefined);
-        return () => notifyParentOfChildSelectChange(null!, getIndex(), undefined, getLocalSelected());
-    }, [])
+        notifyParentOfChildSelectChange(null!, index, getLocalSelected(), undefined);
+        return () => notifyParentOfChildSelectChange(null!, index, undefined, getLocalSelected());
+    }, [index])
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
