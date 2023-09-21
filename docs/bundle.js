@@ -1809,8 +1809,12 @@
     if (lhs == null && rhs == null) {
       return void 0;
     } else if (lhs == null) {
+      if (false)
+        console.assert(typeof rhs == "function" || "current" in rhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return rhs;
     } else if (rhs == null) {
+      if (false)
+        console.assert(typeof lhs == "function" || "current" in lhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return lhs;
     } else {
       return combined;
