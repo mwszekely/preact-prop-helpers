@@ -202,10 +202,12 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
+    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
+
     return {
         contextChildren,
         contextProcessing: useMemoObject({
-            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
+            processedChildrenContext,
             ...contextProcessing
         }),
         props: useMergedProps(props, propsRef),

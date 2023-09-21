@@ -5583,8 +5583,9 @@
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     const c22 = useMemoObject({
-      processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
+      processedChildrenContext,
       ...contextProcessing
     });
     const context = useMemoObject({
@@ -5814,10 +5815,11 @@
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     return {
       contextChildren,
       contextProcessing: useMemoObject({
-        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
+        processedChildrenContext,
         ...contextProcessing
       }),
       props: useMergedProps(props, propsRef),

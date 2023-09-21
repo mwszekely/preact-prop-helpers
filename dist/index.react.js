@@ -4103,8 +4103,9 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     const c2 = useMemoObject({
-        processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
+        processedChildrenContext,
         ...contextProcessing
     });
     const context = useMemoObject({
@@ -4345,10 +4346,11 @@ refElementParameters, ...void1 }) {
         typeaheadNavigationContext,
         managedChildContext: managedChildRTIContext,
     });
+    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     return {
         contextChildren,
         contextProcessing: useMemoObject({
-            processedChildrenContext: useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement }),
+            processedChildrenContext,
             ...contextProcessing
         }),
         props: useMergedProps(props, propsRef),
