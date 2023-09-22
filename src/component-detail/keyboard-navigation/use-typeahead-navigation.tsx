@@ -399,7 +399,19 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
                 if (text) {
                     // Find where to insert this item.
                     // Because all index values should be unique, the returned sortedIndex
-                    // should always refer to a new location (i.e. be negative)                
+                    // should always refer to a new location (i.e. be negative)   
+                    //
+                    // TODO: adding things on mount/unmount means that it's 
+                    // hard to make grid navigation typeahead work smoothly with tables -- 
+                    // every time we change columns, every row resorts itself, even though
+                    // each row should be able to just do that on mount.
+                    // 
+                    // We probably need to instead just sort on-demand, which is better for
+                    // performance anyway, but is tricky to code without major lag on the
+                    // first keystroke.
+                    //
+                    // Or we need to be able to support columns here, within typeahead?
+                    // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
                     const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
                     console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
                     if (sortedIndex < 0) {
