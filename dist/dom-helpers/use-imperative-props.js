@@ -1,22 +1,18 @@
 import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement } from "./use-ref-element.js";
+import { PropNames_RefElementReturn_getElement, useRefElement } from "./use-ref-element.js";
 const P = `PropNames.PropNames.ImperativePropsParameters`;
 const R = `PropNames.PropNames.ImperativePropsReturn`;
-const ImperativePropsParameters = {};
-const ImperativePropsReturn = {
-    hasClass: `${R}.hasClass`,
-    setClass: `${R}.setClass`,
-    setStyle: `${R}.setStyle`,
-    getAttribute: `${R}.getAttribute`,
-    setAttribute: `${R}.setAttribute`,
-    setChildren: `${R}.setChildren`,
-    dangerouslySetInnerHTML: `${R}.dangerouslySetInnerHTML`,
-    dangerouslyAppendHTML: `${R}.dangerouslyAppendHTML`,
-    setEventHandler: `${R}.setEventHandler`
-};
+export const PropNames_ImperativePropsReturn_hasClass = `${R}.hasClass`;
+export const PropNames_ImperativePropsReturn_setClass = `${R}.setClass`;
+export const PropNames_ImperativePropsReturn_setStyle = `${R}.setStyle`;
+export const PropNames_ImperativePropsReturn_getAttribute = `${R}.getAttribute`;
+export const PropNames_ImperativePropsReturn_setAttribute = `${R}.setAttribute`;
+export const PropNames_ImperativePropsReturn_setChildren = `${R}.setChildren`;
+export const PropNames_ImperativePropsReturn_dangerouslySetInnerHTML = `${R}.dangerouslySetInnerHTML`;
+export const PropNames_ImperativePropsReturn_dangerouslyAppendHTML = `${R}.dangerouslyAppendHTML`;
+export const PropNames_ImperativePropsReturn_setEventHandler = `${R}.setEventHandler`;
 let templateElement = null;
 function htmlToElement(parent, html) {
     const document = parent.ownerDocument;
@@ -43,7 +39,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  */
 export const useImperativeProps = monitored(function useImperativeProps(args) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
-    const { [PropNames.RefElementReturn.getElement]: getElement } = args;
+    const { [PropNames_RefElementReturn_getElement]: getElement } = args;
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
         if (hasClass(cls) == !enabled) {
@@ -132,15 +128,15 @@ export const useImperativeProps = monitored(function useImperativeProps(args) {
     }, []);
     return {
         imperativePropsReturn: useRef({
-            [ImperativePropsReturn.hasClass]: hasClass,
-            [ImperativePropsReturn.setClass]: setClass,
-            [ImperativePropsReturn.setStyle]: setStyle,
-            [ImperativePropsReturn.getAttribute]: getAttribute,
-            [ImperativePropsReturn.setAttribute]: setAttribute,
-            [ImperativePropsReturn.setEventHandler]: setEventHandler,
-            [ImperativePropsReturn.setChildren]: setChildren,
-            [ImperativePropsReturn.dangerouslySetInnerHTML]: dangerouslySetInnerHTML,
-            [ImperativePropsReturn.dangerouslyAppendHTML]: dangerouslyAppendHTML
+            [PropNames_ImperativePropsReturn_hasClass]: hasClass,
+            [PropNames_ImperativePropsReturn_setClass]: setClass,
+            [PropNames_ImperativePropsReturn_setStyle]: setStyle,
+            [PropNames_ImperativePropsReturn_getAttribute]: getAttribute,
+            [PropNames_ImperativePropsReturn_setAttribute]: setAttribute,
+            [PropNames_ImperativePropsReturn_setEventHandler]: setEventHandler,
+            [PropNames_ImperativePropsReturn_setChildren]: setChildren,
+            [PropNames_ImperativePropsReturn_dangerouslySetInnerHTML]: dangerouslySetInnerHTML,
+            [PropNames_ImperativePropsReturn_dangerouslyAppendHTML]: dangerouslyAppendHTML
         }).current,
         props: [
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },

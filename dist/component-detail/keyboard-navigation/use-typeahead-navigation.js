@@ -1,37 +1,28 @@
-import { useTextContent } from "../../dom-helpers/use-text-content.js";
+import { PropNames_PressParameters_excludeSpace } from "../../component-use/use-press.js";
+import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
+import { PropNames_TextContentParameters_getText, PropNames_TextContentParameters_onTextContentChange, PropNames_TextContentReturn_getTextContent, useTextContent } from "../../dom-helpers/use-text-content.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { PropNames_RovingTabIndexReturn_getTabbableIndex, PropNames_RovingTabIndexReturn_setTabbableIndex } from "./use-roving-tabindex.js";
 const P1 = `PropNames.TypeaheadNavigationParameters`;
 const P2 = `PropNames.TypeaheadNavigationChildParameters`;
 const R1 = `PropNames.TypeaheadNavigationReturn`;
 const R2 = `PropNames.TypeaheadNavigationChildReturn`;
-export const P1Names = {
-    onNavigateTypeahead: `${P1}.onNavigateTypeahead`,
-    isValidForTypeaheadNavigation: `${P1}.isValidForTypeaheadNavigation`,
-    collator: `${P1}.collator`,
-    noTypeahead: `${P1}.noTypeahead`,
-    typeaheadTimeout: `${P1}.typeaheadTimeout`,
-};
-export const R1Names = {
-    getCurrentTypeahead: `${R1}.getCurrentTypeahead`,
-    typeaheadStatus: `${R1}.typeaheadStatus`
-};
-export const P2Names = {};
-export const R2Names = {
-    tabbable: `${R2}.tabbable`,
-    getTabbable: `${R2}.getTabbable`
-};
-PropNames.TypeaheadNavigationParameters ??= P1Names;
-PropNames.TypeaheadNavigationReturn ??= R1Names;
-PropNames.TypeaheadNavigationChildParameters ??= P2Names;
-PropNames.TypeaheadNavigationChildReturn ??= R2Names;
+export const PropNames_TypeaheadNavigationParameters_onNavigateTypeahead = `${P1}.onNavigateTypeahead`;
+export const PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation = `${P1}.isValidForTypeaheadNavigation`;
+export const PropNames_TypeaheadNavigationParameters_collator = `${P1}.collator`;
+export const PropNames_TypeaheadNavigationParameters_noTypeahead = `${P1}.noTypeahead`;
+export const PropNames_TypeaheadNavigationParameters_typeaheadTimeout = `${P1}.typeaheadTimeout`;
+export const PropNames_TypeaheadNavigationReturn_getCurrentTypeahead = `${R1}.getCurrentTypeahead`;
+export const PropNames_TypeaheadNavigationReturn_typeaheadStatus = `${R1}.typeaheadStatus`;
+export const PropNames_TypeaheadNavigationChildReturn_tabbable = `${R2}.tabbable`;
+export const PropNames_TypeaheadNavigationChildReturn_getTabbable = `${R2}.getTabbable`;
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
@@ -41,7 +32,7 @@ PropNames.TypeaheadNavigationChildReturn ??= R2Names;
  *
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ [PropNames.RovingTabIndexReturn.getTabbableIndex]: getIndex, [PropNames.RovingTabIndexReturn.setTabbableIndex]: setIndex, [PropNames.TypeaheadNavigationParameters.collator]: collator, [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead, [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead, [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout, ..._void1 }) {
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ [PropNames_RovingTabIndexReturn_getTabbableIndex]: getIndex, [PropNames_RovingTabIndexReturn_setTabbableIndex]: setIndex, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, ..._void1 }) {
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
@@ -149,8 +140,8 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
                 excludeSpace
             }),
         }),
-        [PropNames.TypeaheadNavigationReturn.getCurrentTypeahead]: getCurrentTypeahead,
-        [PropNames.TypeaheadNavigationReturn.typeaheadStatus]: typeaheadStatus,
+        [PropNames_TypeaheadNavigationReturn_getCurrentTypeahead]: getCurrentTypeahead,
+        [PropNames_TypeaheadNavigationReturn_typeaheadStatus]: typeaheadStatus,
         props: propsStable.current
     };
     function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
@@ -233,11 +224,11 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
  *
  * @compositeParams
  */
-export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ..._void1 }, [PropNames.TextContentParameters.getText]: getText, [PropNames.RefElementReturn.getElement]: getElement, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } }, ..._void3 }) {
-    const { [PropNames.TextContentReturn.getTextContent]: getTextContent, ..._void4 } = useTextContent({
-        [PropNames.RefElementReturn.getElement]: getElement,
-        [PropNames.TextContentParameters.getText]: getText,
-        [PropNames.TextContentParameters.onTextContentChange]: useCallback((text) => {
+export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ..._void1 }, [PropNames_TextContentParameters_getText]: getText, [PropNames_RefElementReturn_getElement]: getElement, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } }, ..._void3 }) {
+    const { [PropNames_TextContentReturn_getTextContent]: getTextContent, ..._void4 } = useTextContent({
+        [PropNames_RefElementReturn_getElement]: getElement,
+        [PropNames_TextContentParameters_getText]: getText,
+        [PropNames_TextContentParameters_onTextContentChange]: useCallback((text) => {
             if (text) {
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
@@ -279,8 +270,8 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
     assertEmptyObject(_void4);
     assertEmptyObject(_void3);
     return {
-        [PropNames.TextContentReturn.getTextContent]: getTextContent,
-        [PropNames.PressParameters.excludeSpace]: excludeSpace
+        [PropNames_TextContentReturn_getTextContent]: getTextContent,
+        [PropNames_PressParameters_excludeSpace]: excludeSpace
     };
 });
 /**

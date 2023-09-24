@@ -1,27 +1,18 @@
 import { RefObject } from "preact";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { Nullable, useCallback, useRef } from "../util/lib.js";
-import { ElementProps, PropNames } from "../util/types.js";
+import { ElementProps } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 const P = `PropNames.RefElementParameters`;
 const R = `PropNames.RefElementReturn`;
 
-const RefElementParameters = {
-    onElementChange: `${P}.onElementChange`,
-    onMount: `${P}.onMount`,
-    onUnmount: `${P}.onUnmount`
-} as const;
-
-const RefElementReturn = {
-    getElement: `${R}.getElement`
-} as const;
-
-declare module "../util/types.js" { interface PropNames { RefElementParameters: typeof RefElementParameters } }
-declare module "../util/types.js" { interface PropNames { RefElementReturn: typeof RefElementReturn } }
-PropNames.RefElementParameters ??= RefElementParameters;
-PropNames.RefElementReturn ??= RefElementReturn;
+export const PropNames_RefElementParameters_onElementChange = `${P}.onElementChange`;
+export const PropNames_RefElementParameters_onMount = `${P}.onMount`;
+export const PropNames_RefElementParameters_onUnmount = `${P}.onUnmount`;
+export const PropNames_RefElementReturn_getElement = `${R}.getElement`;
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /** 
@@ -30,7 +21,7 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      * 
      * @stable
      */
-    [RefElementReturn.getElement]: () => T | null;
+    [PropNames_RefElementReturn_getElement]: () => T | null;
 
     /**
      * @stable
@@ -44,19 +35,19 @@ export interface UseRefElementParametersSelf<T extends EventTarget> {
      * 
      * @stable
      */
-    [RefElementParameters.onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
+    [PropNames_RefElementParameters_onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
     /** 
      * Called when the element mounts 
      * 
      * @stable
      */
-    [RefElementParameters.onMount]?: Nullable<(element: T) => void>;
+    [PropNames_RefElementParameters_onMount]?: Nullable<(element: T) => void>;
     /** 
      * Called when the element unmounts
      * 
      * @stable 
      */
-    [RefElementParameters.onUnmount]?: Nullable<(element: T) => void>;
+    [PropNames_RefElementParameters_onUnmount]?: Nullable<(element: T) => void>;
 }
 
 export type UseRefElementParameters<T extends EventTarget> = UseRefElementParametersSelf<T>;
@@ -98,9 +89,10 @@ export type UseRefElementReturnType<T extends EventTarget> = UseRefElementReturn
  * @compositeParams
  */
 export const useRefElement = monitored(function useRefElement<T extends EventTarget>({
-    [RefElementParameters.onElementChange]: onElementChange,
-    [RefElementParameters.onMount]: onMount,
-    [RefElementParameters.onUnmount]: onUnmount
+    [PropNames_RefElementParameters_onElementChange]: onElementChange,
+    [PropNames_RefElementParameters_onMount]: onMount,
+    [PropNames_RefElementParameters_onUnmount]: onUnmount,
+    ...void1
 }: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
@@ -138,11 +130,11 @@ export const useRefElement = monitored(function useRefElement<T extends EventTar
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, runImmediately);
     const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement as never }, "data-use-ref-element"));
-
+    assertEmptyObject(void1);
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        [RefElementReturn.getElement]: getElement,
+        [PropNames_RefElementReturn_getElement]: getElement,
         props: propsStable.current
     }
 })

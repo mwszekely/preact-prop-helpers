@@ -1,24 +1,10 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { ElementProps, FocusEventType, Nullable, PropNames } from "../util/types.js";
-declare module "../util/types.js" {
-    interface PropNames {
-        HasCurrentFocusParameters: typeof PNames;
-    }
-}
-declare module "../util/types.js" {
-    interface PropNames {
-        HasCurrentFocusReturn: typeof RNames;
-    }
-}
-export declare const PNames: {
-    readonly onCurrentFocusedChanged: "PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged";
-    readonly onCurrentFocusedInnerChanged: "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged";
-};
-export declare const RNames: {
-    readonly getCurrentFocused: "PropNames.HasCurrentFocusReturn.getCurrentFocused";
-    readonly getCurrentFocusedInner: "PropNames.HasCurrentFocusReturn.getCurrentFocusedInner";
-};
+import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
+export declare const PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged = "PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged";
+export declare const PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged = "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged";
+export declare const PropNames_HasCurrentFocusReturn_getCurrentFocused = "PropNames.HasCurrentFocusReturn.getCurrentFocused";
+export declare const PropNames_HasCurrentFocusReturn_getCurrentFocusedInner = "PropNames.HasCurrentFocusReturn.getCurrentFocusedInner";
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
     /**
      * Whether the element itself currently has focus.
@@ -27,7 +13,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    [PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
@@ -35,16 +21,16 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
 export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     props: ElementProps<E>;
     /** @stable */
-    [PropNames.HasCurrentFocusReturn.getCurrentFocused](): boolean;
+    [PropNames_HasCurrentFocusReturn_getCurrentFocused](): boolean;
     /** @stable */
-    [PropNames.HasCurrentFocusReturn.getCurrentFocusedInner](): boolean;
+    [PropNames_HasCurrentFocusReturn_getCurrentFocusedInner](): boolean;
 }
-export interface UseHasCurrentFocusParameters<T extends Node> extends UseHasCurrentFocusParametersSelf<T>, Pick<UseRefElementReturnType<T>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
+export interface UseHasCurrentFocusParameters<T extends Node> extends UseHasCurrentFocusParametersSelf<T>, Pick<UseRefElementReturnType<T>, typeof PropNames_RefElementReturn_getElement> {
 }
 export interface UseHasCurrentFocusReturnType<E extends Element> extends UseHasCurrentFocusReturnTypeSelf<E> {
 }
@@ -55,5 +41,5 @@ export interface UseHasCurrentFocusReturnType<E extends Element> extends UseHasC
  *
  * @compositeParams
  */
-export declare const useHasCurrentFocus: <T extends Element>({ [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: onCurrentFocusedChanged, [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames.RefElementReturn.getElement]: getElement }: UseHasCurrentFocusParameters<T>) => UseHasCurrentFocusReturnType<T>;
+export declare const useHasCurrentFocus: <T extends Element>({ [PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged]: onCurrentFocusedChanged, [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames_RefElementReturn_getElement]: getElement }: UseHasCurrentFocusParameters<T>) => UseHasCurrentFocusReturnType<T>;
 //# sourceMappingURL=use-has-current-focus.d.ts.map

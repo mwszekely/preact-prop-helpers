@@ -1,17 +1,14 @@
+import { PropNames_ActiveElementParameters_onLastActiveElementChange } from "../../observers/use-active-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
-import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 const P = `PropNames.LostFocusDismissParameters`;
 const R = `PropNames.LostFocusDismissReturn`;
-export const PNames = {
-    dismissLostFocusActive: `${P}.dismissLostFocusActive`,
-    onDismissLostFocus: `${P}.onDismissLostFocus`,
-    getElementSource: `${P}.getElementSource`,
-    getElementPopup: `${P}.getElementPopup`
-};
-export const RNames = {};
+export const PropNames_LostFocusDismissParameters_dismissLostFocusActive = `${P}.dismissLostFocusActive`;
+export const PropNames_LostFocusDismissParameters_onDismissLostFocus = `${P}.onDismissLostFocus`;
+export const PropNames_LostFocusDismissParameters_getElementSource = `${P}.getElementSource`;
+export const PropNames_LostFocusDismissParameters_getElementPopup = `${P}.getElementPopup`;
 ;
 /**
  * Invokes a callback when focus travels outside of the component's element.
@@ -20,7 +17,7 @@ export const RNames = {};
  *
  * @compositeParams
  */
-export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ [PropNames.LostFocusDismissParameters.getElementSource]: getElementSource, [PropNames.LostFocusDismissParameters.getElementPopup]: getElementPopup, [PropNames.LostFocusDismissParameters.dismissLostFocusActive]: open, [PropNames.LostFocusDismissParameters.onDismissLostFocus]: onClose, ..._void1 }) {
+export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ [PropNames_LostFocusDismissParameters_getElementSource]: getElementSource, [PropNames_LostFocusDismissParameters_getElementPopup]: getElementPopup, [PropNames_LostFocusDismissParameters_dismissLostFocusActive]: open, [PropNames_LostFocusDismissParameters_onDismissLostFocus]: onClose, ..._void1 }) {
     assertEmptyObject(_void1);
     const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
@@ -36,7 +33,7 @@ export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ [Pro
         }
     }, [getElementSource]);
     return {
-        [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange
+        [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange
     };
 });
 //# sourceMappingURL=use-lost-focus-dismiss.js.map

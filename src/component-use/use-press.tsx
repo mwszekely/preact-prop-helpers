@@ -1,44 +1,33 @@
 import { noop } from "lodash-es";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { onfocusout, useCallback } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, PropNames, TouchEventType } from "../util/types.js";
+import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, TouchEventType } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-
-declare module "../util/types.js" { interface PropNames { PressParameters: typeof PNames } }
-declare module "../util/types.js" { interface PropNames { PressReturn: typeof RNames } }
 
 const P = `PropNames.PressParameters`;
 const R = `PropNames.PressReturn`;
 
-export const PNames = {
-    onPressingChange: `${P}.onPressingChange`,
-    onPressSync: `${P}.onPressSync`,
-    excludeSpace: `${P}.excludeSpace`,
-    excludeEnter: `${P}.excludeEnter`,
-    excludePointer: `${P}.excludePointer`,
-    focusSelf: `${P}.focusSelf`,
-    allowRepeatPresses: `${P}.allowRepeatPresses`,
-    longPressThreshold: `${P}.longPressThreshold`
-} as const;
-
-export const RNames = {
-    pressing: `${R}.pressing`,
-    getIsPressing: `${R}.getIsPressing`,
-    longPress: `${R}.longPress`
-} as const;
-
-PropNames.PressParameters ??=  PNames;
-PropNames.PressReturn ??=  RNames;
+export const PropNames_PressParameters_onPressingChange = `${P}.onPressingChange`;
+export const PropNames_PressParameters_onPressSync = `${P}.onPressSync`;
+export const PropNames_PressParameters_excludeSpace = `${P}.excludeSpace`;
+export const PropNames_PressParameters_excludeEnter = `${P}.excludeEnter`;
+export const PropNames_PressParameters_excludePointer = `${P}.excludePointer`;
+export const PropNames_PressParameters_focusSelf = `${P}.focusSelf`;
+export const PropNames_PressParameters_allowRepeatPresses = `${P}.allowRepeatPresses`;
+export const PropNames_PressParameters_longPressThreshold = `${P}.longPressThreshold`;
+export const PropNames_PressReturn_pressing = `${R}.pressing`;
+export const PropNames_PressReturn_getIsPressing = `${R}.getIsPressing`;
+export const PropNames_PressReturn_longPress = `${R}.longPress`;
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 
-export interface UsePressParameters<E extends EventTarget> extends UsePressParametersSelf<E>, Pick<UseRefElementReturnType<E>, (typeof PropNames)["RefElementReturn"]["getElement"]> { }
+export interface UsePressParameters<E extends EventTarget> extends UsePressParametersSelf<E>, Pick<UseRefElementReturnType<E>, typeof PropNames_RefElementReturn_getElement> { }
 
 function pressLog(...args: any[]) {
     if ((window as any).__log_press_events)
@@ -47,7 +36,7 @@ function pressLog(...args: any[]) {
 
 export interface UsePressParametersSelf<E extends EventTarget> {
     /**  */
-    [PropNames.PressParameters.onPressingChange]: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
+    [PropNames_PressParameters_onPressingChange]: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
 
     /**
      * What should happen when this widget has been "pressed".
@@ -58,14 +47,14 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    [PropNames.PressParameters.onPressSync]: Nullable<((e: PressEventReason<E>) => void)>;
+    [PropNames_PressParameters_onPressSync]: Nullable<((e: PressEventReason<E>) => void)>;
 
     /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
-    [PropNames.PressParameters.excludeSpace]: Nullable<() => boolean>;
+    [PropNames_PressParameters_excludeSpace]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
-    [PropNames.PressParameters.excludeEnter]: Nullable<() => boolean>;
+    [PropNames_PressParameters_excludeEnter]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
-    [PropNames.PressParameters.excludePointer]: Nullable<() => boolean>;
+    [PropNames_PressParameters_excludePointer]: Nullable<() => boolean>;
 
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
@@ -75,18 +64,18 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    [PropNames.PressParameters.focusSelf](element: E): void;
+    [PropNames_PressParameters_focusSelf](element: E): void;
 
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
      */
-    [PropNames.PressParameters.allowRepeatPresses]: Nullable<boolean>;
+    [PropNames_PressParameters_allowRepeatPresses]: Nullable<boolean>;
 
     /**
      * After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true`
      * and the user's actions will not fire an actual press event.
      */
-    [PropNames.PressParameters.longPressThreshold]: Nullable<number>;
+    [PropNames_PressParameters_longPressThreshold]: Nullable<number>;
 }
 
 export interface UsePressReturnTypeSelf {
@@ -95,16 +84,16 @@ export interface UsePressReturnTypeSelf {
      * but specifically for presses only, so it's a more accurate reflection
      * of what will happen for the user. Useful for styling mostly.
      */
-    [PropNames.PressReturn.pressing]: boolean;
+    [PropNames_PressReturn_pressing]: boolean;
 
     /**
      * @stable
      */
-    [PropNames.PressReturn.getIsPressing](): boolean;
+    [PropNames_PressReturn_getIsPressing](): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
      */
-    [PropNames.PressReturn.longPress]: boolean | null;
+    [PropNames_PressReturn_longPress]: boolean | null;
 }
 
 export interface UsePressReturnType<E extends Element> extends UsePressReturnTypeSelf {
@@ -188,15 +177,15 @@ document.addEventListener("click", (e) => {
  * 
  */
 export const usePress = monitored(function usePress<E extends Element>({
-    [PropNames.RefElementReturn.getElement]: getElement,
-    [PropNames.PressParameters.focusSelf]: focusSelf,
-    [PropNames.PressParameters.onPressSync]: onPressSync,
-    [PropNames.PressParameters.allowRepeatPresses]: allowRepeatPresses,
-    [PropNames.PressParameters.longPressThreshold]: longPressThreshold,
-    [PropNames.PressParameters.excludeEnter]: ee,
-    [PropNames.PressParameters.excludePointer]: ep,
-    [PropNames.PressParameters.excludeSpace]: es,
-    [PropNames.PressParameters.onPressingChange]: opc,
+    [PropNames_RefElementReturn_getElement]: getElement,
+    [PropNames_PressParameters_focusSelf]: focusSelf,
+    [PropNames_PressParameters_onPressSync]: onPressSync,
+    [PropNames_PressParameters_allowRepeatPresses]: allowRepeatPresses,
+    [PropNames_PressParameters_longPressThreshold]: longPressThreshold,
+    [PropNames_PressParameters_excludeEnter]: ee,
+    [PropNames_PressParameters_excludePointer]: ep,
+    [PropNames_PressParameters_excludeSpace]: es,
+    [PropNames_PressParameters_onPressingChange]: opc,
     ..._void1
 }: UsePressParameters<E>): UsePressReturnType<E> {
     assertEmptyObject(_void1);
@@ -528,9 +517,9 @@ export const usePress = monitored(function usePress<E extends Element>({
     const p = supportsPointerEvents();
 
     return {
-        [PropNames.PressReturn.pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-        [PropNames.PressReturn.getIsPressing]: getIsPressing,
-        [PropNames.PressReturn.longPress]: longPress,
+        [PropNames_PressReturn_pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+        [PropNames_PressReturn_getIsPressing]: getIsPressing,
+        [PropNames_PressReturn_longPress]: longPress,
         props: [{
             onKeyDown,
             onKeyUp,

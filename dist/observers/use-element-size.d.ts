@@ -1,22 +1,7 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { PropNames } from "../util/types.js";
-declare module "../util/types.js" {
-    interface PropNames {
-        ElementSizeParameters: typeof PNames;
-    }
-}
-declare module "../util/types.js" {
-    interface PropNames {
-        ElementSizeReturn: typeof RNames;
-    }
-}
-export declare const PNames: {
-    readonly onSizeChange: "PropNames.ElementSizeParameters.onSizeChange";
-    readonly getObserveBox: "PropNames.ElementSizeParameters.getObserveBox";
-};
-export declare const RNames: {
-    readonly getSize: "PropNames.ElementSizeReturn.getSize";
-};
+import { PropNames_RefElementParameters_onElementChange, PropNames_RefElementReturn_getElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+export declare const PropNames_ElementSizeParameters_onSizeChange = "PropNames.ElementSizeParameters.onSizeChange";
+export declare const PropNames_ElementSizeParameters_getObserveBox = "PropNames.ElementSizeParameters.getObserveBox";
+export declare const PropNames_ElementSizeReturn_getSize = "PropNames.ElementSizeReturn.getSize";
 export interface UseElementSizeParametersSelf {
     /**
      * Called any time the browser detects a size change
@@ -26,7 +11,7 @@ export interface UseElementSizeParametersSelf {
      *
      * @stable
      */
-    [PropNames.ElementSizeParameters.onSizeChange](sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
+    [PropNames_ElementSizeParameters_onSizeChange](sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
     /**
      * Passed as an argument to the created ResizeObserver.
      *
@@ -34,7 +19,7 @@ export interface UseElementSizeParametersSelf {
      *
      * @stable
      */
-    [PropNames.ElementSizeParameters.getObserveBox]: null | (() => ResizeObserverOptions["box"]);
+    [PropNames_ElementSizeParameters_getObserveBox]: null | (() => ResizeObserverOptions["box"]);
 }
 export interface ElementSize {
     clientWidth: number;
@@ -52,16 +37,16 @@ export interface ElementSize {
 }
 export interface UseElementSizeReturnTypeSelf<E extends Element> {
     /** @stable */
-    [PropNames.ElementSizeReturn.getSize](): ElementSize | null;
+    [PropNames_ElementSizeReturn_getSize](): ElementSize | null;
 }
-export interface UseElementSizeParameters<T extends Element> extends UseElementSizeParametersSelf, Pick<UseRefElementReturnType<T>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
+export interface UseElementSizeParameters<T extends Element> extends UseElementSizeParametersSelf, Pick<UseRefElementReturnType<T>, typeof PropNames_RefElementReturn_getElement> {
 }
-export interface UseElementSizeReturnType<E extends Element> extends UseElementSizeReturnTypeSelf<E>, Pick<UseRefElementParameters<E>, (typeof PropNames)["RefElementParameters"]["onElementChange"]> {
+export interface UseElementSizeReturnType<E extends Element> extends UseElementSizeReturnTypeSelf<E>, Pick<UseRefElementParameters<E>, typeof PropNames_RefElementParameters_onElementChange> {
 }
 /**
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
  */
-export declare const useElementSize: <E extends Element>({ [PropNames.ElementSizeParameters.getObserveBox]: getObserveBox, [PropNames.ElementSizeParameters.onSizeChange]: onSizeChange, [PropNames.RefElementReturn.getElement]: getElement }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
+export declare const useElementSize: <E extends Element>({ [PropNames_ElementSizeParameters_getObserveBox]: getObserveBox, [PropNames_ElementSizeParameters_onSizeChange]: onSizeChange, [PropNames_RefElementReturn_getElement]: getElement }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
 //# sourceMappingURL=use-element-size.d.ts.map

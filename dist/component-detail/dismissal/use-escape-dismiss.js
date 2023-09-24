@@ -1,19 +1,16 @@
+import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useEffect } from "../../util/lib.js";
-import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 const P = `PropNames.EscapeDismissParameters`;
 const R = `PropNames.EscapeDismissReturn`;
-export const PNames = {
-    dismissEscapeActive: `${P}.dismissEscapeActive`,
-    onDismissEscape: `${P}.onDismissEscape`,
-    getDocument: `${P}.getDocument`,
-    parentDepth: `${P}.parentDepth`
-};
-export const RNames = {};
+export const PropNames_EscapeDismissParameters_dismissEscapeActive = `${P}.dismissEscapeActive`;
+export const PropNames_EscapeDismissParameters_onDismissEscape = `${P}.onDismissEscape`;
+export const PropNames_EscapeDismissParameters_getDocument = `${P}.getDocument`;
+export const PropNames_EscapeDismissParameters_parentDepth = `${P}.parentDepth`;
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
 function getElementDepth(element) {
     let depth = 0;
@@ -33,7 +30,7 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export const useEscapeDismiss = monitored(function useEscapeDismiss({ [PropNames.EscapeDismissParameters.onDismissEscape]: onClose, [PropNames.EscapeDismissParameters.dismissEscapeActive]: open, [PropNames.EscapeDismissParameters.getDocument]: unstableGetDocument, [PropNames.EscapeDismissParameters.parentDepth]: parentDepth, [PropNames.RefElementReturn.getElement]: getElement, ..._void1 }) {
+export const useEscapeDismiss = monitored(function useEscapeDismiss({ [PropNames_EscapeDismissParameters_onDismissEscape]: onClose, [PropNames_EscapeDismissParameters_dismissEscapeActive]: open, [PropNames_EscapeDismissParameters_getDocument]: unstableGetDocument, [PropNames_EscapeDismissParameters_parentDepth]: parentDepth, [PropNames_RefElementReturn_getElement]: getElement, ..._void1 }) {
     assertEmptyObject(_void1);
     const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);

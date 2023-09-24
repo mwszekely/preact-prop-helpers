@@ -1,24 +1,10 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { Nullable } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-declare const RefElementParameters: {
-    readonly onElementChange: "PropNames.RefElementParameters.onElementChange";
-    readonly onMount: "PropNames.RefElementParameters.onMount";
-    readonly onUnmount: "PropNames.RefElementParameters.onUnmount";
-};
-declare const RefElementReturn: {
-    readonly getElement: "PropNames.RefElementReturn.getElement";
-};
-declare module "../util/types.js" {
-    interface PropNames {
-        RefElementParameters: typeof RefElementParameters;
-    }
-}
-declare module "../util/types.js" {
-    interface PropNames {
-        RefElementReturn: typeof RefElementReturn;
-    }
-}
+export declare const PropNames_RefElementParameters_onElementChange = "PropNames.RefElementParameters.onElementChange";
+export declare const PropNames_RefElementParameters_onMount = "PropNames.RefElementParameters.onMount";
+export declare const PropNames_RefElementParameters_onUnmount = "PropNames.RefElementParameters.onUnmount";
+export declare const PropNames_RefElementReturn_getElement = "PropNames.RefElementReturn.getElement";
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
@@ -26,7 +12,7 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      *
      * @stable
      */
-    [RefElementReturn.getElement]: () => T | null;
+    [PropNames_RefElementReturn_getElement]: () => T | null;
     /**
      * @stable
      */
@@ -38,19 +24,19 @@ export interface UseRefElementParametersSelf<T extends EventTarget> {
      *
      * @stable
      */
-    [RefElementParameters.onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
+    [PropNames_RefElementParameters_onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
     /**
      * Called when the element mounts
      *
      * @stable
      */
-    [RefElementParameters.onMount]?: Nullable<(element: T) => void>;
+    [PropNames_RefElementParameters_onMount]?: Nullable<(element: T) => void>;
     /**
      * Called when the element unmounts
      *
      * @stable
      */
-    [RefElementParameters.onUnmount]?: Nullable<(element: T) => void>;
+    [PropNames_RefElementParameters_onUnmount]?: Nullable<(element: T) => void>;
 }
 export type UseRefElementParameters<T extends EventTarget> = UseRefElementParametersSelf<T>;
 export type UseRefElementReturnType<T extends EventTarget> = UseRefElementReturnTypeSelf<T>;
@@ -89,6 +75,5 @@ export type UseRefElementReturnType<T extends EventTarget> = UseRefElementReturn
  *
  * @compositeParams
  */
-export declare const useRefElement: <T extends EventTarget>({ [RefElementParameters.onElementChange]: onElementChange, [RefElementParameters.onMount]: onMount, [RefElementParameters.onUnmount]: onUnmount }: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
-export {};
+export declare const useRefElement: <T extends EventTarget>({ [PropNames_RefElementParameters_onElementChange]: onElementChange, [PropNames_RefElementParameters_onMount]: onMount, [PropNames_RefElementParameters_onUnmount]: onUnmount, ...void1 }: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
 //# sourceMappingURL=use-ref-element.d.ts.map

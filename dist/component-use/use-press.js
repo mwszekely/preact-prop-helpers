@@ -1,31 +1,25 @@
 import { noop } from "lodash-es";
+import { PropNames_RefElementReturn_getElement } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { onfocusout, useCallback } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 const P = `PropNames.PressParameters`;
 const R = `PropNames.PressReturn`;
-export const PNames = {
-    onPressingChange: `${P}.onPressingChange`,
-    onPressSync: `${P}.onPressSync`,
-    excludeSpace: `${P}.excludeSpace`,
-    excludeEnter: `${P}.excludeEnter`,
-    excludePointer: `${P}.excludePointer`,
-    focusSelf: `${P}.focusSelf`,
-    allowRepeatPresses: `${P}.allowRepeatPresses`,
-    longPressThreshold: `${P}.longPressThreshold`
-};
-export const RNames = {
-    pressing: `${R}.pressing`,
-    getIsPressing: `${R}.getIsPressing`,
-    longPress: `${R}.longPress`
-};
-PropNames.PressParameters ??= PNames;
-PropNames.PressReturn ??= RNames;
+export const PropNames_PressParameters_onPressingChange = `${P}.onPressingChange`;
+export const PropNames_PressParameters_onPressSync = `${P}.onPressSync`;
+export const PropNames_PressParameters_excludeSpace = `${P}.excludeSpace`;
+export const PropNames_PressParameters_excludeEnter = `${P}.excludeEnter`;
+export const PropNames_PressParameters_excludePointer = `${P}.excludePointer`;
+export const PropNames_PressParameters_focusSelf = `${P}.focusSelf`;
+export const PropNames_PressParameters_allowRepeatPresses = `${P}.allowRepeatPresses`;
+export const PropNames_PressParameters_longPressThreshold = `${P}.longPressThreshold`;
+export const PropNames_PressReturn_pressing = `${R}.pressing`;
+export const PropNames_PressReturn_getIsPressing = `${R}.getIsPressing`;
+export const PropNames_PressReturn_longPress = `${R}.longPress`;
 function pressLog(...args) {
     if (window.__log_press_events)
         console.log(...args);
@@ -103,7 +97,7 @@ document.addEventListener("click", (e) => {
  * @compositeParams
  *
  */
-export const usePress = monitored(function usePress({ [PropNames.RefElementReturn.getElement]: getElement, [PropNames.PressParameters.focusSelf]: focusSelf, [PropNames.PressParameters.onPressSync]: onPressSync, [PropNames.PressParameters.allowRepeatPresses]: allowRepeatPresses, [PropNames.PressParameters.longPressThreshold]: longPressThreshold, [PropNames.PressParameters.excludeEnter]: ee, [PropNames.PressParameters.excludePointer]: ep, [PropNames.PressParameters.excludeSpace]: es, [PropNames.PressParameters.onPressingChange]: opc, ..._void1 }) {
+export const usePress = monitored(function usePress({ [PropNames_RefElementReturn_getElement]: getElement, [PropNames_PressParameters_focusSelf]: focusSelf, [PropNames_PressParameters_onPressSync]: onPressSync, [PropNames_PressParameters_allowRepeatPresses]: allowRepeatPresses, [PropNames_PressParameters_longPressThreshold]: longPressThreshold, [PropNames_PressParameters_excludeEnter]: ee, [PropNames_PressParameters_excludePointer]: ep, [PropNames_PressParameters_excludeSpace]: es, [PropNames_PressParameters_onPressingChange]: opc, ..._void1 }) {
     assertEmptyObject(_void1);
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -393,9 +387,9 @@ export const usePress = monitored(function usePress({ [PropNames.RefElementRetur
     });
     const p = supportsPointerEvents();
     return {
-        [PropNames.PressReturn.pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-        [PropNames.PressReturn.getIsPressing]: getIsPressing,
-        [PropNames.PressReturn.longPress]: longPress,
+        [PropNames_PressReturn_pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+        [PropNames_PressReturn_getIsPressing]: getIsPressing,
+        [PropNames_PressReturn_longPress]: longPress,
         props: [{
                 onKeyDown,
                 onKeyUp,

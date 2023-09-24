@@ -1,19 +1,13 @@
+import { PropNames_RefElementReturn_getElement } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 const P = `PropNames.HasCurrentFocusParameters`;
 const R = `PropNames.HasCurrentFocusReturn`;
-export const PNames = {
-    onCurrentFocusedChanged: `${P}.onCurrentFocusedChanged`,
-    onCurrentFocusedInnerChanged: `${P}.onCurrentFocusedInnerChanged`
-};
-export const RNames = {
-    getCurrentFocused: `${R}.getCurrentFocused`,
-    getCurrentFocusedInner: `${R}.getCurrentFocusedInner`
-};
-PropNames.HasCurrentFocusParameters ??= PNames;
-PropNames.HasCurrentFocusReturn ??= RNames;
+export const PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged = `${P}.onCurrentFocusedChanged`;
+export const PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged = `${P}.onCurrentFocusedInnerChanged`;
+export const PropNames_HasCurrentFocusReturn_getCurrentFocused = `${R}.getCurrentFocused`;
+export const PropNames_HasCurrentFocusReturn_getCurrentFocusedInner = `${R}.getCurrentFocusedInner`;
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
  *
@@ -21,7 +15,7 @@ PropNames.HasCurrentFocusReturn ??= RNames;
  *
  * @compositeParams
  */
-export const useHasCurrentFocus = monitored(function useHasCurrentFocus({ [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: onCurrentFocusedChanged, [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames.RefElementReturn.getElement]: getElement }) {
+export const useHasCurrentFocus = monitored(function useHasCurrentFocus({ [PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged]: onCurrentFocusedChanged, [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames_RefElementReturn_getElement]: getElement }) {
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
     const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
@@ -47,8 +41,8 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus({ [PropN
         [onfocusout]: onFocusOut
     });
     return {
-        [PropNames.HasCurrentFocusReturn.getCurrentFocused]: getFocused,
-        [PropNames.HasCurrentFocusReturn.getCurrentFocusedInner]: getFocusedInner,
+        [PropNames_HasCurrentFocusReturn_getCurrentFocused]: getFocused,
+        [PropNames_HasCurrentFocusReturn_getCurrentFocusedInner]: getFocusedInner,
         props: propsStable.current,
     };
 });

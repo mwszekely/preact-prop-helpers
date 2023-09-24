@@ -1,43 +1,16 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { ElementProps, OmitStrong, PropNames } from "../../util/types.js";
+import { PropNames_RefElementParameters_onElementChange, PropNames_RefElementReturn_getElement, UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { PropNames_ManagedChildrenReturn_getChildren, UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { ElementProps, OmitStrong } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
-declare module "../../util/types.js" {
-    interface PropNames {
-        StaggeredParameters: typeof P1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        StaggeredReturn: typeof R1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        StaggeredChildParameters: typeof P2Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        StaggeredChildReturn: typeof R2Names;
-    }
-}
-export declare const P1Names: {
-    readonly staggered: "PropNames.StaggeredParameters.staggered";
-    readonly childCount: "PropNames.StaggeredParameters.childCount";
-    readonly untabbable: "PropNames.StaggeredParameters.untabbable";
-    readonly untabbableBehavior: "PropNames.StaggeredParameters.untabbableBehavior";
-    readonly onTabbableIndexChange: "PropNames.StaggeredParameters.onTabbableIndexChange";
-};
-export declare const R1Names: {
-    readonly stillStaggering: "PropNames.StaggeredReturn.stillStaggering";
-};
-export declare const P2Names: {};
-export declare const R2Names: {
-    readonly parentIsStaggered: "PropNames.StaggeredChildReturn.parentIsStaggered";
-    readonly hideBecauseStaggered: "PropNames.StaggeredChildReturn.hideBecauseStaggered";
-    readonly childUseEffect: "PropNames.StaggeredChildReturn.childUseEffect";
-};
+export declare const PropNames_StaggeredParameters_staggered = "PropNames.StaggeredParameters.staggered";
+export declare const PropNames_StaggeredParameters_childCount = "PropNames.StaggeredParameters.childCount";
+export declare const PropNames_StaggeredParameters_untabbable = "PropNames.StaggeredParameters.untabbable";
+export declare const PropNames_StaggeredParameters_untabbableBehavior = "PropNames.StaggeredParameters.untabbableBehavior";
+export declare const PropNames_StaggeredParameters_onTabbableIndexChange = "PropNames.StaggeredParameters.onTabbableIndexChange";
+export declare const PropNames_StaggeredReturn_stillStaggering = "PropNames.StaggeredReturn.stillStaggering";
+export declare const PropNames_StaggeredChildReturn_parentIsStaggered = "PropNames.StaggeredChildReturn.parentIsStaggered";
+export declare const PropNames_StaggeredChildReturn_hideBecauseStaggered = "PropNames.StaggeredChildReturn.hideBecauseStaggered";
+export declare const PropNames_StaggeredChildReturn_childUseEffect = "PropNames.StaggeredChildReturn.childUseEffect";
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     setStaggeredVisible(visible: boolean): void;
     getStaggeredVisible(): boolean;
@@ -46,10 +19,10 @@ export interface UseStaggeredChildrenParametersSelf {
     /**
      * If true, each child will delay rendering itself until the one before it has.
      */
-    [PropNames.StaggeredParameters.staggered]: boolean;
-    [PropNames.StaggeredParameters.childCount]: number | null;
+    [PropNames_StaggeredParameters_staggered]: boolean;
+    [PropNames_StaggeredParameters_childCount]: number | null;
 }
-export interface UseStaggeredChildrenParameters extends UseStaggeredChildrenParametersSelf, Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, typeof PropNames.ManagedChildrenReturn.getChildren>, Pick<UseRefElementReturnType<any>, typeof PropNames.RefElementReturn.getElement> {
+export interface UseStaggeredChildrenParameters extends UseStaggeredChildrenParametersSelf, Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, typeof PropNames_ManagedChildrenReturn_getChildren>, Pick<UseRefElementReturnType<any>, typeof PropNames_RefElementReturn_getElement> {
 }
 export interface UseStaggeredChildContextSelf {
     parentIsStaggered: boolean;
@@ -68,7 +41,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
     /**
      * Whether any children are still waiting to show themselves because of the staggering behavior
      */
-    [PropNames.StaggeredReturn.stillStaggering]: boolean;
+    [PropNames_StaggeredReturn_stillStaggering]: boolean;
 }
 export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
@@ -76,20 +49,20 @@ export interface UseStaggeredChildReturnTypeSelf {
     /**
      * Whether the parent has indicated that all of its children, including this one, are staggered.
      */
-    [PropNames.StaggeredChildReturn.parentIsStaggered]: boolean;
+    [PropNames_StaggeredChildReturn_parentIsStaggered]: boolean;
     /**
      * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
-    [PropNames.StaggeredChildReturn.hideBecauseStaggered]: boolean;
+    [PropNames_StaggeredChildReturn_hideBecauseStaggered]: boolean;
     /**
      * Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).
      *
      * This is generally passed to an inner child, if this is the outer child.
      */
-    [PropNames.StaggeredChildReturn.childUseEffect](): void;
+    [PropNames_StaggeredChildReturn_childUseEffect](): void;
 }
-export interface UseStaggeredChildReturnType<ChildElement extends Element> extends UseStaggeredChildReturnTypeSelf, Pick<UseRefElementParameters<ChildElement>, typeof PropNames.RefElementParameters.onElementChange> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> extends UseStaggeredChildReturnTypeSelf, Pick<UseRefElementParameters<ChildElement>, typeof PropNames_RefElementParameters_onElementChange> {
     props: ElementProps<ChildElement>;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
@@ -106,7 +79,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare const useStaggeredChildren: ({ [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.StaggeredParameters.childCount]: childCount, [PropNames.StaggeredParameters.staggered]: staggered, [PropNames.RefElementReturn.getElement]: getElement, }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_StaggeredParameters_childCount]: childCount, [PropNames_StaggeredParameters_staggered]: staggered, [PropNames_RefElementReturn_getElement]: getElement, }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

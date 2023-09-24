@@ -1,56 +1,42 @@
 
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, PropNames_ManagedChildrenReturn_getChildren, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { Nullable, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { OmitStrong, PropNames, VNode } from "../../util/types.js";
+import { OmitStrong, VNode } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
 
-
-
-
-declare module "../../util/types.js" { interface PropNames { RearrangeableParameters: typeof P1Names } }
-declare module "../../util/types.js" { interface PropNames { RearrangeableReturn: typeof R1Names } }
-
 const P1 = `PropNames.RearrangeableParameters`;
 const R1 = `PropNames.RearrangeableReturn`;
 
-export const P1Names = {
-    compare: `${P1}.compare`,
-    adjust: `${P1}.adjust`,
-    getIndex: `${P1}.getIndex`,
-    onRearranged: `${P1}.onRearranged`,
-    children: `${P1}.children`,
-} as const;
+export const PropNames_RearrangeableParameters_compare =  `${P1}.compare`;
+export const PropNames_RearrangeableParameters_adjust =  `${P1}.adjust`;
+export const PropNames_RearrangeableParameters_getIndex =  `${P1}.getIndex`;
+export const PropNames_RearrangeableParameters_onRearranged =  `${P1}.onRearranged`;
+export const PropNames_RearrangeableParameters_children =  `${P1}.children`;
 
-export const R1Names = {
-    rearrange: `${R1}.rearrange`,
-    shuffle: `${R1}.shuffle`,
-    reverse: `${R1}.reverse`,
-    indexMangler: `${R1}.indexMangler`,
-    indexDemangler: `${R1}.indexDemangler`,
-    children: `${R1}.children`,
-    sort: `${R1}.sort`
-} as const;
-
-PropNames.RearrangeableParameters ??=  P1Names;
-PropNames.RearrangeableReturn ??=  R1Names;
-
+export const PropNames_RearrangeableReturn_rearrange =  `${R1}.rearrange`;
+export const PropNames_RearrangeableReturn_shuffle =  `${R1}.shuffle`;
+export const PropNames_RearrangeableReturn_reverse =  `${R1}.reverse`;
+export const PropNames_RearrangeableReturn_indexMangler =  `${R1}.indexMangler`;
+export const PropNames_RearrangeableReturn_indexDemangler =  `${R1}.indexDemangler`;
+export const PropNames_RearrangeableReturn_children =  `${R1}.children`;
+export const PropNames_RearrangeableReturn_sort =  `${R1}.sort`;
 
 
 export interface UseRearrangedChildrenContextSelf {
     provideManglers(args: Pick<
         UseRearrangeableChildrenReturnTypeSelf<any>,
-        typeof PropNames.RearrangeableReturn.indexDemangler |
-        typeof PropNames.RearrangeableReturn.indexMangler |
-        typeof PropNames.RearrangeableReturn.reverse |
-        typeof PropNames.RearrangeableReturn.shuffle |
-        typeof PropNames.RearrangeableReturn.sort>): void;
+        typeof PropNames_RearrangeableReturn_indexDemangler |
+        typeof PropNames_RearrangeableReturn_indexMangler |
+        typeof PropNames_RearrangeableReturn_reverse |
+        typeof PropNames_RearrangeableReturn_shuffle |
+        typeof PropNames_RearrangeableReturn_sort>): void;
 }
 
 /**
@@ -67,11 +53,11 @@ export interface UseRearrangedChildrenContext {
  * 
  * @returns 
  */
-export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, typeof PropNames.RearrangeableReturn.children> & { context: UseRearrangedChildrenContext } {
-    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames.RearrangeableReturn.sort]>(null);
-    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames.RearrangeableReturn.shuffle]>(null);
-    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames.RearrangeableReturn.reverse]>(null);
-    const rearrangeRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames.RearrangeableReturn.rearrange]>(null);
+export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, typeof PropNames_RearrangeableReturn_children> & { context: UseRearrangedChildrenContext } {
+    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames_RearrangeableReturn_sort]>(null);
+    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames_RearrangeableReturn_shuffle]>(null);
+    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames_RearrangeableReturn_reverse]>(null);
+    const rearrangeRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>[typeof PropNames_RearrangeableReturn_rearrange]>(null);
     const indexManglerRef = useRef<null | ((n: number) => number)>(null);
     const indexDemanglerRef = useRef<null | ((n: number) => number)>(null);
     const indexMangler = useStableCallback((i: number) => { return (indexManglerRef.current ?? identity)(i)! }, []);
@@ -81,11 +67,11 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
     const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
     const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);
     const provideManglers = useStableCallback<UseRearrangedChildrenContextSelf["provideManglers"]>(({
-        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
-        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
-        [PropNames.RearrangeableReturn.reverse]: reverse,
-        [PropNames.RearrangeableReturn.shuffle]: shuffle,
-        [PropNames.RearrangeableReturn.sort]: sort
+        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
+        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
+        [PropNames_RearrangeableReturn_reverse]: reverse,
+        [PropNames_RearrangeableReturn_shuffle]: shuffle,
+        [PropNames_RearrangeableReturn_sort]: sort
     }) => {
         indexManglerRef.current = indexMangler;
         indexDemanglerRef.current = indexDemangler;
@@ -99,12 +85,12 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
 
     return {
         context,
-        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
-        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
-        [PropNames.RearrangeableReturn.rearrange]: rearrange,
-        [PropNames.RearrangeableReturn.reverse]: reverse,
-        [PropNames.RearrangeableReturn.shuffle]: shuffle,
-        [PropNames.RearrangeableReturn.sort]: sort
+        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
+        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
+        [PropNames_RearrangeableReturn_rearrange]: rearrange,
+        [PropNames_RearrangeableReturn_reverse]: reverse,
+        [PropNames_RearrangeableReturn_shuffle]: shuffle,
+        [PropNames_RearrangeableReturn_sort]: sort
     }
 }
 
@@ -128,7 +114,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    [PropNames.RearrangeableParameters.compare]: Nullable<Compare<M>>;
+    [PropNames_RearrangeableParameters_compare]: Nullable<Compare<M>>;
 
 
     /**
@@ -137,27 +123,27 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      * 
      * @default `identity`
      */
-    [PropNames.RearrangeableParameters.adjust]: Nullable<(input: VNode, data: { mangledIndex: number | null, demangledIndex: number | null }) => VNode | null>;
+    [PropNames_RearrangeableParameters_adjust]: Nullable<(input: VNode, data: { mangledIndex: number | null, demangledIndex: number | null }) => VNode | null>;
 
     /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      * 
-     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode_props_index` is what you're usually looking for.
      * 
      * @stable
      */
-    [PropNames.RearrangeableParameters.getIndex]: GetIndex;
+    [PropNames_RearrangeableParameters_getIndex]: GetIndex;
 
 
     /**
      * Called after the children have been rearranged.
      */
-    [PropNames.RearrangeableParameters.onRearranged]: Nullable<(() => void)>;
+    [PropNames_RearrangeableParameters_onRearranged]: Nullable<(() => void)>;
 
     /**
      * The children to sort.
      */
-    [PropNames.RearrangeableParameters.children]: (VNode | null)[];
+    [PropNames_RearrangeableParameters_children]: (VNode | null)[];
 }
 
 /**
@@ -165,7 +151,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends
     UseRearrangeableChildrenParametersSelf<M>,
-    Pick<UseManagedChildrenReturnType<M>, typeof PropNames.ManagedChildrenReturn.getChildren> {
+    Pick<UseManagedChildrenReturnType<M>, typeof PropNames_ManagedChildrenReturn_getChildren> {
     context: UseRearrangedChildrenContext;
 }
 
@@ -182,21 +168,21 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      *  
      * @stable
      */
-    [PropNames.RearrangeableReturn.rearrange]: (originalRows: M[], rowsInOrder: M[]) => void;
+    [PropNames_RearrangeableReturn_rearrange]: (originalRows: M[], rowsInOrder: M[]) => void;
 
     /** 
      * Arranges the children in a random order.
      * 
      * @stable 
      */
-    [PropNames.RearrangeableReturn.shuffle]: () => Promise<void> | void;
+    [PropNames_RearrangeableReturn_shuffle]: () => Promise<void> | void;
 
     /** 
      * Reverses the order of the children
      * 
      * @stable 
      */
-    [PropNames.RearrangeableReturn.reverse]: () => Promise<void> | void;
+    [PropNames_RearrangeableReturn_reverse]: () => Promise<void> | void;
 
     /** 
      * @stable
@@ -206,14 +192,14 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      *  
      * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
      */
-    [PropNames.RearrangeableReturn.indexMangler]: (n: number) => number;
+    [PropNames_RearrangeableReturn_indexMangler]: (n: number) => number;
     /** @stable */
-    [PropNames.RearrangeableReturn.indexDemangler]: (n: number) => number;
+    [PropNames_RearrangeableReturn_indexDemangler]: (n: number) => number;
 
     /**
      * The transformed (i.e. rearranged) children to render.
      */
-    [PropNames.RearrangeableReturn.children]: (VNode | null)[];
+    [PropNames_RearrangeableReturn_children]: (VNode | null)[];
 
     /** 
      * @stable
@@ -221,7 +207,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      * Call to rearrange the children in ascending or descending order according to `compare`.
      * 
      */
-    [PropNames.RearrangeableReturn.sort]: (direction: "ascending" | "descending") => Promise<void> | void;
+    [PropNames_RearrangeableReturn_sort]: (direction: "ascending" | "descending") => Promise<void> | void;
 
     /**
      * Returns an array of each cell's `getSortValue()` result.
@@ -258,12 +244,12 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
 export const useRearrangeableChildren = monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
     //rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
     //managedChildrenReturn: { getChildren },
-    [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
-    [PropNames.RearrangeableParameters.children]: children,
-    [PropNames.RearrangeableParameters.adjust]: adjust,
-    [PropNames.RearrangeableParameters.getIndex]: getIndex,
-    [PropNames.RearrangeableParameters.onRearranged]: onRearranged,
-    [PropNames.RearrangeableParameters.compare]: userCompare,
+    [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
+    [PropNames_RearrangeableParameters_children]: children,
+    [PropNames_RearrangeableParameters_adjust]: adjust,
+    [PropNames_RearrangeableParameters_getIndex]: getIndex,
+    [PropNames_RearrangeableParameters_onRearranged]: onRearranged,
+    [PropNames_RearrangeableParameters_compare]: userCompare,
     context: { rearrangeableChildrenContext: { provideManglers } }
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
     useEnsureStability("useRearrangeableChildren", getIndex);
@@ -374,22 +360,22 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     // but we're one level deeper in the tree, so once we mount we need to give it to them.
     useLayoutEffect(() => {
         provideManglers({
-            [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
-            [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
-            [PropNames.RearrangeableReturn.reverse]: reverse,
-            [PropNames.RearrangeableReturn.shuffle]: shuffle,
-            [PropNames.RearrangeableReturn.sort]: sort,
+            [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
+            [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
+            [PropNames_RearrangeableReturn_reverse]: reverse,
+            [PropNames_RearrangeableReturn_shuffle]: shuffle,
+            [PropNames_RearrangeableReturn_sort]: sort,
         })
     }, [])
 
     return {
-        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
-        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
-        [PropNames.RearrangeableReturn.rearrange]: rearrange,
-        [PropNames.RearrangeableReturn.shuffle]: shuffle,
-        [PropNames.RearrangeableReturn.reverse]: reverse,
-        [PropNames.RearrangeableReturn.sort]: sort,
-        [PropNames.RearrangeableReturn.children]: sorted
+        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
+        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
+        [PropNames_RearrangeableReturn_rearrange]: rearrange,
+        [PropNames_RearrangeableReturn_shuffle]: shuffle,
+        [PropNames_RearrangeableReturn_reverse]: reverse,
+        [PropNames_RearrangeableReturn_sort]: sort,
+        [PropNames_RearrangeableReturn_children]: sorted
     };
 })
 

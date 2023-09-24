@@ -1,18 +1,12 @@
 import { returnFalse, returnZero, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "./use-has-current-focus.js";
 const P1 = `PropNames.ChildrenHaveFocusParameters`;
 const R1 = `PropNames.ChildrenHaveFocusReturn`;
-export const P1Names = {
-    onCompositeFocusChange: `${P1}.onCompositeFocusChange`
-};
-export const R1Names = {
-    getAnyFocused: `${R1}.getAnyFocused`
-};
-PropNames.ChildrenHaveFocusParameters ??= P1Names;
-PropNames.ChildrenHaveFocusReturn ??= R1Names;
+export const PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange = `${P1}.onCompositeFocusChange`;
+export const PropNames_ChildrenHaveFocusReturn_getAnyFocused = `${R1}.getAnyFocused`;
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -24,14 +18,14 @@ PropNames.ChildrenHaveFocusReturn ??= R1Names;
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus({ [PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange]: onCompositeFocusChange }) {
+export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus({ [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: onCompositeFocusChange }) {
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
     }), returnZero, setTimeout); // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being runImmediately...
     return {
-        [PropNames.ChildrenHaveFocusReturn.getAnyFocused]: getAnyFocused,
+        [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused,
         context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     };
 });
@@ -40,7 +34,7 @@ export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus({ [P
  */
 export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return {
-        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: useStableCallback((focused, prev, e) => {
+        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: useStableCallback((focused, prev, e) => {
             if (focused) {
                 setFocusCount(p => (p ?? 0) + 1, e);
             }

@@ -1,37 +1,23 @@
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
-import { FocusEventType, PropNames } from "../util/types.js";
-import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
-declare module "../util/types.js" {
-    interface PropNames {
-        ChildrenHaveFocusParameters: typeof P1Names;
-    }
-}
-declare module "../util/types.js" {
-    interface PropNames {
-        ChildrenHaveFocusReturn: typeof R1Names;
-    }
-}
-export declare const P1Names: {
-    readonly onCompositeFocusChange: "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange";
-};
-export declare const R1Names: {
-    readonly getAnyFocused: "PropNames.ChildrenHaveFocusReturn.getAnyFocused";
-};
+import { FocusEventType } from "../util/types.js";
+import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged, UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
+export declare const PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange = "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange";
+export declare const PropNames_ChildrenHaveFocusReturn_getAnyFocused = "PropNames.ChildrenHaveFocusReturn.getAnyFocused";
 export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
      *
      * @stable
      */
-    [PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange]: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
+    [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 export interface UseChildrenHaveFocusParameters<T extends Element> extends UseChildrenHaveFocusParametersSelf<T> {
 }
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Pick<UseHasCurrentFocusParameters<E>, (typeof PropNames)["HasCurrentFocusParameters"]["onCurrentFocusedInnerChanged"]> {
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Pick<UseHasCurrentFocusParameters<E>, typeof PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged> {
 }
 export interface UseChildrenHaveFocusReturnTypeSelf {
     /** @stable */
-    [PropNames.ChildrenHaveFocusReturn.getAnyFocused](): boolean;
+    [PropNames_ChildrenHaveFocusReturn_getAnyFocused](): boolean;
 }
 export interface UseChildrenHaveFocusReturnType<T extends Element> extends UseChildrenHaveFocusReturnTypeSelf {
     context: UseChildrenHaveFocusContext<T>;
@@ -56,7 +42,7 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export declare const useChildrenHaveFocus: <ChildElement extends Element>({ [PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange]: onCompositeFocusChange }: UseChildrenHaveFocusParameters<ChildElement>) => UseChildrenHaveFocusReturnType<ChildElement>;
+export declare const useChildrenHaveFocus: <ChildElement extends Element>({ [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: onCompositeFocusChange }: UseChildrenHaveFocusParameters<ChildElement>) => UseChildrenHaveFocusReturnType<ChildElement>;
 /**
  * @compositeParams
  */

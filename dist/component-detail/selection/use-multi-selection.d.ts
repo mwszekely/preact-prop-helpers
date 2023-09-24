@@ -1,50 +1,22 @@
-import { UsePressParameters } from "../../component-use/use-press.js";
-import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
-import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { PropNames_PressParameters_onPressSync, UsePressParameters } from "../../component-use/use-press.js";
+import { PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange, PropNames_ChildrenHaveFocusReturn_getAnyFocused, UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
+import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged, UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
+import { PropNames_ManagedChildrenReturn_getChildren, UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
-import { ElementProps, EventType, Nullable, OmitStrong, PropNames } from "../../util/types.js";
+import { ElementProps, EventType, Nullable, OmitStrong } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
-declare module "../../util/types.js" {
-    interface PropNames {
-        MultiSelectionParameters: typeof P1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        MultiSelectionReturn: typeof R1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        MultiSelectionChildParameters: typeof P2Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        MultiSelectionChildReturn: typeof R2Names;
-    }
-}
-export declare const P1Names: {
-    readonly onSelectionChange: "PropNames.MultiSelectionParameters.onSelectionChange";
-    readonly multiSelectionMode: "PropNames.MultiSelectionParameters.multiSelectionMode";
-    readonly multiSelectionAriaPropName: "PropNames.MultiSelectionParameters.multiSelectionAriaPropName";
-};
-export declare const R1Names: {
-    readonly changeMultiSelectedIndex: "PropNames.MultiSelectionReturn.changeMultiSelectedIndex";
-    readonly getMultiSelectedIndex: "PropNames.MultiSelectionReturn.getMultiSelectedIndex";
-};
-export declare const P2Names: {
-    readonly onMultiSelectChange: "PropNames.MultiSelectionChildParameters.onMultiSelectChange";
-    readonly initiallyMultiSelected: "PropNames.MultiSelectionChildParameters.initiallyMultiSelected";
-    readonly multiSelectionDisabled: "PropNames.MultiSelectionChildParameters.multiSelectionDisabled";
-    readonly multiSelected: "PropNames.MultiSelectionChildParameters.multiSelected";
-};
-export declare const R2Names: {
-    readonly changeMultiSelected: "PropNames.MultiSelectionChildReturn.changeMultiSelected";
-    readonly multiSelected: "PropNames.MultiSelectionChildReturn.multiSelected";
-    readonly getMultiSelected: "PropNames.MultiSelectionChildReturn.getMultiSelected";
-};
+export declare const PropNames_MultiSelectionParameters_onSelectionChange = "PropNames.MultiSelectionParameters.onSelectionChange";
+export declare const PropNames_MultiSelectionParameters_multiSelectionMode = "PropNames.MultiSelectionParameters.multiSelectionMode";
+export declare const PropNames_MultiSelectionParameters_multiSelectionAriaPropName = "PropNames.MultiSelectionParameters.multiSelectionAriaPropName";
+export declare const PropNames_MultiSelectionReturn_changeMultiSelectedIndex = "PropNames.MultiSelectionReturn.changeMultiSelectedIndex";
+export declare const PropNames_MultiSelectionReturn_getMultiSelectedIndex = "PropNames.MultiSelectionReturn.getMultiSelectedIndex";
+export declare const PropNames_MultiSelectionChildParameters_onMultiSelectChange = "PropNames.MultiSelectionChildParameters.onMultiSelectChange";
+export declare const PropNames_MultiSelectionChildParameters_initiallyMultiSelected = "PropNames.MultiSelectionChildParameters.initiallyMultiSelected";
+export declare const PropNames_MultiSelectionChildParameters_multiSelectionDisabled = "PropNames.MultiSelectionChildParameters.multiSelectionDisabled";
+export declare const PropNames_MultiSelectionChildParameters_multiSelected = "PropNames.MultiSelectionChildParameters.multiSelected";
+export declare const PropNames_MultiSelectionChildReturn_changeMultiSelected = "PropNames.MultiSelectionChildReturn.changeMultiSelected";
+export declare const PropNames_MultiSelectionChildReturn_multiSelected = "PropNames.MultiSelectionChildReturn.multiSelected";
+export declare const PropNames_MultiSelectionChildReturn_getMultiSelected = "PropNames.MultiSelectionChildReturn.getMultiSelected";
 export type MultiSelectChildChangeHandler = EnhancedEventHandler<Event, {
     multiSelected: boolean;
 }>;
@@ -55,7 +27,7 @@ export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any
     selectedPercent: number;
     selectedIndices: Set<number>;
 }>;
-export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionParametersSelf, typeof PropNames.MultiSelectionParameters.multiSelectionAriaPropName | typeof PropNames.MultiSelectionParameters.multiSelectionMode> {
+export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionParametersSelf, typeof PropNames_MultiSelectionParameters_multiSelectionAriaPropName | typeof PropNames_MultiSelectionParameters_multiSelectionMode> {
     notifyParentOfChildSelectChange(event: EventType<any, any>, childIndex: number, selected: boolean | undefined, previous: boolean | undefined): void;
     /**
      * When the user presses Shift+Space or Ctrl+Space (depending on selectionMode),
@@ -91,18 +63,18 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
     getMultiSelected(): boolean;
     getMultiSelectionDisabled(): boolean;
 }
-export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends UseMultiSelectionParametersSelf, Pick<UseChildrenHaveFocusReturnType<any>, typeof PropNames.ChildrenHaveFocusReturn.getAnyFocused>, Pick<UseManagedChildrenReturnType<M>, typeof PropNames.ManagedChildrenReturn.getChildren> {
+export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends UseMultiSelectionParametersSelf, Pick<UseChildrenHaveFocusReturnType<any>, typeof PropNames_ChildrenHaveFocusReturn_getAnyFocused>, Pick<UseManagedChildrenReturnType<M>, typeof PropNames_ManagedChildrenReturn_getChildren> {
 }
 export interface UseMultiSelectionReturnTypeSelf {
 }
-export interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseMultiSelectionReturnTypeSelf, Pick<UseChildrenHaveFocusParameters<ChildElement>, typeof PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange> {
+export interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseMultiSelectionReturnTypeSelf, Pick<UseChildrenHaveFocusParameters<ChildElement>, typeof PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange> {
     context: UseMultiSelectionContext;
     props: ElementProps<ParentElement>;
 }
 export type UseMultiSelectionChildInfoKeysParameters = "index";
 export type UseMultiSelectionChildInfoKeysReturnType = "setSelectedFromParent" | "getMultiSelected" | "getMultiSelectionDisabled";
 export interface UseMultiSelectionParametersSelf {
-    [PropNames.MultiSelectionParameters.onSelectionChange]: Nullable<(e: MultiSelectionChangeEvent) => void>;
+    [PropNames_MultiSelectionParameters_onSelectionChange]: Nullable<(e: MultiSelectionChangeEvent) => void>;
     /**
      * What causes a child to become selected?
      *
@@ -125,13 +97,13 @@ export interface UseMultiSelectionParametersSelf {
      *     * Selecting a new item (whether via navigation or pressing <kbd>Space</kbd> or <kbd>Enter</kbd>) will **deselect all other items** unless <kbd>Ctrl</kbd> is held.
      * ```
      */
-    [PropNames.MultiSelectionParameters.multiSelectionMode]: "focus" | "activation" | "disabled";
+    [PropNames_MultiSelectionParameters_multiSelectionMode]: "focus" | "activation" | "disabled";
     /**
      * What property will be used to mark this item as selected.
      *
      * TODO: No compelling use-case for aria-current in multi-select? Just in case: | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`
      */
-    [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: Nullable<`aria-${"pressed" | "selected" | "checked"}`>;
+    [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: Nullable<`aria-${"pressed" | "selected" | "checked"}`>;
 }
 export interface UseMultiSelectionChildParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends UseMultiSelectionChildParametersSelf<E>, UseGenericChildParameters<UseMultiSelectionContext, Pick<M, UseMultiSelectionChildInfoKeysParameters>> {
     context: UseMultiSelectionContext;
@@ -147,28 +119,28 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      * * Call `changeSelected`, if this is imperatively controlled.
      * ```
      */
-    [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: Nullable<(e: MultiSelectChildChangeEvent) => void>;
-    [PropNames.MultiSelectionChildParameters.initiallyMultiSelected]: boolean;
+    [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+    [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: boolean;
     /** When true, this child cannot be selected via multi-select, either by focusing it or by clicking it. */
-    [PropNames.MultiSelectionChildParameters.multiSelectionDisabled]: boolean;
+    [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: boolean;
 }
-export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends UseMultiSelectionChildReturnTypeSelf, Pick<UsePressParameters<any>, typeof PropNames.PressParameters.onPressSync>, Pick<UseHasCurrentFocusParameters<any>, typeof PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged> {
+export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends UseMultiSelectionChildReturnTypeSelf, Pick<UsePressParameters<any>, typeof PropNames_PressParameters_onPressSync>, Pick<UseHasCurrentFocusParameters<any>, typeof PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged> {
     props: ElementProps<E>;
     info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
 }
-export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseMultiSelectionContextSelf>, typeof PropNames.MultiSelectionParameters.multiSelectionMode> {
+export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseMultiSelectionContextSelf>, typeof PropNames_MultiSelectionParameters_multiSelectionMode> {
     /**
      * @stable
      */
-    [PropNames.MultiSelectionChildReturn.changeMultiSelected](event: EventType<any, any>, selected: boolean): void;
+    [PropNames_MultiSelectionChildReturn_changeMultiSelected](event: EventType<any, any>, selected: boolean): void;
     /**
      * Indicates that this child is selected, according to itself.
      */
-    [PropNames.MultiSelectionChildReturn.multiSelected]: boolean;
+    [PropNames_MultiSelectionChildReturn_multiSelected]: boolean;
     /**
      * @stable
      */
-    [PropNames.MultiSelectionChildReturn.getMultiSelected](): boolean;
+    [PropNames_MultiSelectionChildReturn_getMultiSelected](): boolean;
 }
 /**
  * Allows a parent to track the changes made to multi-selection children.
@@ -182,24 +154,24 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  *
  * @hasChild {@link useMultiSelectionChild}
  */
-export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ [PropNames.ChildrenHaveFocusReturn.getAnyFocused]: getAnyFocused, [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode, [PropNames.MultiSelectionParameters.onSelectionChange]: onSelectionChange, ...void2 }: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
+export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode, [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange, ...void2 }: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
 /**
  *
  * @compositeParams
  */
-export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, [PropNames.MultiSelectionChildParameters.initiallyMultiSelected]: initiallyMultiSelected, [PropNames.MultiSelectionChildParameters.multiSelectionDisabled]: multiSelectionDisabled, [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: onMultiSelectChange, context: { multiSelectionContext: { notifyParentOfChildSelectChange, [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
-export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends Pick<UseMultiSelectionChildParameters<E, M>, typeof PropNames.MultiSelectionChildParameters.onMultiSelectChange> {
+export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected, [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled, [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange, context: { multiSelectionContext: { notifyParentOfChildSelectChange, [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
+export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends Pick<UseMultiSelectionChildParameters<E, M>, typeof PropNames_MultiSelectionChildParameters_onMultiSelectChange> {
     info: Pick<M, "setSelectedFromParent">;
 }
-export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends Pick<UseMultiSelectionChildReturnType<E, M>, typeof PropNames.MultiSelectionChildReturn.changeMultiSelected> {
-    [PropNames.MultiSelectionChildParameters.multiSelected]: boolean;
-    [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends Pick<UseMultiSelectionChildReturnType<E, M>, typeof PropNames_MultiSelectionChildReturn_changeMultiSelected> {
+    [PropNames_MultiSelectionChildParameters_multiSelected]: boolean;
+    [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: Nullable<(e: MultiSelectChildChangeEvent) => void>;
 }
-export type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = Omit<P, keyof typeof PropNames.MultiSelectionChildParameters> & UseMultiSelectionChildDeclarativeParameters<any, any>;
-export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = Omit<R, keyof typeof PropNames.MultiSelectionChildReturn> & OmitStrong<UseMultiSelectionChildReturnType<any, any>, typeof PropNames.MultiSelectionChildReturn.changeMultiSelected>;
+export type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = Omit<P, typeof PropNames_MultiSelectionChildParameters_initiallyMultiSelected | typeof PropNames_MultiSelectionChildParameters_multiSelected | typeof PropNames_MultiSelectionChildParameters_multiSelectionDisabled | typeof PropNames_MultiSelectionChildParameters_onMultiSelectChange> & UseMultiSelectionChildDeclarativeParameters<any, any>;
+export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = Omit<R, typeof PropNames_MultiSelectionChildParameters_initiallyMultiSelected | typeof PropNames_MultiSelectionChildParameters_multiSelected | typeof PropNames_MultiSelectionChildParameters_multiSelectionDisabled | typeof PropNames_MultiSelectionChildParameters_onMultiSelectChange> & OmitStrong<UseMultiSelectionChildReturnType<any, any>, typeof PropNames_MultiSelectionChildReturn_changeMultiSelected>;
 /**
  *
  * @compositeParams
  */
-export declare function useMultiSelectionChildDeclarative<E extends Element>({ [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: onMultiSelectChange, [PropNames.MultiSelectionChildParameters.multiSelected]: multiSelected, [PropNames.MultiSelectionChildReturn.changeMultiSelected]: changeMultiSelected, ...void1 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>>;
+export declare function useMultiSelectionChildDeclarative<E extends Element>({ [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange, [PropNames_MultiSelectionChildParameters_multiSelected]: multiSelected, [PropNames_MultiSelectionChildReturn_changeMultiSelected]: changeMultiSelected, ...void1 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>>;
 //# sourceMappingURL=use-multi-selection.d.ts.map

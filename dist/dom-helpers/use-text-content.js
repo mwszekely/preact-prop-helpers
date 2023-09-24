@@ -1,24 +1,18 @@
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+import { PropNames_RefElementReturn_getElement } from "./use-ref-element.js";
 const P = `PropNames.TextContentParameters`;
 const R = `PropNames.TextContentReturn`;
-export const PNames = {
-    getText: `${P}.getText`,
-    onTextContentChange: `${P}.onTextContentChange`
-};
-export const RNames = {
-    getTextContent: `${R}.getTextContent`
-};
-PropNames.TextContentParameters = PNames;
-PropNames.TextContentReturn = RNames;
+export const PropNames_TextContentParameters_getText = `${P}.getText`;
+export const PropNames_TextContentParameters_onTextContentChange = `${P}.onTextContentChange`;
+export const PropNames_TextContentReturn_getTextContent = `${R}.getTextContent`;
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
  */
-export const useTextContent = monitored(function useTextContent({ [PropNames.RefElementReturn.getElement]: getElement, [PropNames.TextContentParameters.getText]: getText, [PropNames.TextContentParameters.onTextContentChange]: onTextContentChange }) {
+export const useTextContent = monitored(function useTextContent({ [PropNames_RefElementReturn_getElement]: getElement, [PropNames_TextContentParameters_getText]: getText, [PropNames_TextContentParameters_onTextContentChange]: onTextContentChange }) {
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();
@@ -30,7 +24,7 @@ export const useTextContent = monitored(function useTextContent({ [PropNames.Ref
         }
     });
     return {
-        [PropNames.TextContentReturn.getTextContent]: getTextContent
+        [PropNames_TextContentReturn_getTextContent]: getTextContent
     };
 });
 //# sourceMappingURL=use-text-content.js.map

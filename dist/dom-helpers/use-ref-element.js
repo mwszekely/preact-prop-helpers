@@ -1,20 +1,14 @@
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useRef } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 const P = `PropNames.RefElementParameters`;
 const R = `PropNames.RefElementReturn`;
-const RefElementParameters = {
-    onElementChange: `${P}.onElementChange`,
-    onMount: `${P}.onMount`,
-    onUnmount: `${P}.onUnmount`
-};
-const RefElementReturn = {
-    getElement: `${R}.getElement`
-};
-PropNames.RefElementParameters ??= RefElementParameters;
-PropNames.RefElementReturn ??= RefElementReturn;
+export const PropNames_RefElementParameters_onElementChange = `${P}.onElementChange`;
+export const PropNames_RefElementParameters_onMount = `${P}.onMount`;
+export const PropNames_RefElementParameters_onUnmount = `${P}.onUnmount`;
+export const PropNames_RefElementReturn_getElement = `${R}.getElement`;
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -50,7 +44,7 @@ PropNames.RefElementReturn ??= RefElementReturn;
  *
  * @compositeParams
  */
-export const useRefElement = monitored(function useRefElement({ [RefElementParameters.onElementChange]: onElementChange, [RefElementParameters.onMount]: onMount, [RefElementParameters.onUnmount]: onUnmount }) {
+export const useRefElement = monitored(function useRefElement({ [PropNames_RefElementParameters_onElementChange]: onElementChange, [PropNames_RefElementParameters_onMount]: onMount, [PropNames_RefElementParameters_onUnmount]: onUnmount, ...void1 }) {
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // In dev mode, ensure we don't get the ref of a VNode
     // (it's useRefElement, not useRefVnode)
@@ -81,10 +75,11 @@ export const useRefElement = monitored(function useRefElement({ [RefElementParam
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
     const propsStable = useRef(useTagProps({ ref: setElement }, "data-use-ref-element"));
+    assertEmptyObject(void1);
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        [RefElementReturn.getElement]: getElement,
+        [PropNames_RefElementReturn_getElement]: getElement,
         props: propsStable.current
     };
 });

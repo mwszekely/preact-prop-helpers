@@ -2,50 +2,43 @@ import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import "wicg-inert";
 
-import { UseActiveElementParameters } from "../observers/use-active-element.js";
+import { PropNames_ActiveElementParameters_onLastActiveElementChange, UseActiveElementParameters } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
-declare module "../util/types.js" { interface PropNames { BlockingElementParameters: typeof PNames } }
-declare module "../util/types.js" { interface PropNames { BlockingElementReturn: typeof RNames } }
 
 const P = `PropNames.BlockingElementParameters`;
 const R = `PropNames.BlockingElementReturn`;
 
-export const PNames = {
-    enabled: `${P}.enabled`,
-    getTarget: `${P}.getTarget`
-} as const;
+export const PropNames_BlockingElementParameters_enabled = `${P}.enabled`;
+export const PropNames_BlockingElementParameters_getTarget = `${P}.getTarget`;
+export const PropNames_BlockingElementReturn_getTop = `${R}.getTop`;
+export const PropNames_BlockingElementReturn_getTarget = `${R}.getTarget`;
+export const PropNames_BlockingElementReturn_getLastActiveWhenClosed = `${R}.getLastActiveWhenClosed`;
+export const PropNames_BlockingElementReturn_getLastActiveWhenOpen = `${R}.getLastActiveWhenOpen`;
 
-export const RNames = {
-    getTop: `${R}.getTop`,
-    getTarget: `${R}.getTarget`,
-    getLastActiveWhenClosed: `${R}.getLastActiveWhenClosed`,
-    getLastActiveWhenOpen: `${R}.getLastActiveWhenOpen`
-} as const;
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 
 export interface UseBlockingElementParametersSelf<E extends Element> {
-    [PropNames.BlockingElementParameters.enabled]: boolean;
-    [PropNames.BlockingElementParameters.getTarget](): (E | null)
+    [PropNames_BlockingElementParameters_enabled]: boolean;
+    [PropNames_BlockingElementParameters_getTarget](): (E | null)
 }
 
 
 export interface UseBlockingElementReturnTypeSelf<E extends Element> {
-    [PropNames.BlockingElementReturn.getTarget](): (E | null);
-    [PropNames.BlockingElementReturn.getTop](): Element | null;
-    [PropNames.BlockingElementReturn.getLastActiveWhenClosed](): Element | null;
-    [PropNames.BlockingElementReturn.getLastActiveWhenOpen](): Element | null;
+    [PropNames_BlockingElementReturn_getTarget](): (E | null);
+    [PropNames_BlockingElementReturn_getTop](): Element | null;
+    [PropNames_BlockingElementReturn_getLastActiveWhenClosed](): Element | null;
+    [PropNames_BlockingElementReturn_getLastActiveWhenOpen](): Element | null;
 }
 
 export interface UseBlockingElementParameters<E extends Element> extends UseBlockingElementParametersSelf<E> { }
-export interface UseBlockingElementReturnType<E extends Element> extends UseBlockingElementReturnTypeSelf<E>, Pick<UseActiveElementParameters, (typeof PropNames)["ActiveElementParameters"]["onLastActiveElementChange"]> { }
+export interface UseBlockingElementReturnType<E extends Element> extends UseBlockingElementReturnTypeSelf<E>, Pick<UseActiveElementParameters, typeof PropNames_ActiveElementParameters_onLastActiveElementChange> { }
 
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -57,8 +50,8 @@ export interface UseBlockingElementReturnType<E extends Element> extends UseBloc
  * @param target 
  */
 export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
-    [PropNames.BlockingElementParameters.enabled]: enabled,
-    [PropNames.BlockingElementParameters.getTarget]: getTarget,
+    [PropNames_BlockingElementParameters_enabled]: enabled,
+    [PropNames_BlockingElementParameters_getTarget]: getTarget,
     ...void2
 }: UseBlockingElementParameters<E>): UseBlockingElementReturnType<E> {
     assertEmptyObject(void2);
@@ -96,11 +89,11 @@ export const useBlockingElement = monitored(function useBlockingElement<E extend
     }, [enabled]);
 
     return {
-        [PropNames.BlockingElementReturn.getTop]: getTop,
-        [PropNames.BlockingElementReturn.getTarget]: getTarget,
-        [PropNames.BlockingElementReturn.getLastActiveWhenOpen]: getLastActiveWhenOpen,
-        [PropNames.BlockingElementReturn.getLastActiveWhenClosed]: getLastActiveWhenClosed,
-        [PropNames.ActiveElementParameters.onLastActiveElementChange]: useStableCallback((e, prev, reason) => {
+        [PropNames_BlockingElementReturn_getTop]: getTop,
+        [PropNames_BlockingElementReturn_getTarget]: getTarget,
+        [PropNames_BlockingElementReturn_getLastActiveWhenOpen]: getLastActiveWhenOpen,
+        [PropNames_BlockingElementReturn_getLastActiveWhenClosed]: getLastActiveWhenClosed,
+        [PropNames_ActiveElementParameters_onLastActiveElementChange]: useStableCallback((e, prev, reason) => {
             if (e) {
                 if (enabled)
                     setLastActiveWhenOpen(e as HTMLElement, reason);

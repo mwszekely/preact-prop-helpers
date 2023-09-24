@@ -1,21 +1,16 @@
 import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 const P = `PropNames.ActiveElementParameters`;
 const R = `PropNames.ActiveElementReturn`;
-const PNames = {
-    onActiveElementChange: `${P}.onActiveElementChange`,
-    onLastActiveElementChange: `${P}.onLastActiveElementChange`,
-    onWindowFocusedChange: `${P}.onWindowFocusedChange`,
-    getDocument: `${P}.getDocument`
-};
-const RNames = {
-    getActiveElement: `${R}.getActiveElement`,
-    getLastActiveElement: `${R}.getLastActiveElement`,
-    getWindowFocused: `${R}.getWindowFocused`
-};
+export const PropNames_ActiveElementParameters_onActiveElementChange = `${P}.onActiveElementChange`;
+export const PropNames_ActiveElementParameters_onLastActiveElementChange = `${P}.onLastActiveElementChange`;
+export const PropNames_ActiveElementParameters_onWindowFocusedChange = `${P}.onWindowFocusedChange`;
+export const PropNames_ActiveElementParameters_getDocument = `${P}.getDocument`;
+export const PropNames_ActiveElementReturn_getActiveElement = `${R}.getActiveElement`;
+export const PropNames_ActiveElementReturn_getLastActiveElement = `${R}.getLastActiveElement`;
+export const PropNames_ActiveElementReturn_getWindowFocused = `${R}.getWindowFocused`;
 /**
  * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
  *
@@ -27,7 +22,7 @@ const RNames = {
  *
  * @compositeParams
  */
-export const useActiveElement = monitored(function useActiveElement({ [PropNames.ActiveElementParameters.onActiveElementChange]: onActiveElementChange, [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange, [PropNames.ActiveElementParameters.onWindowFocusedChange]: onWindowFocusedChange, [PropNames.ActiveElementParameters.getDocument]: getDocument }) {
+export const useActiveElement = monitored(function useActiveElement({ [PropNames_ActiveElementParameters_onActiveElementChange]: onActiveElementChange, [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange, [PropNames_ActiveElementParameters_onWindowFocusedChange]: onWindowFocusedChange, [PropNames_ActiveElementParameters_getDocument]: getDocument }) {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
@@ -60,9 +55,9 @@ export const useActiveElement = monitored(function useActiveElement({ [PropNames
     const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
     const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
     return {
-        [PropNames.ActiveElementReturn.getActiveElement]: getActiveElement,
-        [PropNames.ActiveElementReturn.getLastActiveElement]: getLastActiveElement,
-        [PropNames.ActiveElementReturn.getWindowFocused]: getWindowFocused
+        [PropNames_ActiveElementReturn_getActiveElement]: getActiveElement,
+        [PropNames_ActiveElementReturn_getLastActiveElement]: getLastActiveElement,
+        [PropNames_ActiveElementReturn_getWindowFocused]: getWindowFocused
     };
 });
 /**

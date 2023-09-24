@@ -4,35 +4,26 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useRef } from "../../util/lib.js";
-import { PropNames } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { PropNames_PaginatedParameters_paginationMax, PropNames_PaginatedParameters_paginationMin } from "../processed-children/use-paginated-children.js";
+import { PropNames_RearrangeableReturn_indexDemangler, PropNames_RearrangeableReturn_indexMangler } from "../processed-children/use-rearrangeable-children.js";
+import { PropNames_RovingTabIndexReturn_getTabbableIndex, PropNames_RovingTabIndexReturn_setTabbableIndex } from "./use-roving-tabindex.js";
 export { identity };
 const P1 = `PropNames.LinearNavigationParameters`;
 const P2 = `PropNames.LinearNavigationChildParameters`;
 const R1 = `PropNames.LinearNavigationReturn`;
 const R2 = `PropNames.LinearNavigationChildReturn`;
-export const P1Names = {
-    onNavigateLinear: `${P1}.onNavigateLinear`,
-    isValidForLinearNavigation: `${P1}.isValidForLinearNavigation`,
-    pageNavigationSize: `${P1}.pageNavigationSize`,
-    navigatePastStart: `${P1}.navigatePastStart`,
-    navigatePastEnd: `${P1}.navigatePastEnd`,
-    arrowKeyDirection: `${P1}.arrowKeyDirection`,
-    disableHomeEndKeys: `${P1}.disableHomeEndKeys`,
-    getHighestIndex: `${P1}.getHighestIndex`,
-    getLowestIndex: `${P1}.getLowestIndex`,
-};
-export const R1Names = {
-    setTabbableIndex: `${R1}.setTabbableIndex`
-};
-export const P2Names = {};
-export const R2Names = {
-    tabbable: `${R2}.tabbable`,
-};
-PropNames.LinearNavigationParameters ??= P1Names;
-PropNames.LinearNavigationReturn ??= R1Names;
-PropNames.LinearNavigationChildParameters ??= P2Names;
-PropNames.LinearNavigationChildReturn ??= R2Names;
+export const PropNames_LinearNavigationParameters_onNavigateLinear = `${P1}.onNavigateLinear`;
+export const PropNames_LinearNavigationParameters_isValidForLinearNavigation = `${P1}.isValidForLinearNavigation`;
+export const PropNames_LinearNavigationParameters_pageNavigationSize = `${P1}.pageNavigationSize`;
+export const PropNames_LinearNavigationParameters_navigatePastStart = `${P1}.navigatePastStart`;
+export const PropNames_LinearNavigationParameters_navigatePastEnd = `${P1}.navigatePastEnd`;
+export const PropNames_LinearNavigationParameters_arrowKeyDirection = `${P1}.arrowKeyDirection`;
+export const PropNames_LinearNavigationParameters_disableHomeEndKeys = `${P1}.disableHomeEndKeys`;
+export const PropNames_LinearNavigationParameters_getHighestIndex = `${P1}.getHighestIndex`;
+export const PropNames_LinearNavigationParameters_getLowestIndex = `${P1}.getLowestIndex`;
+export const PropNames_LinearNavigationReturn_setTabbableIndex = `${P1}.setTabbableIndex`;
+export const PropNames_LinearNavigationChildReturn_tabbable = `${P1}.tabbable`;
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
@@ -48,7 +39,7 @@ export const useLinearNavigation = (function useLinearNavigation({
 rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
 paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
 rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },*/
-[PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex, [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex, [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd, [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart, [PropNames.LinearNavigationParameters.onNavigateLinear]: onNavigateLinear, [PropNames.LinearNavigationParameters.arrowKeyDirection]: arrowKeyDirection, [PropNames.LinearNavigationParameters.disableHomeEndKeys]: disableHomeEndKeys, [PropNames.LinearNavigationParameters.pageNavigationSize]: pageNavigationSize, [PropNames.RovingTabIndexReturn.getTabbableIndex]: getTabbableIndex, [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex, [PropNames.PaginatedParameters.paginationMin]: paginationMin, [PropNames.PaginatedParameters.paginationMax]: paginationMax, [PropNames.RearrangeableReturn.indexMangler]: indexMangler, [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler, ...void1 }) {
+[PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex, [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex, [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd, [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart, [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear, [PropNames_LinearNavigationParameters_arrowKeyDirection]: arrowKeyDirection, [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys, [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize, [PropNames_RovingTabIndexReturn_getTabbableIndex]: getTabbableIndex, [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex, [PropNames_PaginatedParameters_paginationMin]: paginationMin, [PropNames_PaginatedParameters_paginationMax]: paginationMax, [PropNames_RearrangeableReturn_indexMangler]: indexMangler, [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler, ...void1 }) {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);

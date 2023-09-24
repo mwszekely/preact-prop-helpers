@@ -1,33 +1,19 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { ElementProps, PropNames } from "../util/types.js";
-declare module "../util/types.js" {
-    interface PropNames {
-        FocusTrapParameters: typeof PNames;
-    }
-}
-declare module "../util/types.js" {
-    interface PropNames {
-        FocusTrapReturn: typeof RNames;
-    }
-}
-export declare const PNames: {
-    readonly trapActive: "PropNames.FocusTrapParameters.trapActive";
-    readonly onlyMoveFocus: "PropNames.FocusTrapParameters.onlyMoveFocus";
-    readonly focusPopup: "PropNames.FocusTrapParameters.focusPopup";
-    readonly focusOpener: "PropNames.FocusTrapParameters.focusOpener";
-};
-export declare const RNames: {
-    readonly pressing: "PropNames.FocusTrapReturn.pressing";
-};
+import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { ElementProps } from "../util/types.js";
+export declare const PropNames_FocusTrapParameters_trapActive = "PropNames.FocusTrapParameters.trapActive";
+export declare const PropNames_FocusTrapParameters_onlyMoveFocus = "PropNames.FocusTrapParameters.onlyMoveFocus";
+export declare const PropNames_FocusTrapParameters_focusPopup = "PropNames.FocusTrapParameters.focusPopup";
+export declare const PropNames_FocusTrapParameters_focusOpener = "PropNames.FocusTrapParameters.focusOpener";
+export declare const PropNames_FocusTrapReturn_pressing = "PropNames.FocusTrapReturn.pressing";
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
-    [PropNames.FocusTrapParameters.trapActive]: boolean;
+    [PropNames_FocusTrapParameters_trapActive]: boolean;
     /**
      * If true, focus is not trapped but only moved to the new element.
      */
-    [PropNames.FocusTrapParameters.onlyMoveFocus]: boolean;
+    [PropNames_FocusTrapParameters_onlyMoveFocus]: boolean;
     /**
      * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.
      *
@@ -45,7 +31,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    [PropNames.FocusTrapParameters.focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    [PropNames_FocusTrapParameters_focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
      *
@@ -56,9 +42,9 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    [PropNames.FocusTrapParameters.focusOpener](lastFocused: SourceElement | null): void;
+    [PropNames_FocusTrapParameters_focusOpener](lastFocused: SourceElement | null): void;
 }
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseFocusTrapParametersSelf<SourceElement, PopupElement>, Pick<UseRefElementReturnType<NonNullable<PopupElement>>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseFocusTrapParametersSelf<SourceElement, PopupElement>, Pick<UseRefElementReturnType<NonNullable<PopupElement>>, typeof PropNames_RefElementReturn_getElement> {
 }
 export interface UseFocusTrapReturnType<E extends Element> {
     props: ElementProps<E>;
@@ -71,7 +57,7 @@ export interface UseFocusTrapReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ [PropNames.FocusTrapParameters.focusOpener]: focusOpenerUnstable, [PropNames.FocusTrapParameters.focusPopup]: focusSelfUnstable, [PropNames.FocusTrapParameters.trapActive]: trapActive, [PropNames.FocusTrapParameters.onlyMoveFocus]: onlyMoveFocus, [PropNames.RefElementReturn.getElement]: getElement, ...void2 }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
+export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ [PropNames_FocusTrapParameters_focusOpener]: focusOpenerUnstable, [PropNames_FocusTrapParameters_focusPopup]: focusSelfUnstable, [PropNames_FocusTrapParameters_trapActive]: trapActive, [PropNames_FocusTrapParameters_onlyMoveFocus]: onlyMoveFocus, [PropNames_RefElementReturn_getElement]: getElement, ...void2 }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

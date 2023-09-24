@@ -1,4 +1,6 @@
-import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
+import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
+import { PropNames_ManagedChildrenParameters_onChildrenMountChange, PropNames_ManagedChildrenReturn_getChildren, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -6,34 +8,22 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
 import { useCallback, useEffect, useRef } from "../../util/lib.js";
-import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 const P1 = `PropNames.RovingTabIndexParameters`;
 const P2 = `PropNames.RovingTabIndexChildParameters`;
 const R1 = `PropNames.RovingTabIndexReturn`;
 const R2 = `PropNames.RovingTabIndexChildReturn`;
-const P1Names = {
-    focusSelfParent: `${P1}.focusSelfParent`,
-    initiallyTabbedIndex: `${P1}.initiallyTabbedIndex`,
-    untabbable: `${P1}.untabbable`,
-    untabbableBehavior: `${P1}.untabbableBehavior`,
-    onTabbableIndexChange: `${P1}.onTabbableIndexChange`,
-};
-const R1Names = {
-    setTabbableIndex: `${R1}.setTabbableIndex`,
-    getTabbableIndex: `${R1}.getTabbableIndex`,
-    focusSelf: `${R1}.focusSelf`,
-};
-const P2Names = {};
-const R2Names = {
-    tabbable: `${R2}.tabbable`,
-    getTabbable: `${R2}.getTabbable`
-};
-PropNames.RovingTabIndexParameters ??= P1Names;
-PropNames.RovingTabIndexReturn ??= R1Names;
-PropNames.RovingTabIndexChildParameters ??= P2Names;
-PropNames.RovingTabIndexChildReturn ??= R2Names;
+export const PropNames_RovingTabIndexParameters_focusSelfParent = `${P1}.focusSelfParent`;
+export const PropNames_RovingTabIndexParameters_initiallyTabbedIndex = `${P1}.initiallyTabbedIndex`;
+export const PropNames_RovingTabIndexParameters_untabbable = `${P1}.untabbable`;
+export const PropNames_RovingTabIndexParameters_untabbableBehavior = `${P1}.untabbableBehavior`;
+export const PropNames_RovingTabIndexParameters_onTabbableIndexChange = `${P1}.onTabbableIndexChange`;
+export const PropNames_RovingTabIndexReturn_setTabbableIndex = `${R1}.setTabbableIndex`;
+export const PropNames_RovingTabIndexReturn_getTabbableIndex = `${R1}.getTabbableIndex`;
+export const PropNames_RovingTabIndexReturn_focusSelf = `${R1}.focusSelf`;
+export const PropNames_RovingTabIndexChildReturn_tabbable = `${R2}.tabbable`;
+export const PropNames_RovingTabIndexChildReturn_getTabbable = `${R2}.getTabbable`;
 ;
 /**
  * Implements a roving tabindex system where only one "focusable"
@@ -54,7 +44,7 @@ PropNames.RovingTabIndexChildReturn ??= R2Names;
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export const useRovingTabIndex = monitored(function useRovingTabIndex({ [PropNames.RovingTabIndexParameters.focusSelfParent]: focusSelfParentUnstable, [PropNames.RovingTabIndexParameters.untabbable]: untabbable, [PropNames.RovingTabIndexParameters.untabbableBehavior]: untabbableBehavior, [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange, [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.RefElementReturn.getElement]: getElement, ...void1 }) {
+export const useRovingTabIndex = monitored(function useRovingTabIndex({ [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParentUnstable, [PropNames_RovingTabIndexParameters_untabbable]: untabbable, [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior, [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_RefElementReturn_getElement]: getElement, ...void1 }) {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
     const lastFocused = useRef(null);
@@ -195,10 +185,10 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ [PropNam
         giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
     });
     return {
-        [PropNames.ManagedChildrenParameters.onChildrenMountChange]: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]),
-        [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
-        [PropNames.RovingTabIndexReturn.getTabbableIndex]: getTabbableIndex,
-        [PropNames.RovingTabIndexReturn.focusSelf]: focusSelf,
+        [PropNames_ManagedChildrenParameters_onChildrenMountChange]: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]),
+        [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex,
+        [PropNames_RovingTabIndexReturn_getTabbableIndex]: getTabbableIndex,
+        [PropNames_RovingTabIndexReturn_focusSelf]: focusSelf,
         context: useMemoObject({ rovingTabIndexContext }),
         props: [useTagProps({
                 // Note: Making this -1 instead of null is partially intentional --
@@ -227,7 +217,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ [PropNam
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, [PropNames.RefElementReturn.getElement]: getElement, ...void3 }) {
+export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, [PropNames_RefElementReturn_getElement]: getElement, ...void3 }) {
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
         reevaluateClosestFit(undefined);
@@ -240,7 +230,7 @@ export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild(
         }
     }, [tabbable]);
     return {
-        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: useStableCallback((focused, _prevFocused, e) => {
+        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: useStableCallback((focused, _prevFocused, e) => {
             if (focused) {
                 const parentIsUntabbable = getParentIsUntabbable();
                 const untabbableBehavior = getUntabbableBehavior();
@@ -250,8 +240,8 @@ export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild(
                     parentFocusSelf(false);
             }
         }),
-        [PropNames.RovingTabIndexChildReturn.tabbable]: tabbable,
-        [PropNames.RovingTabIndexChildReturn.getTabbable]: getTabbable,
+        [PropNames_RovingTabIndexChildReturn_tabbable]: tabbable,
+        [PropNames_RovingTabIndexChildReturn_getTabbable]: getTabbable,
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable },
         props: useTagProps({
             tabIndex: (tabbable ? 0 : -1),

@@ -4,51 +4,30 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EventType, useCallback, useRef } from "../../util/lib.js";
-import { ElementProps, KeyboardEventType, Nullable, OmitStrong, PropNames } from "../../util/types.js";
+import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UsePaginatedChildrenParametersSelf } from "../processed-children/use-paginated-children.js";
-import { UseRearrangeableChildrenReturnTypeSelf } from "../processed-children/use-rearrangeable-children.js";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { PropNames_PaginatedParameters_paginationMax, PropNames_PaginatedParameters_paginationMin, UsePaginatedChildrenParametersSelf } from "../processed-children/use-paginated-children.js";
+import { PropNames_RearrangeableReturn_indexDemangler, PropNames_RearrangeableReturn_indexMangler, UseRearrangeableChildrenReturnTypeSelf } from "../processed-children/use-rearrangeable-children.js";
+import { PropNames_RovingTabIndexReturn_getTabbableIndex, PropNames_RovingTabIndexReturn_setTabbableIndex, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
-
-
-declare module "../../util/types.js" { interface PropNames { LinearNavigationParameters: typeof P1Names } }
-declare module "../../util/types.js" { interface PropNames { LinearNavigationReturn: typeof R1Names } }
-declare module "../../util/types.js" { interface PropNames { LinearNavigationChildParameters: typeof P2Names } }
-declare module "../../util/types.js" { interface PropNames { LinearNavigationChildReturn: typeof R2Names } }
 
 const P1 = `PropNames.LinearNavigationParameters`;
 const P2 = `PropNames.LinearNavigationChildParameters`;
 const R1 = `PropNames.LinearNavigationReturn`;
 const R2 = `PropNames.LinearNavigationChildReturn`;
 
-export const P1Names = {
-    onNavigateLinear: `${P1}.onNavigateLinear`,
-    isValidForLinearNavigation: `${P1}.isValidForLinearNavigation`,
-    pageNavigationSize: `${P1}.pageNavigationSize`,
-    navigatePastStart: `${P1}.navigatePastStart`,
-    navigatePastEnd: `${P1}.navigatePastEnd`,
-    arrowKeyDirection: `${P1}.arrowKeyDirection`,
-    disableHomeEndKeys: `${P1}.disableHomeEndKeys`,
-    getHighestIndex: `${P1}.getHighestIndex`,
-    getLowestIndex: `${P1}.getLowestIndex`,
-} as const;
+export const PropNames_LinearNavigationParameters_onNavigateLinear = `${P1}.onNavigateLinear`;
+export const PropNames_LinearNavigationParameters_isValidForLinearNavigation = `${P1}.isValidForLinearNavigation`;
+export const PropNames_LinearNavigationParameters_pageNavigationSize = `${P1}.pageNavigationSize`;
+export const PropNames_LinearNavigationParameters_navigatePastStart = `${P1}.navigatePastStart`;
+export const PropNames_LinearNavigationParameters_navigatePastEnd = `${P1}.navigatePastEnd`;
+export const PropNames_LinearNavigationParameters_arrowKeyDirection = `${P1}.arrowKeyDirection`;
+export const PropNames_LinearNavigationParameters_disableHomeEndKeys = `${P1}.disableHomeEndKeys`;
+export const PropNames_LinearNavigationParameters_getHighestIndex = `${P1}.getHighestIndex`;
+export const PropNames_LinearNavigationParameters_getLowestIndex = `${P1}.getLowestIndex`;
+export const PropNames_LinearNavigationReturn_setTabbableIndex = `${P1}.setTabbableIndex`;
+export const PropNames_LinearNavigationChildReturn_tabbable = `${P1}.tabbable`;
 
-export const R1Names = {
-    setTabbableIndex: `${R1}.setTabbableIndex`
-} as const;
-
-export const P2Names = {
-} as const;
-
-export const R2Names = {
-    tabbable: `${R2}.tabbable`,
-} as const;
-
-PropNames.LinearNavigationParameters ??= P1Names;
-PropNames.LinearNavigationReturn ??= R1Names;
-PropNames.LinearNavigationChildParameters ??= P2Names;
-PropNames.LinearNavigationChildReturn ??= R2Names;
 
 export interface LinearNavigationResult {
     valueDemangled: number | null;
@@ -66,9 +45,9 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
     UseLinearNavigationParametersSelf<ChildElement>,
-    Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, (typeof PropNames)["RovingTabIndexReturn"]["getTabbableIndex"] | (typeof PropNames)["RovingTabIndexReturn"]["setTabbableIndex"]>,
-    Pick<UseRearrangeableChildrenReturnTypeSelf<any>, typeof PropNames.RearrangeableReturn.indexMangler | typeof PropNames.RearrangeableReturn.indexDemangler>,
-    Pick<UsePaginatedChildrenParametersSelf, typeof PropNames.PaginatedParameters.paginationMin | typeof PropNames.PaginatedParameters.paginationMax> {
+    Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, typeof PropNames_RovingTabIndexReturn_getTabbableIndex | typeof PropNames_RovingTabIndexReturn_setTabbableIndex>,
+    Pick<UseRearrangeableChildrenReturnTypeSelf<any>, typeof PropNames_RearrangeableReturn_indexMangler | typeof PropNames_RearrangeableReturn_indexDemangler>,
+    Pick<UsePaginatedChildrenParametersSelf, typeof PropNames_PaginatedParameters_paginationMin | typeof PropNames_PaginatedParameters_paginationMax> {
 }
 
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
@@ -78,14 +57,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    [PropNames.LinearNavigationParameters.onNavigateLinear]: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
+    [PropNames_LinearNavigationParameters_onNavigateLinear]: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
 
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      * 
      * @stable
      */
-    [PropNames.LinearNavigationParameters.isValidForLinearNavigation](i: number): boolean;
+    [PropNames_LinearNavigationParameters_isValidForLinearNavigation](i: number): boolean;
 
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
@@ -96,7 +75,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
      * ```
      */
-    [PropNames.LinearNavigationParameters.pageNavigationSize]: Nullable<number>;
+    [PropNames_LinearNavigationParameters_pageNavigationSize]: Nullable<number>;
 
     /**
      * What happens when `up` is pressed on the first valid child?
@@ -105,14 +84,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * If it's a function, it's is called, and the event does not propagate.
      * If it's `"passthrough"`, nothing happens, **and the event is allowed to propagate**.
      */
-    [PropNames.LinearNavigationParameters.navigatePastStart]: "passthrough" | "wrap" | (() => void);
+    [PropNames_LinearNavigationParameters_navigatePastStart]: "passthrough" | "wrap" | (() => void);
 
     /**
      * What happens when `down` is pressed on the last valid child?
      * 
      * @see {@link UseLinearNavigationParametersSelf.navigatePastStart}
      */
-    [PropNames.LinearNavigationParameters.navigatePastEnd]: "passthrough" | "wrap" | (() => void);
+    [PropNames_LinearNavigationParameters_navigatePastEnd]: "passthrough" | "wrap" | (() => void);
 
     /**
      * Controls which arrow keys are used to navigate through the component.
@@ -123,14 +102,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * Use `"none"` to disallow navigation with the arrow keys in any direction.
      */
-    [PropNames.LinearNavigationParameters.arrowKeyDirection]: "horizontal" | "vertical" | "either" | "none";
+    [PropNames_LinearNavigationParameters_arrowKeyDirection]: "horizontal" | "vertical" | "either" | "none";
 
     /**
      * If set to true, navigation with the home & end keys will
      * be disabled, but navigation with the arrow keys will be
      * unaffected.
      */
-    [PropNames.LinearNavigationParameters.disableHomeEndKeys]: boolean;
+    [PropNames_LinearNavigationParameters_disableHomeEndKeys]: boolean;
 
     /**
      * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.
@@ -157,7 +136,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    [PropNames.LinearNavigationParameters.getHighestIndex](): number;
+    [PropNames_LinearNavigationParameters_getHighestIndex](): number;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      * 
@@ -165,7 +144,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    [PropNames.LinearNavigationParameters.getLowestIndex](): number;
+    [PropNames_LinearNavigationParameters_getLowestIndex](): number;
 }
 
 
@@ -184,21 +163,21 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },*/
-    [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex,
-    [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex,
-    [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation,
-    [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd,
-    [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart,
-    [PropNames.LinearNavigationParameters.onNavigateLinear]: onNavigateLinear,
-    [PropNames.LinearNavigationParameters.arrowKeyDirection]: arrowKeyDirection,
-    [PropNames.LinearNavigationParameters.disableHomeEndKeys]: disableHomeEndKeys,
-    [PropNames.LinearNavigationParameters.pageNavigationSize]: pageNavigationSize,
-    [PropNames.RovingTabIndexReturn.getTabbableIndex]: getTabbableIndex,
-    [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
-    [PropNames.PaginatedParameters.paginationMin]: paginationMin,
-    [PropNames.PaginatedParameters.paginationMax]: paginationMax,
-    [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
-    [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+    [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex,
+    [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex,
+    [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation,
+    [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd,
+    [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart,
+    [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear,
+    [PropNames_LinearNavigationParameters_arrowKeyDirection]: arrowKeyDirection,
+    [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys,
+    [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize,
+    [PropNames_RovingTabIndexReturn_getTabbableIndex]: getTabbableIndex,
+    [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex,
+    [PropNames_PaginatedParameters_paginationMin]: paginationMin,
+    [PropNames_PaginatedParameters_paginationMax]: paginationMax,
+    [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
+    [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = EventType<any, any>;

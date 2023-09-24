@@ -1,32 +1,21 @@
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
-import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "../observers/use-active-element.js";
+import { PropNames_RefElementReturn_getElement, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { PropNames_ActiveElementParameters_getDocument, PropNames_ActiveElementParameters_onActiveElementChange, PropNames_ActiveElementParameters_onLastActiveElementChange, PropNames_ActiveElementParameters_onWindowFocusedChange, UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "../observers/use-active-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, EventType, OmitStrong, PropNames } from "../util/types.js";
+import { ElementProps, EventType, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { UseBackdropDismissParameters, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
-import { UseEscapeDismissParameters, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
-import { UseLostFocusDismissParameters, UseLostFocusDismissReturnType, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
-
-
-declare module "../util/types.js" { interface PropNames { DismissParameters: typeof PNames } }
-declare module "../util/types.js" { interface PropNames { DismissReturn: typeof RNames } }
+import { PropNames_BackdropDismissParameters_dismissBackdropActive, PropNames_BackdropDismissParameters_onDismissBackdrop, UseBackdropDismissParameters, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
+import { PropNames_EscapeDismissParameters_dismissEscapeActive, PropNames_EscapeDismissParameters_getDocument, PropNames_EscapeDismissParameters_onDismissEscape, PropNames_EscapeDismissParameters_parentDepth, UseEscapeDismissParameters, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
+import { PropNames_LostFocusDismissParameters_dismissLostFocusActive, PropNames_LostFocusDismissParameters_getElementPopup, PropNames_LostFocusDismissParameters_getElementSource, PropNames_LostFocusDismissParameters_onDismissLostFocus, UseLostFocusDismissParameters, UseLostFocusDismissReturnType, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
 
 const P = `PropNames.DismissParameters`;
 const R = `PropNames.DismissReturn`;
 
-export const PNames = {
-    dismissActive: `${P}.dismissActive`,
-    onDismiss: `${P}.onDismiss`
-} as const;
+export const PropNames_DismissParameters_dismissActive = `${P}.dismissActive`;
+export const PropNames_DismissParameters_onDismiss = `${P}.onDismiss`;
+export const PropNames_DismissReturn_getElementSource = `${R}.getElementSource`;
+export const PropNames_DismissReturn_getElementPopup = `${R}.getElementPopup`;
 
-export const RNames = {
-    getElementSource: `${R}.getElementSource`,
-    getElementPopup: `${R}.getElementPopup`,
-} as const;
-
-PropNames.DismissParameters ??=  PNames;
-PropNames.DismissReturn ??=  RNames;
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -49,7 +38,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      * @remarks When this is `true`, any of the dismiss behaviors are able to be triggered. 
      * When this is `false`, no dismiss behaviors are able to be triggered.
      */
-    [PropNames.DismissParameters.dismissActive]: boolean;
+    [PropNames_DismissParameters_dismissActive]: boolean;
 
     /**
      * Called any time the user has requested the component be dismissed for the given reason.
@@ -58,23 +47,23 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      * 
      * @nonstable
      */
-    [PropNames.DismissParameters.onDismiss]: (e: EventType<any, any>, reason: Listeners) => void;
+    [PropNames_DismissParameters_onDismiss]: (e: EventType<any, any>, reason: Listeners) => void;
 }
 
 export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends
     UseDismissParametersSelf<Listeners>,
-    OmitStrong<UseEscapeDismissParameters<any, Listeners extends "escape" ? true : false>, (typeof PropNames)["EscapeDismissParameters"]["getDocument"] | (typeof PropNames)["RefElementReturn"]["getElement"]>,
-    OmitStrong<UseBackdropDismissParameters<any, Listeners extends "backdrop" ? true : false>, (typeof PropNames)["RefElementReturn"]["getElement"]>,
-    OmitStrong<UseLostFocusDismissParameters<any, any, Listeners extends "lost-focus" ? true : false>, (typeof PropNames)["LostFocusDismissParameters"]["getElementSource"] | (typeof PropNames)["LostFocusDismissParameters"]["getElementPopup"]>,
+    OmitStrong<UseEscapeDismissParameters<any, Listeners extends "escape" ? true : false>, typeof PropNames_EscapeDismissParameters_getDocument | typeof PropNames_RefElementReturn_getElement>,
+    OmitStrong<UseBackdropDismissParameters<any, Listeners extends "backdrop" ? true : false>, typeof PropNames_RefElementReturn_getElement>,
+    OmitStrong<UseLostFocusDismissParameters<any, any, Listeners extends "lost-focus" ? true : false>, typeof PropNames_LostFocusDismissParameters_getElementSource | typeof PropNames_LostFocusDismissParameters_getElementPopup>,
     UseActiveElementParameters {
 }
 
 export interface UseDismissReturnTypeSelf<SourceElement extends Element | null, PopupElement extends Element> {
-    [PropNames.DismissReturn.getElementSource](): SourceElement | null;
-    [PropNames.DismissReturn.getElementPopup](): PopupElement | null;
+    [PropNames_DismissReturn_getElementSource](): SourceElement | null;
+    [PropNames_DismissReturn_getElementPopup](): PopupElement | null;
 
 }
-export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnTypeSelf<SourceElement, PopupElement>, UseActiveElementReturnType, OmitStrong<UseLostFocusDismissReturnType<SourceElement, PopupElement>, (typeof PropNames)["ActiveElementParameters"]["onLastActiveElementChange"]> {
+export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnTypeSelf<SourceElement, PopupElement>, UseActiveElementReturnType, OmitStrong<UseLostFocusDismissReturnType<SourceElement, PopupElement>, typeof PropNames_ActiveElementParameters_onLastActiveElementChange> {
     /**
      * If this dismissible component has a specific element that caused it to appear (a button, for example),
      * provide it with these props.
@@ -99,65 +88,65 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * 
  * @compositeParams
  */
-export const useDismiss = monitored(function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ [PropNames.DismissParameters.dismissActive]: dismissActive,
-    [PropNames.DismissParameters.onDismiss]: onDismiss,
-    [PropNames.BackdropDismissParameters.dismissBackdropActive]: dismissBackdropActive,
-    [PropNames.BackdropDismissParameters.onDismissBackdrop]: onDismissBackdrop,
-    [PropNames.EscapeDismissParameters.dismissEscapeActive]: dismissEscapeActive,
-    [PropNames.EscapeDismissParameters.onDismissEscape]: onDismissEscape,
-    [PropNames.EscapeDismissParameters.parentDepth]: parentDepth,
-    [PropNames.LostFocusDismissParameters.dismissLostFocusActive]: dismissLostFocusActive,
-    [PropNames.LostFocusDismissParameters.onDismissLostFocus]: onDismissLostFocus,
-    [PropNames.ActiveElementParameters.getDocument]: getDocument,
-    [PropNames.ActiveElementParameters.onActiveElementChange]: onActiveElementChange,
-    [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange1,
-    [PropNames.ActiveElementParameters.onWindowFocusedChange]: onWindowFocusedChange,
+export const useDismiss = monitored(function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ [PropNames_DismissParameters_dismissActive]: dismissActive,
+    [PropNames_DismissParameters_onDismiss]: onDismiss,
+    [PropNames_BackdropDismissParameters_dismissBackdropActive]: dismissBackdropActive,
+    [PropNames_BackdropDismissParameters_onDismissBackdrop]: onDismissBackdrop,
+    [PropNames_EscapeDismissParameters_dismissEscapeActive]: dismissEscapeActive,
+    [PropNames_EscapeDismissParameters_onDismissEscape]: onDismissEscape,
+    [PropNames_EscapeDismissParameters_parentDepth]: parentDepth,
+    [PropNames_LostFocusDismissParameters_dismissLostFocusActive]: dismissLostFocusActive,
+    [PropNames_LostFocusDismissParameters_onDismissLostFocus]: onDismissLostFocus,
+    [PropNames_ActiveElementParameters_getDocument]: getDocument,
+    [PropNames_ActiveElementParameters_onActiveElementChange]: onActiveElementChange,
+    [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange1,
+    [PropNames_ActiveElementParameters_onWindowFocusedChange]: onWindowFocusedChange,
     ...void4
 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
 
-    const { props: propsStableSource, [PropNames.RefElementReturn.getElement]: getElementSource } = useRefElement<NonNullable<SourceElement>>({});
-    const { props: propsStablePopup, [PropNames.RefElementReturn.getElement]: getElementPopup } = useRefElement<PopupElement>({});
+    const { props: propsStableSource, [PropNames_RefElementReturn_getElement]: getElementSource } = useRefElement<NonNullable<SourceElement>>({});
+    const { props: propsStablePopup, [PropNames_RefElementReturn_getElement]: getElementPopup } = useRefElement<PopupElement>({});
 
     const void8 = useBackdropDismiss<PopupElement, Listeners extends "backdrop" ? true : false>({
-        [PropNames.BackdropDismissParameters.dismissBackdropActive]: (dismissBackdropActive && dismissActive) as false,
-        [PropNames.BackdropDismissParameters.onDismissBackdrop]: useStableCallback((e) => {
+        [PropNames_BackdropDismissParameters_dismissBackdropActive]: (dismissBackdropActive && dismissActive) as false,
+        [PropNames_BackdropDismissParameters_onDismissBackdrop]: useStableCallback((e) => {
             onDismissBackdrop?.(e);
             onDismiss(e, "backdrop" as Listeners);
         }),
-        [PropNames.RefElementReturn.getElement]: getElementPopup,
+        [PropNames_RefElementReturn_getElement]: getElementPopup,
     });
     const void9 = useEscapeDismiss<PopupElement, Listeners extends "escape" ? true : false>({
-        [PropNames.RefElementReturn.getElement]: getElementPopup,
-        [PropNames.EscapeDismissParameters.dismissEscapeActive]: (dismissEscapeActive && dismissActive) as false,
-        [PropNames.EscapeDismissParameters.getDocument]: getDocument,
-        [PropNames.EscapeDismissParameters.parentDepth]: parentDepth,
-        [PropNames.EscapeDismissParameters.onDismissEscape]: useStableCallback((e) => {
+        [PropNames_RefElementReturn_getElement]: getElementPopup,
+        [PropNames_EscapeDismissParameters_dismissEscapeActive]: (dismissEscapeActive && dismissActive) as false,
+        [PropNames_EscapeDismissParameters_getDocument]: getDocument,
+        [PropNames_EscapeDismissParameters_parentDepth]: parentDepth,
+        [PropNames_EscapeDismissParameters_onDismissEscape]: useStableCallback((e) => {
             onDismissEscape?.(e);
             onDismiss(e, "escape" as Listeners);
         }),
     });
     const {
-        [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange2,
+        [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange2,
         ...void1
     } = useLostFocusDismiss<SourceElement, PopupElement, Listeners extends "lost-focus" ? true : false>({
-        [PropNames.LostFocusDismissParameters.dismissLostFocusActive]: (dismissLostFocusActive && dismissActive) as false,
-        [PropNames.LostFocusDismissParameters.onDismissLostFocus]: useStableCallback((e) => {
+        [PropNames_LostFocusDismissParameters_dismissLostFocusActive]: (dismissLostFocusActive && dismissActive) as false,
+        [PropNames_LostFocusDismissParameters_onDismissLostFocus]: useStableCallback((e) => {
             onDismissLostFocus?.(e);
             onDismiss(e, "lost-focus" as Listeners);
         }),
-        [PropNames.LostFocusDismissParameters.getElementPopup]: getElementPopup,
-        [PropNames.LostFocusDismissParameters.getElementSource]: getElementSource
+        [PropNames_LostFocusDismissParameters_getElementPopup]: getElementPopup,
+        [PropNames_LostFocusDismissParameters_getElementSource]: getElementSource
     });
 
 
     const activeElementReturn = useActiveElement({
-        [PropNames.ActiveElementParameters.onLastActiveElementChange]: useStableCallback((a, b, r) => {
+        [PropNames_ActiveElementParameters_onLastActiveElementChange]: useStableCallback((a, b, r) => {
             onLastActiveElementChange2?.(a, b, r);
             onLastActiveElementChange1?.(a, b, r);
         }),
-        [PropNames.ActiveElementParameters.onActiveElementChange]: onActiveElementChange,
-        [PropNames.ActiveElementParameters.onWindowFocusedChange]: onWindowFocusedChange,
-        [PropNames.ActiveElementParameters.getDocument]: getDocument
+        [PropNames_ActiveElementParameters_onActiveElementChange]: onActiveElementChange,
+        [PropNames_ActiveElementParameters_onWindowFocusedChange]: onWindowFocusedChange,
+        [PropNames_ActiveElementParameters_getDocument]: getDocument
     });
 
     assertEmptyObject(void1);
@@ -167,8 +156,8 @@ export const useDismiss = monitored(function useDismiss<Listeners extends Dismis
 
     return {
         ...activeElementReturn,
-        [PropNames.DismissReturn.getElementSource]: getElementSource, 
-        [PropNames.DismissReturn.getElementPopup]: getElementPopup,
+        [PropNames_DismissReturn_getElementSource]: getElementSource, 
+        [PropNames_DismissReturn_getElementPopup]: getElementPopup,
         propsStableSource: propsStableSource,
         propsStablePopup: propsStablePopup,
 

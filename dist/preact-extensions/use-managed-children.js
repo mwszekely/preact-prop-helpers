@@ -1,6 +1,5 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -9,22 +8,11 @@ const P1 = `PropNames.ManagedChildrenParameters`;
 const R1 = `PropNames.ManagedChildrenReturn`;
 const P2 = `PropNames.ManagedChildParameters`;
 const R2 = `PropNames.ManagedChildReturnType`;
-export const P1Names = {
-    onAfterChildLayoutEffect: `${P1}.onAfterChildLayoutEffect`,
-    onChildrenMountChange: `${P1}.onChildrenMountChange`,
-    onChildrenCountChange: `${P1}.onChildrenCountChange`
-};
-export const R1Names = {
-    getChildren: `${R1}.getChildren`
-};
-export const P2Names = {};
-export const R2Names = {
-    getChildren: `${R2}.getChildren`
-};
-PropNames.ManagedChildrenParameters ??= P1Names;
-PropNames.ManagedChildrenReturn ??= R1Names;
-PropNames.ManagedChildParameters ??= P2Names;
-PropNames.ManagedChildReturn ??= R2Names;
+export const PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect = `${P1}.onAfterChildLayoutEffect`;
+export const PropNames_ManagedChildrenParameters_onChildrenMountChange = `${P1}.onChildrenMountChange`;
+export const PropNames_ManagedChildrenParameters_onChildrenCountChange = `${P1}.onChildrenCountChange`;
+export const PropNames_ManagedChildrenReturn_getChildren = `${P1}.getChildren`;
+export const PropNames_ManagedChildReturn_getChildren = `${R2}.getChildren`;
 /**
  * Reminder of order of execution:
  *
@@ -61,7 +49,7 @@ const _comments = void (0);
  *
  * @compositeParams
  */
-export const useManagedChildren = monitored(function useManagedChildren({ [PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames.ManagedChildrenParameters.onChildrenMountChange]: onChildrenMountChange, [PropNames.ManagedChildrenParameters.onChildrenCountChange]: onChildrenCountChange, ..._void1 }) {
+export const useManagedChildren = monitored(function useManagedChildren({ [PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames_ManagedChildrenParameters_onChildrenMountChange]: onChildrenMountChange, [PropNames_ManagedChildrenParameters_onChildrenCountChange]: onChildrenCountChange, ..._void1 }) {
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     assertEmptyObject(_void1);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
@@ -179,7 +167,7 @@ export const useManagedChildren = monitored(function useManagedChildren({ [PropN
                 getChildren
             })
         }),
-        [PropNames.ManagedChildrenReturn.getChildren]: getChildren
+        [PropNames_ManagedChildrenReturn_getChildren]: getChildren
     };
 });
 /**
@@ -214,7 +202,7 @@ export const useManagedChild = monitored(function useManagedChild({ context, inf
         return () => remoteULEChildMounted?.(index, false);
     }, [index]);
     return {
-        [PropNames.ManagedChildReturn.getChildren]: getChildren
+        [PropNames_ManagedChildReturn_getChildren]: getChildren
     };
 });
 /**

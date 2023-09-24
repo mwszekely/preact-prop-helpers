@@ -1,49 +1,17 @@
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
+import { PropNames_TextContentParameters_getText } from "../../dom-helpers/use-text-content.js";
+import { PropNames_ManagedChildrenReturn_getChildren, UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { ElementProps, EventType, Nullable, OmitStrong, PropNames } from "../../util/types.js";
+import { ElementProps, EventType, Nullable, OmitStrong } from "../../util/types.js";
+import { PropNames_PaginatedParameters_paginationMax, PropNames_PaginatedParameters_paginationMin } from "../processed-children/use-paginated-children.js";
+import { PropNames_RearrangeableReturn_indexDemangler, PropNames_RearrangeableReturn_indexMangler } from "../processed-children/use-rearrangeable-children.js";
+import { PropNames_LinearNavigationParameters_arrowKeyDirection, PropNames_LinearNavigationParameters_disableHomeEndKeys, PropNames_LinearNavigationParameters_getHighestIndex, PropNames_LinearNavigationParameters_getLowestIndex, PropNames_LinearNavigationParameters_isValidForLinearNavigation, PropNames_LinearNavigationParameters_navigatePastEnd, PropNames_LinearNavigationParameters_navigatePastStart, PropNames_LinearNavigationParameters_onNavigateLinear, PropNames_LinearNavigationParameters_pageNavigationSize } from "./use-linear-navigation.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
-import { SetTabbableIndex } from "./use-roving-tabindex.js";
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationParameters: typeof P1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationReturn: typeof R1Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationRowParameters: typeof P2Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationRowReturn: typeof R2Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationCellParameters: typeof P3Names;
-    }
-}
-declare module "../../util/types.js" {
-    interface PropNames {
-        GridNavigationCellReturn: typeof R3Names;
-    }
-}
-export declare const P1Names: {
-    readonly onTabbableColumnChange: "PropNames.GridNavigationParameters.onTabbableColumnChange";
-    readonly initiallyTabbableColumn: "PropNames.GridNavigationParameters.initiallyTabbableColumn";
-};
-export declare const R1Names: {};
-export declare const P2Names: {};
-export declare const R2Names: {};
-export declare const P3Names: {
-    readonly colSpan: "PropNames.GridNavigationCellParameters.colSpan";
-};
-export declare const R3Names: {};
+import { PropNames_RovingTabIndexParameters_focusSelfParent, PropNames_RovingTabIndexParameters_initiallyTabbedIndex, PropNames_RovingTabIndexParameters_onTabbableIndexChange, PropNames_RovingTabIndexParameters_untabbable, PropNames_RovingTabIndexParameters_untabbableBehavior, PropNames_RovingTabIndexReturn_focusSelf, SetTabbableIndex } from "./use-roving-tabindex.js";
+import { PropNames_TypeaheadNavigationParameters_collator, PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation, PropNames_TypeaheadNavigationParameters_noTypeahead, PropNames_TypeaheadNavigationParameters_onNavigateTypeahead, PropNames_TypeaheadNavigationParameters_typeaheadTimeout } from "./use-typeahead-navigation.js";
+export declare const PropNames_GridNavigationParameters_onTabbableColumnChange = "PropNames.GridNavigationParameters.onTabbableColumnChange";
+export declare const PropNames_GridNavigationParameters_initiallyTabbableColumn = "PropNames.GridNavigationParameters.initiallyTabbableColumn";
+export declare const PropNames_GridNavigationCellParameters_colSpan = "PropNames.GridNavigationCellParameters.colSpan";
 export interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> {
 }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
@@ -54,7 +22,7 @@ export interface UseGridNavigationCellParametersSelf {
      *
      * Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`
      */
-    [PropNames.GridNavigationCellParameters.colSpan]: Nullable<number>;
+    [PropNames_GridNavigationCellParameters_colSpan]: Nullable<number>;
 }
 export interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
@@ -69,18 +37,18 @@ export interface UseGridNavigationParametersSelf {
      *
      * @stable
      */
-    [PropNames.GridNavigationParameters.onTabbableColumnChange]: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
+    [PropNames_GridNavigationParameters_onTabbableColumnChange]: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
     /**
      * Which column of cells is initially tabbable the first time the user interacts with the control.
      */
-    [PropNames.GridNavigationParameters.initiallyTabbableColumn]: number;
+    [PropNames_GridNavigationParameters_initiallyTabbableColumn]: number;
 }
 export interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
     setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
-export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends UseGridNavigationParametersSelf, OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, typeof PropNames.LinearNavigationParameters.arrowKeyDirection> {
+export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends UseGridNavigationParametersSelf, OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, typeof PropNames_LinearNavigationParameters_arrowKeyDirection> {
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrRowElement, RowElement>, "context"> {
     context: UseGridNavigationRowContext;
@@ -92,9 +60,9 @@ export type UseGridNavigationRowInfoKeysParameters = UseListNavigationChildInfoK
 export type UseGridNavigationRowInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | "focusSelf";
 export type UseGridNavigationCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
 export type UseGridNavigationCellInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType;
-export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, typeof PropNames.LinearNavigationParameters.disableHomeEndKeys | typeof PropNames.LinearNavigationParameters.onNavigateLinear | typeof PropNames.LinearNavigationParameters.arrowKeyDirection | typeof PropNames.LinearNavigationParameters.pageNavigationSize | typeof PropNames.RearrangeableReturn.indexMangler | typeof PropNames.RearrangeableReturn.indexDemangler | typeof PropNames.PaginatedParameters.paginationMax | typeof PropNames.PaginatedParameters.paginationMin | typeof PropNames.RovingTabIndexParameters.focusSelfParent | typeof PropNames.RovingTabIndexParameters.untabbableBehavior>, Pick<UseManagedChildrenReturnType<CM>, typeof PropNames.ManagedChildrenReturn.getChildren> {
+export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, typeof PropNames_LinearNavigationParameters_disableHomeEndKeys | typeof PropNames_LinearNavigationParameters_onNavigateLinear | typeof PropNames_LinearNavigationParameters_arrowKeyDirection | typeof PropNames_LinearNavigationParameters_pageNavigationSize | typeof PropNames_RearrangeableReturn_indexMangler | typeof PropNames_RearrangeableReturn_indexDemangler | typeof PropNames_PaginatedParameters_paginationMax | typeof PropNames_PaginatedParameters_paginationMin | typeof PropNames_RovingTabIndexParameters_focusSelfParent | typeof PropNames_RovingTabIndexParameters_untabbableBehavior>, Pick<UseManagedChildrenReturnType<CM>, typeof PropNames_ManagedChildrenReturn_getChildren> {
 }
-export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends OmitStrong<UseListNavigationChildReturnType<RowElement>, "props">, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "context" | "props">, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "props" | typeof PropNames.RovingTabIndexReturn.focusSelf> {
+export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends OmitStrong<UseListNavigationChildReturnType<RowElement>, "props">, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "context" | "props">, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "props" | typeof PropNames_RovingTabIndexReturn_focusSelf> {
     context: UseGridNavigationCellContext;
     info: Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysReturnType>;
     props: ElementProps<RowElement>[];
@@ -132,7 +100,7 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element> ex
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export declare const useGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element>({ [PropNames.LinearNavigationParameters.disableHomeEndKeys]: disableHomeEndKeys, [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex, [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex, [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd, [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart, [PropNames.LinearNavigationParameters.onNavigateLinear]: onNavigateLinear, [PropNames.LinearNavigationParameters.pageNavigationSize]: pageNavigationSize, [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.PaginatedParameters.paginationMax]: paginationMax, [PropNames.PaginatedParameters.paginationMin]: paginationMin, [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler, [PropNames.RearrangeableReturn.indexMangler]: indexMangler, [PropNames.RefElementReturn.getElement]: getElement, [PropNames.RovingTabIndexParameters.focusSelfParent]: focusSelfParent, [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange, [PropNames.RovingTabIndexParameters.untabbable]: untabbable, [PropNames.RovingTabIndexParameters.untabbableBehavior]: untabbableBehavior, [PropNames.TypeaheadNavigationParameters.collator]: collator, [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead, [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead, [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout, [PropNames.GridNavigationParameters.onTabbableColumnChange]: onTabbableColumnChange, [PropNames.GridNavigationParameters.initiallyTabbableColumn]: initiallyTabbableColumn, ...void2 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>) => UseGridNavigationReturnType<ParentOrRowElement, RowElement>;
+export declare const useGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element>({ [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys, [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex, [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex, [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd, [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart, [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear, [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_PaginatedParameters_paginationMax]: paginationMax, [PropNames_PaginatedParameters_paginationMin]: paginationMin, [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler, [PropNames_RearrangeableReturn_indexMangler]: indexMangler, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParent, [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange, [PropNames_RovingTabIndexParameters_untabbable]: untabbable, [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, [PropNames_GridNavigationParameters_onTabbableColumnChange]: onTabbableColumnChange, [PropNames_GridNavigationParameters_initiallyTabbableColumn]: initiallyTabbableColumn, ...void2 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>) => UseGridNavigationReturnType<ParentOrRowElement, RowElement>;
 /**
  * Child hook for {@link useGridNavigation}
  *
@@ -141,11 +109,11 @@ export declare const useGridNavigation: <ParentOrRowElement extends Element, Row
  *
  * @compositeParams
  */
-export declare const useGridNavigationRow: <RowElement extends Element, CellElement extends Element>({ info: { index, untabbable, ...void3 }, "PropNames.TextContentParameters.getText": getText, context: contextFromParent, [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex, [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex, [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd, [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart, [PropNames.RovingTabIndexParameters.untabbable]: rowIsUntabbableAndSoAreCells, [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange, [PropNames.RefElementReturn.getElement]: getElement, [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.TypeaheadNavigationParameters.collator]: collator, [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead, [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead, [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout, ...void1 }: UseGridNavigationRowParameters<RowElement, CellElement, GridChildCellInfo<CellElement>>) => UseGridNavigationRowReturnType<RowElement, CellElement>;
+export declare const useGridNavigationRow: <RowElement extends Element, CellElement extends Element>({ info: { index, untabbable, ...void3 }, [PropNames_TextContentParameters_getText]: getText, context: contextFromParent, [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex, [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex, [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd, [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart, [PropNames_RovingTabIndexParameters_untabbable]: rowIsUntabbableAndSoAreCells, [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, ...void1 }: UseGridNavigationRowParameters<RowElement, CellElement, GridChildCellInfo<CellElement>>) => UseGridNavigationRowReturnType<RowElement, CellElement>;
 /**
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  *
  * @compositeParams
  */
-export declare const useGridNavigationCell: <CellElement extends Element>({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, [PropNames.RefElementReturn.getElement]: getElement, [PropNames.TextContentParameters.getText]: getText, [PropNames.GridNavigationCellParameters.colSpan]: colSpan, ...void1 }: UseGridNavigationCellParameters<CellElement>) => UseGridNavigationCellReturnType<CellElement>;
+export declare const useGridNavigationCell: <CellElement extends Element>({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_TextContentParameters_getText]: getText, [PropNames_GridNavigationCellParameters_colSpan]: colSpan, ...void1 }: UseGridNavigationCellParameters<CellElement>) => UseGridNavigationCellReturnType<CellElement>;
 //# sourceMappingURL=use-grid-navigation-partial.d.ts.map

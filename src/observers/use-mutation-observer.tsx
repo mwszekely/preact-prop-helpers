@@ -1,42 +1,36 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { PropNames_RefElementParameters_onElementChange, PropNames_RefElementReturn_getElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 const P = `PropNames.MutationObserverParameters`;
 const R = `PropNames.MutationObserverReturn`;
 
-declare module "../util/types.js" { interface PropNames { MutationObserverParameters: typeof MutationObserverParameters } }
-declare module "../util/types.js" { interface PropNames { MutationObserverReturn: typeof MutationObserverReturn } }
 
-export const MutationObserverParameters = {
-    onChildList: `${P}.onChildList`,
-    onAttributes: `${P}.onAttributes`,
-    onCharacterData: `${P}.onCharacterData`,
-    subtree: `${P}.subtree`,
-    characterDataOldValue: `${P}.characterDataOldValue`,
-    attributeOldValue: `${P}.attributeOldValue`,
-    attributeFilter: `${P}.attributeFilter`
-} as const;
+export const PropNames_MutationObserverParameters_onChildList = `${P}.onChildList`;
+export const PropNames_MutationObserverParameters_onAttributes = `${P}.onAttributes`;
+export const PropNames_MutationObserverParameters_onCharacterData = `${P}.onCharacterData`;
+export const PropNames_MutationObserverParameters_subtree = `${P}.subtree`;
+export const PropNames_MutationObserverParameters_characterDataOldValue = `${P}.characterDataOldValue`;
+export const PropNames_MutationObserverParameters_attributeOldValue = `${P}.attributeOldValue`;
+export const PropNames_MutationObserverParameters_attributeFilter = `${P}.attributeFilter`;
 
-export const MutationObserverReturn = {}
 
 export type UseMutationObserverParametersSelf = {
-    [MutationObserverParameters.onChildList]: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
-    [MutationObserverParameters.onAttributes]: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
-    [MutationObserverParameters.onCharacterData]: null | ((info: MutationRecord) => void);
-    [MutationObserverParameters.subtree]: boolean;
-    [MutationObserverParameters.characterDataOldValue]: boolean;
-    [MutationObserverParameters.attributeOldValue]: boolean;
-    [MutationObserverParameters.attributeFilter]: string | string[];
+    [PropNames_MutationObserverParameters_onChildList]: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
+    [PropNames_MutationObserverParameters_onAttributes]: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
+    [PropNames_MutationObserverParameters_onCharacterData]: null | ((info: MutationRecord) => void);
+    [PropNames_MutationObserverParameters_subtree]: boolean;
+    [PropNames_MutationObserverParameters_characterDataOldValue]: boolean;
+    [PropNames_MutationObserverParameters_attributeOldValue]: boolean;
+    [PropNames_MutationObserverParameters_attributeFilter]: string | string[];
 }
 
-export interface UseMutationObserverParameters<E extends Element> extends UseMutationObserverParametersSelf, Pick<UseRefElementReturnType<E>, typeof PropNames.RefElementReturn.getElement> {}
+export interface UseMutationObserverParameters<E extends Element> extends UseMutationObserverParametersSelf, Pick<UseRefElementReturnType<E>, typeof PropNames_RefElementReturn_getElement> {}
 
 export interface UseMutationObserverReturnType<E extends Element> extends 
-Pick<UseRefElementParameters<E>, typeof PropNames.RefElementParameters.onElementChange> {}
+Pick<UseRefElementParameters<E>, typeof PropNames_RefElementParameters_onElementChange> {}
 
 /**
  * Effectively just a wrapper around a `MutationObserver`.
@@ -44,14 +38,14 @@ Pick<UseRefElementParameters<E>, typeof PropNames.RefElementParameters.onElement
  * @compositeParams
  */
 export const useMutationObserver = monitored(function useMutationObserver<E extends Element>({
-    [PropNames.RefElementReturn.getElement]: getElement,
-    [PropNames.MutationObserverParameters.attributeFilter]: attributeFilter, 
-    [PropNames.MutationObserverParameters.subtree]: subtree, 
-    [PropNames.MutationObserverParameters.onChildList]: onChildList, 
-    [PropNames.MutationObserverParameters.characterDataOldValue]: characterDataOldValue, 
-    [PropNames.MutationObserverParameters.onCharacterData]: onCharacterData, 
-    [PropNames.MutationObserverParameters.onAttributes]: onAttributes, 
-    [PropNames.MutationObserverParameters.attributeOldValue]: attributeOldValue
+    [PropNames_RefElementReturn_getElement]: getElement,
+    [PropNames_MutationObserverParameters_attributeFilter]: attributeFilter, 
+    [PropNames_MutationObserverParameters_subtree]: subtree, 
+    [PropNames_MutationObserverParameters_onChildList]: onChildList, 
+    [PropNames_MutationObserverParameters_characterDataOldValue]: characterDataOldValue, 
+    [PropNames_MutationObserverParameters_onCharacterData]: onCharacterData, 
+    [PropNames_MutationObserverParameters_onAttributes]: onAttributes, 
+    [PropNames_MutationObserverParameters_attributeOldValue]: attributeOldValue
 }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
 
 
@@ -113,7 +107,7 @@ export const useMutationObserver = monitored(function useMutationObserver<E exte
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
 
     return {
-        [PropNames.RefElementParameters.onElementChange]: useStableCallback((e: E | null, p: E | null | undefined, r) => {
+        [PropNames_RefElementParameters_onElementChange]: useStableCallback((e: E | null, p: E | null | undefined, r) => {
             onNeedMutationObserverReset(e);
         }),
     };
