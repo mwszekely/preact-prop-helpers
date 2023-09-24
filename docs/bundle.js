@@ -24,16 +24,16 @@
     l4 && l4.removeChild(n2);
   }
   function y(l4, u4, t3) {
-    var i4, o5, r5, f4 = {};
+    var i3, o5, r5, f4 = {};
     for (r5 in u4)
-      "key" == r5 ? i4 = u4[r5] : "ref" == r5 ? o5 = u4[r5] : f4[r5] = u4[r5];
+      "key" == r5 ? i3 = u4[r5] : "ref" == r5 ? o5 = u4[r5] : f4[r5] = u4[r5];
     if (arguments.length > 2 && (f4.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l4 && null != l4.defaultProps)
       for (r5 in l4.defaultProps)
         void 0 === f4[r5] && (f4[r5] = l4.defaultProps[r5]);
-    return d(l4, f4, i4, o5, null);
+    return d(l4, f4, i3, o5, null);
   }
-  function d(n2, t3, i4, o5, r5) {
-    var f4 = { type: n2, props: t3, key: i4, ref: o5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == r5 ? ++u : r5 };
+  function d(n2, t3, i3, o5, r5) {
+    var f4 = { type: n2, props: t3, key: i3, ref: o5, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == r5 ? ++u : r5 };
     return null == r5 && null != l.vnode && l.vnode(f4), f4;
   }
   function k(n2) {
@@ -70,16 +70,16 @@
       n2.__d && (l4 = i.length, t3 = void 0, o5 = void 0, r5 = void 0, c4 = (e3 = (u4 = n2).__v).__e, (s4 = u4.__P) && (t3 = [], o5 = [], (r5 = v({}, e3)).__v = e3.__v + 1, L(s4, e3, r5, u4.__n, void 0 !== s4.ownerSVGElement, null != e3.__h ? [c4] : null, t3, null == c4 ? g(e3) : c4, e3.__h, o5), M(t3, e3, o5), e3.__e != c4 && m(e3)), i.length > l4 && i.sort(f));
     x.__r = 0;
   }
-  function P(n2, l4, u4, t3, i4, o5, r5, f4, e3, a4, v4) {
+  function P(n2, l4, u4, t3, i3, o5, r5, f4, e3, a4, v4) {
     var p4, y4, _4, b4, m4, w4, x4, P28, C3, H3 = 0, I3 = t3 && t3.__k || s, T4 = I3.length, j4 = T4, z4 = l4.length;
     for (u4.__k = [], p4 = 0; p4 < z4; p4++)
-      null != (b4 = u4.__k[p4] = null == (b4 = l4[p4]) || "boolean" == typeof b4 || "function" == typeof b4 ? null : "string" == typeof b4 || "number" == typeof b4 || "bigint" == typeof b4 ? d(null, b4, null, null, b4) : h(b4) ? d(k, { children: b4 }, null, null, null) : b4.__b > 0 ? d(b4.type, b4.props, b4.key, b4.ref ? b4.ref : null, b4.__v) : b4) ? (b4.__ = u4, b4.__b = u4.__b + 1, -1 === (P28 = A(b4, I3, x4 = p4 + H3, j4)) ? _4 = c : (_4 = I3[P28] || c, I3[P28] = void 0, j4--), L(n2, b4, _4, i4, o5, r5, f4, e3, a4, v4), m4 = b4.__e, (y4 = b4.ref) && _4.ref != y4 && (_4.ref && O(_4.ref, null, b4), v4.push(y4, b4.__c || m4, b4)), null != m4 && (null == w4 && (w4 = m4), (C3 = _4 === c || null === _4.__v) ? -1 == P28 && H3-- : P28 !== x4 && (P28 === x4 + 1 ? H3++ : P28 > x4 ? j4 > z4 - x4 ? H3 += P28 - x4 : H3-- : H3 = P28 < x4 && P28 == x4 - 1 ? P28 - x4 : 0), x4 = p4 + H3, "function" != typeof b4.type || P28 === x4 && _4.__k !== b4.__k ? "function" == typeof b4.type || P28 === x4 && !C3 ? void 0 !== b4.__d ? (e3 = b4.__d, b4.__d = void 0) : e3 = m4.nextSibling : e3 = S(n2, m4, e3) : e3 = $(b4, e3, n2), "function" == typeof u4.type && (u4.__d = e3))) : (_4 = I3[p4]) && null == _4.key && _4.__e && (_4.__e == e3 && (e3 = g(_4)), q(_4, _4, false), I3[p4] = null);
+      null != (b4 = u4.__k[p4] = null == (b4 = l4[p4]) || "boolean" == typeof b4 || "function" == typeof b4 ? null : "string" == typeof b4 || "number" == typeof b4 || "bigint" == typeof b4 ? d(null, b4, null, null, b4) : h(b4) ? d(k, { children: b4 }, null, null, null) : b4.__b > 0 ? d(b4.type, b4.props, b4.key, b4.ref ? b4.ref : null, b4.__v) : b4) ? (b4.__ = u4, b4.__b = u4.__b + 1, -1 === (P28 = A(b4, I3, x4 = p4 + H3, j4)) ? _4 = c : (_4 = I3[P28] || c, I3[P28] = void 0, j4--), L(n2, b4, _4, i3, o5, r5, f4, e3, a4, v4), m4 = b4.__e, (y4 = b4.ref) && _4.ref != y4 && (_4.ref && O(_4.ref, null, b4), v4.push(y4, b4.__c || m4, b4)), null != m4 && (null == w4 && (w4 = m4), (C3 = _4 === c || null === _4.__v) ? -1 == P28 && H3-- : P28 !== x4 && (P28 === x4 + 1 ? H3++ : P28 > x4 ? j4 > z4 - x4 ? H3 += P28 - x4 : H3-- : H3 = P28 < x4 && P28 == x4 - 1 ? P28 - x4 : 0), x4 = p4 + H3, "function" != typeof b4.type || P28 === x4 && _4.__k !== b4.__k ? "function" == typeof b4.type || P28 === x4 && !C3 ? void 0 !== b4.__d ? (e3 = b4.__d, b4.__d = void 0) : e3 = m4.nextSibling : e3 = S(n2, m4, e3) : e3 = $(b4, e3, n2), "function" == typeof u4.type && (u4.__d = e3))) : (_4 = I3[p4]) && null == _4.key && _4.__e && (_4.__e == e3 && (e3 = g(_4)), q(_4, _4, false), I3[p4] = null);
     for (u4.__e = w4, p4 = T4; p4--; )
       null != I3[p4] && ("function" == typeof u4.type && null != I3[p4].__e && I3[p4].__e == u4.__d && (u4.__d = I3[p4].__e.nextSibling), q(I3[p4], I3[p4]));
   }
   function $(n2, l4, u4) {
-    for (var t3, i4 = n2.__k, o5 = 0; i4 && o5 < i4.length; o5++)
-      (t3 = i4[o5]) && (t3.__ = n2, l4 = "function" == typeof t3.type ? $(t3, l4, u4) : S(u4, t3.__e, l4));
+    for (var t3, i3 = n2.__k, o5 = 0; i3 && o5 < i3.length; o5++)
+      (t3 = i3[o5]) && (t3.__ = n2, l4 = "function" == typeof t3.type ? $(t3, l4, u4) : S(u4, t3.__e, l4));
     return l4;
   }
   function C(n2, l4) {
@@ -91,35 +91,35 @@
     return null == u4 || u4.parentNode !== n2 ? n2.insertBefore(l4, null) : l4 == u4 && null != l4.parentNode || n2.insertBefore(l4, u4), l4.nextSibling;
   }
   function A(n2, l4, u4, t3) {
-    var i4 = n2.key, o5 = n2.type, r5 = u4 - 1, f4 = u4 + 1, e3 = l4[u4];
-    if (null === e3 || e3 && i4 == e3.key && o5 === e3.type)
+    var i3 = n2.key, o5 = n2.type, r5 = u4 - 1, f4 = u4 + 1, e3 = l4[u4];
+    if (null === e3 || e3 && i3 == e3.key && o5 === e3.type)
       return u4;
     if (t3 > (null != e3 ? 1 : 0))
       for (; r5 >= 0 || f4 < l4.length; ) {
         if (r5 >= 0) {
-          if ((e3 = l4[r5]) && i4 == e3.key && o5 === e3.type)
+          if ((e3 = l4[r5]) && i3 == e3.key && o5 === e3.type)
             return r5;
           r5--;
         }
         if (f4 < l4.length) {
-          if ((e3 = l4[f4]) && i4 == e3.key && o5 === e3.type)
+          if ((e3 = l4[f4]) && i3 == e3.key && o5 === e3.type)
             return f4;
           f4++;
         }
       }
     return -1;
   }
-  function H(n2, l4, u4, t3, i4) {
+  function H(n2, l4, u4, t3, i3) {
     var o5;
     for (o5 in u4)
       "children" === o5 || "key" === o5 || o5 in l4 || T(n2, o5, null, u4[o5], t3);
     for (o5 in l4)
-      i4 && "function" != typeof l4[o5] || "children" === o5 || "key" === o5 || "value" === o5 || "checked" === o5 || u4[o5] === l4[o5] || T(n2, o5, l4[o5], u4[o5], t3);
+      i3 && "function" != typeof l4[o5] || "children" === o5 || "key" === o5 || "value" === o5 || "checked" === o5 || u4[o5] === l4[o5] || T(n2, o5, l4[o5], u4[o5], t3);
   }
   function I(n2, l4, u4) {
     "-" === l4[0] ? n2.setProperty(l4, null == u4 ? "" : u4) : n2[l4] = null == u4 ? "" : "number" != typeof u4 || a.test(l4) ? u4 : u4 + "px";
   }
-  function T(n2, l4, u4, t3, i4) {
+  function T(n2, l4, u4, t3, i3) {
     var o5;
     n:
       if ("style" === l4)
@@ -136,7 +136,7 @@
       else if ("o" === l4[0] && "n" === l4[1])
         o5 = l4 !== (l4 = l4.replace(/(PointerCapture)$|Capture$/, "$1")), l4 = l4.toLowerCase() in n2 ? l4.toLowerCase().slice(2) : l4.slice(2), n2.l || (n2.l = {}), n2.l[l4 + o5] = u4, u4 ? t3 || n2.addEventListener(l4, o5 ? z : j, o5) : n2.removeEventListener(l4, o5 ? z : j, o5);
       else if ("dangerouslySetInnerHTML" !== l4) {
-        if (i4)
+        if (i3)
           l4 = l4.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
         else if ("width" !== l4 && "height" !== l4 && "href" !== l4 && "list" !== l4 && "form" !== l4 && "tabIndex" !== l4 && "download" !== l4 && "rowSpan" !== l4 && "colSpan" !== l4 && l4 in n2)
           try {
@@ -153,7 +153,7 @@
   function z(n2) {
     return this.l[n2.type + true](l.event ? l.event(n2) : n2);
   }
-  function L(n2, u4, t3, i4, o5, r5, f4, e3, c4, s4) {
+  function L(n2, u4, t3, i3, o5, r5, f4, e3, c4, s4) {
     var a4, p4, y4, d4, _4, g4, m4, w4, x4, $3, C3, S2, A3, H3, I3, T4 = u4.type;
     if (void 0 !== u4.constructor)
       return null;
@@ -161,7 +161,7 @@
     n:
       if ("function" == typeof T4)
         try {
-          if (w4 = u4.props, x4 = (a4 = T4.contextType) && i4[a4.__c], $3 = a4 ? x4 ? x4.props.value : a4.__ : i4, t3.__c ? m4 = (p4 = u4.__c = t3.__c).__ = p4.__E : ("prototype" in T4 && T4.prototype.render ? u4.__c = p4 = new T4(w4, $3) : (u4.__c = p4 = new b(w4, $3), p4.constructor = T4, p4.render = B), x4 && x4.sub(p4), p4.props = w4, p4.state || (p4.state = {}), p4.context = $3, p4.__n = i4, y4 = p4.__d = true, p4.__h = [], p4._sb = []), null == p4.__s && (p4.__s = p4.state), null != T4.getDerivedStateFromProps && (p4.__s == p4.state && (p4.__s = v({}, p4.__s)), v(p4.__s, T4.getDerivedStateFromProps(w4, p4.__s))), d4 = p4.props, _4 = p4.state, p4.__v = u4, y4)
+          if (w4 = u4.props, x4 = (a4 = T4.contextType) && i3[a4.__c], $3 = a4 ? x4 ? x4.props.value : a4.__ : i3, t3.__c ? m4 = (p4 = u4.__c = t3.__c).__ = p4.__E : ("prototype" in T4 && T4.prototype.render ? u4.__c = p4 = new T4(w4, $3) : (u4.__c = p4 = new b(w4, $3), p4.constructor = T4, p4.render = B), x4 && x4.sub(p4), p4.props = w4, p4.state || (p4.state = {}), p4.context = $3, p4.__n = i3, y4 = p4.__d = true, p4.__h = [], p4._sb = []), null == p4.__s && (p4.__s = p4.state), null != T4.getDerivedStateFromProps && (p4.__s == p4.state && (p4.__s = v({}, p4.__s)), v(p4.__s, T4.getDerivedStateFromProps(w4, p4.__s))), d4 = p4.props, _4 = p4.state, p4.__v = u4, y4)
             null == T4.getDerivedStateFromProps && null != p4.componentWillMount && p4.componentWillMount(), null != p4.componentDidMount && p4.__h.push(p4.componentDidMount);
           else {
             if (null == T4.getDerivedStateFromProps && w4 !== d4 && null != p4.componentWillReceiveProps && p4.componentWillReceiveProps(w4, $3), !p4.__e && (null != p4.shouldComponentUpdate && false === p4.shouldComponentUpdate(w4, p4.__s, $3) || u4.__v === t3.__v)) {
@@ -184,17 +184,17 @@
             do {
               p4.__d = false, S2 && S2(u4), a4 = p4.render(p4.props, p4.state, p4.context), p4.state = p4.__s;
             } while (p4.__d && ++A3 < 25);
-          p4.state = p4.__s, null != p4.getChildContext && (i4 = v(v({}, i4), p4.getChildContext())), y4 || null == p4.getSnapshotBeforeUpdate || (g4 = p4.getSnapshotBeforeUpdate(d4, _4)), P(n2, h(I3 = null != a4 && a4.type === k && null == a4.key ? a4.props.children : a4) ? I3 : [I3], u4, t3, i4, o5, r5, f4, e3, c4, s4), p4.base = u4.__e, u4.__h = null, p4.__h.length && f4.push(p4), m4 && (p4.__E = p4.__ = null);
+          p4.state = p4.__s, null != p4.getChildContext && (i3 = v(v({}, i3), p4.getChildContext())), y4 || null == p4.getSnapshotBeforeUpdate || (g4 = p4.getSnapshotBeforeUpdate(d4, _4)), P(n2, h(I3 = null != a4 && a4.type === k && null == a4.key ? a4.props.children : a4) ? I3 : [I3], u4, t3, i3, o5, r5, f4, e3, c4, s4), p4.base = u4.__e, u4.__h = null, p4.__h.length && f4.push(p4), m4 && (p4.__E = p4.__ = null);
         } catch (n3) {
           u4.__v = null, (c4 || null != r5) && (u4.__e = e3, u4.__h = !!c4, r5[r5.indexOf(e3)] = null), l.__e(n3, u4, t3);
         }
       else
-        null == r5 && u4.__v === t3.__v ? (u4.__k = t3.__k, u4.__e = t3.__e) : u4.__e = N(t3.__e, u4, t3, i4, o5, r5, f4, c4, s4);
+        null == r5 && u4.__v === t3.__v ? (u4.__k = t3.__k, u4.__e = t3.__e) : u4.__e = N(t3.__e, u4, t3, i3, o5, r5, f4, c4, s4);
     (a4 = l.diffed) && a4(u4);
   }
   function M(n2, u4, t3) {
-    for (var i4 = 0; i4 < t3.length; i4++)
-      O(t3[i4], t3[++i4], t3[++i4]);
+    for (var i3 = 0; i3 < t3.length; i3++)
+      O(t3[i3], t3[++i3], t3[++i3]);
     l.__c && l.__c(u4, n2), n2.some(function(u5) {
       try {
         n2 = u5.__h, u5.__h = [], n2.some(function(n3) {
@@ -205,7 +205,7 @@
       }
     });
   }
-  function N(l4, u4, t3, i4, o5, r5, f4, e3, s4) {
+  function N(l4, u4, t3, i3, o5, r5, f4, e3, s4) {
     var a4, v4, y4, d4 = t3.props, _4 = u4.props, k4 = u4.type, b4 = 0;
     if ("svg" === k4 && (o5 = true), null != r5) {
       for (; b4 < r5.length; b4++)
@@ -230,7 +230,7 @@
       }
       if (H(l4, _4, d4, o5, e3), y4)
         u4.__k = [];
-      else if (P(l4, h(b4 = u4.props.children) ? b4 : [b4], u4, t3, i4, o5 && "foreignObject" !== k4, r5, f4, r5 ? r5[0] : t3.__k && g(t3, 0), e3, s4), null != r5)
+      else if (P(l4, h(b4 = u4.props.children) ? b4 : [b4], u4, t3, i3, o5 && "foreignObject" !== k4, r5, f4, r5 ? r5[0] : t3.__k && g(t3, 0), e3, s4), null != r5)
         for (b4 = r5.length; b4--; )
           null != r5[b4] && p(r5[b4]);
       e3 || ("value" in _4 && void 0 !== (b4 = _4.value) && (b4 !== l4.value || "progress" === k4 && !b4 || "option" === k4 && b4 !== d4.value) && T(l4, "value", b4, d4.value, false), "checked" in _4 && void 0 !== (b4 = _4.checked) && b4 !== l4.checked && T(l4, "checked", b4, d4.checked, false));
@@ -245,33 +245,33 @@
     }
   }
   function q(n2, u4, t3) {
-    var i4, o5;
-    if (l.unmount && l.unmount(n2), (i4 = n2.ref) && (i4.current && i4.current !== n2.__e || O(i4, null, u4)), null != (i4 = n2.__c)) {
-      if (i4.componentWillUnmount)
+    var i3, o5;
+    if (l.unmount && l.unmount(n2), (i3 = n2.ref) && (i3.current && i3.current !== n2.__e || O(i3, null, u4)), null != (i3 = n2.__c)) {
+      if (i3.componentWillUnmount)
         try {
-          i4.componentWillUnmount();
+          i3.componentWillUnmount();
         } catch (n3) {
           l.__e(n3, u4);
         }
-      i4.base = i4.__P = null, n2.__c = void 0;
+      i3.base = i3.__P = null, n2.__c = void 0;
     }
-    if (i4 = n2.__k)
-      for (o5 = 0; o5 < i4.length; o5++)
-        i4[o5] && q(i4[o5], u4, t3 || "function" != typeof n2.type);
+    if (i3 = n2.__k)
+      for (o5 = 0; o5 < i3.length; o5++)
+        i3[o5] && q(i3[o5], u4, t3 || "function" != typeof n2.type);
     t3 || null == n2.__e || p(n2.__e), n2.__ = n2.__e = n2.__d = void 0;
   }
   function B(n2, l4, u4) {
     return this.constructor(n2, u4);
   }
-  function D(u4, t3, i4) {
+  function D(u4, t3, i3) {
     var o5, r5, f4, e3;
-    l.__ && l.__(u4, t3), r5 = (o5 = "function" == typeof i4) ? null : i4 && i4.__k || t3.__k, f4 = [], e3 = [], L(t3, u4 = (!o5 && i4 || t3).__k = y(k, null, [u4]), r5 || c, c, void 0 !== t3.ownerSVGElement, !o5 && i4 ? [i4] : r5 ? null : t3.firstChild ? n.call(t3.childNodes) : null, f4, !o5 && i4 ? i4 : r5 ? r5.__e : t3.firstChild, o5, e3), M(f4, u4, e3);
+    l.__ && l.__(u4, t3), r5 = (o5 = "function" == typeof i3) ? null : i3 && i3.__k || t3.__k, f4 = [], e3 = [], L(t3, u4 = (!o5 && i3 || t3).__k = y(k, null, [u4]), r5 || c, c, void 0 !== t3.ownerSVGElement, !o5 && i3 ? [i3] : r5 ? null : t3.firstChild ? n.call(t3.childNodes) : null, f4, !o5 && i3 ? i3 : r5 ? r5.__e : t3.firstChild, o5, e3), M(f4, u4, e3);
   }
   function F(l4, u4, t3) {
-    var i4, o5, r5, f4, e3 = v({}, l4.props);
+    var i3, o5, r5, f4, e3 = v({}, l4.props);
     for (r5 in l4.type && l4.type.defaultProps && (f4 = l4.type.defaultProps), u4)
-      "key" == r5 ? i4 = u4[r5] : "ref" == r5 ? o5 = u4[r5] : e3[r5] = void 0 === u4[r5] && void 0 !== f4 ? f4[r5] : u4[r5];
-    return arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), d(l4.type, e3, i4 || l4.key, o5 || l4.ref, null);
+      "key" == r5 ? i3 = u4[r5] : "ref" == r5 ? o5 = u4[r5] : e3[r5] = void 0 === u4[r5] && void 0 !== f4 ? f4[r5] : u4[r5];
+    return arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), d(l4.type, e3, i3 || l4.key, o5 || l4.ref, null);
   }
   function G(n2, l4) {
     var u4 = { __c: l4 = "__cC" + e++, __: n2, Consumer: function(n3, l5) {
@@ -295,11 +295,11 @@
     return u4.Provider.__ = u4.Consumer.contextType = u4;
   }
   n = s.slice, l = { __e: function(n2, l4, u4, t3) {
-    for (var i4, o5, r5; l4 = l4.__; )
-      if ((i4 = l4.__c) && !i4.__)
+    for (var i3, o5, r5; l4 = l4.__; )
+      if ((i3 = l4.__c) && !i3.__)
         try {
-          if ((o5 = i4.constructor) && null != o5.getDerivedStateFromError && (i4.setState(o5.getDerivedStateFromError(n2)), r5 = i4.__d), null != i4.componentDidCatch && (i4.componentDidCatch(n2, t3 || {}), r5 = i4.__d), r5)
-            return i4.__E = i4;
+          if ((o5 = i3.constructor) && null != o5.getDerivedStateFromError && (i3.setState(o5.getDerivedStateFromError(n2)), r5 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t3 || {}), r5 = i3.__d), r5)
+            return i3.__E = i3;
         } catch (l5) {
           n2 = l5;
         }
@@ -383,8 +383,8 @@
         var a4 = t3[r5];
         "function" == typeof a4 && (a4 = "function " + (a4.displayName || a4.name) + "() {}"), a4 = Object(a4) !== a4 || a4.toString ? a4 + "" : Object.prototype.toString.call(a4), o5 += " " + r5 + "=" + JSON.stringify(a4);
       }
-    var i4 = t3.children;
-    return "<" + e3 + o5 + (i4 && i4.length ? ">..</" + e3 + ">" : " />");
+    var i3 = t3.children;
+    return "<" + e3 + o5 + (i3 && i3.length ? ">..</" + e3 + ">" : " />");
   }
   b.prototype.forceUpdate = function(n2) {
     return null == this.__v ? console.warn('Calling "this.forceUpdate" inside the constructor of a component is a no-op and might be a bug in your application.\n\n' + p2(s2())) : null == this.__P && console.warn(`Can't call "this.forceUpdate" on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
@@ -405,7 +405,7 @@
         d2(n4) && l2.push(n4), a4 && a4(n4);
       };
     }();
-    var n2 = false, e3 = l.__b, o5 = l.diffed, i4 = l.vnode, s4 = l.__r, f4 = l.__e, y4 = l.__, m4 = l.__h, w4 = l.__c, g4 = h2 ? { useEffect: /* @__PURE__ */ new WeakMap(), useLayoutEffect: /* @__PURE__ */ new WeakMap(), lazyPropTypes: /* @__PURE__ */ new WeakMap() } : null, E2 = [], k4 = [];
+    var n2 = false, e3 = l.__b, o5 = l.diffed, i3 = l.vnode, s4 = l.__r, f4 = l.__e, y4 = l.__, m4 = l.__h, w4 = l.__c, g4 = h2 ? { useEffect: /* @__PURE__ */ new WeakMap(), useLayoutEffect: /* @__PURE__ */ new WeakMap(), lazyPropTypes: /* @__PURE__ */ new WeakMap() } : null, E2 = [], k4 = [];
     l.__e = function(n3, t3, e4, o6) {
       if (t3 && t3.__c && "function" == typeof n3.then) {
         var r5 = n3;
@@ -461,12 +461,12 @@
       }
       if ("function" == typeof t3.type && t3.type.propTypes) {
         if ("Lazy" === t3.type.displayName && g4 && !g4.lazyPropTypes.has(t3.type)) {
-          var i5 = "PropTypes are not supported on lazy(). Use propTypes on the wrapped component itself. ";
+          var i4 = "PropTypes are not supported on lazy(). Use propTypes on the wrapped component itself. ";
           try {
             var u4 = t3.type();
-            g4.lazyPropTypes.set(t3.type, true), console.warn(i5 + "Component wrapped in lazy() is " + c2(u4));
+            g4.lazyPropTypes.set(t3.type, true), console.warn(i4 + "Component wrapped in lazy() is " + c2(u4));
           } catch (n3) {
-            console.warn(i5 + "We will log the wrapped component's name once it is loaded.");
+            console.warn(i4 + "We will log the wrapped component's name once it is loaded.");
           }
         }
         var l4 = t3.props;
@@ -476,13 +476,13 @@
           return n3;
         }({}, l4)).ref, function(n3, t4, e4, o7, r6) {
           Object.keys(n3).forEach(function(e5) {
-            var i6;
+            var i5;
             try {
-              i6 = n3[e5](t4, e5, o7, "prop", null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
+              i5 = n3[e5](t4, e5, o7, "prop", null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
             } catch (n4) {
-              i6 = n4;
+              i5 = n4;
             }
-            i6 && !(i6.message in a2) && (a2[i6.message] = true, console.error("Failed prop type: " + i6.message + (r6 && "\n" + r6() || "")));
+            i5 && !(i5.message in a2) && (a2[i5.message] = true, console.error("Failed prop type: " + i5.message + (r6 && "\n" + r6() || "")));
           });
         }(t3.type.propTypes, l4, 0, c2(t3), function() {
           return p2(t3);
@@ -514,7 +514,7 @@
           "__source" === o6 ? n3.__source = r5 : "__self" === o6 ? n3.__self = r5 : e4[o6] = r5;
         }
       }
-      n3.__proto__ = I3, i4 && i4(n3);
+      n3.__proto__ = I3, i3 && i3(n3);
     }, l.diffed = function(t3) {
       if (t3.__k && t3.__k.forEach(function(n3) {
         if ("object" == typeof n3 && n3 && void 0 === n3.type) {
@@ -523,9 +523,9 @@
         }
       }), n2 = false, o5 && o5(t3), null != t3.__k)
         for (var e4 = [], a4 = 0; a4 < t3.__k.length; a4++) {
-          var i5 = t3.__k[a4];
-          if (i5 && null != i5.key) {
-            var u4 = i5.key;
+          var i4 = t3.__k[a4];
+          if (i4 && null != i4.key) {
+            var u4 = i4.key;
             if (-1 !== e4.indexOf(u4)) {
               console.error('Following component has two or more children with the same key attribute: "' + u4 + '". This may cause glitches and misbehavior in rendering process. Component: \n\n' + b2(t3) + "\n\n" + p2(t3));
               break;
@@ -572,15 +572,15 @@
   var m3 = l.unmount;
   function d3(t3, u4) {
     l.__h && l.__h(r3, t3, o3 || u4), o3 = 0;
-    var i4 = r3.__H || (r3.__H = { __: [], __h: [] });
-    return t3 >= i4.__.length && i4.__.push({ __V: c3 }), i4.__[t3];
+    var i3 = r3.__H || (r3.__H = { __: [], __h: [] });
+    return t3 >= i3.__.length && i3.__.push({ __V: c3 }), i3.__[t3];
   }
   function h3(n2) {
     return o3 = 1, s3(B2, n2);
   }
-  function s3(n2, u4, i4) {
+  function s3(n2, u4, i3) {
     var o5 = d3(t2++, 2);
-    if (o5.t = n2, !o5.__c && (o5.__ = [i4 ? i4(u4) : B2(void 0, u4), function(n3) {
+    if (o5.t = n2, !o5.__c && (o5.__ = [i3 ? i3(u4) : B2(void 0, u4), function(n3) {
       var t3 = o5.__N ? o5.__N[0] : o5.__[0], r5 = o5.t(t3, n3);
       t3 !== r5 && (o5.__N = [r5, o5.__[1]], o5.__c.setState({}));
     }], o5.__c = r3, !r3.u)) {
@@ -594,13 +594,13 @@
           return !n4.__N;
         }))
           return !c4 || c4.call(this, n3, t3, r5);
-        var i5 = false;
+        var i4 = false;
         return u5.forEach(function(n4) {
           if (n4.__N) {
             var t4 = n4.__[0];
-            n4.__ = n4.__N, n4.__N = void 0, t4 !== n4.__[0] && (i5 = true);
+            n4.__ = n4.__N, n4.__N = void 0, t4 !== n4.__[0] && (i4 = true);
           }
-        }), !(!i5 && o5.__c.props === n3) && (!c4 || c4.call(this, n3, t3, r5));
+        }), !(!i4 && o5.__c.props === n3) && (!c4 || c4.call(this, n3, t3, r5));
       };
       r3.u = true;
       var c4 = r3.shouldComponentUpdate, e3 = r3.componentWillUpdate;
@@ -614,13 +614,13 @@
     }
     return o5.__N || o5.__;
   }
-  function p3(u4, i4) {
+  function p3(u4, i3) {
     var o5 = d3(t2++, 3);
-    !l.__s && z2(o5.__H, i4) && (o5.__ = u4, o5.i = i4, r3.__H.__h.push(o5));
+    !l.__s && z2(o5.__H, i3) && (o5.__ = u4, o5.i = i3, r3.__H.__h.push(o5));
   }
-  function y3(u4, i4) {
+  function y3(u4, i3) {
     var o5 = d3(t2++, 4);
-    !l.__s && z2(o5.__H, i4) && (o5.__ = u4, o5.i = i4, r3.__h.push(o5));
+    !l.__s && z2(o5.__H, i3) && (o5.__ = u4, o5.i = i3, r3.__h.push(o5));
   }
   function _(n2) {
     return o3 = 5, F2(function() {
@@ -646,16 +646,16 @@
     }, t3);
   }
   function q2(n2) {
-    var u4 = r3.context[n2.__c], i4 = d3(t2++, 9);
-    return i4.c = n2, u4 ? (null == i4.__ && (i4.__ = true, u4.sub(r3)), u4.props.value) : n2.__;
+    var u4 = r3.context[n2.__c], i3 = d3(t2++, 9);
+    return i3.c = n2, u4 ? (null == i3.__ && (i3.__ = true, u4.sub(r3)), u4.props.value) : n2.__;
   }
   function V() {
     var n2 = d3(t2++, 11);
     if (!n2.__) {
       for (var u4 = r3.__v; null !== u4 && !u4.__m && null !== u4.__; )
         u4 = u4.__;
-      var i4 = u4.__m || (u4.__m = [0, 0]);
-      n2.__ = "P" + i4[0] + "-" + i4[1]++;
+      var i3 = u4.__m || (u4.__m = [0, 0]);
+      n2.__ = "P" + i3[0] + "-" + i3[1]++;
     }
     return n2.__;
   }
@@ -672,10 +672,10 @@
     r3 = null, e2 && e2(n2);
   }, l.__r = function(n2) {
     a3 && a3(n2), t2 = 0;
-    var i4 = (r3 = n2.__c).__H;
-    i4 && (u3 === r3 ? (i4.__h = [], r3.__h = [], i4.__.forEach(function(n3) {
+    var i3 = (r3 = n2.__c).__H;
+    i3 && (u3 === r3 ? (i3.__h = [], r3.__h = [], i3.__.forEach(function(n3) {
       n3.__N && (n3.__ = n3.__N), n3.__V = c3, n3.__N = n3.i = void 0;
-    })) : (i4.__h.forEach(k2), i4.__h.forEach(w2), i4.__h = [], t2 = 0)), u3 = r3;
+    })) : (i3.__h.forEach(k2), i3.__h.forEach(w2), i3.__h = [], t2 = 0)), u3 = r3;
   }, l.diffed = function(t3) {
     v3 && v3(t3);
     var o5 = t3.__c;
@@ -810,10 +810,10 @@
   }, (U.prototype = new b()).__c = function(n2, t3) {
     var e3 = t3.__c, r5 = this;
     null == r5.t && (r5.t = []), r5.t.push(e3);
-    var u4 = D2(r5.__v), o5 = false, i4 = function() {
+    var u4 = D2(r5.__v), o5 = false, i3 = function() {
       o5 || (o5 = true, e3.__R = null, u4 ? u4(l4) : l4());
     };
-    e3.__R = i4;
+    e3.__R = i3;
     var l4 = function() {
       if (!--r5.__u) {
         if (r5.state.__a) {
@@ -825,7 +825,7 @@
           t4.forceUpdate();
       }
     }, c4 = true === t3.__h;
-    r5.__u++ || c4 || r5.setState({ __a: r5.__b = r5.__v.__k[0] }), n2.then(i4, i4);
+    r5.__u++ || c4 || r5.setState({ __a: r5.__b = r5.__v.__k[0] }), n2.then(i3, i3);
   }, U.prototype.componentWillUnmount = function() {
     this.t = [];
   }, U.prototype.render = function(n2, e3) {
@@ -836,8 +836,8 @@
       }
       this.__b = null;
     }
-    var i4 = e3.__a && y(k, null, n2.fallback);
-    return i4 && (i4.__h = null), [y(k, null, e3.__a ? null : n2.children), i4];
+    var i3 = e3.__a && y(k, null, n2.fallback);
+    return i3 && (i3.__h = null), [y(k, null, e3.__a ? null : n2.children), i3];
   };
   var W = function(n2, t3, e3) {
     if (++e3[1] === e3[0] && n2.o.delete(t3), n2.props.revealOrder && ("t" !== n2.props.revealOrder[0] || !n2.o.size))
@@ -927,10 +927,10 @@
     "string" == typeof n2.type && function(n3) {
       var t3 = n3.props, e3 = n3.type, u4 = {};
       for (var o5 in t3) {
-        var i4 = t3[o5];
-        if (!("value" === o5 && "defaultValue" in t3 && null == i4 || $2 && "children" === o5 && "noscript" === e3 || "class" === o5 || "className" === o5)) {
+        var i3 = t3[o5];
+        if (!("value" === o5 && "defaultValue" in t3 && null == i3 || $2 && "children" === o5 && "noscript" === e3 || "class" === o5 || "className" === o5)) {
           var l4 = o5.toLowerCase();
-          "defaultValue" === o5 && "value" in t3 && null == t3.value ? o5 = "value" : "download" === o5 && true === i4 ? i4 = "" : "ondoubleclick" === l4 ? o5 = "ondblclick" : "onchange" !== l4 || "input" !== e3 && "textarea" !== e3 || q3(t3.type) ? "onfocus" === l4 ? o5 = "onfocusin" : "onblur" === l4 ? o5 = "onfocusout" : Z.test(o5) ? o5 = l4 : -1 === e3.indexOf("-") && H2.test(o5) ? o5 = o5.replace(Y, "-$&").toLowerCase() : null === i4 && (i4 = void 0) : l4 = o5 = "oninput", "oninput" === l4 && u4[o5 = l4] && (o5 = "oninputCapture"), u4[o5] = i4;
+          "defaultValue" === o5 && "value" in t3 && null == t3.value ? o5 = "value" : "download" === o5 && true === i3 ? i3 = "" : "ondoubleclick" === l4 ? o5 = "ondblclick" : "onchange" !== l4 || "input" !== e3 && "textarea" !== e3 || q3(t3.type) ? "onfocus" === l4 ? o5 = "onfocusin" : "onblur" === l4 ? o5 = "onfocusout" : Z.test(o5) ? o5 = l4 : -1 === e3.indexOf("-") && H2.test(o5) ? o5 = o5.replace(Y, "-$&").toLowerCase() : null === i3 && (i3 = void 0) : l4 = o5 = "oninput", "oninput" === l4 && u4[o5 = l4] && (o5 = "oninputCapture"), u4[o5] = i3;
         }
       }
       "select" == e3 && u4.multiple && Array.isArray(u4.value) && (u4.value = C(t3.children).forEach(function(n4) {
@@ -1106,21 +1106,21 @@
 
   // ../dist/preact-extensions/use-passive-state.js
   function useEnsureStability(parentHookName, ...values2) {
-    if (false)
+    if (true)
       return;
     const helperToEnsureStability = _([]);
     const shownError = _([]);
     useHelper(values2.length, -1);
     values2.forEach(useHelper);
     return;
-    function useHelper(value, i4) {
-      const index = i4 + 1;
+    function useHelper(value, i3) {
+      const index = i3 + 1;
       if (helperToEnsureStability.current[index] === void 0)
         helperToEnsureStability.current[index] = value;
       if (helperToEnsureStability.current[index] != value) {
         if (!shownError.current[index]) {
           debugger;
-          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i4}-indexed argument (${i4 >= 0 ? JSON.stringify(values2[i4]) : "the number of supposedly stable elements"}).`);
+          console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i3}-indexed argument (${i3 >= 0 ? JSON.stringify(values2[i3]) : "the number of supposedly stable elements"}).`);
           shownError.current[index] = true;
         }
       }
@@ -1256,7 +1256,7 @@
   // ../dist/util/mode.js
   globalThis["process"] ??= {};
   globalThis["process"]["env"] ??= {};
-  globalThis["process"]["env"]["NODE_ENV"] = "development";
+  globalThis["process"]["env"]["NODE_ENV"] = "production";
 
   // ../dist/util/use-call-count.js
   window.requestIdleCallback ??= (callback) => {
@@ -1266,13 +1266,11 @@
       } });
     }, 5);
   };
-  var timeoutHandle = null;
-  var i3 = 0;
   function monitored(hook) {
     const h4 = hook;
-    if (true) {
+    if (false) {
       return function(...args) {
-        const r5 = _(++i3);
+        const r5 = _(++i);
         monitorCallCount(h4);
         const start = performance.mark(`${h4.name}-start-${r5.current}`);
         const ret = h4(...args);
@@ -1284,40 +1282,6 @@
       return hook;
     }
   }
-  function monitorCallCount(hook) {
-    if (false)
-      return;
-    const name = hook.name;
-    if (filterAll || filters.has(name))
-      return;
-    console.assert(name.length > 0);
-    window._hookCallCount ??= { callCounts: {} };
-    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
-    window._hookCallCount.callCounts[name].moment += 1;
-    window._hookCallCount.callCounts[name].total += 1;
-    if (timeoutHandle == null) {
-      timeoutHandle = requestIdleCallback(() => {
-        const o5 = Object.entries(window._hookCallCount.callCounts).map(([hook2, counts]) => {
-          return { Hook: hook2 || "?", Now: counts?.moment || 0, Total: counts?.total || 0 };
-        }).filter(({ Now }) => {
-          return !!Now;
-        }).sort(({ Now: lhsM }, { Now: rhsM }) => {
-          if (!lhsM && !rhsM)
-            return 0;
-          lhsM ||= Infinity;
-          rhsM ||= Infinity;
-          return lhsM - rhsM;
-        });
-        console.table(o5, ["Hook", "Now", "Total"]);
-        Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => {
-          counts.moment = 0;
-        });
-        timeoutHandle = null;
-      });
-    }
-  }
-  var filterAll = false;
-  var filters = /* @__PURE__ */ new Set();
 
   // ../dist/dom-helpers/use-event-handler.js
   var useGlobalHandler = monitored(function useGlobalHandler2(target, type, handler, options, mode) {
@@ -2087,11 +2051,11 @@
     if (lhs == null && rhs == null) {
       return void 0;
     } else if (lhs == null) {
-      if (true)
+      if (false)
         console.assert(typeof rhs == "function" || "current" in rhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return rhs;
     } else if (rhs == null) {
-      if (true)
+      if (false)
         console.assert(typeof lhs == "function" || "current" in lhs, "Unknown ref type found that was neither a RefCallback nor a RefObject");
       return lhs;
     } else {
@@ -2251,9 +2215,9 @@
     return r5;
   };
   var getCheckedRadio = function getCheckedRadio2(nodes, form) {
-    for (var i4 = 0; i4 < nodes.length; i4++) {
-      if (nodes[i4].checked && nodes[i4].form === form) {
-        return nodes[i4];
+    for (var i3 = 0; i3 < nodes.length; i3++) {
+      if (nodes[i3].checked && nodes[i3].form === form) {
+        return nodes[i3];
       }
     }
   };
@@ -2350,8 +2314,8 @@
       var parentNode = node.parentElement;
       while (parentNode) {
         if (parentNode.tagName === "FIELDSET" && parentNode.disabled) {
-          for (var i4 = 0; i4 < parentNode.children.length; i4++) {
-            var child = parentNode.children.item(i4);
+          for (var i3 = 0; i3 < parentNode.children.length; i3++) {
+            var child = parentNode.children.item(i3);
             if (child.tagName === "LEGEND") {
               return matches.call(parentNode, "fieldset[disabled] *") ? true : !child.contains(node);
             }
@@ -2402,18 +2366,8 @@
   };
 
   // ../dist/util/stack.js
-  function generateStack() {
-    if (window._generate_setState_stacks) {
-      try {
-        throw new Error();
-      } catch (e3) {
-        return e3.stack;
-      }
-    }
-    return void 0;
-  }
   function useStack() {
-    if (true) {
+    if (false) {
       const stack = F2(generateStack, []);
       const getStack = T2(() => stack, []);
       return getStack;
@@ -2421,10 +2375,13 @@
       return returnEmptyString;
     }
   }
+  function returnEmptyString() {
+    return "";
+  }
 
   // ../dist/util/focus.js
   function focus(e3) {
-    if (window.LOG_FOCUS_CHANGES === true) {
+    if (false) {
       console.log(`Focus changed to ${(e3?.tagName || "").toLowerCase().padStart(6)}:`, e3);
       console.log(generateStack());
     }
@@ -2496,9 +2453,8 @@
   });
 
   // ../dist/util/use-tag-props.js
-  var idIndex = 0;
   function useTagProps(props, tag) {
-    if (window._generate_useTagProps_tags) {
+    if (false) {
       const [id] = h3(() => ++idIndex);
       const propsIdTag = `data-props-${tag}-${id}`;
       const getStack = useStack();
@@ -2844,9 +2800,9 @@
       _arraySlice: T2(() => {
         let ret = managedChildrenArray.current.arr.slice();
         const max = getHighestIndex();
-        for (let i4 = 0; i4 <= max; ++i4) {
-          if (ret[i4] == null)
-            ret[i4] = { index: i4 };
+        for (let i3 = 0; i3 <= max; ++i3) {
+          if (ret[i3] == null)
+            ret[i3] = { index: i3 };
         }
         return ret;
       }, [])
@@ -2987,7 +2943,7 @@
     const [state, setStateP] = h3(initialState);
     const ref = _(state);
     const setState = _((value) => {
-      if (true) {
+      if (false) {
         window._setState_stack = getStack();
       }
       if (typeof value === "function") {
@@ -3375,22 +3331,22 @@
               return;
             if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
               lowestUnsortedIndexAll = unsortedIndex;
-              lowestSortedIndexAll = i4;
+              lowestSortedIndexAll = i3;
             }
             if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
               lowestUnsortedIndexNext = unsortedIndex;
-              lowestSortedIndexNext = i4;
+              lowestSortedIndexNext = i3;
             }
           };
-          let i4 = sortedTypeaheadIndex;
-          while (i4 >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i4]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i4].unsortedIndex);
-            --i4;
+          let i3 = sortedTypeaheadIndex;
+          while (i3 >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i3]) == 0) {
+            updateBestFit(sortedTypeaheadInfo.current[i3].unsortedIndex);
+            --i3;
           }
-          i4 = sortedTypeaheadIndex;
-          while (i4 < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i4]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i4].unsortedIndex);
-            ++i4;
+          i3 = sortedTypeaheadIndex;
+          while (i3 < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i3]) == 0) {
+            updateBestFit(sortedTypeaheadInfo.current[i3].unsortedIndex);
+            ++i3;
           }
           let toSet = null;
           if (lowestUnsortedIndexNext !== null)
@@ -3807,11 +3763,11 @@
     const refreshPagination = T2((paginationMin2, paginationMax2) => {
       const childMax = getChildren().getHighestIndex() + 1;
       const childMin = getChildren().getLowestIndex();
-      for (let i4 = childMin; i4 <= childMax; ++i4) {
-        const visible = i4 >= (paginationMin2 ?? -Infinity) && i4 < (paginationMax2 ?? Infinity);
-        getChildren().getAt(indexDemangler(i4))?.setPaginationVisible(visible);
+      for (let i3 = childMin; i3 <= childMax; ++i3) {
+        const visible = i3 >= (paginationMin2 ?? -Infinity) && i3 < (paginationMax2 ?? Infinity);
+        getChildren().getAt(indexDemangler(i3))?.setPaginationVisible(visible);
         if (visible && (paginationMax2 != null || paginationMin2 != null))
-          getChildren().getAt(indexDemangler(i4))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+          getChildren().getAt(indexDemangler(i3))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [
       /* Must be empty */
@@ -3839,8 +3795,8 @@
     const pmax = _(paginationMax);
     pmin.current = paginationMin;
     pmax.current = paginationMax;
-    const getDefaultPaginationVisible = T2((i4) => {
-      return i4 >= (pmin.current ?? -Infinity) && i4 < (pmax.current ?? Infinity);
+    const getDefaultPaginationVisible = T2((i3) => {
+      return i3 >= (pmin.current ?? -Infinity) && i3 < (pmax.current ?? Infinity);
     }, []);
     const paginatedChildContext = F2(() => ({
       parentIsPaginated,
@@ -3855,8 +3811,8 @@
       if (paginationMax2 != null || paginationMin2 != null) {
         const min = paginationMin2 ?? 0;
         const max = paginationMax2 ?? count;
-        for (let i4 = min; i4 < max; ++i4) {
-          getChildren().getAt(i4)?.setChildCountIfPaginated(count);
+        for (let i3 = min; i3 < max; ++i3) {
+          getChildren().getAt(i3)?.setChildCountIfPaginated(count);
         }
       }
     }, [childCount]);
@@ -3882,7 +3838,7 @@
   // ../dist/preact-extensions/use-force-update.js
   var useForceUpdate = monitored(function useForceUpdate2() {
     const [, set] = h3(0);
-    return _(() => set((i4) => ++i4)).current;
+    return _(() => set((i3) => ++i3)).current;
   });
 
   // ../dist/component-detail/processed-children/use-rearrangeable-children.js
@@ -3913,14 +3869,14 @@
     const rearrangeRef = _(null);
     const indexManglerRef = _(null);
     const indexDemanglerRef = _(null);
-    const indexMangler = useStableCallback((i4) => {
-      return (indexManglerRef.current ?? identity_default)(i4);
+    const indexMangler = useStableCallback((i3) => {
+      return (indexManglerRef.current ?? identity_default)(i3);
     }, []);
-    const indexDemangler = useStableCallback((i4) => {
-      return (indexDemanglerRef.current ?? identity_default)(i4);
+    const indexDemangler = useStableCallback((i3) => {
+      return (indexDemanglerRef.current ?? identity_default)(i3);
     }, []);
-    const sort = useStableCallback((i4) => {
-      return (sortRef.current ?? identity_default)(i4);
+    const sort = useStableCallback((i3) => {
+      return (sortRef.current ?? identity_default)(i3);
     }, []);
     const shuffle2 = useStableCallback(() => {
       return (shuffleRef.current ?? identity_default)();
@@ -4019,7 +3975,7 @@
     console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
     forceUpdateRef.current = forceUpdate;
     let sorted = children.slice().map((child) => {
-      if (child) {
+      if (false) {
         console.assert(getIndex(child) != null, `getIndex(vnode) must return its 0-based numeric index (e.g. its \`index\` prop)`);
       }
       const mangledIndex = (child == null ? null : indexMangler(getIndex(child))) ?? null;
@@ -4102,13 +4058,13 @@
   }) {
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
-    const timeoutHandle2 = _(-1);
+    const timeoutHandle = _(-1);
     const resetEmergencyTimeout = T2(() => {
-      if (timeoutHandle2.current != -1)
-        clearTimeout(timeoutHandle2.current);
-      timeoutHandle2.current = setTimeout(() => {
-        timeoutHandle2.current = setTimeout(() => {
-          timeoutHandle2.current = -1;
+      if (timeoutHandle.current != -1)
+        clearTimeout(timeoutHandle.current);
+      timeoutHandle.current = setTimeout(() => {
+        timeoutHandle.current = setTimeout(() => {
+          timeoutHandle.current = -1;
           let target = getTargetStaggerIndex();
           setDisplayedStaggerIndex((prev) => {
             let next = Math.min(target || 0, (prev || 0) + 1);
@@ -4122,7 +4078,7 @@
       /* Must be empty */
     ]);
     p3(() => {
-      if (timeoutHandle2.current == -1) {
+      if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
         let current = getDisplayedStaggerIndex();
         let next = Math.min(childCount ?? 0, (current ?? 0) + 1);
@@ -4135,8 +4091,8 @@
       }
       setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
       queueMicrotask(() => {
-        for (let i4 = (prevIndex ?? 0) - 1; i4 <= newIndex; ++i4) {
-          getChildren().getAt(i4)?.setStaggeredVisible(true);
+        for (let i3 = (prevIndex ?? 0) - 1; i3 <= newIndex; ++i3) {
+          getChildren().getAt(i3)?.setStaggeredVisible(true);
         }
       });
       resetEmergencyTimeout();
@@ -4163,12 +4119,12 @@
     }, []);
     const s4 = _(parentIsStaggered);
     s4.current = parentIsStaggered;
-    const getDefaultStaggeredVisible = T2((i4) => {
+    const getDefaultStaggeredVisible = T2((i3) => {
       if (s4.current) {
         const staggerIndex = getDisplayedStaggerIndex();
         if (staggerIndex == null)
           return false;
-        return i4 < staggerIndex;
+        return i3 < staggerIndex;
       } else {
         return true;
       }
@@ -4827,7 +4783,7 @@
   var useRefElement = monitored(function useRefElement2({ [RefElementParameters.onElementChange]: onElementChange, [RefElementParameters.onMount]: onMount, [RefElementParameters.onUnmount]: onUnmount }) {
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     let nonElementWarn;
-    if (true) {
+    if (false) {
       nonElementWarn = _(false);
       if (nonElementWarn.current) {
         nonElementWarn.current = false;
@@ -5084,12 +5040,12 @@
         this[_blockingElements].push(element);
       }
       remove(element) {
-        const i4 = this[_blockingElements].indexOf(element);
-        if (i4 === -1) {
+        const i3 = this[_blockingElements].indexOf(element);
+        if (i3 === -1) {
           return false;
         }
-        this[_blockingElements].splice(i4, 1);
-        if (i4 === this[_blockingElements].length) {
+        this[_blockingElements].splice(i3, 1);
+        if (i3 === this[_blockingElements].length) {
           this[_topChanged](this.top);
         }
         return true;
@@ -5125,16 +5081,16 @@
           this[_inertSiblings](newParents, toSkip, toKeepInert);
           return;
         }
-        let i4 = oldParents.length - 1;
+        let i3 = oldParents.length - 1;
         let j4 = newParents.length - 1;
-        while (i4 > 0 && j4 > 0 && oldParents[i4] === newParents[j4]) {
-          i4--;
+        while (i3 > 0 && j4 > 0 && oldParents[i3] === newParents[j4]) {
+          i3--;
           j4--;
         }
-        if (oldParents[i4] !== newParents[j4]) {
-          this[_swapInertedSibling](oldParents[i4], newParents[j4]);
+        if (oldParents[i3] !== newParents[j4]) {
+          this[_swapInertedSibling](oldParents[i3], newParents[j4]);
         }
-        i4 > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i4));
+        i3 > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i3));
         j4 > 0 && this[_inertSiblings](newParents.slice(0, j4), toSkip, null);
       }
       /**
@@ -5227,8 +5183,8 @@
           const idx = target === document.body ? parents.length : parents.indexOf(target);
           const inertedChild = parents[idx - 1];
           const inertedSiblings = inertedChild[_siblingsToRestore];
-          for (let i4 = 0; i4 < mutation.removedNodes.length; i4++) {
-            const sibling = mutation.removedNodes[i4];
+          for (let i3 = 0; i3 < mutation.removedNodes.length; i3++) {
+            const sibling = mutation.removedNodes[i3];
             if (sibling === inertedChild) {
               console.info("Detected removal of the top Blocking Element.");
               this.pop();
@@ -5239,8 +5195,8 @@
               inertedSiblings.delete(sibling);
             }
           }
-          for (let i4 = 0; i4 < mutation.addedNodes.length; i4++) {
-            const sibling = mutation.addedNodes[i4];
+          for (let i3 = 0; i3 < mutation.addedNodes.length; i3++) {
+            const sibling = mutation.addedNodes[i3];
             if (!this[_isInertable](sibling)) {
               continue;
             }
@@ -5291,13 +5247,13 @@
           return null;
         }
         const result = /* @__PURE__ */ new Set();
-        let i4;
+        let i3;
         let j4;
         let nodes;
         const slots = shadowRoot.querySelectorAll("slot");
         if (slots.length && slots[0].assignedNodes) {
-          for (i4 = 0; i4 < slots.length; i4++) {
-            nodes = slots[i4].assignedNodes({
+          for (i3 = 0; i3 < slots.length; i3++) {
+            nodes = slots[i3].assignedNodes({
               flatten: true
             });
             for (j4 = 0; j4 < nodes.length; j4++) {
@@ -5316,8 +5272,8 @@
   // ../node_modules/.pnpm/wicg-inert@3.1.2/node_modules/wicg-inert/dist/inert.esm.js
   var _createClass = function() {
     function defineProperties(target, props) {
-      for (var i4 = 0; i4 < props.length; i4++) {
-        var descriptor = props[i4];
+      for (var i3 = 0; i3 < props.length; i3++) {
+        var descriptor = props[i3];
         descriptor.enumerable = descriptor.enumerable || false;
         descriptor.configurable = true;
         if ("value" in descriptor)
@@ -5865,8 +5821,8 @@
             element
           );
           var distributedNodes = content.getDistributedNodes ? content.getDistributedNodes() : [];
-          for (var i4 = 0; i4 < distributedNodes.length; i4++) {
-            composedTreeWalk(distributedNodes[i4], callback, shadowRootAncestor);
+          for (var i3 = 0; i3 < distributedNodes.length; i3++) {
+            composedTreeWalk(distributedNodes[i3], callback, shadowRootAncestor);
           }
           return;
         }
@@ -6436,8 +6392,8 @@
     const getChildren = T2(() => getChildrenButItsDeclaredTooLateToBeUseful(), []);
     const getLowestChildIndex = T2(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = T2(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = T2((i4) => {
-      const child = getChildren().getAt(i4);
+    const isValidForNavigation = T2((i3) => {
+      const child = getChildren().getAt(i3);
       if (child == null)
         return false;
       if (child.untabbable)
@@ -6600,8 +6556,8 @@
     const getCells = T2(() => getCells2(), []);
     const getHighestChildIndex = T2(() => getRows().getHighestIndex(), []);
     const getLowestChildIndex = T2(() => getRows().getLowestIndex(), []);
-    const isValidForNavigation = T2((i4) => {
-      const child = getRows().getAt(i4);
+    const isValidForNavigation = T2((i3) => {
+      const child = getRows().getAt(i3);
       if (child == null)
         return false;
       if (child.untabbable)
@@ -6780,8 +6736,8 @@
     const getChildren = T2(() => getChildren2(), []);
     const getLowestIndex = T2(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = T2(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = T2((i4) => {
-      const child = getChildren().getAt(i4);
+    const isValidForNavigation = T2((i3) => {
+      const child = getChildren().getAt(i3);
       if (!child)
         return false;
       if (child.untabbable)
@@ -7702,7 +7658,7 @@
       const promiseCount2 = getPromiseCount();
       if (promiseCount2 > 0) {
         if (currentPromiseIndex2 + 1 < promiseCount2) {
-          setCurrentPromiseIndex((i4) => ++i4);
+          setCurrentPromiseIndex((i3) => ++i3);
         }
       }
     }, [promiseCount]);
@@ -7718,7 +7674,7 @@
           const currentPromiseIndex2 = getCurrentPromiseIndex();
           const promiseCount2 = getPromiseCount();
           if (currentPromiseIndex2 + 1 < promiseCount2) {
-            setCurrentPromiseIndex((i4) => ++i4);
+            setCurrentPromiseIndex((i3) => ++i3);
           }
         });
       }
@@ -7783,7 +7739,7 @@
         }
       }
       dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-        setPromiseCount((i4) => ++i4);
+        setPromiseCount((i3) => ++i3);
         setDropError(null);
         return {
           strings: dropData,
@@ -7791,7 +7747,7 @@
         };
       }).catch((ex) => {
         debugger;
-        setPromiseCount((i4) => ++i4);
+        setPromiseCount((i3) => ++i3);
         setDropError(ex);
         return null;
       }));
@@ -8506,9 +8462,9 @@
     const effect2 = () => {
       const changes = [];
       if (inputs && prevInputs.current) {
-        for (let i4 = 0; i4 < Math.max(prevInputs.current.length, inputs.length); ++i4) {
-          if (prevInputs.current[i4] != inputs[i4])
-            changes[i4] = { from: prevInputs.current[i4], to: inputs[i4] };
+        for (let i3 = 0; i3 < Math.max(prevInputs.current.length, inputs.length); ++i3) {
+          if (prevInputs.current[i3] != inputs[i3])
+            changes[i3] = { from: prevInputs.current[i3], to: inputs[i3] };
         }
       }
       const ret = effect(prevInputs.current, changes);
@@ -8586,11 +8542,11 @@
     var s4, u4, a4 = {};
     for (u4 in e3)
       "ref" == u4 ? s4 = e3[u4] : a4[u4] = e3[u4];
-    var i4 = { type: o5, props: a4, key: n2, ref: s4, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_3, __source: f4, __self: l4 };
+    var i3 = { type: o5, props: a4, key: n2, ref: s4, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: --_3, __source: f4, __self: l4 };
     if ("function" == typeof o5 && (s4 = o5.defaultProps))
       for (u4 in s4)
         void 0 === a4[u4] && (a4[u4] = s4[u4]);
-    return l.vnode && l.vnode(i4), i4;
+    return l.vnode && l.vnode(i3), i3;
   }
 
   // ../dist/timing/use-animation-frame.js
@@ -8882,8 +8838,8 @@
       [PropNames.RearrangeableParameters.compare]: null,
       [PropNames.RearrangeableParameters.adjust]: null,
       [PropNames.RearrangeableParameters.children]: F2(() => Array.from(function* () {
-        for (let i4 = 0; i4 < count; ++i4) {
-          yield /* @__PURE__ */ o4(DemoUseRovingTabIndexChildOuter, { index: i4 }, i4);
+        for (let i3 = 0; i3 < count; ++i3) {
+          yield /* @__PURE__ */ o4(DemoUseRovingTabIndexChildOuter, { index: i3 }, i3);
         }
       }()), [count]),
       [PropNames.StaggeredParameters.staggered]: staggered,
@@ -9009,8 +8965,8 @@
   window._generate_setState_stacks = false;
   var DemoGlobalHandlerChildren = x3(function DemoGlobalHandlerChildren2({ count, mode }) {
     return /* @__PURE__ */ o4(k, { children: [...function* () {
-      for (let i4 = 0; i4 < count; ++i4) {
-        yield /* @__PURE__ */ o4(DemoGlobalHandlerChild, { mode, target: window }, i4);
+      for (let i3 = 0; i3 < count; ++i3) {
+        yield /* @__PURE__ */ o4(DemoGlobalHandlerChild, { mode, target: window }, i3);
       }
     }()] });
   });
