@@ -1,4 +1,4 @@
-import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { KeyboardEventType, Nullable } from "../../util/lib.js";
 export declare const PropNames_EscapeDismissParameters_dismissEscapeActive = "PropNames.EscapeDismissParameters.dismissEscapeActive";
 export declare const PropNames_EscapeDismissParameters_onDismissEscape = "PropNames.EscapeDismissParameters.onDismissEscape";
@@ -10,11 +10,11 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      *
      * @nonstable
      */
-    [PropNames_EscapeDismissParameters_onDismissEscape]: Nullable<(e: KeyboardEventType<any>) => void>;
+    "PropNames.EscapeDismissParameters.onDismissEscape": Nullable<(e: KeyboardEventType<any>) => void>;
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    [PropNames_EscapeDismissParameters_dismissEscapeActive]: B | false;
+    "PropNames.EscapeDismissParameters.dismissEscapeActive": B | false;
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
@@ -22,15 +22,15 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      *
      * @nonstable
      */
-    [PropNames_EscapeDismissParameters_getDocument](): Document;
+    "PropNames.EscapeDismissParameters.getDocument"(): Document;
     /**
      * Get this from context somewhere, and increment it in that context.
      *
      * If multiple instances of Preact are on the page, tree depth is used as a tiebreaker
      */
-    [PropNames_EscapeDismissParameters_parentDepth]: number;
+    "PropNames.EscapeDismissParameters.parentDepth": number;
 }
-export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> extends UseEscapeDismissParametersSelf<B>, Pick<UseRefElementReturnType<PopupElement>, typeof PropNames_RefElementReturn_getElement> {
+export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> extends UseEscapeDismissParametersSelf<B>, Pick<UseRefElementReturnType<PopupElement>, "PropNames.RefElementReturn.getElement"> {
 }
 /**
  * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)
@@ -41,5 +41,5 @@ export interface UseEscapeDismissParameters<PopupElement extends Element, B exte
  *
  * @compositeParams
  */
-export declare const useEscapeDismiss: <PopupElement extends Element, B extends boolean>({ [PropNames_EscapeDismissParameters_onDismissEscape]: onClose, [PropNames_EscapeDismissParameters_dismissEscapeActive]: open, [PropNames_EscapeDismissParameters_getDocument]: unstableGetDocument, [PropNames_EscapeDismissParameters_parentDepth]: parentDepth, [PropNames_RefElementReturn_getElement]: getElement, ..._void1 }: UseEscapeDismissParameters<PopupElement, B>) => void;
+export declare const useEscapeDismiss: <PopupElement extends Element, B extends boolean>({ "PropNames.EscapeDismissParameters.onDismissEscape": onClose, "PropNames.EscapeDismissParameters.dismissEscapeActive": open, "PropNames.EscapeDismissParameters.getDocument": unstableGetDocument, "PropNames.EscapeDismissParameters.parentDepth": parentDepth, "PropNames.RefElementReturn.getElement": getElement, ..._void1 }: UseEscapeDismissParameters<PopupElement, B>) => void;
 //# sourceMappingURL=use-escape-dismiss.d.ts.map

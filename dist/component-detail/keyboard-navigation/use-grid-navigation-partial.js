@@ -1,31 +1,18 @@
 import { identity } from "lodash-es";
-import { PropNames_PressParameters_excludeSpace } from "../../component-use/use-press.js";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
-import { PropNames_TextContentParameters_getText, PropNames_TextContentReturn_getTextContent } from "../../dom-helpers/use-text-content.js";
-import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
-import { PropNames_ManagedChildrenReturn_getChildren } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { monitored } from "../../util/use-call-count.js";
-import { PropNames_PaginatedParameters_paginationMax, PropNames_PaginatedParameters_paginationMin } from "../processed-children/use-paginated-children.js";
-import { PropNames_RearrangeableReturn_indexDemangler, PropNames_RearrangeableReturn_indexMangler } from "../processed-children/use-rearrangeable-children.js";
-import { PropNames_LinearNavigationParameters_arrowKeyDirection, PropNames_LinearNavigationParameters_disableHomeEndKeys, PropNames_LinearNavigationParameters_getHighestIndex, PropNames_LinearNavigationParameters_getLowestIndex, PropNames_LinearNavigationParameters_isValidForLinearNavigation, PropNames_LinearNavigationParameters_navigatePastEnd, PropNames_LinearNavigationParameters_navigatePastStart, PropNames_LinearNavigationParameters_onNavigateLinear, PropNames_LinearNavigationParameters_pageNavigationSize } from "./use-linear-navigation.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
-import { PropNames_RovingTabIndexChildReturn_getTabbable, PropNames_RovingTabIndexChildReturn_tabbable, PropNames_RovingTabIndexParameters_focusSelfParent, PropNames_RovingTabIndexParameters_initiallyTabbedIndex, PropNames_RovingTabIndexParameters_onTabbableIndexChange, PropNames_RovingTabIndexParameters_untabbable, PropNames_RovingTabIndexParameters_untabbableBehavior, PropNames_RovingTabIndexReturn_setTabbableIndex } from "./use-roving-tabindex.js";
-import { PropNames_TypeaheadNavigationParameters_collator, PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation, PropNames_TypeaheadNavigationParameters_noTypeahead, PropNames_TypeaheadNavigationParameters_onNavigateTypeahead, PropNames_TypeaheadNavigationParameters_typeaheadTimeout } from "./use-typeahead-navigation.js";
 const P1 = `PropNames.GridNavigationParameters`;
 const P2 = `PropNames.GridNavigationRowParameters`;
 const P3 = `PropNames.GridNavigationCellParameters`;
 const R1 = `PropNames.GridNavigationReturn`;
 const R2 = `PropNames.GridNavigationRowReturn`;
 const R3 = `PropNames.GridNavigationCellReturn`;
-export const PropNames_GridNavigationParameters_onTabbableColumnChange = `${P1}.onTabbableColumnChange`;
-export const PropNames_GridNavigationParameters_initiallyTabbableColumn = `${P1}.initiallyTabbableColumn`;
-export const PropNames_GridNavigationCellParameters_colSpan = `${P3}.colSpan`;
 /**
  * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
  *
@@ -45,40 +32,40 @@ export const PropNames_GridNavigationCellParameters_colSpan = `${P3}.colSpan`;
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export const useGridNavigation = monitored(function useGridNavigation({ [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys, [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex, [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex, [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd, [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart, [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear, [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_PaginatedParameters_paginationMax]: paginationMax, [PropNames_PaginatedParameters_paginationMin]: paginationMin, [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler, [PropNames_RearrangeableReturn_indexMangler]: indexMangler, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParent, [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange, [PropNames_RovingTabIndexParameters_untabbable]: untabbable, [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, [PropNames_GridNavigationParameters_onTabbableColumnChange]: onTabbableColumnChange, [PropNames_GridNavigationParameters_initiallyTabbableColumn]: initiallyTabbableColumn, ...void2 }) {
+export const useGridNavigation = monitored(function useGridNavigation({ "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys, "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex, "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex, "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation, "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd, "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart, "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear, "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize, "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.PaginatedParameters.paginationMax": paginationMax, "PropNames.PaginatedParameters.paginationMin": paginationMin, "PropNames.RearrangeableReturn.indexDemangler": indexDemangler, "PropNames.RearrangeableReturn.indexMangler": indexMangler, "PropNames.RefElementReturn.getElement": getElement, "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent, "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex, "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange, "PropNames.RovingTabIndexParameters.untabbable": untabbable, "PropNames.RovingTabIndexParameters.untabbableBehavior": untabbableBehavior, "PropNames.TypeaheadNavigationParameters.collator": collator, "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation, "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead, "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead, "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout, "PropNames.GridNavigationParameters.onTabbableColumnChange": onTabbableColumnChange, "PropNames.GridNavigationParameters.initiallyTabbableColumn": initiallyTabbableColumn, ...void2 }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
         let t = (initiallyTabbableColumn ?? 0);
         return { actual: t, ideal: t };
     }));
     const { context: { rovingTabIndexContext, typeaheadNavigationContext }, props, ...retLN } = useListNavigation({
-        [PropNames_LinearNavigationParameters_arrowKeyDirection]: "vertical",
-        [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys,
-        [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex,
-        [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex,
-        [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation,
-        [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd,
-        [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart,
-        [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear,
-        [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_PaginatedParameters_paginationMax]: paginationMax,
-        [PropNames_PaginatedParameters_paginationMin]: paginationMin,
-        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParent,
-        [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex,
-        [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange,
-        [PropNames_RovingTabIndexParameters_untabbable]: untabbable,
-        [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior,
-        [PropNames_TypeaheadNavigationParameters_collator]: collator,
-        [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
-        [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead,
-        [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead,
-        [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout
+        "PropNames.LinearNavigationParameters.arrowKeyDirection": "vertical",
+        "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys,
+        "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex,
+        "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex,
+        "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation,
+        "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
+        "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
+        "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear,
+        "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.PaginatedParameters.paginationMax": paginationMax,
+        "PropNames.PaginatedParameters.paginationMin": paginationMin,
+        "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+        "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent,
+        "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex,
+        "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange,
+        "PropNames.RovingTabIndexParameters.untabbable": untabbable,
+        "PropNames.RovingTabIndexParameters.untabbableBehavior": untabbableBehavior,
+        "PropNames.TypeaheadNavigationParameters.collator": collator,
+        "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation,
+        "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
+        "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
+        "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout
     });
     assertEmptyObject(void2);
-    const { [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex } = retLN;
+    const { "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex } = retLN;
     const gridNavigationRowContext = useMemoObject({
         setTabbableRow: setTabbableIndex,
         getTabbableColumn,
@@ -104,9 +91,9 @@ export const useGridNavigation = monitored(function useGridNavigation({ [PropNam
  */
 export const useGridNavigationRow = monitored(function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
-info: { index, untabbable, ...void3 }, [PropNames_TextContentParameters_getText]: getText, context: contextFromParent, 
+info: { index, untabbable, ...void3 }, "PropNames.TextContentParameters.getText": getText, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
-[PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex, [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex, [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation, [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd, [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart, [PropNames_RovingTabIndexParameters_untabbable]: rowIsUntabbableAndSoAreCells, [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, ...void1 }) {
+"PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex, "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex, "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation, "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd, "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart, "PropNames.RovingTabIndexParameters.untabbable": rowIsUntabbableAndSoAreCells, "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex, "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange, "PropNames.RefElementReturn.getElement": getElement, "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.TypeaheadNavigationParameters.collator": collator, "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation, "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead, "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead, "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout, ...void1 }) {
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
     const getIndex = useStableCallback(() => { return index; });
     // When this row is focused from the parent's `useRovingTabIndex`,
@@ -146,46 +133,46 @@ info: { index, untabbable, ...void3 }, [PropNames_TextContentParameters_getText]
     const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, ...retLN } = useListNavigationChild({
         info: { index, untabbable },
         context: contextFromParent,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_TextContentParameters_getText]: getText,
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.TextContentParameters.getText": getText,
     });
-    const allChildCellsAreUntabbable = !retLN[PropNames_RovingTabIndexChildReturn_tabbable];
+    const allChildCellsAreUntabbable = !retLN["PropNames.RovingTabIndexChildReturn.tabbable"];
     const { props: propsLN, context: contextULN, ...retLS } = useListNavigation({
-        [PropNames_RearrangeableReturn_indexDemangler]: identity,
-        [PropNames_RearrangeableReturn_indexMangler]: identity,
-        [PropNames_RovingTabIndexParameters_untabbableBehavior]: "leave-child-focused",
-        [PropNames_RovingTabIndexParameters_focusSelfParent]: whenThisRowIsFocused,
-        [PropNames_RovingTabIndexParameters_untabbable]: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
-        [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex,
-        [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: useStableCallback((v, p, r) => {
+        "PropNames.RearrangeableReturn.indexDemangler": identity,
+        "PropNames.RearrangeableReturn.indexMangler": identity,
+        "PropNames.RovingTabIndexParameters.untabbableBehavior": "leave-child-focused",
+        "PropNames.RovingTabIndexParameters.focusSelfParent": whenThisRowIsFocused,
+        "PropNames.RovingTabIndexParameters.untabbable": allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
+        "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex,
+        "PropNames.RovingTabIndexParameters.onTabbableIndexChange": useStableCallback((v, p, r) => {
             setTabbableColumn({ ideal: v, actual: v }, r);
             onTabbableIndexChange?.(v, p, r);
         }),
-        [PropNames_LinearNavigationParameters_onNavigateLinear]: useStableCallback((next, event) => {
+        "PropNames.LinearNavigationParameters.onNavigateLinear": useStableCallback((next, event) => {
             setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
         }),
-        [PropNames_LinearNavigationParameters_disableHomeEndKeys]: true,
-        [PropNames_LinearNavigationParameters_pageNavigationSize]: 0,
-        [PropNames_LinearNavigationParameters_arrowKeyDirection]: "horizontal",
-        [PropNames_PaginatedParameters_paginationMax]: null,
-        [PropNames_PaginatedParameters_paginationMin]: null,
-        [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex,
-        [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex,
-        [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation,
-        [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd,
-        [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_TypeaheadNavigationParameters_collator]: collator,
-        [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
-        [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead,
-        [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead,
-        [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout
+        "PropNames.LinearNavigationParameters.disableHomeEndKeys": true,
+        "PropNames.LinearNavigationParameters.pageNavigationSize": 0,
+        "PropNames.LinearNavigationParameters.arrowKeyDirection": "horizontal",
+        "PropNames.PaginatedParameters.paginationMax": null,
+        "PropNames.PaginatedParameters.paginationMin": null,
+        "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex,
+        "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex,
+        "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation,
+        "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
+        "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.TypeaheadNavigationParameters.collator": collator,
+        "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation,
+        "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
+        "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
+        "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
-    const { [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex } = retLS;
+    const { "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex } = retLS;
     const gridNavigationCellContext = useMemoObject({
         //allChildCellsAreUntabbable,
         setTabbableRow,
@@ -220,13 +207,13 @@ info: { index, untabbable, ...void3 }, [PropNames_TextContentParameters_getText]
  *
  * @compositeParams
  */
-export const useGridNavigationCell = monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, [PropNames_RefElementReturn_getElement]: getElement, [PropNames_TextContentParameters_getText]: getText, [PropNames_GridNavigationCellParameters_colSpan]: colSpan, ...void1 }) {
+export const useGridNavigationCell = monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, "PropNames.RefElementReturn.getElement": getElement, "PropNames.TextContentParameters.getText": getText, "PropNames.GridNavigationCellParameters.colSpan": colSpan, ...void1 }) {
     colSpan ??= 1;
-    const { [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames_PressParameters_excludeSpace]: excludeSpace, [PropNames_RovingTabIndexChildReturn_getTabbable]: getTabbable, [PropNames_RovingTabIndexChildReturn_tabbable]: tabbable, [PropNames_TextContentReturn_getTextContent]: getTextContent, props, info: infoLS, ...void2 } = useListNavigationChild({
+    const { "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": onCurrentFocusedInnerChanged, "PropNames.PressParameters.excludeSpace": excludeSpace, "PropNames.RovingTabIndexChildReturn.getTabbable": getTabbable, "PropNames.RovingTabIndexChildReturn.tabbable": tabbable, "PropNames.TextContentReturn.getTextContent": getTextContent, props, info: infoLS, ...void2 } = useListNavigationChild({
         info: { index, untabbable },
         context: { rovingTabIndexContext, typeaheadNavigationContext },
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_TextContentParameters_getText]: getText
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.TextContentParameters.getText": getText
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -236,11 +223,11 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell({ 
     return {
         info: infoLS,
         props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
-        [PropNames_RovingTabIndexChildReturn_getTabbable]: getTabbable,
-        [PropNames_PressParameters_excludeSpace]: excludeSpace,
-        [PropNames_RovingTabIndexChildReturn_tabbable]: tabbable,
-        [PropNames_TextContentReturn_getTextContent]: getTextContent,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: useStableCallback((focused, prev, e) => {
+        "PropNames.RovingTabIndexChildReturn.getTabbable": getTabbable,
+        "PropNames.PressParameters.excludeSpace": excludeSpace,
+        "PropNames.RovingTabIndexChildReturn.tabbable": tabbable,
+        "PropNames.TextContentReturn.getTextContent": getTextContent,
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": useStableCallback((focused, prev, e) => {
             onCurrentFocusedInnerChanged?.(focused, prev, e);
             if (focused) {
                 setTabbableRow(getRowIndex(), e, false);

@@ -1,5 +1,4 @@
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
-import { PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
@@ -13,7 +12,7 @@ export const PropNames_BackdropDismissParameters_onDismissBackdrop = `${P}.onDis
  *
  * @compositeParams
  */
-export const useBackdropDismiss = monitored(function useBackdropDismiss({ [PropNames_BackdropDismissParameters_dismissBackdropActive]: open, [PropNames_BackdropDismissParameters_onDismissBackdrop]: onCloseUnstable, [PropNames_RefElementReturn_getElement]: getElement, ..._void2 }) {
+export const useBackdropDismiss = monitored(function useBackdropDismiss({ "PropNames.BackdropDismissParameters.dismissBackdropActive": open, "PropNames.BackdropDismissParameters.onDismissBackdrop": onCloseUnstable, "PropNames.RefElementReturn.getElement": getElement, ..._void2 }) {
     assertEmptyObject(_void2);
     const getOpen = useStableGetter(open);
     const onClose = useStableGetter(onCloseUnstable);

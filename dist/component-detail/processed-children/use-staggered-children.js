@@ -1,5 +1,3 @@
-import { PropNames_RefElementParameters_onElementChange, PropNames_RefElementReturn_getElement } from "../../dom-helpers/use-ref-element.js";
-import { PropNames_ManagedChildrenReturn_getChildren } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -7,19 +5,6 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-const P1 = `PropNames.StaggeredParameters`;
-const P2 = `PropNames.StaggeredChildParameters`;
-const R1 = `PropNames.StaggeredReturn`;
-const R2 = `PropNames.StaggeredChildReturn`;
-export const PropNames_StaggeredParameters_staggered = `${P1}.staggered`;
-export const PropNames_StaggeredParameters_childCount = `${P1}.childCount`;
-export const PropNames_StaggeredParameters_untabbable = `${P1}.untabbable`;
-export const PropNames_StaggeredParameters_untabbableBehavior = `${P1}.untabbableBehavior`;
-export const PropNames_StaggeredParameters_onTabbableIndexChange = `${P1}.onTabbableIndexChange`;
-export const PropNames_StaggeredReturn_stillStaggering = `${R1}.stillStaggering`;
-export const PropNames_StaggeredChildReturn_parentIsStaggered = `${R2}.parentIsStaggered`;
-export const PropNames_StaggeredChildReturn_hideBecauseStaggered = `${R2}.hideBecauseStaggered`;
-export const PropNames_StaggeredChildReturn_childUseEffect = `${R2}.childUseEffect`;
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering.
  * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
@@ -37,7 +22,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
 //managedChildrenReturn: { getChildren },
 //staggeredChildrenParameters: { staggered, childCount },
 //refElementReturn: { getElement }
-[PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_StaggeredParameters_childCount]: childCount, [PropNames_StaggeredParameters_staggered]: staggered, [PropNames_RefElementReturn_getElement]: getElement, }) {
+"PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.StaggeredParameters.childCount": childCount, "PropNames.StaggeredParameters.staggered": staggered, "PropNames.RefElementReturn.getElement": getElement, }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
     // until they fill in.
@@ -165,7 +150,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
         return () => io.disconnect();
     }, []);
     return {
-        [PropNames_StaggeredReturn_stillStaggering]: currentlyStaggering,
+        "PropNames.StaggeredReturn.stillStaggering": currentlyStaggering,
         context: useMemo(() => ({
             staggeredChildContext
         }), [staggeredChildContext]),
@@ -217,11 +202,11 @@ context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisibl
     const e = useRef(null);
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
-        [PropNames_StaggeredChildReturn_hideBecauseStaggered]: parentIsStaggered ? !staggeredVisible : false,
-        [PropNames_StaggeredChildReturn_childUseEffect]: childUseEffect,
-        [PropNames_StaggeredChildReturn_parentIsStaggered]: parentIsStaggered,
+        "PropNames.StaggeredChildReturn.hideBecauseStaggered": parentIsStaggered ? !staggeredVisible : false,
+        "PropNames.StaggeredChildReturn.childUseEffect": childUseEffect,
+        "PropNames.StaggeredChildReturn.parentIsStaggered": parentIsStaggered,
         info: { setStaggeredVisible, getStaggeredVisible },
-        [PropNames_RefElementParameters_onElementChange]: useStableCallback((element) => {
+        "PropNames.RefElementParameters.onElementChange": useStableCallback((element) => {
             setElementToIndexMap(index, element);
             e.current = (element || e.current);
             const io = getIntersectionObserver();

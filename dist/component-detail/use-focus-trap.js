@@ -1,7 +1,5 @@
 import { isFocusable, isTabbable } from "tabbable";
-import { PropNames_BlockingElementParameters_enabled, PropNames_BlockingElementParameters_getTarget, PropNames_BlockingElementReturn_getLastActiveWhenClosed, PropNames_BlockingElementReturn_getLastActiveWhenOpen, PropNames_BlockingElementReturn_getTarget, PropNames_BlockingElementReturn_getTop, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
-import { PropNames_RefElementReturn_getElement } from "../dom-helpers/use-ref-element.js";
-import { PropNames_ActiveElementParameters_onLastActiveElementChange } from "../observers/use-active-element.js";
+import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useEffect } from "../util/lib.js";
@@ -22,7 +20,7 @@ export const PropNames_FocusTrapReturn_pressing = `${R}.pressing`;
  *
  * @compositeParams
  */
-export const useFocusTrap = monitored(function useFocusTrap({ [PropNames_FocusTrapParameters_focusOpener]: focusOpenerUnstable, [PropNames_FocusTrapParameters_focusPopup]: focusSelfUnstable, [PropNames_FocusTrapParameters_trapActive]: trapActive, [PropNames_FocusTrapParameters_onlyMoveFocus]: onlyMoveFocus, [PropNames_RefElementReturn_getElement]: getElement, ...void2 }) {
+export const useFocusTrap = monitored(function useFocusTrap({ "PropNames.FocusTrapParameters.focusOpener": focusOpenerUnstable, "PropNames.FocusTrapParameters.focusPopup": focusSelfUnstable, "PropNames.FocusTrapParameters.trapActive": trapActive, "PropNames.FocusTrapParameters.onlyMoveFocus": onlyMoveFocus, "PropNames.RefElementReturn.getElement": getElement, ...void2 }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
@@ -52,9 +50,9 @@ export const useFocusTrap = monitored(function useFocusTrap({ [PropNames_FocusTr
             }
         }
     }, [trapActive]);
-    const { [PropNames_BlockingElementReturn_getTarget]: getTarget, [PropNames_BlockingElementReturn_getTop]: getTop, [PropNames_BlockingElementReturn_getLastActiveWhenClosed]: getLastActiveWhenClosed, [PropNames_BlockingElementReturn_getLastActiveWhenOpen]: getLastActiveWhenOpen, [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange, ...void1 } = useBlockingElement({
-        [PropNames_BlockingElementParameters_enabled]: trapActive && !onlyMoveFocus,
-        [PropNames_BlockingElementParameters_getTarget]: getElement
+    const { "PropNames.BlockingElementReturn.getTarget": getTarget, "PropNames.BlockingElementReturn.getTop": getTop, "PropNames.BlockingElementReturn.getLastActiveWhenClosed": getLastActiveWhenClosed, "PropNames.BlockingElementReturn.getLastActiveWhenOpen": getLastActiveWhenOpen, "PropNames.ActiveElementParameters.onLastActiveElementChange": onLastActiveElementChange, ...void1 } = useBlockingElement({
+        "PropNames.BlockingElementParameters.enabled": trapActive && !onlyMoveFocus,
+        "PropNames.BlockingElementParameters.getTarget": getElement
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);

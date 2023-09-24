@@ -8,11 +8,6 @@ const P1 = `PropNames.ManagedChildrenParameters`;
 const R1 = `PropNames.ManagedChildrenReturn`;
 const P2 = `PropNames.ManagedChildParameters`;
 const R2 = `PropNames.ManagedChildReturnType`;
-export const PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect = `${P1}.onAfterChildLayoutEffect`;
-export const PropNames_ManagedChildrenParameters_onChildrenMountChange = `${P1}.onChildrenMountChange`;
-export const PropNames_ManagedChildrenParameters_onChildrenCountChange = `${P1}.onChildrenCountChange`;
-export const PropNames_ManagedChildrenReturn_getChildren = `${P1}.getChildren`;
-export const PropNames_ManagedChildReturn_getChildren = `${R2}.getChildren`;
 /**
  * Reminder of order of execution:
  *
@@ -49,7 +44,7 @@ const _comments = void (0);
  *
  * @compositeParams
  */
-export const useManagedChildren = monitored(function useManagedChildren({ [PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames_ManagedChildrenParameters_onChildrenMountChange]: onChildrenMountChange, [PropNames_ManagedChildrenParameters_onChildrenCountChange]: onChildrenCountChange, ..._void1 }) {
+export const useManagedChildren = monitored(function useManagedChildren({ "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect, "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange, "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange, ..._void1 }) {
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     assertEmptyObject(_void1);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
@@ -167,7 +162,7 @@ export const useManagedChildren = monitored(function useManagedChildren({ [PropN
                 getChildren
             })
         }),
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren
     };
 });
 /**
@@ -202,7 +197,7 @@ export const useManagedChild = monitored(function useManagedChild({ context, inf
         return () => remoteULEChildMounted?.(index, false);
     }, [index]);
     return {
-        [PropNames_ManagedChildReturn_getChildren]: getChildren
+        "PropNames.ManagedChildReturn.getChildren": getChildren
     };
 });
 /**

@@ -1,23 +1,12 @@
-import { PropNames_PressParameters_excludeSpace, PropNames_PressParameters_onPressSync } from "../component-use/use-press.js";
-import { PropNames_RefElementReturn_getElement } from "../dom-helpers/use-ref-element.js";
-import { PropNames_TextContentParameters_getText } from "../dom-helpers/use-text-content.js";
-import { PropNames_ChildrenHaveFocusReturn_getAnyFocused } from "../observers/use-children-have-focus.js";
-import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "../observers/use-has-current-focus.js";
-import { PropNames_ManagedChildrenReturn_getChildren, UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { PropNames_LinearNavigationParameters_arrowKeyDirection, PropNames_LinearNavigationParameters_disableHomeEndKeys, PropNames_LinearNavigationParameters_getHighestIndex, PropNames_LinearNavigationParameters_getLowestIndex, PropNames_LinearNavigationParameters_isValidForLinearNavigation, PropNames_LinearNavigationParameters_navigatePastEnd, PropNames_LinearNavigationParameters_navigatePastStart, PropNames_LinearNavigationParameters_onNavigateLinear, PropNames_LinearNavigationParameters_pageNavigationSize } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./keyboard-navigation/use-list-navigation-partial.js";
-import { PropNames_RovingTabIndexParameters_focusSelfParent, PropNames_RovingTabIndexParameters_initiallyTabbedIndex, PropNames_RovingTabIndexParameters_onTabbableIndexChange, PropNames_RovingTabIndexParameters_untabbable, PropNames_RovingTabIndexParameters_untabbableBehavior, PropNames_RovingTabIndexReturn_setTabbableIndex, UseRovingTabIndexReturnTypeSelf } from "./keyboard-navigation/use-roving-tabindex.js";
-import { PropNames_TypeaheadNavigationParameters_collator, PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation, PropNames_TypeaheadNavigationParameters_noTypeahead, PropNames_TypeaheadNavigationParameters_onNavigateTypeahead, PropNames_TypeaheadNavigationParameters_typeaheadTimeout } from "./keyboard-navigation/use-typeahead-navigation.js";
-import { PropNames_PaginatedParameters_paginationMax, PropNames_PaginatedParameters_paginationMin } from "./processed-children/use-paginated-children.js";
-import { PropNames_RearrangeableReturn_indexDemangler, PropNames_RearrangeableReturn_indexMangler } from "./processed-children/use-rearrangeable-children.js";
-import { PropNames_MultiSelectionChildParameters_initiallyMultiSelected, PropNames_MultiSelectionChildParameters_multiSelectionDisabled, PropNames_MultiSelectionChildParameters_onMultiSelectChange, PropNames_MultiSelectionParameters_multiSelectionAriaPropName, PropNames_MultiSelectionParameters_multiSelectionMode, PropNames_MultiSelectionParameters_onSelectionChange } from "./selection/use-multi-selection.js";
+import { UseRovingTabIndexReturnTypeSelf } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild } from "./selection/use-selection.js";
-import { PropNames_SingleSelectionChildParameters_singleSelectionDisabled, PropNames_SingleSelectionParameters_initiallySingleSelectedIndex, PropNames_SingleSelectionParameters_onSingleSelectedIndexChange, PropNames_SingleSelectionParameters_singleSelectionAriaPropName, PropNames_SingleSelectionParameters_singleSelectionMode } from "./selection/use-single-selection.js";
 
 export interface UseListNavigationSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSelectionChildInfo<TabbableChildElement> { }
 export interface UseListNavigationSelectionChildContext extends UseListNavigationContext, UseSelectionContext { }
@@ -55,40 +44,40 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * @compositeParams
  */
 export const useListNavigationSelection = monitored(function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
-    [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused,
-    [PropNames_LinearNavigationParameters_arrowKeyDirection]: arrowKeyDirection,
-    [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys,
-    [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex,
-    [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex,
-    [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation,
-    [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd,
-    [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart,
-    [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear,
-    [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize,
-    [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-    //[PropNames_RovingTabIndexReturn_setTabbableIndex]: sti2,
-    [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName,
-    [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-    [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange,
-    [PropNames_PaginatedParameters_paginationMax]: paginationMax,
-    [PropNames_PaginatedParameters_paginationMin]: paginationMin,
-    [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-    [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-    [PropNames_RefElementReturn_getElement]: getElement,
-    [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParent,
-    [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange,
-    [PropNames_RovingTabIndexParameters_untabbable]: untabbable,
-    [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior,
-    [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallyTabbedIndex,
-    [PropNames_SingleSelectionParameters_initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
-    [PropNames_SingleSelectionParameters_onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
-    [PropNames_SingleSelectionParameters_singleSelectionAriaPropName]: singleSelectionAriaPropName,
-    [PropNames_SingleSelectionParameters_singleSelectionMode]: singleSelectionMode,
-    [PropNames_TypeaheadNavigationParameters_collator]: collator,
-    [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
-    [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead,
-    [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead,
-    [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout,
+    "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
+    "PropNames.LinearNavigationParameters.arrowKeyDirection": arrowKeyDirection,
+    "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys,
+    "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex,
+    "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex,
+    "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation,
+    "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
+    "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
+    "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear,
+    "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize,
+    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+    //"PropNames.RovingTabIndexReturn.setTabbableIndex": sti2,
+    "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
+    "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+    "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
+    "PropNames.PaginatedParameters.paginationMax": paginationMax,
+    "PropNames.PaginatedParameters.paginationMin": paginationMin,
+    "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+    "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+    "PropNames.RefElementReturn.getElement": getElement,
+    "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent,
+    "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange,
+    "PropNames.RovingTabIndexParameters.untabbable": untabbable,
+    "PropNames.RovingTabIndexParameters.untabbableBehavior": untabbableBehavior,
+    "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex,
+    "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
+    "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
+    "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
+    "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode,
+    "PropNames.TypeaheadNavigationParameters.collator": collator,
+    "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation,
+    "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
+    "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
+    "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout,
     ...void3
 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
     const {
@@ -96,50 +85,50 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
         props: propsStable,
         ...retSS
     } = useSelection<ParentOrChildElement, ChildElement>({
-        [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName,
-        [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-        [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange,
-        [PropNames_RovingTabIndexReturn_setTabbableIndex]: useStableCallback((...args) => { sti1(...args); }),
-        [PropNames_SingleSelectionParameters_initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
-        [PropNames_SingleSelectionParameters_onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
-        [PropNames_SingleSelectionParameters_singleSelectionAriaPropName]: singleSelectionAriaPropName,
-        [PropNames_SingleSelectionParameters_singleSelectionMode]: singleSelectionMode
+        "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
+        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+        "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
+        "PropNames.RovingTabIndexReturn.setTabbableIndex": useStableCallback((...args) => { sti1(...args); }),
+        "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
+        "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
+        "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
+        "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode
     });
     const {
         context: contextLN,
         props,
         ...retLN
     } = useListNavigation<ParentOrChildElement, ChildElement>({
-        [PropNames_LinearNavigationParameters_arrowKeyDirection]: arrowKeyDirection,
-        [PropNames_LinearNavigationParameters_disableHomeEndKeys]: disableHomeEndKeys,
-        [PropNames_LinearNavigationParameters_getHighestIndex]: getHighestIndex,
-        [PropNames_LinearNavigationParameters_getLowestIndex]: getLowestIndex,
-        [PropNames_LinearNavigationParameters_isValidForLinearNavigation]: isValidForLinearNavigation,
-        [PropNames_LinearNavigationParameters_navigatePastEnd]: navigatePastEnd,
-        [PropNames_LinearNavigationParameters_navigatePastStart]: navigatePastStart,
-        [PropNames_LinearNavigationParameters_onNavigateLinear]: onNavigateLinear,
-        [PropNames_LinearNavigationParameters_pageNavigationSize]: pageNavigationSize,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_PaginatedParameters_paginationMax]: paginationMax,
-        [PropNames_PaginatedParameters_paginationMin]: paginationMin,
-        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_RovingTabIndexParameters_focusSelfParent]: focusSelfParent,
-        [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: initiallySingleSelectedIndex ?? initiallyTabbedIndex,
-        [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: onTabbableIndexChange,
-        [PropNames_RovingTabIndexParameters_untabbable]: untabbable,
-        [PropNames_RovingTabIndexParameters_untabbableBehavior]: untabbableBehavior,
-        [PropNames_TypeaheadNavigationParameters_collator]: collator,
-        [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
-        [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead,
-        [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead,
-        [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout,
+        "PropNames.LinearNavigationParameters.arrowKeyDirection": arrowKeyDirection,
+        "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys,
+        "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex,
+        "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex,
+        "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForLinearNavigation,
+        "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
+        "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
+        "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear,
+        "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.PaginatedParameters.paginationMax": paginationMax,
+        "PropNames.PaginatedParameters.paginationMin": paginationMin,
+        "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+        "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent,
+        "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallySingleSelectedIndex ?? initiallyTabbedIndex,
+        "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange,
+        "PropNames.RovingTabIndexParameters.untabbable": untabbable,
+        "PropNames.RovingTabIndexParameters.untabbableBehavior": untabbableBehavior,
+        "PropNames.TypeaheadNavigationParameters.collator": collator,
+        "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation,
+        "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
+        "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
+        "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout,
     });
 
-    const { [PropNames_RovingTabIndexReturn_setTabbableIndex]: sti1 } = retLN;
+    const { "PropNames.RovingTabIndexReturn.setTabbableIndex": sti1 } = retLN;
 
     assertEmptyObject(void3);
 
@@ -160,52 +149,52 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
 export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, ...void2 },
     context,
-    [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected,
-    [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled,
-    [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange,
-    [PropNames_RefElementReturn_getElement]: getElement,
-    [PropNames_SingleSelectionChildParameters_singleSelectionDisabled]: singleSelectionDisabled,
-    [PropNames_TextContentParameters_getText]: getText,
+    "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
+    "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
+    "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
+    "PropNames.RefElementReturn.getElement": getElement,
+    "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled,
+    "PropNames.TextContentParameters.getText": getText,
     ...void1
 }: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
     const {
         info: infoSS,
         props: propsSS,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: ocfic2,
-        [PropNames_PressParameters_onPressSync]: onPressSync,
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic2,
+        "PropNames.PressParameters.onPressSync": onPressSync,
         ...retSS
     } = useSelectionChild<ChildElement>({
         info: { index, untabbable },
         context,
-        [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected,
-        [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled,
-        [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange,
-        [PropNames_SingleSelectionChildParameters_singleSelectionDisabled]: singleSelectionDisabled,
+        "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
+        "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
+        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
+        "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled,
     });
 
     const {
         props: propsLN,
         info: infoLN,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: ocfic1,
-        [PropNames_PressParameters_excludeSpace]: excludeSpace,
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic1,
+        "PropNames.PressParameters.excludeSpace": excludeSpace,
         ...retLN
     } = useListNavigationChild<ChildElement>({
         info: { index, untabbable },
         context,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_TextContentParameters_getText]: getText
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.TextContentParameters.getText": getText
     });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
     return {
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: useStableCallback((focused, previouslyFocused, e) => {
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": useStableCallback((focused, previouslyFocused, e) => {
             ocfic1?.(focused, previouslyFocused, e);
             ocfic2?.(focused, previouslyFocused, e);
         }),
-        [PropNames_PressParameters_excludeSpace]: excludeSpace,
-        [PropNames_PressParameters_onPressSync]: onPressSync,
+        "PropNames.PressParameters.excludeSpace": excludeSpace,
+        "PropNames.PressParameters.onPressSync": onPressSync,
         info: { ...infoSS, ...infoLN },
         ...retSS,
         ...retLN,

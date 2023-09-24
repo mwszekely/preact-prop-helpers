@@ -1,11 +1,11 @@
-import { PropNames_RefElementReturn_getElement, useRefElement } from "../dom-helpers/use-ref-element.js";
-import { PropNames_ActiveElementParameters_getDocument, PropNames_ActiveElementParameters_onActiveElementChange, PropNames_ActiveElementParameters_onLastActiveElementChange, PropNames_ActiveElementParameters_onWindowFocusedChange, useActiveElement } from "../observers/use-active-element.js";
+import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { useActiveElement } from "../observers/use-active-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitored } from "../util/use-call-count.js";
-import { PropNames_BackdropDismissParameters_dismissBackdropActive, PropNames_BackdropDismissParameters_onDismissBackdrop, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
-import { PropNames_EscapeDismissParameters_dismissEscapeActive, PropNames_EscapeDismissParameters_getDocument, PropNames_EscapeDismissParameters_onDismissEscape, PropNames_EscapeDismissParameters_parentDepth, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
-import { PropNames_LostFocusDismissParameters_dismissLostFocusActive, PropNames_LostFocusDismissParameters_getElementPopup, PropNames_LostFocusDismissParameters_getElementSource, PropNames_LostFocusDismissParameters_onDismissLostFocus, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
+import { useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
+import { useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
+import { useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
 const P = `PropNames.DismissParameters`;
 const R = `PropNames.DismissReturn`;
 export const PropNames_DismissParameters_dismissActive = `${P}.dismissActive`;
@@ -26,44 +26,44 @@ const _dummy = 0;
  *
  * @compositeParams
  */
-export const useDismiss = monitored(function useDismiss({ [PropNames_DismissParameters_dismissActive]: dismissActive, [PropNames_DismissParameters_onDismiss]: onDismiss, [PropNames_BackdropDismissParameters_dismissBackdropActive]: dismissBackdropActive, [PropNames_BackdropDismissParameters_onDismissBackdrop]: onDismissBackdrop, [PropNames_EscapeDismissParameters_dismissEscapeActive]: dismissEscapeActive, [PropNames_EscapeDismissParameters_onDismissEscape]: onDismissEscape, [PropNames_EscapeDismissParameters_parentDepth]: parentDepth, [PropNames_LostFocusDismissParameters_dismissLostFocusActive]: dismissLostFocusActive, [PropNames_LostFocusDismissParameters_onDismissLostFocus]: onDismissLostFocus, [PropNames_ActiveElementParameters_getDocument]: getDocument, [PropNames_ActiveElementParameters_onActiveElementChange]: onActiveElementChange, [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange1, [PropNames_ActiveElementParameters_onWindowFocusedChange]: onWindowFocusedChange, ...void4 }) {
-    const { props: propsStableSource, [PropNames_RefElementReturn_getElement]: getElementSource } = useRefElement({});
-    const { props: propsStablePopup, [PropNames_RefElementReturn_getElement]: getElementPopup } = useRefElement({});
+export const useDismiss = monitored(function useDismiss({ "PropNames.DismissParameters.dismissActive": dismissActive, "PropNames.DismissParameters.onDismiss": onDismiss, "PropNames.BackdropDismissParameters.dismissBackdropActive": dismissBackdropActive, "PropNames.BackdropDismissParameters.onDismissBackdrop": onDismissBackdrop, "PropNames.EscapeDismissParameters.dismissEscapeActive": dismissEscapeActive, "PropNames.EscapeDismissParameters.onDismissEscape": onDismissEscape, "PropNames.EscapeDismissParameters.parentDepth": parentDepth, "PropNames.LostFocusDismissParameters.dismissLostFocusActive": dismissLostFocusActive, "PropNames.LostFocusDismissParameters.onDismissLostFocus": onDismissLostFocus, "PropNames.ActiveElementParameters.getDocument": getDocument, "PropNames.ActiveElementParameters.onActiveElementChange": onActiveElementChange, "PropNames.ActiveElementParameters.onLastActiveElementChange": onLastActiveElementChange1, "PropNames.ActiveElementParameters.onWindowFocusedChange": onWindowFocusedChange, ...void4 }) {
+    const { props: propsStableSource, "PropNames.RefElementReturn.getElement": getElementSource } = useRefElement({});
+    const { props: propsStablePopup, "PropNames.RefElementReturn.getElement": getElementPopup } = useRefElement({});
     const void8 = useBackdropDismiss({
-        [PropNames_BackdropDismissParameters_dismissBackdropActive]: (dismissBackdropActive && dismissActive),
-        [PropNames_BackdropDismissParameters_onDismissBackdrop]: useStableCallback((e) => {
+        "PropNames.BackdropDismissParameters.dismissBackdropActive": (dismissBackdropActive && dismissActive),
+        "PropNames.BackdropDismissParameters.onDismissBackdrop": useStableCallback((e) => {
             onDismissBackdrop?.(e);
             onDismiss(e, "backdrop");
         }),
-        [PropNames_RefElementReturn_getElement]: getElementPopup,
+        "PropNames.RefElementReturn.getElement": getElementPopup,
     });
     const void9 = useEscapeDismiss({
-        [PropNames_RefElementReturn_getElement]: getElementPopup,
-        [PropNames_EscapeDismissParameters_dismissEscapeActive]: (dismissEscapeActive && dismissActive),
-        [PropNames_EscapeDismissParameters_getDocument]: getDocument,
-        [PropNames_EscapeDismissParameters_parentDepth]: parentDepth,
-        [PropNames_EscapeDismissParameters_onDismissEscape]: useStableCallback((e) => {
+        "PropNames.RefElementReturn.getElement": getElementPopup,
+        "PropNames.EscapeDismissParameters.dismissEscapeActive": (dismissEscapeActive && dismissActive),
+        "PropNames.EscapeDismissParameters.getDocument": getDocument,
+        "PropNames.EscapeDismissParameters.parentDepth": parentDepth,
+        "PropNames.EscapeDismissParameters.onDismissEscape": useStableCallback((e) => {
             onDismissEscape?.(e);
             onDismiss(e, "escape");
         }),
     });
-    const { [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange2, ...void1 } = useLostFocusDismiss({
-        [PropNames_LostFocusDismissParameters_dismissLostFocusActive]: (dismissLostFocusActive && dismissActive),
-        [PropNames_LostFocusDismissParameters_onDismissLostFocus]: useStableCallback((e) => {
+    const { "PropNames.ActiveElementParameters.onLastActiveElementChange": onLastActiveElementChange2, ...void1 } = useLostFocusDismiss({
+        "PropNames.LostFocusDismissParameters.dismissLostFocusActive": (dismissLostFocusActive && dismissActive),
+        "PropNames.LostFocusDismissParameters.onDismissLostFocus": useStableCallback((e) => {
             onDismissLostFocus?.(e);
             onDismiss(e, "lost-focus");
         }),
-        [PropNames_LostFocusDismissParameters_getElementPopup]: getElementPopup,
-        [PropNames_LostFocusDismissParameters_getElementSource]: getElementSource
+        "PropNames.LostFocusDismissParameters.getElementPopup": getElementPopup,
+        "PropNames.LostFocusDismissParameters.getElementSource": getElementSource
     });
     const activeElementReturn = useActiveElement({
-        [PropNames_ActiveElementParameters_onLastActiveElementChange]: useStableCallback((a, b, r) => {
+        "PropNames.ActiveElementParameters.onLastActiveElementChange": useStableCallback((a, b, r) => {
             onLastActiveElementChange2?.(a, b, r);
             onLastActiveElementChange1?.(a, b, r);
         }),
-        [PropNames_ActiveElementParameters_onActiveElementChange]: onActiveElementChange,
-        [PropNames_ActiveElementParameters_onWindowFocusedChange]: onWindowFocusedChange,
-        [PropNames_ActiveElementParameters_getDocument]: getDocument
+        "PropNames.ActiveElementParameters.onActiveElementChange": onActiveElementChange,
+        "PropNames.ActiveElementParameters.onWindowFocusedChange": onWindowFocusedChange,
+        "PropNames.ActiveElementParameters.getDocument": getDocument
     });
     assertEmptyObject(void1);
     assertEmptyObject(void4);
@@ -71,8 +71,8 @@ export const useDismiss = monitored(function useDismiss({ [PropNames_DismissPara
     assertEmptyObject(void9);
     return {
         ...activeElementReturn,
-        [PropNames_DismissReturn_getElementSource]: getElementSource,
-        [PropNames_DismissReturn_getElementPopup]: getElementPopup,
+        "PropNames.DismissReturn.getElementSource": getElementSource,
+        "PropNames.DismissReturn.getElementPopup": getElementPopup,
         propsStableSource: propsStableSource,
         propsStablePopup: propsStablePopup,
     };

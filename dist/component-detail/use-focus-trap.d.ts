@@ -9,11 +9,11 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
-    [PropNames_FocusTrapParameters_trapActive]: boolean;
+    "PropNames.FocusTrapParameters.trapActive": boolean;
     /**
      * If true, focus is not trapped but only moved to the new element.
      */
-    [PropNames_FocusTrapParameters_onlyMoveFocus]: boolean;
+    "PropNames.FocusTrapParameters.onlyMoveFocus": boolean;
     /**
      * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.
      *
@@ -31,7 +31,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    [PropNames_FocusTrapParameters_focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    "PropNames.FocusTrapParameters.focusPopup"(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
      *
@@ -42,7 +42,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    [PropNames_FocusTrapParameters_focusOpener](lastFocused: SourceElement | null): void;
+    "PropNames.FocusTrapParameters.focusOpener"(lastFocused: SourceElement | null): void;
 }
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseFocusTrapParametersSelf<SourceElement, PopupElement>, Pick<UseRefElementReturnType<NonNullable<PopupElement>>, typeof PropNames_RefElementReturn_getElement> {
 }
@@ -57,7 +57,7 @@ export interface UseFocusTrapReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ [PropNames_FocusTrapParameters_focusOpener]: focusOpenerUnstable, [PropNames_FocusTrapParameters_focusPopup]: focusSelfUnstable, [PropNames_FocusTrapParameters_trapActive]: trapActive, [PropNames_FocusTrapParameters_onlyMoveFocus]: onlyMoveFocus, [PropNames_RefElementReturn_getElement]: getElement, ...void2 }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
+export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ "PropNames.FocusTrapParameters.focusOpener": focusOpenerUnstable, "PropNames.FocusTrapParameters.focusPopup": focusSelfUnstable, "PropNames.FocusTrapParameters.trapActive": trapActive, "PropNames.FocusTrapParameters.onlyMoveFocus": onlyMoveFocus, "PropNames.RefElementReturn.getElement": getElement, ...void2 }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

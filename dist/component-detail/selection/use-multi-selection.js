@@ -1,8 +1,4 @@
-import { PropNames_PressParameters_onPressSync } from "../../component-use/use-press.js";
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
-import { PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange, PropNames_ChildrenHaveFocusReturn_getAnyFocused } from "../../observers/use-children-have-focus.js";
-import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
-import { PropNames_ManagedChildrenReturn_getChildren } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnTrue } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -11,22 +7,6 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
-const P1 = `PropNames.MultiSelectionParameters`;
-const P2 = `PropNames.MultiSelectionChildParameters`;
-const R1 = `PropNames.MultiSelectionReturn`;
-const R2 = `PropNames.MultiSelectionChildReturn`;
-export const PropNames_MultiSelectionParameters_onSelectionChange = `${P1}.onSelectionChange`;
-export const PropNames_MultiSelectionParameters_multiSelectionMode = `${P1}.multiSelectionMode`;
-export const PropNames_MultiSelectionParameters_multiSelectionAriaPropName = `${P1}.multiSelectionAriaPropName`;
-export const PropNames_MultiSelectionReturn_changeMultiSelectedIndex = `${R1}.changeMultiSelectedIndex`;
-export const PropNames_MultiSelectionReturn_getMultiSelectedIndex = `${R1}.getMultiSelectedIndex`;
-export const PropNames_MultiSelectionChildParameters_onMultiSelectChange = `${P2}.onMultiSelectChange`;
-export const PropNames_MultiSelectionChildParameters_initiallyMultiSelected = `${P2}.initiallyMultiSelected`;
-export const PropNames_MultiSelectionChildParameters_multiSelectionDisabled = `${P2}.multiSelectionDisabled`;
-export const PropNames_MultiSelectionChildParameters_multiSelected = `${P2}.multiSelected`;
-export const PropNames_MultiSelectionChildReturn_changeMultiSelected = `${R2}.changeMultiSelected`;
-export const PropNames_MultiSelectionChildReturn_multiSelected = `${R2}.multiSelected`;
-export const PropNames_MultiSelectionChildReturn_getMultiSelected = `${R2}.getMultiSelected`;
 /**
  * Allows a parent to track the changes made to multi-selection children.
  *
@@ -39,7 +19,7 @@ export const PropNames_MultiSelectionChildReturn_getMultiSelected = `${R2}.getMu
  *
  * @hasChild {@link useMultiSelectionChild}
  */
-export function useMultiSelection({ [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode, [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange, ...void2 }) {
+export function useMultiSelection({ "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused, "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName, "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode, "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange, ...void2 }) {
     // By having both we get the total number of children for free, even if there are holes in the array.
     // TODO: useManagedChildren should do that by default??
     const selectedIndices = useRef(new Set());
@@ -161,15 +141,15 @@ export function useMultiSelection({ [PropNames_ChildrenHaveFocusReturn_getAnyFoc
             multiSelectionContext: useMemoObject({
                 doContiguousSelection,
                 notifyParentOfChildSelectChange,
-                [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName,
-                [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
+                "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
+                "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
                 changeAllChildren,
                 getCtrlKeyDown: useCallback(() => ctrlKeyHeld.current, []),
                 getShiftKeyDown: useCallback(() => shiftKeyHeld.current, []),
                 getAnyFocused
             })
         }),
-        [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: onCompositeFocusChange,
+        "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": onCompositeFocusChange,
         props: useMemoObject({})
     };
 }
@@ -177,7 +157,7 @@ export function useMultiSelection({ [PropNames_ChildrenHaveFocusReturn_getAnyFoc
  *
  * @compositeParams
  */
-export function useMultiSelectionChild({ info: { index, ...void4 }, [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected, [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled, [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange, context: { multiSelectionContext: { notifyParentOfChildSelectChange, [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
+export function useMultiSelectionChild({ info: { index, ...void4 }, "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected, "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled, "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange, context: { multiSelectionContext: { notifyParentOfChildSelectChange, "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName, "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
     // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
     // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
     // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
@@ -271,12 +251,12 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, [PropNames_M
         onMultiSelectChange?.(enhanceEvent(event, { multiSelected }));
     });
     return {
-        [PropNames_MultiSelectionChildReturn_changeMultiSelected]: changeMultiSelected,
-        [PropNames_MultiSelectionChildReturn_multiSelected]: localSelected,
-        [PropNames_MultiSelectionChildReturn_getMultiSelected]: getLocalSelected,
-        [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-        [PropNames_PressParameters_onPressSync]: onPressSync,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged,
+        "PropNames.MultiSelectionChildReturn.changeMultiSelected": changeMultiSelected,
+        "PropNames.MultiSelectionChildReturn.multiSelected": localSelected,
+        "PropNames.MultiSelectionChildReturn.getMultiSelected": getLocalSelected,
+        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+        "PropNames.PressParameters.onPressSync": onPressSync,
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": onCurrentFocusedInnerChanged,
         props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled" ? undefined : (localSelected ? "true" : "false") },
         info: {
             getMultiSelected: getLocalSelected,
@@ -289,7 +269,7 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, [PropNames_M
  *
  * @compositeParams
  */
-export function useMultiSelectionChildDeclarative({ [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange, [PropNames_MultiSelectionChildParameters_multiSelected]: multiSelected, [PropNames_MultiSelectionChildReturn_changeMultiSelected]: changeMultiSelected, ...void1 }) {
+export function useMultiSelectionChildDeclarative({ "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange, "PropNames.MultiSelectionChildParameters.multiSelected": multiSelected, "PropNames.MultiSelectionChildReturn.changeMultiSelected": changeMultiSelected, ...void1 }) {
     let s = (multiSelected || false);
     let reasonRef = useRef(undefined);
     useEffect(() => {
@@ -304,7 +284,7 @@ export function useMultiSelectionChildDeclarative({ [PropNames_MultiSelectionChi
     });
     assertEmptyObject(void1);
     return {
-        [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: omsc,
+        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": omsc,
         info: { setSelectedFromParent }
     };
 }

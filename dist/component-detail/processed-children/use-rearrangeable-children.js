@@ -1,5 +1,4 @@
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { PropNames_ManagedChildrenReturn_getChildren } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -7,20 +6,6 @@ import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/
 import { monitored } from "../../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
-const P1 = `PropNames.RearrangeableParameters`;
-const R1 = `PropNames.RearrangeableReturn`;
-export const PropNames_RearrangeableParameters_compare = `${P1}.compare`;
-export const PropNames_RearrangeableParameters_adjust = `${P1}.adjust`;
-export const PropNames_RearrangeableParameters_getIndex = `${P1}.getIndex`;
-export const PropNames_RearrangeableParameters_onRearranged = `${P1}.onRearranged`;
-export const PropNames_RearrangeableParameters_children = `${P1}.children`;
-export const PropNames_RearrangeableReturn_rearrange = `${R1}.rearrange`;
-export const PropNames_RearrangeableReturn_shuffle = `${R1}.shuffle`;
-export const PropNames_RearrangeableReturn_reverse = `${R1}.reverse`;
-export const PropNames_RearrangeableReturn_indexMangler = `${R1}.indexMangler`;
-export const PropNames_RearrangeableReturn_indexDemangler = `${R1}.indexDemangler`;
-export const PropNames_RearrangeableReturn_children = `${R1}.children`;
-export const PropNames_RearrangeableReturn_sort = `${R1}.sort`;
 /**
  * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
  *
@@ -39,7 +24,7 @@ export function useCreateProcessedChildrenContext() {
     const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
     const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
     const rearrange = useStableCallback((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered); }, []);
-    const provideManglers = useStableCallback(({ [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler, [PropNames_RearrangeableReturn_indexMangler]: indexMangler, [PropNames_RearrangeableReturn_reverse]: reverse, [PropNames_RearrangeableReturn_shuffle]: shuffle, [PropNames_RearrangeableReturn_sort]: sort }) => {
+    const provideManglers = useStableCallback(({ "PropNames.RearrangeableReturn.indexDemangler": indexDemangler, "PropNames.RearrangeableReturn.indexMangler": indexMangler, "PropNames.RearrangeableReturn.reverse": reverse, "PropNames.RearrangeableReturn.shuffle": shuffle, "PropNames.RearrangeableReturn.sort": sort }) => {
         indexManglerRef.current = indexMangler;
         indexDemanglerRef.current = indexDemangler;
         reverseRef.current = reverse;
@@ -50,12 +35,12 @@ export function useCreateProcessedChildrenContext() {
     const context = useMemoObject({ rearrangeableChildrenContext });
     return {
         context,
-        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-        [PropNames_RearrangeableReturn_rearrange]: rearrange,
-        [PropNames_RearrangeableReturn_reverse]: reverse,
-        [PropNames_RearrangeableReturn_shuffle]: shuffle,
-        [PropNames_RearrangeableReturn_sort]: sort
+        "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+        "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+        "PropNames.RearrangeableReturn.rearrange": rearrange,
+        "PropNames.RearrangeableReturn.reverse": reverse,
+        "PropNames.RearrangeableReturn.shuffle": shuffle,
+        "PropNames.RearrangeableReturn.sort": sort
     };
 }
 /**
@@ -84,7 +69,7 @@ export function useCreateProcessedChildrenContext() {
 export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ 
 //rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
 //managedChildrenReturn: { getChildren },
-[PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_RearrangeableParameters_children]: children, [PropNames_RearrangeableParameters_adjust]: adjust, [PropNames_RearrangeableParameters_getIndex]: getIndex, [PropNames_RearrangeableParameters_onRearranged]: onRearranged, [PropNames_RearrangeableParameters_compare]: userCompare, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+"PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.RearrangeableParameters.children": children, "PropNames.RearrangeableParameters.adjust": adjust, "PropNames.RearrangeableParameters.getIndex": getIndex, "PropNames.RearrangeableParameters.onRearranged": onRearranged, "PropNames.RearrangeableParameters.compare": userCompare, context: { rearrangeableChildrenContext: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -172,21 +157,21 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     // but we're one level deeper in the tree, so once we mount we need to give it to them.
     useLayoutEffect(() => {
         provideManglers({
-            [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-            [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-            [PropNames_RearrangeableReturn_reverse]: reverse,
-            [PropNames_RearrangeableReturn_shuffle]: shuffle,
-            [PropNames_RearrangeableReturn_sort]: sort,
+            "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+            "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+            "PropNames.RearrangeableReturn.reverse": reverse,
+            "PropNames.RearrangeableReturn.shuffle": shuffle,
+            "PropNames.RearrangeableReturn.sort": sort,
         });
     }, []);
     return {
-        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-        [PropNames_RearrangeableReturn_rearrange]: rearrange,
-        [PropNames_RearrangeableReturn_shuffle]: shuffle,
-        [PropNames_RearrangeableReturn_reverse]: reverse,
-        [PropNames_RearrangeableReturn_sort]: sort,
-        [PropNames_RearrangeableReturn_children]: sorted
+        "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+        "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+        "PropNames.RearrangeableReturn.rearrange": rearrange,
+        "PropNames.RearrangeableReturn.shuffle": shuffle,
+        "PropNames.RearrangeableReturn.reverse": reverse,
+        "PropNames.RearrangeableReturn.sort": sort,
+        "PropNames.RearrangeableReturn.children": sorted
     };
 });
 function defaultCompare(lhs, rhs) {

@@ -1,6 +1,6 @@
 import { PropNames_PressParameters_excludeSpace, UsePressParameters } from "../../component-use/use-press.js";
 import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { PropNames_TextContentParameters_getText, PropNames_TextContentParameters_onTextContentChange, PropNames_TextContentReturn_getTextContent, UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
+import { PropNames_TextContentParameters_getText, UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -33,7 +33,7 @@ export const PropNames_TypeaheadNavigationChildReturn_getTabbable = `${R2}.getTa
 
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
-    [PropNames_TypeaheadNavigationReturn_getCurrentTypeahead](): string | null;
+    "PropNames.TypeaheadNavigationReturn.getCurrentTypeahead"(): string | null;
 
     /**
      * What the current status of the user's input is:
@@ -42,7 +42,7 @@ export interface UseTypeaheadNavigationReturnTypeSelf {
      * * `"valid"`: The string the user has typed so far corresponds to at least one child
      * * `"invalid"`: The string the user has typed so does not correspond to any child
      */
-    [PropNames_TypeaheadNavigationReturn_typeaheadStatus]: "invalid" | "valid" | "none";
+    "PropNames.TypeaheadNavigationReturn.typeaheadStatus": "invalid" | "valid" | "none";
 }
 
 export interface UseTypeaheadNavigationContextSelf {
@@ -65,7 +65,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
+    "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
 
 
     /**
@@ -76,7 +76,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation](index: number): boolean;
+    "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation"(index: number): boolean;
 
 
     /**
@@ -85,17 +85,17 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_collator]: Nullable<Intl.Collator>;
+    "PropNames.TypeaheadNavigationParameters.collator": Nullable<Intl.Collator>;
 
     /**
      * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
      */
-    [PropNames_TypeaheadNavigationParameters_noTypeahead]: boolean;
+    "PropNames.TypeaheadNavigationParameters.noTypeahead": boolean;
 
     /**
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
-    [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: number;
+    "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": number;
 }
 
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeSelf {
@@ -143,13 +143,13 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * @compositeParams
  */
 export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    [PropNames_RovingTabIndexReturn_getTabbableIndex]: getIndex,
-    [PropNames_RovingTabIndexReturn_setTabbableIndex]: setIndex,
-    [PropNames_TypeaheadNavigationParameters_collator]: collator,
-    [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead,
-    [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
-    [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead,
-    [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout,
+    "PropNames.RovingTabIndexReturn.getTabbableIndex": getIndex,
+    "PropNames.RovingTabIndexReturn.setTabbableIndex": setIndex,
+    "PropNames.TypeaheadNavigationParameters.collator": collator,
+    "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
+    "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation,
+    "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
+    "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout,
     ..._void1
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
@@ -289,8 +289,8 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<
             }),
 
         }),
-        [PropNames_TypeaheadNavigationReturn_getCurrentTypeahead]: getCurrentTypeahead,
-        [PropNames_TypeaheadNavigationReturn_typeaheadStatus]: typeaheadStatus,
+        "PropNames.TypeaheadNavigationReturn.getCurrentTypeahead": getCurrentTypeahead,
+        "PropNames.TypeaheadNavigationReturn.typeaheadStatus": typeaheadStatus,
         props: propsStable.current
     }
 
@@ -397,8 +397,8 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<
  */
 export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ..._void1 },
-    [PropNames_TextContentParameters_getText]: getText,
-    [PropNames_RefElementReturn_getElement]: getElement,
+    "PropNames.TextContentParameters.getText": getText,
+    "PropNames.RefElementReturn.getElement": getElement,
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } },
     ..._void3
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
@@ -406,12 +406,12 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
 
 
     const {
-        [PropNames_TextContentReturn_getTextContent]: getTextContent,
+        "PropNames.TextContentReturn.getTextContent": getTextContent,
         ..._void4
     } = useTextContent({
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_TextContentParameters_getText]: getText,
-        [PropNames_TextContentParameters_onTextContentChange]: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.TextContentParameters.getText": getText,
+        "PropNames.TextContentParameters.onTextContentChange": useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
             if (text) {
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
@@ -458,8 +458,8 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
     assertEmptyObject(_void3);
 
     return {
-        [PropNames_TextContentReturn_getTextContent]: getTextContent,
-        [PropNames_PressParameters_excludeSpace]: excludeSpace
+        "PropNames.TextContentReturn.getTextContent": getTextContent,
+        "PropNames.PressParameters.excludeSpace": excludeSpace
     };
 
 })

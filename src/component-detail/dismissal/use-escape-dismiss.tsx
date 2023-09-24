@@ -1,4 +1,4 @@
-import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
@@ -23,12 +23,12 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    [PropNames_EscapeDismissParameters_onDismissEscape]: Nullable<(e: KeyboardEventType<any>) => void>;
+    "PropNames.EscapeDismissParameters.onDismissEscape": Nullable<(e: KeyboardEventType<any>) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    [PropNames_EscapeDismissParameters_dismissEscapeActive]: B | false;
+    "PropNames.EscapeDismissParameters.dismissEscapeActive": B | false;
 
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
@@ -37,17 +37,17 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    [PropNames_EscapeDismissParameters_getDocument](): Document;
+    "PropNames.EscapeDismissParameters.getDocument"(): Document;
 
     /**
      * Get this from context somewhere, and increment it in that context.
      * 
      * If multiple instances of Preact are on the page, tree depth is used as a tiebreaker
      */
-    [PropNames_EscapeDismissParameters_parentDepth]: number;
+    "PropNames.EscapeDismissParameters.parentDepth": number;
 }
 
-export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> extends UseEscapeDismissParametersSelf<B>, Pick<UseRefElementReturnType<PopupElement>, typeof PropNames_RefElementReturn_getElement> { }
+export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> extends UseEscapeDismissParametersSelf<B>, Pick<UseRefElementReturnType<PopupElement>, "PropNames.RefElementReturn.getElement"> { }
 
 
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__") as keyof Window;
@@ -77,11 +77,11 @@ function getElementDepth(element: Element) {
  * @compositeParams 
  */
 export const useEscapeDismiss = monitored(function useEscapeDismiss<PopupElement extends Element, B extends boolean>({
-    [PropNames_EscapeDismissParameters_onDismissEscape]: onClose,
-    [PropNames_EscapeDismissParameters_dismissEscapeActive]: open,
-    [PropNames_EscapeDismissParameters_getDocument]: unstableGetDocument,
-    [PropNames_EscapeDismissParameters_parentDepth]: parentDepth,
-    [PropNames_RefElementReturn_getElement]: getElement,
+    "PropNames.EscapeDismissParameters.onDismissEscape": onClose,
+    "PropNames.EscapeDismissParameters.dismissEscapeActive": open,
+    "PropNames.EscapeDismissParameters.getDocument": unstableGetDocument,
+    "PropNames.EscapeDismissParameters.parentDepth": parentDepth,
+    "PropNames.RefElementReturn.getElement": getElement,
     ..._void1
 }: UseEscapeDismissParameters<PopupElement, B>): void {
     assertEmptyObject(_void1);

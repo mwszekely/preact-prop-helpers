@@ -1,13 +1,8 @@
-import { PropNames_PressParameters_onPressSync } from "../../component-use/use-press.js";
-import { PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange, PropNames_ChildrenHaveFocusReturn_getAnyFocused } from "../../observers/use-children-have-focus.js";
-import { PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
-import { PropNames_ManagedChildrenReturn_getChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { PropNames_RovingTabIndexReturn_setTabbableIndex } from "../keyboard-navigation/use-roving-tabindex.js";
-import { PropNames_MultiSelectionChildParameters_initiallyMultiSelected, PropNames_MultiSelectionChildParameters_multiSelectionDisabled, PropNames_MultiSelectionChildParameters_onMultiSelectChange, PropNames_MultiSelectionParameters_multiSelectionAriaPropName, PropNames_MultiSelectionParameters_multiSelectionMode, PropNames_MultiSelectionParameters_onSelectionChange, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
-import { PropNames_SingleSelectionChildParameters_singleSelectionDisabled, PropNames_SingleSelectionParameters_initiallySingleSelectedIndex, PropNames_SingleSelectionParameters_onSingleSelectedIndexChange, PropNames_SingleSelectionParameters_singleSelectionAriaPropName, PropNames_SingleSelectionParameters_singleSelectionMode, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
+import { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
+import { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
 /**
  * Allows the children of this component to be selected, either with a `singleSelectedIndex` prop on the parent, or via each child's individual `multiSelected` prop.
  *
@@ -27,27 +22,27 @@ import { PropNames_SingleSelectionChildParameters_singleSelectionDisabled, PropN
  *
  * @hasChild {@link useSelectionChild}
  */
-export function useSelection({ [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused, [PropNames_ManagedChildrenReturn_getChildren]: getChildren, [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName, [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode, [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange, [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex, [PropNames_SingleSelectionParameters_initiallySingleSelectedIndex]: initiallySingleSelectedIndex, [PropNames_SingleSelectionParameters_onSingleSelectedIndexChange]: onSingleSelectedIndexChange, [PropNames_SingleSelectionParameters_singleSelectionAriaPropName]: singleSelectionAriaPropName, [PropNames_SingleSelectionParameters_singleSelectionMode]: singleSelectionMode, ...void1 }) {
-    const { [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: ocfc1, context: contextSS, ...singleSelectionReturn } = useSingleSelection({
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex,
-        [PropNames_SingleSelectionParameters_initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
-        [PropNames_SingleSelectionParameters_onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
-        [PropNames_SingleSelectionParameters_singleSelectionAriaPropName]: singleSelectionAriaPropName,
-        [PropNames_SingleSelectionParameters_singleSelectionMode]: singleSelectionMode
+export function useSelection({ "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused, "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName, "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode, "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange, "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex, "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex, "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange, "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName, "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode, ...void1 }) {
+    const { "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": ocfc1, context: contextSS, ...singleSelectionReturn } = useSingleSelection({
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
+        "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
+        "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
+        "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
+        "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode
     });
-    const { [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: ocfc2, context: contextMS, props: propsStable, ...multiSelectionReturn } = useMultiSelection({
-        [PropNames_ChildrenHaveFocusReturn_getAnyFocused]: getAnyFocused,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: multiSelectionAriaPropName,
-        [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-        [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange,
+    const { "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": ocfc2, context: contextMS, props: propsStable, ...multiSelectionReturn } = useMultiSelection({
+        "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
+        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+        "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
     });
     assertEmptyObject(void1);
     return {
         ...multiSelectionReturn,
         ...singleSelectionReturn,
-        [PropNames_ChildrenHaveFocusParameters_onCompositeFocusChange]: useStableCallback((...a) => { ocfc1(...a); ocfc2(...a); }),
+        "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": useStableCallback((...a) => { ocfc1(...a); ocfc2(...a); }),
         props: propsStable,
         context: useMemoObject({ ...contextSS, ...contextMS }),
     };
@@ -56,25 +51,25 @@ export function useSelection({ [PropNames_ChildrenHaveFocusReturn_getAnyFocused]
  *
  * @compositeParams
  */
-export function useSelectionChild({ context, info: { index, untabbable, ...void2 }, [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected, [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled, [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange, [PropNames_SingleSelectionChildParameters_singleSelectionDisabled]: singleSelectionDisabled, ...void3 }) {
-    const { props: p1, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: ocfic1, [PropNames_PressParameters_onPressSync]: opc1, ...singleSelectionChildReturn } = useSingleSelectionChild({
+export function useSelectionChild({ context, info: { index, untabbable, ...void2 }, "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected, "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled, "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange, "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled, ...void3 }) {
+    const { props: p1, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic1, "PropNames.PressParameters.onPressSync": opc1, ...singleSelectionChildReturn } = useSingleSelectionChild({
         context,
         info: { index, untabbable },
-        [PropNames_SingleSelectionChildParameters_singleSelectionDisabled]: singleSelectionDisabled
+        "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled
     });
-    const { props: p2, [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: ocfic2, [PropNames_PressParameters_onPressSync]: opc2, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...multiSelectionChildReturn } = useMultiSelectionChild({
+    const { props: p2, "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic2, "PropNames.PressParameters.onPressSync": opc2, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...multiSelectionChildReturn } = useMultiSelectionChild({
         context,
         info: { index },
-        [PropNames_MultiSelectionChildParameters_initiallyMultiSelected]: initiallyMultiSelected,
-        [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: multiSelectionDisabled,
-        [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: onMultiSelectChange,
+        "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
+        "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
+        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void5);
     return {
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: useStableCallback((...a) => { ocfic1(...a); ocfic2(...a); }),
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": useStableCallback((...a) => { ocfic1(...a); ocfic2(...a); }),
         info: {
             getMultiSelected,
             setSelectedFromParent,
@@ -85,7 +80,7 @@ export function useSelectionChild({ context, info: { index, untabbable, ...void2
         },
         ...multiSelectionChildReturn,
         ...singleSelectionChildReturn,
-        [PropNames_PressParameters_onPressSync]: useStableCallback((...a) => { opc1(...a); opc2(...a); }),
+        "PropNames.PressParameters.onPressSync": useStableCallback((...a) => { opc1(...a); opc2(...a); }),
         props: [p1, p2],
     };
 }

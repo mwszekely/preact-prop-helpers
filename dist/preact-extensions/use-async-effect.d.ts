@@ -23,7 +23,7 @@ export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(v
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "sync" | "async" | "throw" | null;
+    invocationResult: "async" | "sync" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 //# sourceMappingURL=use-async-effect.d.ts.map

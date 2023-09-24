@@ -1,10 +1,5 @@
 import { Nullable } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
-export declare const PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect = "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect";
-export declare const PropNames_ManagedChildrenParameters_onChildrenMountChange = "PropNames.ManagedChildrenParameters.onChildrenMountChange";
-export declare const PropNames_ManagedChildrenParameters_onChildrenCountChange = "PropNames.ManagedChildrenParameters.onChildrenCountChange";
-export declare const PropNames_ManagedChildrenReturn_getChildren = "PropNames.ManagedChildrenParameters.getChildren";
-export declare const PropNames_ManagedChildReturn_getChildren = "PropNames.ManagedChildReturnType.getChildren";
 export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
@@ -41,18 +36,18 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
      *
      * @stable
      */
-    [PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect]?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
+    "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect"?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      *
      * @stable
      */
-    [PropNames_ManagedChildrenParameters_onChildrenMountChange]?: Nullable<OnChildrenMountChange<M["index"]>>;
+    "PropNames.ManagedChildrenParameters.onChildrenMountChange"?: Nullable<OnChildrenMountChange<M["index"]>>;
     /**
      *
      * @stable
      */
-    [PropNames_ManagedChildrenParameters_onChildrenCountChange]?: Nullable<((count: number) => void)>;
+    "PropNames.ManagedChildrenParameters.onChildrenCountChange"?: Nullable<((count: number) => void)>;
 }
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> extends UseManagedChildrenParametersSelf<M> {
 }
@@ -93,7 +88,7 @@ export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any
      *
      * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere
      */
-    [PropNames_ManagedChildrenReturn_getChildren](): ManagedChildren<M>;
+    "PropNames.ManagedChildrenReturn.getChildren"(): ManagedChildren<M>;
 }
 export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> extends UseManagedChildrenReturnTypeSelf<M> {
     context: UseManagedChildrenContext<M>;
@@ -104,7 +99,7 @@ export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> 
      *
      * @stable
      */
-    [PropNames_ManagedChildReturn_getChildren](): ManagedChildren<M>;
+    "PropNames.ManagedChildReturn.getChildren"(): ManagedChildren<M>;
 }
 /**
  * Abstraction over the managed children
@@ -175,7 +170,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  * @compositeParams
  */
-export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>({ [PropNames_ManagedChildrenParameters_onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames_ManagedChildrenParameters_onChildrenMountChange]: onChildrenMountChange, [PropNames_ManagedChildrenParameters_onChildrenCountChange]: onChildrenCountChange, ..._void1 }: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
+export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>({ "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect, "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange, "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange, ..._void1 }: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
 /**
  * @compositeParams
  */

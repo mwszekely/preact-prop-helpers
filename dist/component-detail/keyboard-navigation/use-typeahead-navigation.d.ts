@@ -15,7 +15,7 @@ export declare const PropNames_TypeaheadNavigationChildReturn_tabbable = "PropNa
 export declare const PropNames_TypeaheadNavigationChildReturn_getTabbable = "PropNames.TypeaheadNavigationChildReturn.getTabbable";
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
-    [PropNames_TypeaheadNavigationReturn_getCurrentTypeahead](): string | null;
+    "PropNames.TypeaheadNavigationReturn.getCurrentTypeahead"(): string | null;
     /**
      * What the current status of the user's input is:
      *
@@ -23,7 +23,7 @@ export interface UseTypeaheadNavigationReturnTypeSelf {
      * * `"valid"`: The string the user has typed so far corresponds to at least one child
      * * `"invalid"`: The string the user has typed so does not correspond to any child
      */
-    [PropNames_TypeaheadNavigationReturn_typeaheadStatus]: "invalid" | "valid" | "none";
+    "PropNames.TypeaheadNavigationReturn.typeaheadStatus": "invalid" | "valid" | "none";
 }
 export interface UseTypeaheadNavigationContextSelf {
     /**
@@ -43,7 +43,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      *
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
+    "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
     /**
      * Must return true if the given child can be navigated to.
      *
@@ -52,22 +52,22 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      *
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation](index: number): boolean;
+    "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation"(index: number): boolean;
     /**
      * A collator to use when comparing.
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
      *
      * @nonstable
      */
-    [PropNames_TypeaheadNavigationParameters_collator]: Nullable<Intl.Collator>;
+    "PropNames.TypeaheadNavigationParameters.collator": Nullable<Intl.Collator>;
     /**
      * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
      */
-    [PropNames_TypeaheadNavigationParameters_noTypeahead]: boolean;
+    "PropNames.TypeaheadNavigationParameters.noTypeahead": boolean;
     /**
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
-    [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: number;
+    "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": number;
 }
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeSelf {
     props: ElementProps<ParentOrChildElement>;
@@ -100,12 +100,12 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ [PropNames_RovingTabIndexReturn_getTabbableIndex]: getIndex, [PropNames_RovingTabIndexReturn_setTabbableIndex]: setIndex, [PropNames_TypeaheadNavigationParameters_collator]: collator, [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: onNavigateTypeahead, [PropNames_TypeaheadNavigationParameters_isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [PropNames_TypeaheadNavigationParameters_noTypeahead]: noTypeahead, [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: typeaheadTimeout, ..._void1 }: UseTypeaheadNavigationParameters<ChildElement>) => UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ "PropNames.RovingTabIndexReturn.getTabbableIndex": getIndex, "PropNames.RovingTabIndexReturn.setTabbableIndex": setIndex, "PropNames.TypeaheadNavigationParameters.collator": collator, "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead, "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForTypeaheadNavigation, "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead, "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout, ..._void1 }: UseTypeaheadNavigationParameters<ChildElement>) => UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 /**
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ..._void1 }, [PropNames_TextContentParameters_getText]: getText, [PropNames_RefElementReturn_getElement]: getElement, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } }, ..._void3 }: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
+export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ..._void1 }, "PropNames.TextContentParameters.getText": getText, "PropNames.RefElementReturn.getElement": getElement, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } }, ..._void3 }: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.
  *

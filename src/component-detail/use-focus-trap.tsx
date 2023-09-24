@@ -1,7 +1,6 @@
 import { isFocusable, isTabbable } from "tabbable";
-import { PropNames_BlockingElementParameters_enabled, PropNames_BlockingElementParameters_getTarget, PropNames_BlockingElementReturn_getLastActiveWhenClosed, PropNames_BlockingElementReturn_getLastActiveWhenOpen, PropNames_BlockingElementReturn_getTarget, PropNames_BlockingElementReturn_getTop, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { PropNames_RefElementReturn_getElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { PropNames_ActiveElementParameters_onLastActiveElementChange } from "../observers/use-active-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useEffect } from "../util/lib.js";
@@ -25,12 +24,12 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
-    [PropNames_FocusTrapParameters_trapActive]: boolean;
+    "PropNames.FocusTrapParameters.trapActive": boolean;
 
     /**
      * If true, focus is not trapped but only moved to the new element. 
      */
-    [PropNames_FocusTrapParameters_onlyMoveFocus]: boolean;
+    "PropNames.FocusTrapParameters.onlyMoveFocus": boolean;
 
 
     /**
@@ -50,7 +49,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    [PropNames_FocusTrapParameters_focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    "PropNames.FocusTrapParameters.focusPopup"(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
 
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
@@ -62,7 +61,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    [PropNames_FocusTrapParameters_focusOpener](lastFocused: SourceElement | null): void;
+    "PropNames.FocusTrapParameters.focusOpener"(lastFocused: SourceElement | null): void;
 }
 
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends
@@ -83,11 +82,11 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * @compositeParams
  */
 export const useFocusTrap = monitored(function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
-    [PropNames_FocusTrapParameters_focusOpener]: focusOpenerUnstable,
-    [PropNames_FocusTrapParameters_focusPopup]: focusSelfUnstable,
-    [PropNames_FocusTrapParameters_trapActive]: trapActive,
-    [PropNames_FocusTrapParameters_onlyMoveFocus]: onlyMoveFocus,
-    [PropNames_RefElementReturn_getElement]: getElement,
+    "PropNames.FocusTrapParameters.focusOpener": focusOpenerUnstable,
+    "PropNames.FocusTrapParameters.focusPopup": focusSelfUnstable,
+    "PropNames.FocusTrapParameters.trapActive": trapActive,
+    "PropNames.FocusTrapParameters.onlyMoveFocus": onlyMoveFocus,
+    "PropNames.RefElementReturn.getElement": getElement,
     ...void2
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
     const focusSelf = useStableCallback(focusSelfUnstable);
@@ -124,15 +123,15 @@ export const useFocusTrap = monitored(function useFocusTrap<SourceElement extend
     }, [trapActive]);
 
     const {
-        [PropNames_BlockingElementReturn_getTarget]: getTarget,
-        [PropNames_BlockingElementReturn_getTop]: getTop,
-        [PropNames_BlockingElementReturn_getLastActiveWhenClosed]: getLastActiveWhenClosed,
-        [PropNames_BlockingElementReturn_getLastActiveWhenOpen]: getLastActiveWhenOpen,
-        [PropNames_ActiveElementParameters_onLastActiveElementChange]: onLastActiveElementChange,
+        "PropNames.BlockingElementReturn.getTarget": getTarget,
+        "PropNames.BlockingElementReturn.getTop": getTop,
+        "PropNames.BlockingElementReturn.getLastActiveWhenClosed": getLastActiveWhenClosed,
+        "PropNames.BlockingElementReturn.getLastActiveWhenOpen": getLastActiveWhenOpen,
+        "PropNames.ActiveElementParameters.onLastActiveElementChange": onLastActiveElementChange,
         ...void1
     } = useBlockingElement({
-        [PropNames_BlockingElementParameters_enabled]: trapActive && !onlyMoveFocus,
-        [PropNames_BlockingElementParameters_getTarget]: getElement
+        "PropNames.BlockingElementParameters.enabled": trapActive && !onlyMoveFocus,
+        "PropNames.BlockingElementParameters.getTarget": getElement
     });
 
     assertEmptyObject(void1);

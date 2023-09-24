@@ -7,80 +7,6 @@ import {
     GetIndex,
     MultiSelectionChangeEvent,
     UseProcessedChildContext as NormalListChildContext,
-    PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged,
-    PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged,
-    PropNames_LinearNavigationParameters_arrowKeyDirection,
-    PropNames_LinearNavigationParameters_disableHomeEndKeys,
-    PropNames_LinearNavigationParameters_navigatePastEnd,
-    PropNames_LinearNavigationParameters_navigatePastStart,
-    PropNames_LinearNavigationParameters_onNavigateLinear,
-    PropNames_LinearNavigationParameters_pageNavigationSize,
-    PropNames_ManagedChildrenReturn_getChildren,
-    PropNames_MultiSelectionChildParameters_multiSelected,
-    PropNames_MultiSelectionChildParameters_multiSelectionDisabled,
-    PropNames_MultiSelectionChildParameters_onMultiSelectChange,
-    PropNames_MultiSelectionChildReturn_getMultiSelected,
-    PropNames_MultiSelectionParameters_multiSelectionAriaPropName,
-    PropNames_MultiSelectionParameters_multiSelectionMode,
-    PropNames_MultiSelectionParameters_onSelectionChange,
-    PropNames_PaginatedChildReturn_hideBecausePaginated,
-    PropNames_PaginatedParameters_paginationMax,
-    PropNames_PaginatedParameters_paginationMin,
-    PropNames_PaginatedReturn_refreshPagination,
-    PropNames_PressParameters_allowRepeatPresses,
-    PropNames_PressParameters_excludeEnter,
-    PropNames_PressParameters_excludePointer,
-    PropNames_PressParameters_excludeSpace,
-    PropNames_PressParameters_focusSelf,
-    PropNames_PressParameters_longPressThreshold,
-    PropNames_PressParameters_onPressSync,
-    PropNames_PressParameters_onPressingChange,
-    PropNames_PressReturn_getIsPressing,
-    PropNames_PressReturn_longPress,
-    PropNames_PressReturn_pressing,
-    PropNames_RearrangeableParameters_adjust,
-    PropNames_RearrangeableParameters_children,
-    PropNames_RearrangeableParameters_compare,
-    PropNames_RearrangeableParameters_getIndex,
-    PropNames_RearrangeableParameters_onRearranged,
-    PropNames_RearrangeableReturn_children,
-    PropNames_RearrangeableReturn_indexDemangler,
-    PropNames_RearrangeableReturn_indexMangler,
-    PropNames_RearrangeableReturn_rearrange,
-    PropNames_RearrangeableReturn_reverse,
-    PropNames_RearrangeableReturn_shuffle,
-    PropNames_RearrangeableReturn_sort,
-    PropNames_RefElementParameters_onElementChange,
-    PropNames_RefElementParameters_onMount,
-    PropNames_RefElementParameters_onUnmount,
-    PropNames_RefElementReturn_getElement,
-    PropNames_RovingTabIndexChildReturn_getTabbable,
-    PropNames_RovingTabIndexChildReturn_tabbable,
-    PropNames_RovingTabIndexParameters_focusSelfParent,
-    PropNames_RovingTabIndexParameters_initiallyTabbedIndex,
-    PropNames_RovingTabIndexParameters_onTabbableIndexChange,
-    PropNames_RovingTabIndexParameters_untabbable,
-    PropNames_RovingTabIndexReturn_setTabbableIndex,
-    PropNames_SingleSelectionChildParameters_singleSelectionDisabled,
-    PropNames_SingleSelectionChildReturn_getSingleSelected,
-    PropNames_SingleSelectionChildReturn_getSingleSelectedOffset,
-    PropNames_SingleSelectionChildReturn_singleSelected,
-    PropNames_SingleSelectionChildReturn_singleSelectedOffset,
-    PropNames_SingleSelectionChildReturn_singleSelectionMode,
-    PropNames_SingleSelectionParameters_onSingleSelectedIndexChange,
-    PropNames_SingleSelectionParameters_singleSelectedIndex,
-    PropNames_SingleSelectionParameters_singleSelectionAriaPropName,
-    PropNames_SingleSelectionParameters_singleSelectionMode,
-    PropNames_StaggeredChildReturn_hideBecauseStaggered,
-    PropNames_StaggeredParameters_staggered,
-    PropNames_StaggeredReturn_stillStaggering,
-    PropNames_TextContentParameters_getText,
-    PropNames_TextContentReturn_getTextContent,
-    PropNames_TypeaheadNavigationParameters_collator,
-    PropNames_TypeaheadNavigationParameters_noTypeahead,
-    PropNames_TypeaheadNavigationParameters_onNavigateTypeahead,
-    PropNames_TypeaheadNavigationParameters_typeaheadTimeout,
-    PropNames_TypeaheadNavigationReturn_typeaheadStatus,
     UseCompleteListNavigationChildInfo,
     UseCompleteListNavigationDeclarativeReturnType,
     VNode,
@@ -134,30 +60,30 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
     }
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
-        [PropNames_RovingTabIndexParameters_onTabbableIndexChange]: null,
-        [PropNames_RovingTabIndexParameters_untabbable]: untabbable,
-        [PropNames_RovingTabIndexParameters_focusSelfParent]: focus,
-        [PropNames_SingleSelectionParameters_onSingleSelectedIndexChange]: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []),
-        [PropNames_SingleSelectionParameters_singleSelectedIndex]: singleSelectedIndex,
-        [PropNames_TypeaheadNavigationParameters_collator]: null,
-        [PropNames_TypeaheadNavigationParameters_noTypeahead]: false,
-        [PropNames_TypeaheadNavigationParameters_typeaheadTimeout]: 1000,
-        [PropNames_TypeaheadNavigationParameters_onNavigateTypeahead]: null,
-        [PropNames_LinearNavigationParameters_disableHomeEndKeys]: false,
-        [PropNames_LinearNavigationParameters_arrowKeyDirection]: "vertical",
-        [PropNames_LinearNavigationParameters_navigatePastEnd]: "wrap",
-        [PropNames_LinearNavigationParameters_navigatePastStart]: "wrap",
-        [PropNames_LinearNavigationParameters_pageNavigationSize]: 0.1,
-        [PropNames_LinearNavigationParameters_onNavigateLinear]: null,
-        [PropNames_PaginatedParameters_paginationMin]: min,
-        [PropNames_PaginatedParameters_paginationMax]: max,
-        [PropNames_SingleSelectionParameters_singleSelectionAriaPropName]: "aria-selected",
-        [PropNames_SingleSelectionParameters_singleSelectionMode]: singleSelectionMode,
-        [PropNames_MultiSelectionParameters_multiSelectionAriaPropName]: "aria-checked",
-        [PropNames_MultiSelectionParameters_onSelectionChange]: onSelectionChange,
-        [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-        [PropNames_RovingTabIndexParameters_initiallyTabbedIndex]: 0,
-        [PropNames_StaggeredParameters_staggered]: staggered
+        "PropNames.RovingTabIndexParameters.onTabbableIndexChange": null,
+        "PropNames.RovingTabIndexParameters.untabbable": untabbable,
+        "PropNames.RovingTabIndexParameters.focusSelfParent": focus,
+        "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []),
+        "PropNames.SingleSelectionParameters.singleSelectedIndex": singleSelectedIndex,
+        "PropNames.TypeaheadNavigationParameters.collator": null,
+        "PropNames.TypeaheadNavigationParameters.noTypeahead": false,
+        "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": 1000,
+        "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": null,
+        "PropNames.LinearNavigationParameters.disableHomeEndKeys": false,
+        "PropNames.LinearNavigationParameters.arrowKeyDirection": "vertical",
+        "PropNames.LinearNavigationParameters.navigatePastEnd": "wrap",
+        "PropNames.LinearNavigationParameters.navigatePastStart": "wrap",
+        "PropNames.LinearNavigationParameters.pageNavigationSize": 0.1,
+        "PropNames.LinearNavigationParameters.onNavigateLinear": null,
+        "PropNames.PaginatedParameters.paginationMin": min,
+        "PropNames.PaginatedParameters.paginationMax": max,
+        "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": "aria-selected",
+        "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode,
+        "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": "aria-checked",
+        "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
+        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+        "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": 0,
+        "PropNames.StaggeredParameters.staggered": staggered
     });
 
 
@@ -165,12 +91,12 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
         props,
         contextChildren,
         contextProcessing,
-        [PropNames_RovingTabIndexReturn_setTabbableIndex]: setTabbableIndex,
-        [PropNames_ManagedChildrenReturn_getChildren]: getChildren,
-        [PropNames_TypeaheadNavigationReturn_typeaheadStatus]: typeaheadStatus,
-        [PropNames_RearrangeableReturn_shuffle]: shuffle,
-        [PropNames_RearrangeableReturn_reverse]: reverse,
-        [PropNames_RearrangeableReturn_sort]: _sort
+        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
+        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.TypeaheadNavigationReturn.typeaheadStatus": typeaheadStatus,
+        "PropNames.RearrangeableReturn.shuffle": shuffle,
+        "PropNames.RearrangeableReturn.reverse": reverse,
+        "PropNames.RearrangeableReturn.sort": _sort
     } = r;
 
 
@@ -243,28 +169,28 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 export const DemoUseRovingTabIndexChildren = memo((function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
     const {
         context,
-        [PropNames_PaginatedReturn_refreshPagination]: refreshPagination,
-        [PropNames_RearrangeableReturn_children]: children,
-        [PropNames_RearrangeableReturn_indexDemangler]: indexDemangler,
-        [PropNames_RearrangeableReturn_indexMangler]: indexMangler,
-        [PropNames_RearrangeableReturn_rearrange]: rearrange,
-        [PropNames_RearrangeableReturn_reverse]: reverse,
-        [PropNames_RearrangeableReturn_shuffle]: shuffle,
-        [PropNames_RearrangeableReturn_sort]: sort,
-        [PropNames_StaggeredReturn_stillStaggering]: stillStaggering
+        "PropNames.PaginatedReturn.refreshPagination": refreshPagination,
+        "PropNames.RearrangeableReturn.children": children,
+        "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
+        "PropNames.RearrangeableReturn.indexMangler": indexMangler,
+        "PropNames.RearrangeableReturn.rearrange": rearrange,
+        "PropNames.RearrangeableReturn.reverse": reverse,
+        "PropNames.RearrangeableReturn.shuffle": shuffle,
+        "PropNames.RearrangeableReturn.sort": sort,
+        "PropNames.StaggeredReturn.stillStaggering": stillStaggering
     } = useCompleteListNavigationChildren({
-        [PropNames_PaginatedParameters_paginationMax]: max,
-        [PropNames_PaginatedParameters_paginationMin]: min,
-        [PropNames_RearrangeableParameters_getIndex]: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-        [PropNames_RearrangeableParameters_onRearranged]: null,
-        [PropNames_RearrangeableParameters_compare]: null,
-        [PropNames_RearrangeableParameters_adjust]: null,
-        [PropNames_RearrangeableParameters_children]: useMemo(() => Array.from((function* () {
+        "PropNames.PaginatedParameters.paginationMax": max,
+        "PropNames.PaginatedParameters.paginationMin": min,
+        "PropNames.RearrangeableParameters.getIndex": useCallback<GetIndex>((a: VNode) => a.props.index, []),
+        "PropNames.RearrangeableParameters.onRearranged": null,
+        "PropNames.RearrangeableParameters.compare": null,
+        "PropNames.RearrangeableParameters.adjust": null,
+        "PropNames.RearrangeableParameters.children": useMemo(() => Array.from((function* () {
             for (let i = 0; i < (count); ++i) {
                 yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
             }
         })()), [count]),
-        [PropNames_StaggeredParameters_staggered]: staggered,
+        "PropNames.StaggeredParameters.staggered": staggered,
         context: useContext(WeirdContext)
     })
 
@@ -287,18 +213,18 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChildOuter = memo((function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const {
         props: propsStable,
-        [PropNames_RefElementReturn_getElement]: getElement
+        "PropNames.RefElementReturn.getElement": getElement
     } = useRefElement<HTMLLIElement>({
-        [PropNames_RefElementParameters_onElementChange]: useStableCallback((e, p, r) => {
+        "PropNames.RefElementParameters.onElementChange": useStableCallback((e, p, r) => {
             onElementChange?.(e, p, r);
         })
     })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
     const {
         props,
-        [PropNames_RefElementParameters_onElementChange]: onElementChange,
-        [PropNames_StaggeredChildReturn_hideBecauseStaggered]: hideBecauseStaggered,
-        [PropNames_PaginatedChildReturn_hideBecausePaginated]: hideBecausePaginated
+        "PropNames.RefElementParameters.onElementChange": onElementChange,
+        "PropNames.StaggeredChildReturn.hideBecauseStaggered": hideBecauseStaggered,
+        "PropNames.PaginatedChildReturn.hideBecausePaginated": hideBecausePaginated
 
     }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
@@ -332,37 +258,37 @@ const DemoUseRovingTabIndexChild = memo((function DemoUseRovingTabIndexChild({ i
         propsChild,
         propsTabbable,
 
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged,
-        //  [PropNames_HasCurrentFocusReturn_getLastFocused]: getLastFocused,
-        // [PropNames_HasCurrentFocusReturn_getLastFocusedInner]: getLastFocusedInner,
-        //  [PropNames_ManagedChildReturnType_getChildren]: getChildren,
-        [PropNames_MultiSelectionChildReturn_getMultiSelected]: getMultiSelected,
-        //    [PropNames_MultiSelectionChildReturn_multiSelected]: multiSelected,
-        [PropNames_MultiSelectionParameters_multiSelectionMode]: multiSelectionMode,
-        [PropNames_PressParameters_excludeSpace]: excludeSpace,
-        [PropNames_PressParameters_onPressSync]: onPressSync,
-        [PropNames_RefElementReturn_getElement]: getElement,
-        [PropNames_RovingTabIndexChildReturn_getTabbable]: getTabbable,
-        [PropNames_RovingTabIndexChildReturn_tabbable]: tabbable,
-        [PropNames_SingleSelectionChildReturn_getSingleSelected]: getSingleSelected,
-        [PropNames_SingleSelectionChildReturn_getSingleSelectedOffset]: getSingleSelectedOffset,
-        [PropNames_SingleSelectionChildReturn_singleSelected]: singleSelected,
-        [PropNames_SingleSelectionChildReturn_singleSelectedOffset]: singleSelectedOffset,
-        [PropNames_SingleSelectionChildReturn_singleSelectionMode]: singleSelectionMode,
-        [PropNames_TextContentReturn_getTextContent]: getTextContent
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": onCurrentFocusedInnerChanged,
+        //  "PropNames.HasCurrentFocusReturn.getLastFocused": getLastFocused,
+        // "PropNames.HasCurrentFocusReturn.getLastFocusedInner": getLastFocusedInner,
+        //  "PropNames.ManagedChildReturnType.getChildren": getChildren,
+        "PropNames.MultiSelectionChildReturn.getMultiSelected": getMultiSelected,
+        //    "PropNames.MultiSelectionChildReturn.multiSelected": multiSelected,
+        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
+        "PropNames.PressParameters.excludeSpace": excludeSpace,
+        "PropNames.PressParameters.onPressSync": onPressSync,
+        "PropNames.RefElementReturn.getElement": getElement,
+        "PropNames.RovingTabIndexChildReturn.getTabbable": getTabbable,
+        "PropNames.RovingTabIndexChildReturn.tabbable": tabbable,
+        "PropNames.SingleSelectionChildReturn.getSingleSelected": getSingleSelected,
+        "PropNames.SingleSelectionChildReturn.getSingleSelectedOffset": getSingleSelectedOffset,
+        "PropNames.SingleSelectionChildReturn.singleSelected": singleSelected,
+        "PropNames.SingleSelectionChildReturn.singleSelectedOffset": singleSelectedOffset,
+        "PropNames.SingleSelectionChildReturn.singleSelectionMode": singleSelectionMode,
+        "PropNames.TextContentReturn.getTextContent": getTextContent
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedChanged]: null,
-        [PropNames_HasCurrentFocusParameters_onCurrentFocusedInnerChanged]: null,
-        [PropNames_MultiSelectionChildParameters_multiSelected]: multiSelected,
-        [PropNames_MultiSelectionChildParameters_multiSelectionDisabled]: disabled,
-        [PropNames_MultiSelectionChildParameters_onMultiSelectChange]: null,
-        [PropNames_SingleSelectionChildParameters_singleSelectionDisabled]: false,
-        [PropNames_TextContentParameters_getText]: useCallback((e) => { return e?.textContent ?? "" }, []),
-        [PropNames_RefElementParameters_onElementChange]: null,
-        [PropNames_RefElementParameters_onMount]: null,
-        [PropNames_RefElementParameters_onUnmount]: null
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged": null,
+        "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": null,
+        "PropNames.MultiSelectionChildParameters.multiSelected": multiSelected,
+        "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": disabled,
+        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": null,
+        "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": false,
+        "PropNames.TextContentParameters.getText": useCallback((e) => { return e?.textContent ?? "" }, []),
+        "PropNames.RefElementParameters.onElementChange": null,
+        "PropNames.RefElementParameters.onMount": null,
+        "PropNames.RefElementParameters.onUnmount": null
         //  textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
         //  hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
         //  refElementParameters: { onElementChange: null, onMount: null, onUnmount: null },
@@ -373,20 +299,20 @@ const DemoUseRovingTabIndexChild = memo((function DemoUseRovingTabIndexChild({ i
 
     const {
         props: p2,
-        [PropNames_PressReturn_getIsPressing]: getIsPressing,
-        [PropNames_PressReturn_longPress]: longPress,
-        [PropNames_PressReturn_pressing]: pressing
+        "PropNames.PressReturn.getIsPressing": getIsPressing,
+        "PropNames.PressReturn.longPress": longPress,
+        "PropNames.PressReturn.pressing": pressing
 
     } = usePress<HTMLLIElement>({
-        [PropNames_PressParameters_focusSelf]: focusSelf,
-        [PropNames_PressParameters_onPressSync]: onPressSync,
-        [PropNames_PressParameters_excludeSpace]: excludeSpace,
-        [PropNames_PressParameters_allowRepeatPresses]: false,
-        [PropNames_PressParameters_excludeEnter]: null,
-        [PropNames_PressParameters_excludePointer]: null,
-        [PropNames_PressParameters_longPressThreshold]: null,
-        [PropNames_PressParameters_onPressingChange]: null,
-        [PropNames_RefElementReturn_getElement]: getElement
+        "PropNames.PressParameters.focusSelf": focusSelf,
+        "PropNames.PressParameters.onPressSync": onPressSync,
+        "PropNames.PressParameters.excludeSpace": excludeSpace,
+        "PropNames.PressParameters.allowRepeatPresses": false,
+        "PropNames.PressParameters.excludeEnter": null,
+        "PropNames.PressParameters.excludePointer": null,
+        "PropNames.PressParameters.longPressThreshold": null,
+        "PropNames.PressParameters.onPressingChange": null,
+        "PropNames.RefElementReturn.getElement": getElement
     })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
