@@ -1,46 +1,66 @@
-import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
-import { CSSProperties, ElementProps, Ref } from "../util/types.js";
+import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
+import { CSSProperties, ElementProps, PropNames, Ref } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
 
-export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
-export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
-export type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"];
-export type GetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>["getAttribute"];
-export type SetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>["setAttribute"];
-export type SetChildren = UseImperativePropsReturnTypeSelf<any>["setChildren"];
-export type DangerouslySetInnerHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslySetInnerHTML"];
-export type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslyAppendHTML"];
-export type SetEventHandler = UseImperativePropsReturnTypeSelf<any>["setEventHandler"];
+export type HasClass = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["hasClass"]];
+export type SetClass = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["setClass"]];
+export type SetStyle = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["setStyle"]];
+export type GetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>[typeof ImperativePropsReturn["getAttribute"]];
+export type SetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>[typeof ImperativePropsReturn["setAttribute"]];
+export type SetChildren = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["setChildren"]];
+export type DangerouslySetInnerHTML = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["dangerouslySetInnerHTML"]];
+export type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["dangerouslyAppendHTML"]];
+export type SetEventHandler = UseImperativePropsReturnTypeSelf<any>[typeof ImperativePropsReturn["setEventHandler"]];
 
 type AvailableStyles = (keyof CSSStyleDeclaration & keyof CSSProperties) & string;
 
+
+const P = `PropNames.PropNames.ImperativePropsParameters`;
+const R = `PropNames.PropNames.ImperativePropsReturn`;
+
+const ImperativePropsParameters = {
+} as const;
+
+const ImperativePropsReturn = {
+    hasClass: `${R}.hasClass`,
+    setClass: `${R}.setClass`,
+    setStyle: `${R}.setStyle`,
+    getAttribute: `${R}.getAttribute`,
+    setAttribute: `${R}.setAttribute`,
+    setChildren: `${R}.setChildren`,
+    dangerouslySetInnerHTML: `${R}.dangerouslySetInnerHTML`,
+    dangerouslyAppendHTML: `${R}.dangerouslyAppendHTML`,
+    setEventHandler: `${R}.setEventHandler`
+} as const;
+
+declare module "../util/types.js" { interface PropNames { ImperativePropsReturn: typeof ImperativePropsReturn } }
+declare module "../util/types.js" { interface PropNames { ImperativePropsParameters: typeof ImperativePropsParameters } }
+
 export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Returns whether the element currently has the current CSS class */
-    hasClass(cls: string): boolean;
+    [ImperativePropsReturn.hasClass](cls: string): boolean;
     /** @stable Applies or removes the given CSS class to the element and its props */
-    setClass(cls: string, enabled: boolean): void;
+    [ImperativePropsReturn.setClass](cls: string, enabled: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
+    [ImperativePropsReturn.setStyle]<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
     /** @stable Returns the current value of the attribute on the element */
-    getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
+    [ImperativePropsReturn.getAttribute]<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */
-    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
+    [ImperativePropsReturn.setAttribute]<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
     /** @stable Sets the element's `textContent` and `props.children` */
-    setChildren(children: string | null): void;
+    [ImperativePropsReturn.setChildren](children: string | null): void;
     /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */
-    dangerouslySetInnerHTML(html: string): void;
+    [ImperativePropsReturn.dangerouslySetInnerHTML](html: string): void;
     /** @stable Evaluates the given HTML and appends it to the current children and the current props. */
-    dangerouslyAppendHTML(html: string): Element;
+    [ImperativePropsReturn.dangerouslyAppendHTML](html: string): Element;
     /** @stable Applies the given event handler to the element and its props */
-    setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
+    [ImperativePropsReturn.setEventHandler]<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
-let a: UseImperativePropsReturnTypeSelf<any> = null!;
 
-
-export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> { }
+export interface UseImperativePropsParameters<E extends Element> extends Pick<UseRefElementReturnType<E>, PropNames["RefElementReturn"]["getElement"]> { }
 
 interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
@@ -54,7 +74,7 @@ export interface UseImperativePropsReturnType<T extends Element> {
      *  (The object itself and everything within it are all stable and can be passed around freely)
      */
     imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
-    props: ElementProps<T>;
+    props: ElementProps<T>[];
 }
 
 let templateElement: HTMLTemplateElement | null = null;
@@ -84,9 +104,10 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as 
  * 
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
+export const useImperativeProps = monitored(function useImperativeProps<E extends Element>(args: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
+    const { [PropNames.RefElementReturn.getElement]: getElement } = args;
 
     const hasClass = useCallback<HasClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
     const setClass = useCallback<SetClass>((cls, enabled) => {
@@ -184,31 +205,31 @@ export const useImperativeProps = monitored(function useImperativeProps<E extend
 
     return {
         imperativePropsReturn: useRef<UseImperativePropsReturnTypeSelf<E>>({
-            hasClass,
-            setClass,
-            setStyle,
-            getAttribute,
-            setAttribute,
-            setEventHandler,
-            setChildren,
-            dangerouslySetInnerHTML,
-            dangerouslyAppendHTML
+            [ImperativePropsReturn.hasClass]: hasClass,
+            [ImperativePropsReturn.setClass]: setClass,
+            [ImperativePropsReturn.setStyle]: setStyle,
+            [ImperativePropsReturn.getAttribute]: getAttribute,
+            [ImperativePropsReturn.setAttribute]: setAttribute,
+            [ImperativePropsReturn.setEventHandler]: setEventHandler,
+            [ImperativePropsReturn.setChildren]: setChildren,
+            [ImperativePropsReturn.dangerouslySetInnerHTML]: dangerouslySetInnerHTML,
+            [ImperativePropsReturn.dangerouslyAppendHTML]: dangerouslyAppendHTML
         }).current,
-        props: useMergedProps<E>(
+        props: [
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
             currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {},
             { children: currentImperativeProps.current.children },
             currentImperativeProps.current.others
-        )
+        ]
 
     }
 })
 
 function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
-    const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
-    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
+    const { props: propsStable, ...ret } = useRefElement<HTMLElementTagNameMap[T]>({})
+    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>(ret);
     useImperativeHandle(handle, () => imperativeHandle);
-    return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
+    return (createElement(Tag, useMergedProps(propsStable, ...imperativeProps, props, { ref })));
 }
 
 

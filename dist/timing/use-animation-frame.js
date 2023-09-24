@@ -27,7 +27,7 @@ export function ProvideBatchedAnimationFrames({ children }) {
         handle = requestAnimationFrame(rafWithBatchedCallbacks);
         return () => cancelAnimationFrame(handle);
     }, []);
-    return (createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children }));
+    return createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children });
 }
 /**
  * The callback you provide will start running every frame after the component mounts.

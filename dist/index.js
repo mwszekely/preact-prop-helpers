@@ -339,7 +339,7 @@ export { useListNavigationSelection, useListNavigationSelectionChild } from "./c
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { useModal } from "./component-use/use-modal.js";
-export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
+export { setPressVibrate, usePress } from "./component-use/use-press.js";
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
@@ -392,4 +392,5 @@ export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitored } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
 export { EventMapping, Fragment, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
+export { PropNames } from "./util/types.js";
 //# sourceMappingURL=index.js.map

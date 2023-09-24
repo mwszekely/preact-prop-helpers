@@ -10,12 +10,57 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
-import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
-import { EventType, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
-import { ElementProps, Nullable } from "../../util/types.js";
+import { OmitStrong, RequiredN } from "../../util/lib-shared.js";
+import { EventType, useCallback, useEffect, useRef } from "../../util/lib.js";
+import { ElementProps, Nullable, PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+
+
+declare module "../../util/types.js" { interface PropNames { SingleSelectionParameters: typeof P1Names } }
+declare module "../../util/types.js" { interface PropNames { SingleSelectionReturn: typeof R1Names } }
+declare module "../../util/types.js" { interface PropNames { SingleSelectionChildParameters: typeof P2Names } }
+declare module "../../util/types.js" { interface PropNames { SingleSelectionChildReturn: typeof R2Names } }
+
+const P1 = `PropNames.SingleSelectionParameters`;
+const P2 = `PropNames.SingleSelectionChildParameters`;
+const R1 = `PropNames.SingleSelectionReturn`;
+const R2 = `PropNames.SingleSelectionChildReturn`;
+
+export const P1Names = {
+    initiallySingleSelectedIndex: `${P1}.initiallySingleSelectedIndex`,
+    onSingleSelectedIndexChange: `${P1}.onSingleSelectedIndexChange`,
+    singleSelectionMode: `${P1}.singleSelectionMode`,
+    singleSelectionAriaPropName: `${P1}.singleSelectionAriaPropName`,
+    singleSelectedIndex: `${P1}.singleSelectedIndex`,
+} as const;
+
+export const R1Names = {
+    changeSingleSelectedIndex: `${R1}.changeSingleSelectedIndex`,
+    getSingleSelectedIndex: `${R1}.getSingleSelectedIndex`
+} as const;
+
+export const P2Names = {
+    singleSelectionDisabled: `${P2}.singleSelectionDisabled`
+} as const;
+
+export const R2Names = {
+    singleSelected: `${R2}.singleSelected`,
+    getSingleSelected: `${R2}.getSingleSelected`,
+    singleSelectedOffset: `${R2}.singleSelectedOffset`,
+    singleSelectionMode: `${R2}.singleSelectionMode`,
+    getSingleSelectedOffset: `${R2}.getSingleSelectedOffset`
+} as const;
+
+
+
+PropNames.SingleSelectionParameters ??=  P1Names;
+PropNames.SingleSelectionReturn ??=  R1Names;
+PropNames.SingleSelectionChildParameters ??=  P2Names;
+PropNames.SingleSelectionChildReturn ??=  R2Names;
+
+
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -47,7 +92,7 @@ export interface UseSingleSelectionParametersSelf {
      * This is imperative, as opposed to declarative, 
      * to save on re-rendering the parent whenever the selected index changes.
      */
-    initiallySingleSelectedIndex: Nullable<number>;
+    [PropNames.SingleSelectionParameters.initiallySingleSelectedIndex]: Nullable<number>;
 
     /**
      * Called when a child is selected (via a press or other method).
@@ -62,7 +107,7 @@ export interface UseSingleSelectionParametersSelf {
      * 
      * @nonstable
      */
-    onSingleSelectedIndexChange: Nullable<SelectedIndexChangeHandler>; // ((index: number | null, reason: Event | undefined) => void);
+    [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: Nullable<SelectedIndexChangeHandler>; // ((index: number | null, reason: Event | undefined) => void);
 
 
     /**
@@ -73,7 +118,7 @@ export interface UseSingleSelectionParametersSelf {
      * 
      * When this is `"disabled"`, all single-selection behavior is turned off, allowing for multi-selection, or no selection.
      */
-    singleSelectionMode: "focus" | "activation" | "disabled";
+    [PropNames.SingleSelectionParameters.singleSelectionMode]: "focus" | "activation" | "disabled";
 
     /**
      * What property will be used to mark this item as selected.
@@ -82,7 +127,7 @@ export interface UseSingleSelectionParametersSelf {
      * 
      * This is ignored if `selectionMode` is set to `"disabled"`.
      */
-    singleSelectionAriaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
+    [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
 
 }
 
@@ -97,25 +142,25 @@ export interface UseSingleSelectionReturnTypeSelf {
      * 
      * @stable
      */
-    changeSingleSelectedIndex: PassiveStateUpdater<number | null, SelectedIndexChangeEvent>;
+    [PropNames.SingleSelectionReturn.changeSingleSelectedIndex]: PassiveStateUpdater<number | null, SelectedIndexChangeEvent>;
 
     /**
      * @stable
      */
-    getSingleSelectedIndex(): number | null;
+    [PropNames.SingleSelectionReturn.getSingleSelectedIndex](): number | null;
 }
 
-export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<SingleSelectionContextSelf>, "singleSelectionMode"> {
+export interface UseSingleSelectionChildReturnTypeSelf {
     // These two are already available as managedChild info,
     // but we're keeping them because RTI does the same thing, and it's convenient (info is kinda semi-private).
 
     /**
      * Is this child currently the selected child among all its siblings?
      */
-    singleSelected: boolean;
+    [PropNames.SingleSelectionChildReturn.singleSelected]: boolean;
 
     /** @stable */
-    getSingleSelected(): boolean;
+    [PropNames.SingleSelectionChildReturn.getSingleSelected](): boolean;
 
     /**
      * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
@@ -124,16 +169,18 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
      * 
      * This useful for things like animations or transitions.
      */
-    singleSelectedOffset: Nullable<number>;
+    [PropNames.SingleSelectionChildReturn.singleSelectedOffset]: Nullable<number>;
 
     /** @stable */
-    getSingleSelectedOffset: () => (number | null);
+    [PropNames.SingleSelectionChildReturn.getSingleSelectedOffset]: () => (number | null);
+
+    [PropNames.SingleSelectionChildReturn.singleSelectionMode]: SingleSelectionContextSelf[typeof PropNames.SingleSelectionParameters.singleSelectionMode]
 }
 
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
-    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">,
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
-    singleSelectionParameters: UseSingleSelectionParametersSelf;
+    UseSingleSelectionParametersSelf,
+    Pick<UseManagedChildrenReturnType<M>, typeof PropNames.ManagedChildrenReturn.getChildren>,
+    Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, typeof PropNames.RovingTabIndexReturn.setTabbableIndex> {
 }
 
 export type UseSingleSelectionChildInfoKeysParameters = "index" | "untabbable";
@@ -141,29 +188,32 @@ export type UseSingleSelectionChildInfoKeysReturnType = "getSingleSelected" | "s
 
 export interface UseSingleSelectionChildParametersSelf {
     /** When true, this child cannot be selected via single-select, either by focusing it or by clicking it. */
-    singleSelectionDisabled: boolean;
+    [PropNames.SingleSelectionChildParameters.singleSelectionDisabled]: boolean;
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends
+    UseSingleSelectionChildParametersSelf,
     UseGenericChildParameters<UseSingleSelectionContext, Pick<M, UseSingleSelectionChildInfoKeysParameters>> {
-    singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
 }
 
 
-export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
+export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends
+    UseSingleSelectionChildReturnTypeSelf,
+    UseChildrenHaveFocusChildReturnType<E>,
+    Pick<UsePressParameters<any>, typeof PropNames.PressParameters.onPressSync> {
     props: ElementProps<E>;
-
     info: Pick<M, UseSingleSelectionChildInfoKeysReturnType>;
-
-    singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
-export interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
-    singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
+export interface UseSingleSelectionReturnType<ChildElement extends Element> extends
+    UseSingleSelectionReturnTypeSelf,
+    Pick<UseChildrenHaveFocusParameters<ChildElement>, typeof PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange> {
     context: UseSingleSelectionContext;
 }
 
-export interface SingleSelectionContextSelf extends RequiredN<Pick<UseSingleSelectionParametersSelf, "singleSelectionMode" | "onSingleSelectedIndexChange">>, Pick<UseSingleSelectionParametersSelf, "singleSelectionAriaPropName"> {
+export interface SingleSelectionContextSelf extends
+    RequiredN<Pick<UseSingleSelectionParametersSelf, typeof PropNames.SingleSelectionParameters.singleSelectionMode | typeof PropNames.SingleSelectionParameters.onSingleSelectedIndexChange>>,
+    Pick<UseSingleSelectionParametersSelf, typeof PropNames.SingleSelectionParameters.singleSelectionAriaPropName> {
     getSingleSelectedIndex(): number | null;
 }
 
@@ -181,14 +231,17 @@ export interface UseSingleSelectionContext {
  * @compositeParams
  */
 export const useSingleSelection = monitored(function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
-    managedChildrenReturn: { getChildren, ...void1 },
-    rovingTabIndexReturn: { setTabbableIndex, ...void2 },
-    singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
+    //   managedChildrenReturn: { getChildren, ...void1 },
+    //   rovingTabIndexReturn: { setTabbableIndex, ...void2 },
+    //   singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
+    [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+    [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
+    [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSelectedIndexChange_U,
+    [PropNames.SingleSelectionParameters.initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
+    [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: singleSelectionAriaPropName,
+    [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode,
     ...void4
 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement> {
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
     assertEmptyObject(void4);
 
     type R = Event;
@@ -224,27 +277,23 @@ export const useSingleSelection = monitored(function useSingleSelection<ParentOr
         onClosestFit: null
     });
     return {
-        singleSelectionReturn: useMemoObject({
-            getSingleSelectedIndex,
-            changeSingleSelectedIndex
-        }),
+        [PropNames.SingleSelectionReturn.getSingleSelectedIndex]: getSingleSelectedIndex,
+        [PropNames.SingleSelectionReturn.changeSingleSelectedIndex]: changeSingleSelectedIndex,
         context: useMemoObject({
             singleSelectionContext: useMemoObject<SingleSelectionContextSelf>({
                 getSingleSelectedIndex,
-                onSingleSelectedIndexChange,
-                singleSelectionAriaPropName,
-                singleSelectionMode
+                [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
+                [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: singleSelectionAriaPropName,
+                [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode
             }),
         }),
-        childrenHaveFocusParameters: {
-            onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
-                if (!anyFocused) {
-                    const selectedIndex = getSingleSelectedIndex();
-                    if (selectedIndex != null)
-                        setTabbableIndex(selectedIndex, reason, false);
-                }
-            })
-        }
+        [PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange]: useStableCallback((anyFocused, prev, reason) => {
+            if (!anyFocused) {
+                const selectedIndex = getSingleSelectedIndex();
+                if (selectedIndex != null)
+                    setTabbableIndex(selectedIndex, reason, false);
+            }
+        })
     }
 })
 
@@ -255,8 +304,18 @@ export const useSingleSelection = monitored(function useSingleSelection<ParentOr
  * @compositeParams
  */
 export const useSingleSelectionChild = monitored(function useSingleSelectionChild<ChildElement extends Element>({
-    singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
-    context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 },
+    //singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
+    [PropNames.SingleSelectionChildParameters.singleSelectionDisabled]: singleSelectionDisabled,
+    context: {
+        singleSelectionContext: {
+            getSingleSelectedIndex,
+            [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
+            [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: ariaPropName,
+            [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode,
+            ...void1
+        },
+        ...void2
+    },
     info: { index, untabbable, ...void3 },
     ...void4
 }: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
@@ -266,7 +325,6 @@ export const useSingleSelectionChild = monitored(function useSingleSelectionChil
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    assertEmptyObject(void5);
 
     useEnsureStability("useSingleSelectionChild", getSingleSelectedIndex, onSingleSelectedIndexChange);
 
@@ -302,48 +360,51 @@ export const useSingleSelectionChild = monitored(function useSingleSelectionChil
             getSingleSelected: getLocalSelected,
             singleSelected: localSelected,
         },
-        singleSelectionChildReturn: {
-            singleSelected: localSelected,
-            getSingleSelected: getLocalSelected,
-            singleSelectedOffset: direction,
-            singleSelectionMode,
-            getSingleSelectedOffset: getDirection
-        },
+        // singleSelectionChildReturn: {
+        [PropNames.SingleSelectionChildReturn.singleSelected]: localSelected,
+        [PropNames.SingleSelectionChildReturn.getSingleSelected]: getLocalSelected,
+        [PropNames.SingleSelectionChildReturn.singleSelectedOffset]: direction,
+        [PropNames.SingleSelectionChildReturn.singleSelectionMode]: singleSelectionMode,
+        [PropNames.SingleSelectionChildReturn.getSingleSelectedOffset]: getDirection,
+        //},
         props: useTagProps(ariaPropName == null || singleSelectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         }, "data-single-selection-child"),
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        pressParameters: { onPressSync }
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged,
+        [PropNames.PressParameters.onPressSync]: onPressSync
     }
 })
 
-export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
-    singleSelectedIndex: Nullable<number>;
+export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, typeof PropNames.SingleSelectionParameters.onSingleSelectedIndexChange> {
+    [PropNames.SingleSelectionParameters.singleSelectedIndex]: Nullable<number>;
 }
 
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
-    singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
-}
+export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends
+    UseSingleSelectionDeclarativeParametersSelf,
+    Pick<UseSingleSelectionReturnType<ChildElement>, typeof PropNames.SingleSelectionReturn.changeSingleSelectedIndex> { }
 
-export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<UseSingleSelectionParameters<any, any, any>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
-export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<UseSingleSelectionReturnType<any>, "singleSelectionReturn", "changeSingleSelectedIndex">;
+export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, keyof UseSingleSelectionParametersSelf> & UseSingleSelectionDeclarativeParameters<any> & Pick<UseSingleSelectionParameters<any, any, any>, typeof PropNames.SingleSelectionParameters.singleSelectionAriaPropName | typeof PropNames.SingleSelectionParameters.singleSelectionMode>;
+export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, keyof UseSingleSelectionReturnTypeSelf> & OmitStrong<UseSingleSelectionReturnType<any>, typeof PropNames.SingleSelectionReturn.changeSingleSelectedIndex>;
 
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
 export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({
-    singleSelectionReturn: { changeSingleSelectedIndex },
-    singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange }
+    [PropNames.SingleSelectionReturn.changeSingleSelectedIndex]: changeSingleSelectedIndex,
+    [PropNames.SingleSelectionParameters.singleSelectedIndex]: singleSelectedIndex,
+    [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSingleSelectedIndexChange
 }: UseSingleSelectionDeclarativeParameters<ChildElement>) {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef<SelectedIndexChangeEvent | undefined>(undefined);
     useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current!); }, [s]);
 
-    const osic = useCallback<NonNullable<UseSingleSelectionParametersSelf["onSingleSelectedIndexChange"]>>((e) => {
+    const osic = useCallback<NonNullable<UseSingleSelectionParametersSelf[typeof PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]>>((e) => {
         reasonRef.current = e;
         return onSingleSelectedIndexChange?.(e);
     }, [onSingleSelectedIndexChange]);
 
-    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>["singleSelectionParameters"], "onSingleSelectedIndexChange"> }
+    return {
+        [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: osic
+    } //satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>[typeof PropNames.SingleSelectionParameters.onSingleSelectedIndexChange], typeof PropNames.SingleSelectionParameters.onSingleSelectedIndexChange> }
 }
 

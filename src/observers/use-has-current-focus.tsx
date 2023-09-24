@@ -1,9 +1,29 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
-import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
+import { onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
+import { ElementProps, FocusEventType, Nullable, PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+
+declare module "../util/types.js" { interface PropNames { HasCurrentFocusParameters: typeof PNames } }
+declare module "../util/types.js" { interface PropNames { HasCurrentFocusReturn: typeof RNames } }
+
+const P = `PropNames.HasCurrentFocusParameters`;
+const R = `PropNames.HasCurrentFocusReturn`;
+
+
+export const PNames = {
+    onCurrentFocusedChanged: `${P}.onCurrentFocusedChanged`,
+    onCurrentFocusedInnerChanged: `${P}.onCurrentFocusedInnerChanged`
+} as const;
+
+export const RNames = {
+    getCurrentFocused: `${R}.getCurrentFocused`,
+    getCurrentFocusedInner: `${R}.getCurrentFocusedInner`
+} as const;
+
+PropNames.HasCurrentFocusParameters ??= PNames;
+PropNames.HasCurrentFocusReturn ??= RNames;
 
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
 
@@ -14,7 +34,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
@@ -23,29 +43,20 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
-}
-
-export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
+    [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
 
 export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
-    propsStable: ElementProps<E>
-    /**
-     * Modifies the element to be able to track its own focus state
-     */
-    //propsStable: ElementProps<T>;
+    props: ElementProps<E>;
 
     /** @stable */
-    getCurrentFocused(): boolean;
+    [PropNames.HasCurrentFocusReturn.getCurrentFocused](): boolean;
     /** @stable */
-    getCurrentFocusedInner(): boolean;
+    [PropNames.HasCurrentFocusReturn.getCurrentFocusedInner](): boolean;
 }
 
-export interface UseHasCurrentFocusReturnType<E extends Element> {
-    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
-}
+export interface UseHasCurrentFocusParameters<T extends Node> extends UseHasCurrentFocusParametersSelf<T>, Pick<UseRefElementReturnType<T>, (typeof PropNames)["RefElementReturn"]["getElement"]> { }
+export interface UseHasCurrentFocusReturnType<E extends Element> extends UseHasCurrentFocusReturnTypeSelf<E> {}
 
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
@@ -54,13 +65,11 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
-    const {
-        hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
-        refElementReturn: { getElement }
-    } = args;
-
-
+export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extends Element>({
+    [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: onCurrentFocusedChanged,
+    [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged,
+    [PropNames.RefElementReturn.getElement]: getElement
+}: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
 
     const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, runImmediately);
@@ -92,11 +101,9 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extend
     });
 
     return {
-        hasCurrentFocusReturn: {
-            propsStable: propsStable.current,
-            getCurrentFocused: getFocused,
-            getCurrentFocusedInner: getFocusedInner,
-        }
+        [PropNames.HasCurrentFocusReturn.getCurrentFocused]: getFocused,
+        [PropNames.HasCurrentFocusReturn.getCurrentFocusedInner]: getFocusedInner,
+        props: propsStable.current,
     };
 })
 

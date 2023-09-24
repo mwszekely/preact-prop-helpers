@@ -1,8 +1,30 @@
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
+import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+const P1 = `PropNames.PaginatedParameters`;
+const P2 = `PropNames.PaginatedChildParameters`;
+const R1 = `PropNames.PaginatedReturn`;
+const R2 = `PropNames.PaginatedChildReturn`;
+export const P1Names = {
+    paginationMin: `${P1}.paginationMin`,
+    paginationMax: `${P1}.paginationMax`,
+    childCount: `${P1}.childCount`,
+};
+export const R1Names = {
+    refreshPagination: `${R1}.refreshPagination`
+};
+export const P2Names = {};
+export const R2Names = {
+    parentIsPaginated: `${R2}.parentIsPaginated`,
+    hideBecausePaginated: `${R2}.hideBecausePaginated`,
+};
+PropNames.PaginatedParameters ??= P1Names;
+PropNames.PaginatedReturn ??= R1Names;
+PropNames.PaginatedChildParameters ??= P2Names;
+PropNames.PaginatedChildReturn ??= R2Names;
 /**
  * Allows children to stop themselves from rendering outside of a narrow range.
  *
@@ -12,7 +34,11 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
+export const usePaginatedChildren = monitored(function usePaginatedChildren({ [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler, [PropNames.PaginatedParameters.paginationMax]: paginationMax, [PropNames.PaginatedParameters.paginationMin]: paginationMin, [PropNames.PaginatedParameters.childCount]: childCount, [PropNames.RovingTabIndexReturn.getTabbableIndex]: getTabbableIndex, [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex, [PropNames.ChildrenHaveFocusReturn.getAnyFocused]: getAnyFocused,
+// paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
+// rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
+// childrenHaveFocusReturn: { getAnyFocused }
+ }) {
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
@@ -75,7 +101,7 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
     }, [childCount]);
     return {
         context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        paginatedChildrenReturn: { refreshPagination }
+        [PropNames.PaginatedReturn.refreshPagination]: refreshPagination
     };
 });
 /**
@@ -91,7 +117,8 @@ export const usePaginatedChild = monitored(function usePaginatedChild({ info: { 
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
         props: useTagProps(!parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) }, "data-paginated-children-child"),
-        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        [PropNames.PaginatedChildReturn.parentIsPaginated]: parentIsPaginated,
+        [PropNames.PaginatedChildReturn.hideBecausePaginated]: parentIsPaginated ? !paginatedVisible : false,
         info: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated

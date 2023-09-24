@@ -7,15 +7,52 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
+import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable, PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
+
+declare module "../../util/types.js" { interface PropNames { TypeaheadNavigationParameters: typeof P1Names } }
+declare module "../../util/types.js" { interface PropNames { TypeaheadNavigationReturn: typeof R1Names } }
+declare module "../../util/types.js" { interface PropNames { TypeaheadNavigationChildParameters: typeof P2Names } }
+declare module "../../util/types.js" { interface PropNames { TypeaheadNavigationChildReturn: typeof R2Names } }
+
+const P1 = `PropNames.TypeaheadNavigationParameters`;
+const P2 = `PropNames.TypeaheadNavigationChildParameters`;
+const R1 = `PropNames.TypeaheadNavigationReturn`;
+const R2 = `PropNames.TypeaheadNavigationChildReturn`;
+
+export const P1Names = {
+    onNavigateTypeahead: `${P1}.onNavigateTypeahead`,
+    isValidForTypeaheadNavigation: `${P1}.isValidForTypeaheadNavigation`,
+    collator: `${P1}.collator`,
+    noTypeahead: `${P1}.noTypeahead`,
+    typeaheadTimeout: `${P1}.typeaheadTimeout`,
+} as const;
+
+export const R1Names = {
+    getCurrentTypeahead: `${R1}.getCurrentTypeahead`,
+    typeaheadStatus: `${R1}.typeaheadStatus`
+} as const;
+
+export const P2Names = {
+} as const;
+
+export const R2Names = {
+    tabbable: `${R2}.tabbable`,
+    getTabbable: `${R2}.getTabbable`
+} as const;
+
+PropNames.TypeaheadNavigationParameters ??= P1Names;
+PropNames.TypeaheadNavigationReturn ??= R1Names;
+PropNames.TypeaheadNavigationChildParameters ??= P2Names;
+PropNames.TypeaheadNavigationChildReturn ??= R2Names;
+
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
-    getCurrentTypeahead(): string | null;
+    [PropNames.TypeaheadNavigationReturn.getCurrentTypeahead](): string | null;
 
     /**
      * What the current status of the user's input is:
@@ -24,7 +61,7 @@ export interface UseTypeaheadNavigationReturnTypeSelf {
      * * `"valid"`: The string the user has typed so far corresponds to at least one child
      * * `"invalid"`: The string the user has typed so does not correspond to any child
      */
-    typeaheadStatus: "invalid" | "valid" | "none";
+    [PropNames.TypeaheadNavigationReturn.typeaheadStatus]: "invalid" | "valid" | "none";
 }
 
 export interface UseTypeaheadNavigationContextSelf {
@@ -47,7 +84,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
+    [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
 
 
     /**
@@ -58,7 +95,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    isValidForTypeaheadNavigation(index: number): boolean;
+    [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation](index: number): boolean;
 
 
     /**
@@ -67,22 +104,21 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    collator: Nullable<Intl.Collator>;
+    [PropNames.TypeaheadNavigationParameters.collator]: Nullable<Intl.Collator>;
 
     /**
      * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
      */
-    noTypeahead: boolean;
+    [PropNames.TypeaheadNavigationParameters.noTypeahead]: boolean;
 
     /**
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
-    typeaheadTimeout: number;
+    [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: number;
 }
 
-export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
-    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeSelf {
+    props: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }
 
@@ -94,9 +130,9 @@ export interface UseTypeaheadNavigationContext {
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
 
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
-    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
-}
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends
+    UseTypeaheadNavigationParametersSelf<TabbableChildElement>,
+    Pick<UseRovingTabIndexReturnType<any, TabbableChildElement>, (typeof PropNames)["RovingTabIndexReturn"]["getTabbableIndex"] | (typeof PropNames)["RovingTabIndexReturn"]["setTabbableIndex"]> { }
 
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
@@ -104,13 +140,13 @@ export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
     UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>,
-    TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">,
-    TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
+    Pick<UseTextContentParameters<ChildElement>, (typeof PropNames)["TextContentParameters"]["getText"]>,
+    Pick<UseRefElementReturnType<ChildElement>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends
     UseTextContentReturnType,
-    TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
+    Pick<UsePressParameters<any>, (typeof PropNames)["PressParameters"]["excludeSpace"]> {
 }
 
 interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
@@ -125,15 +161,17 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
-    rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
-    ...void2
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+    [PropNames.RovingTabIndexReturn.getTabbableIndex]: getIndex,
+    [PropNames.RovingTabIndexReturn.setTabbableIndex]: setIndex,
+    [PropNames.TypeaheadNavigationParameters.collator]: collator,
+    [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead,
+    [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
+    [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead,
+    [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout,
+    ..._void1
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
@@ -260,6 +298,7 @@ export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation
 
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
+    assertEmptyObject(_void1);
     return {
         context: useMemoObject({
             typeaheadNavigationContext: useMemoObject({
@@ -269,11 +308,9 @@ export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation
             }),
 
         }),
-        typeaheadNavigationReturn: {
-            getCurrentTypeahead,
-            typeaheadStatus
-        },
-        propsStable: propsStable.current
+        [PropNames.TypeaheadNavigationReturn.getCurrentTypeahead]: getCurrentTypeahead,
+        [PropNames.TypeaheadNavigationReturn.typeaheadStatus]: typeaheadStatus,
+        props: propsStable.current
     }
 
 
@@ -378,68 +415,69 @@ export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation
  * @compositeParams
  */
 export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
-    info: { index, ...void1 },
-    textContentParameters: { getText, ...void5 },
-    context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
-    refElementReturn: { getElement, ...void3 },
-    ...void4
+    info: { index, ..._void1 },
+    [PropNames.TextContentParameters.getText]: getText,
+    [PropNames.RefElementReturn.getElement]: getElement,
+    context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ..._void2 } },
+    ..._void3
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
 
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    assertEmptyObject(void5);
 
-    const { textContentReturn } = useTextContent({
-        refElementReturn: { getElement },
-        textContentParameters: {
-            getText,
-            onTextContentChange: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
-                if (text) {
-                    // Find where to insert this item.
-                    // Because all index values should be unique, the returned sortedIndex
-                    // should always refer to a new location (i.e. be negative)   
-                    //
-                    // TODO: adding things on mount/unmount means that it's 
-                    // hard to make grid navigation typeahead work smoothly with tables -- 
-                    // every time we change columns, every row resorts itself, even though
-                    // each row should be able to just do that on mount.
-                    // 
-                    // We probably need to instead just sort on-demand, which is better for
-                    // performance anyway, but is tricky to code without major lag on the
-                    // first keystroke.
-                    //
-                    // Or we need to be able to support columns here, within typeahead?
-                    // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
-                    const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                    if (sortedIndex < 0) {
-                        sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-                    }
-                    else {
-                        sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
-                    }
-
-                    return () => {
-                        // When unmounting, find where we were and remove ourselves.
-                        // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                        const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                        console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-
-                        if (sortedIndex >= 0) {
-                            sortedTypeaheadInfo.splice(sortedIndex, 1);
-                        }
-                    }
+    const {
+        [PropNames.TextContentReturn.getTextContent]: getTextContent,
+        ..._void4
+    } = useTextContent({
+        [PropNames.RefElementReturn.getElement]: getElement,
+        [PropNames.TextContentParameters.getText]: getText,
+        [PropNames.TextContentParameters.onTextContentChange]: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+            if (text) {
+                // Find where to insert this item.
+                // Because all index values should be unique, the returned sortedIndex
+                // should always refer to a new location (i.e. be negative)   
+                //
+                // TODO: adding things on mount/unmount means that it's 
+                // hard to make grid navigation typeahead work smoothly with tables -- 
+                // every time we change columns, every row resorts itself, even though
+                // each row should be able to just do that on mount.
+                // 
+                // We probably need to instead just sort on-demand, which is better for
+                // performance anyway, but is tricky to code without major lag on the
+                // first keystroke.
+                //
+                // Or we need to be able to support columns here, within typeahead?
+                // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
+                const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                if (sortedIndex < 0) {
+                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                }
+                else {
+                    sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
                 }
 
-            }, [])
-        }
-    })
+                return () => {
+                    // When unmounting, find where we were and remove ourselves.
+                    // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                    const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+
+                    if (sortedIndex >= 0) {
+                        sortedTypeaheadInfo.splice(sortedIndex, 1);
+                    }
+                }
+            }
+
+        }, [])
+    });
+
+    assertEmptyObject(_void1);
+    assertEmptyObject(_void2);
+    assertEmptyObject(_void4);
+    assertEmptyObject(_void3);
 
     return {
-        textContentReturn,
-        pressParameters: { excludeSpace }
+        [PropNames.TextContentReturn.getTextContent]: getTextContent,
+        [PropNames.PressParameters.excludeSpace]: excludeSpace
     };
 
 })

@@ -1,3 +1,4 @@
+import { createElement } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
@@ -5,7 +6,7 @@ import { ElementProps, Nullable } from "../util/types.js";
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
-}): import("preact").VNode<any>;
+}): createElement.JSX.Element;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`

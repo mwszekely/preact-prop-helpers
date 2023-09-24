@@ -1,6 +1,19 @@
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+const P = `PropNames.HasCurrentFocusParameters`;
+const R = `PropNames.HasCurrentFocusReturn`;
+export const PNames = {
+    onCurrentFocusedChanged: `${P}.onCurrentFocusedChanged`,
+    onCurrentFocusedInnerChanged: `${P}.onCurrentFocusedInnerChanged`
+};
+export const RNames = {
+    getCurrentFocused: `${R}.getCurrentFocused`,
+    getCurrentFocusedInner: `${R}.getCurrentFocusedInner`
+};
+PropNames.HasCurrentFocusParameters ??= PNames;
+PropNames.HasCurrentFocusReturn ??= RNames;
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
  *
@@ -8,8 +21,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
+export const useHasCurrentFocus = monitored(function useHasCurrentFocus({ [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: onCurrentFocusedChanged, [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged, [PropNames.RefElementReturn.getElement]: getElement }) {
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
     const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
@@ -35,11 +47,9 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
         [onfocusout]: onFocusOut
     });
     return {
-        hasCurrentFocusReturn: {
-            propsStable: propsStable.current,
-            getCurrentFocused: getFocused,
-            getCurrentFocusedInner: getFocusedInner,
-        }
+        [PropNames.HasCurrentFocusReturn.getCurrentFocused]: getFocused,
+        [PropNames.HasCurrentFocusReturn.getCurrentFocusedInner]: getFocusedInner,
+        props: propsStable.current,
     };
 });
 //# sourceMappingURL=use-has-current-focus.js.map

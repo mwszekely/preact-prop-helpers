@@ -1,9 +1,8 @@
-import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ExtendMerge, OmitStrong, TargetedOmit } from "../util/types.js";
+import { ExtendMerge, OmitStrong, PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./keyboard-navigation/use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./keyboard-navigation/use-list-navigation-partial.js";
@@ -27,12 +26,12 @@ export type UseGridNavigationSelectionCellInfoKeysReturnType = UseGridNavigation
 export interface GridSelectChildRowInfo<RowElement extends Element> extends GridChildRowInfo<RowElement>, UseSelectionChildInfo<RowElement> { }
 export interface GridSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> { }
 export interface UseGridNavigationSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectChildRowInfo<RowElement>> extends
-    OmitStrong<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters">,
-    TargetedOmit<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters", "initiallyTabbedIndex">,
-    OmitStrong<UseSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn"> { }
+    OmitStrong<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, never>,
+    OmitStrong<UseSelectionParameters<ParentOrRowElement, RowElement, RM>, never> { }
+
 export interface UseGridNavigationSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends
     UseGridNavigationReturnType<ParentOrRowElement, RowElement>,
-    OmitStrong<UseSelectionReturnType<ParentOrRowElement, RowElement>, "propsStable"> {
+    OmitStrong<UseSelectionReturnType<ParentOrRowElement, RowElement>, "props"> {
     context: UseGridNavigationRowSelectionContext;
 }
 export interface UseGridNavigationRowSelectionContext extends UseGridNavigationRowContext, UseSelectionContext { }
@@ -70,54 +69,101 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  * @compositeParams
  */
 export const useGridNavigationSelection = monitored(function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
-    gridNavigationParameters,
-    linearNavigationParameters,
-    rovingTabIndexParameters,
-    managedChildrenReturn,
-    typeaheadNavigationParameters,
-    singleSelectionParameters,
-    multiSelectionParameters,
-    refElementReturn,
-    paginatedChildrenParameters,
-    rearrangeableChildrenReturn,
-    childrenHaveFocusReturn,
+
+    // Both
+    [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+
+    // Grid navigation
+    [PropNames.GridNavigationParameters.initiallyTabbableColumn]: initiallyTabbableColumn,
+    [PropNames.GridNavigationParameters.onTabbableColumnChange]: onTabbableColumnChange,
+    [PropNames.LinearNavigationParameters.disableHomeEndKeys]: disableHomeEndKeys,
+    [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex,
+    [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex,
+    [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation,
+    [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd,
+    [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart,
+    [PropNames.LinearNavigationParameters.onNavigateLinear]: onNavigateLinear,
+    [PropNames.LinearNavigationParameters.pageNavigationSize]: pageNavigationSize,
+    [PropNames.PaginatedParameters.paginationMax]: paginationMax,
+    [PropNames.PaginatedParameters.paginationMin]: paginationMin,
+    [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+    [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+    [PropNames.RefElementReturn.getElement]: getElement,
+    [PropNames.RovingTabIndexParameters.focusSelfParent]: focusSelfParent,
+    [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex,
+    [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange,
+    [PropNames.RovingTabIndexParameters.untabbable]: untabbable,
+    [PropNames.RovingTabIndexParameters.untabbableBehavior]: untabbableBehavior,
+    [PropNames.TypeaheadNavigationParameters.collator]: collator,
+    [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
+    [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead,
+    [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead,
+    [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout,
+
+    // Selection
+    [PropNames.ChildrenHaveFocusReturn.getAnyFocused]: getAnyFocused,
+    [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: multiSelectionAriaPropName,
+    [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode,
+    [PropNames.MultiSelectionParameters.onSelectionChange]: onSelectionChange,
+    [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
+    [PropNames.SingleSelectionParameters.initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
+    [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
+    [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: singleSelectionAriaPropName,
+    [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode,
     ...void2
 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>): UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement> {
 
     const {
         context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext },
-        linearNavigationReturn,
-        managedChildrenParameters,
-        props,
-        rovingTabIndexReturn,
-        typeaheadNavigationReturn,
+        props: propsGN,
+        ...retGN
     } = useGridNavigation<ParentOrRowElement, RowElement>({
-        gridNavigationParameters,
-        linearNavigationParameters,
-        managedChildrenReturn,
-        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
-        typeaheadNavigationParameters,
-        paginatedChildrenParameters,
-        rearrangeableChildrenReturn,
-        refElementReturn
+        [PropNames.GridNavigationParameters.initiallyTabbableColumn]: initiallyTabbableColumn,
+        [PropNames.GridNavigationParameters.onTabbableColumnChange]: onTabbableColumnChange,
+        [PropNames.LinearNavigationParameters.disableHomeEndKeys]: disableHomeEndKeys,
+        [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex,
+        [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex,
+        [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation,
+        [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd,
+        [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart,
+        [PropNames.LinearNavigationParameters.onNavigateLinear]: onNavigateLinear,
+        [PropNames.LinearNavigationParameters.pageNavigationSize]: pageNavigationSize,
+        [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+        [PropNames.PaginatedParameters.paginationMax]: paginationMax,
+        [PropNames.PaginatedParameters.paginationMin]: paginationMin,
+        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+        [PropNames.RefElementReturn.getElement]: getElement,
+        [PropNames.RovingTabIndexParameters.focusSelfParent]: focusSelfParent,
+        [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex,
+        [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange,
+        [PropNames.RovingTabIndexParameters.untabbable]: untabbable,
+        [PropNames.RovingTabIndexParameters.untabbableBehavior]: untabbableBehavior,
+        [PropNames.TypeaheadNavigationParameters.collator]: collator,
+        [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
+        [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead,
+        [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead,
+        [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout
+        //rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
     });
 
     const {
-        childrenHaveFocusParameters,
         context: { singleSelectionContext, multiSelectionContext },
-        multiSelectionReturn,
-        propsStable,
-        singleSelectionReturn,
-        ...void1
+        props: propsSS,
+        ...retSS
     } = useSelection<ParentOrRowElement, RowElement>({
-        managedChildrenReturn,
-        rovingTabIndexReturn,
-        singleSelectionParameters,
-        multiSelectionParameters,
-        childrenHaveFocusReturn
+        [PropNames.ChildrenHaveFocusReturn.getAnyFocused]: getAnyFocused,
+        [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+        [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: multiSelectionAriaPropName,
+        [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode,
+        [PropNames.MultiSelectionParameters.onSelectionChange]: onSelectionChange,
+        [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
+        [PropNames.SingleSelectionParameters.initiallySingleSelectedIndex]: initiallySingleSelectedIndex,
+        [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: onSingleSelectedIndexChange,
+        [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: singleSelectionAriaPropName,
+        [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode
     });
 
-    assertEmptyObject(void1);
     assertEmptyObject(void2);
 
     return {
@@ -128,14 +174,9 @@ export const useGridNavigationSelection = monitored(function useGridNavigationSe
             multiSelectionContext,
             typeaheadNavigationContext
         }),
-        childrenHaveFocusParameters,
-        linearNavigationReturn,
-        managedChildrenParameters,
-        props: useMergedProps(props, propsStable),
-        rovingTabIndexReturn,
-        singleSelectionReturn,
-        multiSelectionReturn,
-        typeaheadNavigationReturn
+        props: [...propsGN, propsSS],
+        ...retGN,
+        ...retSS
     }
 })
 
@@ -144,33 +185,81 @@ export const useGridNavigationSelection = monitored(function useGridNavigationSe
  */
 export const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
     info: mcp1,
-    linearNavigationParameters,
-    managedChildrenReturn,
-    refElementReturn,
-    rovingTabIndexParameters,
-    textContentParameters,
-    typeaheadNavigationParameters,
     context,
-    singleSelectionChildParameters,
-    multiSelectionChildParameters,
+
+
+    [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex,
+    [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex,
+    [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation,
+    [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd,
+    [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart,
+    [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+    [PropNames.RefElementReturn.getElement]: getElement,
+    [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex,
+    [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange,
+    [PropNames.RovingTabIndexParameters.untabbable]: untabbable,
+    [PropNames.TextContentParameters.getText]: getText,
+    [PropNames.TypeaheadNavigationParameters.collator]: collator,
+    [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
+    [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead,
+    [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead,
+    [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout,
+
+
+    [PropNames.MultiSelectionChildParameters.initiallyMultiSelected]: initiallyMultiSelected,
+    [PropNames.MultiSelectionChildParameters.multiSelectionDisabled]: multiSelectionDisabled,
+    [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: onMultiSelectChange,
+    [PropNames.SingleSelectionChildParameters.singleSelectionDisabled]: singleSelectionDisabled,
     ...void1
 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>): UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>> {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild<RowElement>({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow<RowElement, CellElement>({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
+    const {
+        info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 },
+        props: propsSelection,
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: ocfic2,
+        ...retSS
+    } = useSelectionChild<RowElement>({
+        info: mcp1,
+        context,
+        [PropNames.MultiSelectionChildParameters.initiallyMultiSelected]: initiallyMultiSelected,
+        [PropNames.MultiSelectionChildParameters.multiSelectionDisabled]: multiSelectionDisabled,
+        [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: onMultiSelectChange,
+        [PropNames.SingleSelectionChildParameters.singleSelectionDisabled]: singleSelectionDisabled
+    });
+    const {
+        info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 },
+        props: propsGridNavigation,
+        context: contextGridNavigation,
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: ocfic1,
+        [PropNames.ManagedChildrenParameters.onChildrenMountChange]: onChildrenMountChange,
+        ...retGN
+    } = useGridNavigationRow<RowElement, CellElement>({
+        context,
+        info: mcp1,
+        [PropNames.LinearNavigationParameters.getHighestIndex]: getHighestIndex,
+        [PropNames.LinearNavigationParameters.getLowestIndex]: getLowestIndex,
+        [PropNames.LinearNavigationParameters.isValidForLinearNavigation]: isValidForLinearNavigation,
+        [PropNames.LinearNavigationParameters.navigatePastEnd]: navigatePastEnd,
+        [PropNames.LinearNavigationParameters.navigatePastStart]: navigatePastStart,
+        [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+        [PropNames.RefElementReturn.getElement]: getElement,
+        [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex,
+        [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange,
+        [PropNames.RovingTabIndexParameters.untabbable]: untabbable,
+        [PropNames.TextContentParameters.getText]: getText,
+        [PropNames.TypeaheadNavigationParameters.collator]: collator,
+        [PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation,
+        [PropNames.TypeaheadNavigationParameters.noTypeahead]: noTypeahead,
+        [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: onNavigateTypeahead,
+        [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: typeaheadTimeout,
+    });
 
     assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    assertEmptyObject(void5);
-    assertEmptyObject(void6);
-    assertEmptyObject(void7);
     assertEmptyObject(void8);
     assertEmptyObject(void9);
 
     return {
+        props: [...propsGridNavigation, ...propsSelection],
         context: contextGridNavigation,
-        linearNavigationReturn,
         info: {
             getLocallyTabbable,
             getSingleSelected,
@@ -182,16 +271,10 @@ export const useGridNavigationSelectionRow = monitored(function useGridNavigatio
             setSelectedFromParent,
             getMultiSelectionDisabled
         },
-        managedChildrenParameters,
-        pressParameters: { onPressSync, excludeSpace },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason) }) },
-        props: useMergedProps(propsGridNavigation, propsSelection),
-        rovingTabIndexChildReturn,
-        rovingTabIndexReturn,
-        singleSelectionChildReturn,
-        multiSelectionChildReturn,
-        textContentReturn,
-        typeaheadNavigationReturn
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason) }),
+        [PropNames.ManagedChildrenParameters.onChildrenMountChange]: onChildrenMountChange,
+        ...retGN,
+        ...retSS,
     }
 })
 

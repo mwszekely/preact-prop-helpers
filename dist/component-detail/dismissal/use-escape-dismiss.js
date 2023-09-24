@@ -3,7 +3,17 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useEffect } from "../../util/lib.js";
+import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
+const P = `PropNames.EscapeDismissParameters`;
+const R = `PropNames.EscapeDismissReturn`;
+export const PNames = {
+    dismissEscapeActive: `${P}.dismissEscapeActive`,
+    onDismissEscape: `${P}.onDismissEscape`,
+    getDocument: `${P}.getDocument`,
+    parentDepth: `${P}.parentDepth`
+};
+export const RNames = {};
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
 function getElementDepth(element) {
     let depth = 0;
@@ -23,9 +33,8 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export const useEscapeDismiss = monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
+export const useEscapeDismiss = monitored(function useEscapeDismiss({ [PropNames.EscapeDismissParameters.onDismissEscape]: onClose, [PropNames.EscapeDismissParameters.dismissEscapeActive]: open, [PropNames.EscapeDismissParameters.getDocument]: unstableGetDocument, [PropNames.EscapeDismissParameters.parentDepth]: parentDepth, [PropNames.RefElementReturn.getElement]: getElement, ..._void1 }) {
+    assertEmptyObject(_void1);
     const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);

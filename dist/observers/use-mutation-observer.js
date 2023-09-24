@@ -1,15 +1,26 @@
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+const P = `PropNames.MutationObserverParameters`;
+const R = `PropNames.MutationObserverReturn`;
+export const MutationObserverParameters = {
+    onChildList: `${P}.onChildList`,
+    onAttributes: `${P}.onAttributes`,
+    onCharacterData: `${P}.onCharacterData`,
+    subtree: `${P}.subtree`,
+    characterDataOldValue: `${P}.characterDataOldValue`,
+    attributeOldValue: `${P}.attributeOldValue`,
+    attributeFilter: `${P}.attributeFilter`
+};
+export const MutationObserverReturn = {};
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
  */
-export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
-    const { onElementChange, ...rest } = (refElementParameters || {});
+export const useMutationObserver = monitored(function useMutationObserver({ [PropNames.RefElementReturn.getElement]: getElement, [PropNames.MutationObserverParameters.attributeFilter]: attributeFilter, [PropNames.MutationObserverParameters.subtree]: subtree, [PropNames.MutationObserverParameters.onChildList]: onChildList, [PropNames.MutationObserverParameters.characterDataOldValue]: characterDataOldValue, [PropNames.MutationObserverParameters.onCharacterData]: onCharacterData, [PropNames.MutationObserverParameters.onAttributes]: onAttributes, [PropNames.MutationObserverParameters.attributeOldValue]: attributeOldValue }) {
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
     const attributeKey = attributeFilter?.join(";");
@@ -58,16 +69,10 @@ export const useMutationObserver = monitored(function useMutationObserver({ refE
     useEffect(() => {
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
-    const { refElementReturn, propsStable } = useRefElement({
-        refElementParameters: {
-            onElementChange: useStableCallback((e, p, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
-            ...rest
-        }
-    });
-    const { getElement } = refElementReturn;
     return {
-        refElementReturn,
-        propsStable
+        [PropNames.RefElementParameters.onElementChange]: useStableCallback((e, p, r) => {
+            onNeedMutationObserverReset(e);
+        }),
     };
 });
 //# sourceMappingURL=use-mutation-observer.js.map

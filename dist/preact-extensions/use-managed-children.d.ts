@@ -1,5 +1,37 @@
-import { Nullable } from "../util/types.js";
+import { Nullable, PropNames } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
+declare module "../util/types.js" {
+    interface PropNames {
+        ManagedChildrenParameters: typeof P1Names;
+    }
+}
+declare module "../util/types.js" {
+    interface PropNames {
+        ManagedChildrenReturn: typeof R1Names;
+    }
+}
+declare module "../util/types.js" {
+    interface PropNames {
+        ManagedChildParameters: typeof P2Names;
+    }
+}
+declare module "../util/types.js" {
+    interface PropNames {
+        ManagedChildReturn: typeof R2Names;
+    }
+}
+export declare const P1Names: {
+    readonly onAfterChildLayoutEffect: "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect";
+    readonly onChildrenMountChange: "PropNames.ManagedChildrenParameters.onChildrenMountChange";
+    readonly onChildrenCountChange: "PropNames.ManagedChildrenParameters.onChildrenCountChange";
+};
+export declare const R1Names: {
+    readonly getChildren: "PropNames.ManagedChildrenReturn.getChildren";
+};
+export declare const P2Names: {};
+export declare const R2Names: {
+    readonly getChildren: "PropNames.ManagedChildReturnType.getChildren";
+};
 export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
@@ -36,21 +68,22 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
      *
      * @stable
      */
-    onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
+    [PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect]?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      *
      * @stable
      */
-    onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+    [PropNames.ManagedChildrenParameters.onChildrenMountChange]?: Nullable<OnChildrenMountChange<M["index"]>>;
     /**
      *
      * @stable
      */
-    onChildrenCountChange?: Nullable<((count: number) => void)>;
+    [PropNames.ManagedChildrenParameters.onChildrenCountChange]?: Nullable<((count: number) => void)>;
 }
-export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
+export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> extends UseManagedChildrenParametersSelf<M> {
+}
+export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> extends UseManagedChildReturnTypeSelf<M> {
 }
 /**
  * Basically all `use*Child` functions contain the same two parameters, plus the extras:
@@ -87,18 +120,9 @@ export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any
      *
      * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere
      */
-    getChildren(): ManagedChildren<M>;
+    [PropNames.ManagedChildrenReturn.getChildren](): ManagedChildren<M>;
 }
-export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
-    /**
-     * Returns information about the child that rendered itself with the requested key.
-     *
-     * **Everything about this object is stable**. E.G. `managedChildrenReturn` itself, `managedChildrenReturn.getChildren`,
-     * `managedChildrenReturn.getChildren()`, and `managedChildrenReturn.getChildren().getAt`, are all stable.
-     *
-     * @stable
-     */
-    managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
+export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> extends UseManagedChildrenReturnTypeSelf<M> {
     context: UseManagedChildrenContext<M>;
 }
 export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
@@ -107,10 +131,7 @@ export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> 
      *
      * @stable
      */
-    getChildren(): ManagedChildren<M>;
-}
-export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
-    managedChildReturn: UseManagedChildReturnTypeSelf<M>;
+    [PropNames.ManagedChildReturn.getChildren](): ManagedChildren<M>;
 }
 /**
  * Abstraction over the managed children
@@ -181,7 +202,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  * @compositeParams
  */
-export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
+export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>({ [PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames.ManagedChildrenParameters.onChildrenMountChange]: onChildrenMountChange, [PropNames.ManagedChildrenParameters.onChildrenCountChange]: onChildrenCountChange, ..._void1 }: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
 /**
  * @compositeParams
  */

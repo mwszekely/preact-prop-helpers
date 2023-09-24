@@ -1,7 +1,20 @@
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useRef } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
+const P = `PropNames.RefElementParameters`;
+const R = `PropNames.RefElementReturn`;
+const RefElementParameters = {
+    onElementChange: `${P}.onElementChange`,
+    onMount: `${P}.onMount`,
+    onUnmount: `${P}.onUnmount`
+};
+const RefElementReturn = {
+    getElement: `${R}.getElement`
+};
+PropNames.RefElementParameters ??= RefElementParameters;
+PropNames.RefElementReturn ??= RefElementReturn;
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -37,21 +50,26 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export const useRefElement = monitored(function useRefElement(args) {
-    const nonElementWarn = useRef(false);
-    if (nonElementWarn.current) {
-        nonElementWarn.current = false;
-        // There are two of these to catch the problem in the two most useful areas --
-        // when it initially happens, and also in the component stack.
-        console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-    }
-    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
+export const useRefElement = monitored(function useRefElement({ [RefElementParameters.onElementChange]: onElementChange, [RefElementParameters.onMount]: onMount, [RefElementParameters.onUnmount]: onUnmount }) {
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
+    // In dev mode, ensure we don't get the ref of a VNode
+    // (it's useRefElement, not useRefVnode)
+    let nonElementWarn;
+    if (process.env.NODE_ENV === 'development') {
+        nonElementWarn = useRef(false);
+        if (nonElementWarn.current) {
+            nonElementWarn.current = false;
+            // There are two of these to catch the problem in the two most useful areas --
+            // when it initially happens, and also in the component stack.
+            console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+        }
+    }
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback((e, prevValue) => {
         if (!(e == null || e instanceof Element)) {
             console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-            nonElementWarn.current = true;
+            if (nonElementWarn)
+                nonElementWarn.current = true;
         }
         const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
@@ -66,10 +84,8 @@ export const useRefElement = monitored(function useRefElement(args) {
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        propsStable: propsStable.current,
-        refElementReturn: {
-            getElement,
-        }
+        [RefElementReturn.getElement]: getElement,
+        props: propsStable.current
     };
 });
 //# sourceMappingURL=use-ref-element.js.map

@@ -7,12 +7,12 @@ import {
     GetIndex,
     MultiSelectionChangeEvent,
     UseProcessedChildContext as NormalListChildContext,
+    PropNames,
     UseCompleteListNavigationChildInfo,
     UseCompleteListNavigationDeclarativeReturnType,
     VNode,
 
     focus,
-    monitored,
     useCompleteListNavigationChildDeclarative,
     useCompleteListNavigationChildren,
     useCompleteListNavigationDeclarative,
@@ -37,7 +37,7 @@ const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
 const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
 const WeirdContext = createContext<UseProcessedChildrenContext>(null!);
-export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
+export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
 
@@ -61,14 +61,30 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     }
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
-        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
-        singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
-        refElementParameters: {},
-        paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
-        singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
-        multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode }
+        [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: null,
+        [PropNames.RovingTabIndexParameters.untabbable]: untabbable,
+        [PropNames.RovingTabIndexParameters.focusSelfParent]: focus,
+        [PropNames.SingleSelectionParameters.onSingleSelectedIndexChange]: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []),
+        [PropNames.SingleSelectionParameters.singleSelectedIndex]: singleSelectedIndex,
+        [PropNames.TypeaheadNavigationParameters.collator]: null,
+        [PropNames.TypeaheadNavigationParameters.noTypeahead]: false,
+        [PropNames.TypeaheadNavigationParameters.typeaheadTimeout]: 1000,
+        [PropNames.TypeaheadNavigationParameters.onNavigateTypeahead]: null,
+        [PropNames.LinearNavigationParameters.disableHomeEndKeys]: false,
+        [PropNames.LinearNavigationParameters.arrowKeyDirection]: "vertical",
+        [PropNames.LinearNavigationParameters.navigatePastEnd]: "wrap",
+        [PropNames.LinearNavigationParameters.navigatePastStart]: "wrap",
+        [PropNames.LinearNavigationParameters.pageNavigationSize]: 0.1,
+        [PropNames.LinearNavigationParameters.onNavigateLinear]: null,
+        [PropNames.PaginatedParameters.paginationMin]: min,
+        [PropNames.PaginatedParameters.paginationMax]: max,
+        [PropNames.SingleSelectionParameters.singleSelectionAriaPropName]: "aria-selected",
+        [PropNames.SingleSelectionParameters.singleSelectionMode]: singleSelectionMode,
+        [PropNames.MultiSelectionParameters.multiSelectionAriaPropName]: "aria-checked",
+        [PropNames.MultiSelectionParameters.onSelectionChange]: onSelectionChange,
+        [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode,
+        [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: 0,
+        [PropNames.StaggeredParameters.staggered]: staggered
     });
 
 
@@ -76,10 +92,12 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         props,
         contextChildren,
         contextProcessing,
-        rovingTabIndexReturn: { setTabbableIndex },
-        managedChildrenReturn: { getChildren },
-        typeaheadNavigationReturn: { typeaheadStatus },
-        rearrangeableChildrenReturn: { shuffle, reverse, sort: _sort },
+        [PropNames.RovingTabIndexReturn.setTabbableIndex]: setTabbableIndex,
+        [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+        [PropNames.TypeaheadNavigationReturn.typeaheadStatus]: typeaheadStatus,
+        [PropNames.RearrangeableReturn.shuffle]: shuffle,
+        [PropNames.RearrangeableReturn.reverse]: reverse,
+        [PropNames.RearrangeableReturn.sort]: _sort
     } = r;
 
 
@@ -129,7 +147,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                 <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <div>Staggering status: {staggered? staggering? "Staggering..." : "Done staggering" : "Not staggered"}</div>
+            <div>Staggering status: {staggered ? staggering ? "Staggering..." : "Done staggering" : "Not staggered"}</div>
             {<div>Typeahead status: {typeaheadStatus}</div>}
             {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
             <UntabbableContext.Provider value={untabbable}>
@@ -137,7 +155,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                     <MultiSelectionModeContext.Provider value={multiSelectionMode}>
                         <ListNavigationSingleSelectionChildContext.Provider value={contextChildren}>
                             <WeirdContext.Provider value={contextProcessing}>
-                                <ol start={0} {...props}>
+                                <ol start={0} {...useMergedProps(...props)}>
                                     <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
                                 </ol>
                             </WeirdContext.Provider>
@@ -147,38 +165,42 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
             </UntabbableContext.Provider>
         </div>
     );
-}))
+})
 
-export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
-    const { 
+export const DemoUseRovingTabIndexChildren = memo((function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
+    const {
         context,
-        paginatedChildrenReturn,
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn
+        [PropNames.PaginatedReturn.refreshPagination]: refreshPagination,
+        [PropNames.RearrangeableReturn.children]: children,
+        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+        [PropNames.RearrangeableReturn.rearrange]: rearrange,
+        [PropNames.RearrangeableReturn.reverse]: reverse,
+        [PropNames.RearrangeableReturn.shuffle]: shuffle,
+        [PropNames.RearrangeableReturn.sort]: sort,
+        [PropNames.StaggeredReturn.stillStaggering]: stillStaggering
     } = useCompleteListNavigationChildren({
-        paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
-        rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null,
-            compare: null,
-            adjust: null,
-            children: useMemo(() => Array.from((function* () {
-                for (let i = 0; i < (count); ++i) {
-                    yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
-                }
-            })()), [count]),
-        },
-        managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        [PropNames.PaginatedParameters.paginationMax]: max,
+        [PropNames.PaginatedParameters.paginationMin]: min,
+        [PropNames.RearrangeableParameters.getIndex]: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+        [PropNames.RearrangeableParameters.onRearranged]: null,
+        [PropNames.RearrangeableParameters.compare]: null,
+        [PropNames.RearrangeableParameters.adjust]: null,
+        [PropNames.RearrangeableParameters.children]: useMemo(() => Array.from((function* () {
+            for (let i = 0; i < (count); ++i) {
+                yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
+            }
+        })()), [count]),
+        [PropNames.StaggeredParameters.staggered]: staggered,
         context: useContext(WeirdContext)
     })
 
     useEffect(() => {
-        setStaggering(staggeredChildrenReturn.stillStaggering);
-    }, [staggeredChildrenReturn.stillStaggering])
+        setStaggering(stillStaggering);
+    }, [stillStaggering])
 
     return (
-        <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
+        <ListChildContext.Provider value={context}>{children}</ListChildContext.Provider>
     )
 }));
 
@@ -189,22 +211,33 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { propsStable, refElementReturn: { getElement } } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: useStableCallback((e, p, r) => {
-        onElementChange?.(e, p, r);
-    }) } })
+const DemoUseRovingTabIndexChildOuter = memo((function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
+    const {
+        props: propsStable,
+        [PropNames.RefElementReturn.getElement]: getElement
+    } = useRefElement<HTMLLIElement>({
+        [PropNames.RefElementParameters.onElementChange]: useStableCallback((e, p, r) => {
+            onElementChange?.(e, p, r);
+        })
+    })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
+    const {
+        props,
+        [PropNames.RefElementParameters.onElementChange]: onElementChange,
+        [PropNames.StaggeredChildReturn.hideBecauseStaggered]: hideBecauseStaggered,
+        [PropNames.PaginatedChildReturn.hideBecausePaginated]: hideBecausePaginated
+
+    }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index }
     })
     const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
     return (
-        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : c}</li>
+        <li {...useMergedProps(props, propsStable)}>{hideBecausePaginated || hideBecauseStaggered ? "\xA0" : c}</li>
     )
 }));
 
-const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndexChild({ index }: { index: number }) {
+const DemoUseRovingTabIndexChild = memo((function DemoUseRovingTabIndexChild({ index }: { index: number }) {
     if (index == 1)
         return <span>(Item {index} is a <strong>hole in the array</strong> and does not exist)</span>;
 
@@ -223,34 +256,72 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
     const getSortValue = useStableCallback(() => index);
 
     const {
-        hasCurrentFocusReturn,
-        managedChildReturn,
         propsChild,
         propsTabbable,
-        textContentReturn,
-        rovingTabIndexChildReturn: { tabbable },
-        singleSelectionChildReturn: { singleSelected, getSingleSelected, singleSelectedOffset, getSingleSelectedOffset },
-        multiSelectionChildReturn: { getMultiSelected },
-        pressParameters: { onPressSync, excludeSpace },
-        refElementReturn
+
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged,
+        //  [PropNames.HasCurrentFocusReturn.getLastFocused]: getLastFocused,
+        // [PropNames.HasCurrentFocusReturn.getLastFocusedInner]: getLastFocusedInner,
+        //  [PropNames.ManagedChildReturnType.getChildren]: getChildren,
+        [PropNames.MultiSelectionChildReturn.getMultiSelected]: getMultiSelected,
+        //    [PropNames.MultiSelectionChildReturn.multiSelected]: multiSelected,
+        [PropNames.MultiSelectionParameters.multiSelectionMode]: multiSelectionMode,
+        [PropNames.PressParameters.excludeSpace]: excludeSpace,
+        [PropNames.PressParameters.onPressSync]: onPressSync,
+        [PropNames.RefElementReturn.getElement]: getElement,
+        [PropNames.RovingTabIndexChildReturn.getTabbable]: getTabbable,
+        [PropNames.RovingTabIndexChildReturn.tabbable]: tabbable,
+        [PropNames.SingleSelectionChildReturn.getSingleSelected]: getSingleSelected,
+        [PropNames.SingleSelectionChildReturn.getSingleSelectedOffset]: getSingleSelectedOffset,
+        [PropNames.SingleSelectionChildReturn.singleSelected]: singleSelected,
+        [PropNames.SingleSelectionChildReturn.singleSelectedOffset]: singleSelectedOffset,
+        [PropNames.SingleSelectionChildReturn.singleSelectionMode]: singleSelectionMode,
+        [PropNames.TextContentReturn.getTextContent]: getTextContent
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
-        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
-        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
-        refElementParameters: { onElementChange: null, onMount: null, onUnmount: null },
-        multiSelectionChildParameters: { multiSelectionDisabled: disabled },
-        singleSelectionChildParameters: { singleSelectionDisabled: disabled },
-        multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged]: null,
+        [PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged]: null,
+        [PropNames.MultiSelectionChildParameters.initiallyMultiSelected]: false,
+        [PropNames.MultiSelectionChildParameters.multiSelected]: multiSelected,
+        [PropNames.MultiSelectionChildParameters.multiSelectionDisabled]: disabled,
+        [PropNames.MultiSelectionChildParameters.onMultiSelectChange]: null,
+        [PropNames.SingleSelectionChildParameters.singleSelectionDisabled]: false,
+        [PropNames.TextContentParameters.getText]: useCallback((e) => { return e?.textContent ?? "" }, []),
+        [PropNames.RefElementParameters.onElementChange]: null,
+        [PropNames.RefElementParameters.onMount]: null,
+        [PropNames.RefElementParameters.onUnmount]: null
+        //  textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
+        //  hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+        //  refElementParameters: { onElementChange: null, onMount: null, onUnmount: null },
+        //   multiSelectionChildParameters: { multiSelectionDisabled: disabled },
+        //   singleSelectionChildParameters: { singleSelectionDisabled: disabled },
+        //   multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
-    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
+    const {
+        props: p2,
+        [PropNames.PressReturn.getIsPressing]: getIsPressing,
+        [PropNames.PressReturn.longPress]: longPress,
+        [PropNames.PressReturn.pressing]: pressing
+
+    } = usePress<HTMLLIElement>({
+        [PropNames.PressParameters.focusSelf]: focusSelf,
+        [PropNames.PressParameters.onPressSync]: onPressSync,
+        [PropNames.PressParameters.excludeSpace]: excludeSpace,
+        [PropNames.PressParameters.allowRepeatPresses]: false,
+        [PropNames.PressParameters.excludeEnter]: null,
+        [PropNames.PressParameters.excludePointer]: null,
+        [PropNames.PressParameters.longPressThreshold]: null,
+        [PropNames.PressParameters.onPressingChange]: null,
+        [PropNames.RefElementReturn.getElement]: getElement
+    })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
     const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></span>
+        <span {...useMergedProps(...propsChild, ...propsTabbable, ...p2)}>{text}<input {...useMergedProps(...propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></span>
     )
 }));

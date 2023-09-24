@@ -3,9 +3,30 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
+const P1 = `PropNames.RearrangeableParameters`;
+const R1 = `PropNames.RearrangeableReturn`;
+export const P1Names = {
+    compare: `${P1}.compare`,
+    adjust: `${P1}.adjust`,
+    getIndex: `${P1}.getIndex`,
+    onRearranged: `${P1}.onRearranged`,
+    children: `${P1}.children`,
+};
+export const R1Names = {
+    rearrange: `${R1}.rearrange`,
+    shuffle: `${R1}.shuffle`,
+    reverse: `${R1}.reverse`,
+    indexMangler: `${R1}.indexMangler`,
+    indexDemangler: `${R1}.indexDemangler`,
+    children: `${R1}.children`,
+    sort: `${R1}.sort`
+};
+PropNames.RearrangeableParameters ??= P1Names;
+PropNames.RearrangeableReturn ??= R1Names;
 /**
  * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
  *
@@ -24,7 +45,7 @@ export function useCreateProcessedChildrenContext() {
     const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
     const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
     const rearrange = useStableCallback((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered); }, []);
-    const provideManglers = useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+    const provideManglers = useStableCallback(({ [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler, [PropNames.RearrangeableReturn.indexMangler]: indexMangler, [PropNames.RearrangeableReturn.reverse]: reverse, [PropNames.RearrangeableReturn.shuffle]: shuffle, [PropNames.RearrangeableReturn.sort]: sort }) => {
         indexManglerRef.current = indexMangler;
         indexDemanglerRef.current = indexDemangler;
         reverseRef.current = reverse;
@@ -35,12 +56,12 @@ export function useCreateProcessedChildrenContext() {
     const context = useMemoObject({ rearrangeableChildrenContext });
     return {
         context,
-        indexDemangler,
-        indexMangler,
-        rearrange,
-        reverse,
-        shuffle,
-        sort
+        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+        [PropNames.RearrangeableReturn.rearrange]: rearrange,
+        [PropNames.RearrangeableReturn.reverse]: reverse,
+        [PropNames.RearrangeableReturn.shuffle]: shuffle,
+        [PropNames.RearrangeableReturn.sort]: sort
     };
 }
 /**
@@ -66,7 +87,10 @@ export function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ 
+//rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
+//managedChildrenReturn: { getChildren },
+[PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.RearrangeableParameters.children]: children, [PropNames.RearrangeableParameters.adjust]: adjust, [PropNames.RearrangeableParameters.getIndex]: getIndex, [PropNames.RearrangeableParameters.onRearranged]: onRearranged, [PropNames.RearrangeableParameters.compare]: userCompare, context: { rearrangeableChildrenContext: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -154,23 +178,21 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     // but we're one level deeper in the tree, so once we mount we need to give it to them.
     useLayoutEffect(() => {
         provideManglers({
-            indexDemangler,
-            indexMangler,
-            reverse,
-            shuffle,
-            sort
+            [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+            [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+            [PropNames.RearrangeableReturn.reverse]: reverse,
+            [PropNames.RearrangeableReturn.shuffle]: shuffle,
+            [PropNames.RearrangeableReturn.sort]: sort,
         });
     }, []);
     return {
-        rearrangeableChildrenReturn: {
-            indexMangler,
-            indexDemangler,
-            rearrange,
-            shuffle,
-            reverse,
-            sort,
-            children: sorted
-        }
+        [PropNames.RearrangeableReturn.indexMangler]: indexMangler,
+        [PropNames.RearrangeableReturn.indexDemangler]: indexDemangler,
+        [PropNames.RearrangeableReturn.rearrange]: rearrange,
+        [PropNames.RearrangeableReturn.shuffle]: shuffle,
+        [PropNames.RearrangeableReturn.reverse]: reverse,
+        [PropNames.RearrangeableReturn.sort]: sort,
+        [PropNames.RearrangeableReturn.children]: sorted
     };
 });
 function defaultCompare(lhs, rhs) {

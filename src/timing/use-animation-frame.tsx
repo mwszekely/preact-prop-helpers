@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
-import { ElementProps, Nullable } from "../util/types.js";
+import { ElementProps, Nullable, VNode } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
@@ -45,7 +45,7 @@ export function ProvideBatchedAnimationFrames({ children }: { children: ElementP
     }, []);
 
     return (
-        createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children })
+        createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children }) as VNode
     )
 }
 

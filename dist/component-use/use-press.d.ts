@@ -1,16 +1,38 @@
-import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "../dom-helpers/use-async-handler.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
+import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, PropNames, TouchEventType } from "../util/types.js";
+declare module "../util/types.js" {
+    interface PropNames {
+        PressParameters: typeof PNames;
+    }
+}
+declare module "../util/types.js" {
+    interface PropNames {
+        PressReturn: typeof RNames;
+    }
+}
+export declare const PNames: {
+    readonly onPressingChange: "PropNames.PressParameters.onPressingChange";
+    readonly onPressSync: "PropNames.PressParameters.onPressSync";
+    readonly excludeSpace: "PropNames.PressParameters.excludeSpace";
+    readonly excludeEnter: "PropNames.PressParameters.excludeEnter";
+    readonly excludePointer: "PropNames.PressParameters.excludePointer";
+    readonly focusSelf: "PropNames.PressParameters.focusSelf";
+    readonly allowRepeatPresses: "PropNames.PressParameters.allowRepeatPresses";
+    readonly longPressThreshold: "PropNames.PressParameters.longPressThreshold";
+};
+export declare const RNames: {
+    readonly pressing: "PropNames.PressReturn.pressing";
+    readonly getIsPressing: "PropNames.PressReturn.getIsPressing";
+    readonly longPress: "PropNames.PressReturn.longPress";
+};
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
-export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    pressParameters: UsePressParametersSelf<E>;
+export interface UsePressParameters<E extends EventTarget> extends UsePressParametersSelf<E>, Pick<UseRefElementReturnType<E>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
 }
 export interface UsePressParametersSelf<E extends EventTarget> {
     /**  */
-    onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
+    [PropNames.PressParameters.onPressingChange]: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
     /**
      * What should happen when this widget has been "pressed".
      *
@@ -20,13 +42,13 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      *
      * @nonstable
      */
-    onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
+    [PropNames.PressParameters.onPressSync]: Nullable<((e: PressEventReason<E>) => void)>;
     /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
-    excludeSpace: Nullable<() => boolean>;
+    [PropNames.PressParameters.excludeSpace]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
-    excludeEnter: Nullable<() => boolean>;
+    [PropNames.PressParameters.excludeEnter]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
-    excludePointer: Nullable<() => boolean>;
+    [PropNames.PressParameters.excludePointer]: Nullable<() => boolean>;
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
      *
@@ -35,16 +57,16 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      *
      * @nonstable
      */
-    focusSelf(element: E): void;
+    [PropNames.PressParameters.focusSelf](element: E): void;
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
      */
-    allowRepeatPresses: Nullable<boolean>;
+    [PropNames.PressParameters.allowRepeatPresses]: Nullable<boolean>;
     /**
      * After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true`
      * and the user's actions will not fire an actual press event.
      */
-    longPressThreshold: Nullable<number>;
+    [PropNames.PressParameters.longPressThreshold]: Nullable<number>;
 }
 export interface UsePressReturnTypeSelf {
     /**
@@ -52,19 +74,18 @@ export interface UsePressReturnTypeSelf {
      * but specifically for presses only, so it's a more accurate reflection
      * of what will happen for the user. Useful for styling mostly.
      */
-    pressing: boolean;
+    [PropNames.PressReturn.pressing]: boolean;
     /**
      * @stable
      */
-    getIsPressing(): boolean;
+    [PropNames.PressReturn.getIsPressing](): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
      */
-    longPress: boolean | null;
+    [PropNames.PressReturn.longPress]: boolean | null;
 }
-export interface UsePressReturnType<E extends Element> {
-    pressReturn: UsePressReturnTypeSelf;
-    props: ElementProps<E>;
+export interface UsePressReturnType<E extends Element> extends UsePressReturnTypeSelf {
+    props: ElementProps<E>[];
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for
@@ -91,14 +112,7 @@ export interface UsePressReturnType<E extends Element> {
  * @compositeParams
  *
  */
-export declare const usePress: <E extends Element>(args: UsePressParameters<E>) => UsePressReturnType<E>;
-export interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
-    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
-}
-export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
-    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
-}
-export declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
+export declare const usePress: <E extends Element>({ [PropNames.RefElementReturn.getElement]: getElement, [PropNames.PressParameters.focusSelf]: focusSelf, [PropNames.PressParameters.onPressSync]: onPressSync, [PropNames.PressParameters.allowRepeatPresses]: allowRepeatPresses, [PropNames.PressParameters.longPressThreshold]: longPressThreshold, [PropNames.PressParameters.excludeEnter]: ee, [PropNames.PressParameters.excludePointer]: ep, [PropNames.PressParameters.excludeSpace]: es, [PropNames.PressParameters.onPressingChange]: opc, ..._void1 }: UsePressParameters<E>) => UsePressReturnType<E>;
 /**
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *

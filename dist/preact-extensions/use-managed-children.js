@@ -1,9 +1,30 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
+const P1 = `PropNames.ManagedChildrenParameters`;
+const R1 = `PropNames.ManagedChildrenReturn`;
+const P2 = `PropNames.ManagedChildParameters`;
+const R2 = `PropNames.ManagedChildReturnType`;
+export const P1Names = {
+    onAfterChildLayoutEffect: `${P1}.onAfterChildLayoutEffect`,
+    onChildrenMountChange: `${P1}.onChildrenMountChange`,
+    onChildrenCountChange: `${P1}.onChildrenCountChange`
+};
+export const R1Names = {
+    getChildren: `${R1}.getChildren`
+};
+export const P2Names = {};
+export const R2Names = {
+    getChildren: `${R2}.getChildren`
+};
+PropNames.ManagedChildrenParameters ??= P1Names;
+PropNames.ManagedChildrenReturn ??= R1Names;
+PropNames.ManagedChildParameters ??= P2Names;
+PropNames.ManagedChildReturn ??= R2Names;
 /**
  * Reminder of order of execution:
  *
@@ -40,10 +61,9 @@ const _comments = void (0);
  *
  * @compositeParams
  */
-export const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
-    assertEmptyObject(rest);
+export const useManagedChildren = monitored(function useManagedChildren({ [PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [PropNames.ManagedChildrenParameters.onChildrenMountChange]: onChildrenMountChange, [PropNames.ManagedChildrenParameters.onChildrenCountChange]: onChildrenCountChange, ..._void1 }) {
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
+    assertEmptyObject(_void1);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
     const getLowestIndex = useCallback(() => { return managedChildrenArray.current.lowestIndex; }, []);
     // All the information we have about our children is stored in this **stable** array.
@@ -159,7 +179,7 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
                 getChildren
             })
         }),
-        managedChildrenReturn: { getChildren }
+        [PropNames.ManagedChildrenReturn.getChildren]: getChildren
     };
 });
 /**
@@ -194,7 +214,7 @@ export const useManagedChild = monitored(function useManagedChild({ context, inf
         return () => remoteULEChildMounted?.(index, false);
     }, [index]);
     return {
-        managedChildReturn: { getChildren: getChildren }
+        [PropNames.ManagedChildReturn.getChildren]: getChildren
     };
 });
 /**

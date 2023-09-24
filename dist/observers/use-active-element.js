@@ -1,7 +1,70 @@
 import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+const P = `PropNames.ActiveElementParameters`;
+const R = `PropNames.ActiveElementReturn`;
+const PNames = {
+    onActiveElementChange: `${P}.onActiveElementChange`,
+    onLastActiveElementChange: `${P}.onLastActiveElementChange`,
+    onWindowFocusedChange: `${P}.onWindowFocusedChange`,
+    getDocument: `${P}.getDocument`
+};
+const RNames = {
+    getActiveElement: `${R}.getActiveElement`,
+    getLastActiveElement: `${R}.getLastActiveElement`,
+    getWindowFocused: `${R}.getWindowFocused`
+};
+/**
+ * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
+ *
+ * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
+ *
+ * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
+ *
+ * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+ *
+ * @compositeParams
+ */
+export const useActiveElement = monitored(function useActiveElement({ [PropNames.ActiveElementParameters.onActiveElementChange]: onActiveElementChange, [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange, [PropNames.ActiveElementParameters.onWindowFocusedChange]: onWindowFocusedChange, [PropNames.ActiveElementParameters.getDocument]: getDocument }) {
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
+    useEffect(() => {
+        const document = getDocument();
+        const window = (document?.defaultView);
+        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+            document?.addEventListener("focusin", focusin, { passive: true });
+            document?.addEventListener("focusout", focusout, { passive: true });
+            window?.addEventListener("focus", windowFocus, { passive: true });
+            window?.addEventListener("blur", windowBlur, { passive: true });
+        }
+        const laeu = { send: setActiveElement, lastSent: undefined };
+        const llaeu = { send: setLastActiveElement, lastSent: undefined };
+        const lwfu = { send: setWindowFocused, lastSent: undefined };
+        MapOfSets.add(activeElementUpdaters, window, laeu);
+        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
+        return () => {
+            MapOfSets.delete(activeElementUpdaters, window, laeu);
+            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
+            if (activeElementUpdaters.size === 0) {
+                document?.removeEventListener("focusin", focusin);
+                document?.removeEventListener("focusout", focusout);
+                window?.removeEventListener("focus", windowFocus);
+                window?.removeEventListener("blur", windowBlur);
+            }
+        };
+    }, []);
+    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, runImmediately);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
+    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
+    return {
+        [PropNames.ActiveElementReturn.getActiveElement]: getActiveElement,
+        [PropNames.ActiveElementReturn.getLastActiveElement]: getLastActiveElement,
+        [PropNames.ActiveElementReturn.getWindowFocused]: getWindowFocused
+    };
+});
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -82,49 +145,4 @@ function windowBlur(e) {
     windowsFocusedUpdaters.set(window, false);
     forEachUpdater(window, windowFocusedUpdaters, false, e);
 }
-/**
- * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
- *
- * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
- *
- * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
- *
- * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
- *
- * @compositeParams
- */
-export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
-    useEffect(() => {
-        const document = getDocument();
-        const window = (document?.defaultView);
-        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
-            document?.addEventListener("focusin", focusin, { passive: true });
-            document?.addEventListener("focusout", focusout, { passive: true });
-            window?.addEventListener("focus", windowFocus, { passive: true });
-            window?.addEventListener("blur", windowBlur, { passive: true });
-        }
-        const laeu = { send: setActiveElement, lastSent: undefined };
-        const llaeu = { send: setLastActiveElement, lastSent: undefined };
-        const lwfu = { send: setWindowFocused, lastSent: undefined };
-        MapOfSets.add(activeElementUpdaters, window, laeu);
-        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
-        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
-        return () => {
-            MapOfSets.delete(activeElementUpdaters, window, laeu);
-            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
-            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
-            if (activeElementUpdaters.size === 0) {
-                document?.removeEventListener("focusin", focusin);
-                document?.removeEventListener("focusout", focusout);
-                window?.removeEventListener("focus", windowFocus);
-                window?.removeEventListener("blur", windowBlur);
-            }
-        };
-    }, []);
-    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, runImmediately);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
-    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
-    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-});
 //# sourceMappingURL=use-active-element.js.map

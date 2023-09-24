@@ -1,17 +1,14 @@
-//import "preact/debug";
+import "preact/debug";
 
-import { createContext, render } from "preact";
+import { render } from "preact";
 import { memo } from "preact/compat";
-import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/index.js";
+import { MouseEventType, useGlobalHandler, usePortalChildren, useState } from "../dist/index.js";
 
-import { DemoUseGrid } from "./demos/use-grid.js";
-import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
-import { DemoUseTimeout } from "./demos/use-timeout.js";
 
 (window as any)._generate_setState_stacks = false;
 
+/*
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
@@ -378,7 +375,6 @@ const DemoFocus = memo(() => {
     )
 })
 
-
 function DemoLabel() {
     const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
     return (
@@ -399,12 +395,6 @@ function DemoPress({ remaining }: { remaining: number }) {
             focusSelf: e => { e.focus() },
             longPressThreshold: 1000,
             onPressSync: () => {
-                /*setTimeout(() => {
-                    let startTime = +(new Date());
-                    let endTime = new Date(startTime + 2000);
-                    while (+(new Date()) < +endTime);
-                    setCount((c: number) => ++c);
-                 });*/
                 setCount((c: number) => ++c);
             },
             allowRepeatPresses: false,
@@ -429,7 +419,7 @@ function DemoPress({ remaining }: { remaining: number }) {
             </div>
         </div>
     )
-}
+}*/
 
 function DemoPortalChildrenChild() {
     console.log("Render portal child");
@@ -549,12 +539,12 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 //options.debounceRendering = (f) => f();
 
-
+debugger;
 const Component = () => {
     return (
         <DemoUseRovingTabIndex />
     )
-    return <div class="flex" style={{ flexWrap: "wrap" }}>
+    /*return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />
         <div style="display:grid;grid-template-columns:1fr 1fr">
@@ -577,7 +567,7 @@ const Component = () => {
         <DemoUseTimeout />
         <hr />
         {/*<DemoUseInterval />
-        <hr />*/}
+        <hr />*\/}
         <DemoUseRovingTabIndex />
         <hr />
 
@@ -594,8 +584,8 @@ const Component = () => {
         <hr />
         {/*<DemoUseElementSizeAnimation />
         <hr />
-<input />*/}
-    </div>
+<input />*\/}
+    </div>*/
 }
 
 requestAnimationFrame(() => {

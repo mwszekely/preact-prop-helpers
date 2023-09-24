@@ -1,7 +1,17 @@
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
+import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
+const P = `PropNames.LostFocusDismissParameters`;
+const R = `PropNames.LostFocusDismissReturn`;
+export const PNames = {
+    dismissLostFocusActive: `${P}.dismissLostFocusActive`,
+    onDismissLostFocus: `${P}.onDismissLostFocus`,
+    getElementSource: `${P}.getElementSource`,
+    getElementPopup: `${P}.getElementPopup`
+};
+export const RNames = {};
 ;
 /**
  * Invokes a callback when focus travels outside of the component's element.
@@ -10,25 +20,23 @@ import { monitored } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
-    const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
+export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ [PropNames.LostFocusDismissParameters.getElementSource]: getElementSource, [PropNames.LostFocusDismissParameters.getElementPopup]: getElementPopup, [PropNames.LostFocusDismissParameters.dismissLostFocusActive]: open, [PropNames.LostFocusDismissParameters.onDismissLostFocus]: onClose, ..._void1 }) {
+    assertEmptyObject(_void1);
     const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
     const onLastActiveElementChange = useCallback((newElement, _prevElement, e) => {
         const open = getOpen();
-        const sourceElement = getSourceElement?.();
-        const popupElement = getPopupElement();
+        const sourceElement = getElementSource?.();
+        const popupElement = getElementPopup();
         if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
             if (open) {
                 console.assert(e != null);
                 stableOnClose()?.(e);
             }
         }
-    }, [getSourceElement]);
-    return { activeElementParameters: { onLastActiveElementChange } };
+    }, [getElementSource]);
+    return {
+        [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange
+    };
 });
 //# sourceMappingURL=use-lost-focus-dismiss.js.map

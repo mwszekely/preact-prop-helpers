@@ -2,26 +2,63 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseGenericChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { EventType, StateUpdater, TargetedPick } from "../../util/lib.js";
-import { ElementProps, Nullable } from "../../util/types.js";
+import { EventType, StateUpdater } from "../../util/lib.js";
+import { ElementProps, Nullable, PropNames } from "../../util/types.js";
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
+declare module "../../util/types.js" {
+    interface PropNames {
+        RovingTabIndexParameters: typeof P1Names;
+    }
+}
+declare module "../../util/types.js" {
+    interface PropNames {
+        RovingTabIndexReturn: typeof R1Names;
+    }
+}
+declare module "../../util/types.js" {
+    interface PropNames {
+        RovingTabIndexChildParameters: typeof P2Names;
+    }
+}
+declare module "../../util/types.js" {
+    interface PropNames {
+        RovingTabIndexChildReturn: typeof R2Names;
+    }
+}
+declare const P1Names: {
+    readonly focusSelfParent: "PropNames.RovingTabIndexParameters.focusSelfParent";
+    readonly initiallyTabbedIndex: "PropNames.RovingTabIndexParameters.initiallyTabbedIndex";
+    readonly untabbable: "PropNames.RovingTabIndexParameters.untabbable";
+    readonly untabbableBehavior: "PropNames.RovingTabIndexParameters.untabbableBehavior";
+    readonly onTabbableIndexChange: "PropNames.RovingTabIndexParameters.onTabbableIndexChange";
+};
+declare const R1Names: {
+    readonly setTabbableIndex: "PropNames.RovingTabIndexReturn.setTabbableIndex";
+    readonly getTabbableIndex: "PropNames.RovingTabIndexReturn.getTabbableIndex";
+    readonly focusSelf: "PropNames.RovingTabIndexReturn.focusSelf";
+};
+declare const P2Names: {};
+declare const R2Names: {
+    readonly tabbable: "PropNames.RovingTabIndexChildReturn.tabbable";
+    readonly getTabbable: "PropNames.RovingTabIndexChildReturn.getTabbable";
+};
 export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> {
     /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
-    focusSelfParent(e: ParentElement | null): void;
+    [PropNames.RovingTabIndexParameters.focusSelfParent](e: ParentElement | null): void;
     /**
      * This is imperative, not declarative;
      * it is better if we can keep re-renders on the parent to a minimum anyway.
      *
      * You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.
      */
-    initiallyTabbedIndex: Nullable<number>;
+    [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: Nullable<number>;
     /**
      * When true, none of the children will be tabbable, as if the entire component is hidden.
      *
      * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
      */
-    untabbable: boolean;
+    [PropNames.RovingTabIndexParameters.untabbable]: boolean;
     /**
      * When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.
      *
@@ -30,7 +67,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> 
      *
      * If `untabbable` is false, then this has no effect.
      */
-    untabbableBehavior: "focus-parent" | "leave-child-focused";
+    [PropNames.RovingTabIndexParameters.untabbableBehavior]: "focus-parent" | "leave-child-focused";
     /**
      * If you would like to have an event run whenever a new index becomes tabbable
      * (e.g. to call `setState` to render that tabbable index...for some reason...)
@@ -38,7 +75,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> 
      *
      * **MUST** be stable!
      */
-    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
+    [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
 }
 export interface UseRovingTabIndexReturnTypeSelf {
     /**
@@ -49,19 +86,19 @@ export interface UseRovingTabIndexReturnTypeSelf {
      *
      * @stable
      */
-    setTabbableIndex: SetTabbableIndex;
+    [PropNames.RovingTabIndexReturn.setTabbableIndex]: SetTabbableIndex;
     /**
      * Returns the index of the child that is currently tabbable.
      *
      * @stable
      */
-    getTabbableIndex: () => number | null;
+    [PropNames.RovingTabIndexReturn.getTabbableIndex]: () => number | null;
     /**
      * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      *
      * @stable
      */
-    focusSelf: (reason?: any) => void;
+    [PropNames.RovingTabIndexReturn.focusSelf]: (reason?: any) => void;
 }
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
     /**
@@ -111,26 +148,15 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      */
     getLocallyTabbable: () => boolean;
 }
-export interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
-    /** When children mount/unmount, RTI needs access to all known children in case we unmounted the currently tabbable child */
-    /** The only parameters RTI needs directly is the initial index to be tabbable */
-    rovingTabIndexParameters: UseRovingTabIndexParametersSelf<ParentElement>;
+export interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends Pick<UseManagedChildrenReturnType<M>, (typeof PropNames)["ManagedChildrenReturn"]["getChildren"]>, Pick<UseRefElementReturnType<ParentElement>, (typeof PropNames)["RefElementReturn"]["getElement"]>, UseRovingTabIndexParametersSelf<ParentElement> {
 }
-export interface UseRovingTabIndexReturnType<ParentElement extends Element, TabbableChildElement extends Element> extends TargetedPick<UseManagedChildrenParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenParameters", "onChildrenMountChange"> {
-    /** RTI runs logic when its children mount/unmount themselves */
-    props: ElementProps<ParentElement>;
-    /**
-     * STABLE
-     */
+export interface UseRovingTabIndexReturnType<ParentElement extends Element, TabbableChildElement extends Element> extends UseRovingTabIndexReturnTypeSelf, Pick<UseManagedChildrenParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>, (typeof PropNames)["ManagedChildrenParameters"]["onChildrenMountChange"]> {
+    props: ElementProps<ParentElement>[];
     context: RovingTabIndexChildContext;
-    /**
-     * Return information that lets the user update/query/focus the currently tabbable child
-     */
-    rovingTabIndexReturn: UseRovingTabIndexReturnTypeSelf;
 }
 export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
 export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
-export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> extends UseGenericChildParameters<RovingTabIndexChildContext, Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, UseRovingTabIndexChildInfoKeysParameters>>, Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn"> {
+export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> extends UseGenericChildParameters<RovingTabIndexChildContext, Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, UseRovingTabIndexChildInfoKeysParameters>>, Pick<UseRefElementReturnType<TabbableChildElement>, (typeof PropNames)["RefElementReturn"]["getElement"]> {
 }
 export interface RovingTabIndexChildContextSelf {
     getUntabbable(): boolean;
@@ -153,15 +179,13 @@ export interface UseRovingTabIndexChildReturnTypeSelf {
     /**
      * Whether this child, individually, is *the* currently tabbable child.
      */
-    tabbable: boolean;
+    [PropNames.RovingTabIndexChildReturn.tabbable]: boolean;
     /**
      * @stable
      */
-    getTabbable(): boolean;
+    [PropNames.RovingTabIndexChildReturn.getTabbable](): boolean;
 }
-export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> extends TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
-    /** Return information about the tabbable state of this child */
-    rovingTabIndexChildReturn: UseRovingTabIndexChildReturnTypeSelf;
+export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeSelf, Pick<UseHasCurrentFocusParameters<ChildElement>, (typeof PropNames)["HasCurrentFocusParameters"]["onCurrentFocusedInnerChanged"]> {
     /**
      * Pass this to `useManagedChild`.
      */
@@ -194,7 +218,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export declare const useRovingTabIndex: <ParentElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>) => UseRovingTabIndexReturnType<ParentElement, ChildElement>;
+export declare const useRovingTabIndex: <ParentElement extends Element, ChildElement extends Element>({ [PropNames.RovingTabIndexParameters.focusSelfParent]: focusSelfParentUnstable, [PropNames.RovingTabIndexParameters.untabbable]: untabbable, [PropNames.RovingTabIndexParameters.untabbableBehavior]: untabbableBehavior, [PropNames.RovingTabIndexParameters.initiallyTabbedIndex]: initiallyTabbedIndex, [PropNames.RovingTabIndexParameters.onTabbableIndexChange]: onTabbableIndexChange, [PropNames.ManagedChildrenReturn.getChildren]: getChildren, [PropNames.RefElementReturn.getElement]: getElement, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>) => UseRovingTabIndexReturnType<ParentElement, ChildElement>;
 /**
  * @compositeParams
  *
@@ -202,5 +226,6 @@ export declare const useRovingTabIndex: <ParentElement extends Element, ChildEle
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export declare const useRovingTabIndexChild: <ChildElement extends Element>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement>) => UseRovingTabIndexChildReturnType<ChildElement>;
+export declare const useRovingTabIndexChild: <ChildElement extends Element>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, [PropNames.RefElementReturn.getElement]: getElement, ...void3 }: UseRovingTabIndexChildParameters<ChildElement>) => UseRovingTabIndexChildReturnType<ChildElement>;
+export {};
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

@@ -1,9 +1,146 @@
 
 import { MapOfSets } from "map-and-set-extensions";
-
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+
+declare module "../util/types.js" { interface PropNames { ActiveElementParameters: typeof PNames } }
+declare module "../util/types.js" { interface PropNames { ActiveElementReturn: typeof RNames } }
+
+const P = `PropNames.ActiveElementParameters`;
+const R = `PropNames.ActiveElementReturn`;
+
+const PNames = {
+    onActiveElementChange: `${P}.onActiveElementChange`,
+    onLastActiveElementChange: `${P}.onLastActiveElementChange`,
+    onWindowFocusedChange: `${P}.onWindowFocusedChange`,
+    getDocument: `${P}.getDocument`
+} as const;
+
+const RNames = {
+    getActiveElement: `${R}.getActiveElement`,
+    getLastActiveElement: `${R}.getLastActiveElement`,
+    getWindowFocused: `${R}.getWindowFocused`
+} as const;
+
+export interface UseActiveElementParametersSelf {
+    /**
+     * Called any time the active element changes.
+     * 
+     * @stable
+     */
+    [PropNames.ActiveElementParameters.onActiveElementChange]: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+
+    /**
+     * Called any time the active element changes and is not null.
+     * 
+     * @stable
+     */
+    [PropNames.ActiveElementParameters.onLastActiveElementChange]: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+
+    /**
+     * Called any time the window gains/loses focus.
+     * 
+     * @stable
+     */
+    [PropNames.ActiveElementParameters.onWindowFocusedChange]: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+
+    /**
+     * This must be a function that returns the document associated with whatever elements we're listening to.
+     * 
+     * E.G. someDivElement.ownerDocument
+     * 
+     * @stable
+     */
+    [PropNames.ActiveElementParameters.getDocument](): Document;
+}
+
+export interface UseActiveElementReturnTypeSelf {
+    /** 
+     * Returns whatever element is currently focused, or `null` if there's no focused element
+     * @stable
+     */
+    [PropNames.ActiveElementReturn.getActiveElement]: () => Element | null;
+    /** 
+     * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
+     * @stable
+     */
+    [PropNames.ActiveElementReturn.getLastActiveElement]: () => Element;
+    /** 
+     * Returns if the window itself has focus or not
+     * @stable
+     */
+    [PropNames.ActiveElementReturn.getWindowFocused]: () => boolean;
+}
+
+export interface UseActiveElementParameters extends UseActiveElementParametersSelf { }
+export interface UseActiveElementReturnType extends UseActiveElementReturnTypeSelf { }
+
+/**
+ * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus 
+ * 
+ * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
+ * 
+ * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
+ * 
+ * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+ * 
+ * @compositeParams
+ */
+export const useActiveElement = monitored(function useActiveElement({
+    [PropNames.ActiveElementParameters.onActiveElementChange]: onActiveElementChange,
+    [PropNames.ActiveElementParameters.onLastActiveElementChange]: onLastActiveElementChange,
+    [PropNames.ActiveElementParameters.onWindowFocusedChange]: onWindowFocusedChange,
+    [PropNames.ActiveElementParameters.getDocument]: getDocument
+}: UseActiveElementParameters): UseActiveElementReturnType {
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
+
+    useEffect(() => {
+        const document = getDocument();
+        const window = (document?.defaultView);
+
+        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+            document?.addEventListener("focusin", focusin, { passive: true });
+            document?.addEventListener("focusout", focusout, { passive: true });
+            window?.addEventListener("focus", windowFocus, { passive: true });
+            window?.addEventListener("blur", windowBlur, { passive: true });
+        }
+
+        const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
+        const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
+        const lwfu = { send: setWindowFocused, lastSent: undefined };
+
+        MapOfSets.add(activeElementUpdaters, window, laeu);
+        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
+
+        return () => {
+            MapOfSets.delete(activeElementUpdaters, window, laeu);
+            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
+
+            if (activeElementUpdaters.size === 0) {
+                document?.removeEventListener("focusin", focusin);
+                document?.removeEventListener("focusout", focusout);
+                window?.removeEventListener("focus", windowFocus);
+                window?.removeEventListener("blur", windowBlur);
+            }
+        }
+    }, [])
+
+    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, runImmediately);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, runImmediately);
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
+
+    return {
+        [PropNames.ActiveElementReturn.getActiveElement]: getActiveElement,
+        [PropNames.ActiveElementReturn.getLastActiveElement]: getLastActiveElement,
+        [PropNames.ActiveElementReturn.getWindowFocused]: getWindowFocused
+    };
+})
+
+
 
 
 /**
@@ -103,125 +240,3 @@ function windowBlur(e: FocusEvent) {
     windowsFocusedUpdaters.set(window, false);
     forEachUpdater(window, windowFocusedUpdaters, false, e);
 }
-
-export interface UseActiveElementParametersSelf {
-    /**
-     * Called any time the active element changes.
-     * 
-     * @stable
-     */
-    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
-
-    /**
-     * Called any time the active element changes and is not null.
-     * 
-     * @stable
-     */
-    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
-
-    /**
-     * Called any time the window gains/loses focus.
-     * 
-     * @stable
-     */
-    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
-
-    /**
-     * This must be a function that returns the document associated with whatever elements we're listening to.
-     * 
-     * E.G. someDivElement.ownerDocument
-     * 
-     * @stable
-     */
-    getDocument(): Document;
-
-    /**
-     * By default, event handlers are attached to the document's defaultView Window.
-     * If you need something different, override it here.
-     * 
-     * @stable
-     */
-    //getWindow: Nullable<((document: Document) => Window)>;
-}
-
-
-export interface UseActiveElementParameters {
-
-    activeElementParameters: UseActiveElementParametersSelf;
-}
-
-export interface UseActiveElementReturnTypeSelf {
-    /** 
-     * Returns whatever element is currently focused, or `null` if there's no focused element
-     * @stable
-     */
-    getActiveElement: () => Element | null;
-    /** 
-     * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
-     * @stable
-     */
-    getLastActiveElement: () => Element;
-    /** 
-     * Returns if the window itself has focus or not
-     * @stable
-     */
-    getWindowFocused: () => boolean;
-}
-
-export interface UseActiveElementReturnType {
-    activeElementReturn: UseActiveElementReturnTypeSelf;
-}
-
-/**
- * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus 
- * 
- * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
- * 
- * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
- * 
- * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
- * 
- * @compositeParams
- */
-export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
-
-    useEffect(() => {
-        const document = getDocument();
-        const window = (document?.defaultView);
-
-        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
-            document?.addEventListener("focusin", focusin, { passive: true });
-            document?.addEventListener("focusout", focusout, { passive: true });
-            window?.addEventListener("focus", windowFocus, { passive: true });
-            window?.addEventListener("blur", windowBlur, { passive: true });
-        }
-
-        const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
-        const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
-        const lwfu = { send: setWindowFocused, lastSent: undefined };
-
-        MapOfSets.add(activeElementUpdaters, window, laeu);
-        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
-        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
-
-        return () => {
-            MapOfSets.delete(activeElementUpdaters, window, laeu);
-            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
-            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
-
-            if (activeElementUpdaters.size === 0) {
-                document?.removeEventListener("focusin", focusin);
-                document?.removeEventListener("focusout", focusout);
-                window?.removeEventListener("focus", windowFocus);
-                window?.removeEventListener("blur", windowBlur);
-            }
-        }
-    }, [])
-
-    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, runImmediately);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, runImmediately);
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
-
-    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-})

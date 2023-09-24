@@ -2,23 +2,50 @@ import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import "wicg-inert";
 
-import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
+import { UseActiveElementParameters } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
+
+declare module "../util/types.js" { interface PropNames { BlockingElementParameters: typeof PNames } }
+declare module "../util/types.js" { interface PropNames { BlockingElementReturn: typeof RNames } }
+
+const P = `PropNames.BlockingElementParameters`;
+const R = `PropNames.BlockingElementReturn`;
+
+export const PNames = {
+    enabled: `${P}.enabled`,
+    getTarget: `${P}.getTarget`
+} as const;
+
+export const RNames = {
+    getTop: `${R}.getTop`,
+    getTarget: `${R}.getTarget`,
+    getLastActiveWhenClosed: `${R}.getLastActiveWhenClosed`,
+    getLastActiveWhenOpen: `${R}.getLastActiveWhenOpen`
+} as const;
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 
 export interface UseBlockingElementParametersSelf<E extends Element> {
-    enabled: boolean;
-    getTarget(): (E | null)
+    [PropNames.BlockingElementParameters.enabled]: boolean;
+    [PropNames.BlockingElementParameters.getTarget](): (E | null)
 }
 
-export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
-    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+
+export interface UseBlockingElementReturnTypeSelf<E extends Element> {
+    [PropNames.BlockingElementReturn.getTarget](): (E | null);
+    [PropNames.BlockingElementReturn.getTop](): Element | null;
+    [PropNames.BlockingElementReturn.getLastActiveWhenClosed](): Element | null;
+    [PropNames.BlockingElementReturn.getLastActiveWhenOpen](): Element | null;
 }
+
+export interface UseBlockingElementParameters<E extends Element> extends UseBlockingElementParametersSelf<E> { }
+export interface UseBlockingElementReturnType<E extends Element> extends UseBlockingElementReturnTypeSelf<E>, Pick<UseActiveElementParameters, (typeof PropNames)["ActiveElementParameters"]["onLastActiveElementChange"]> { }
 
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -30,41 +57,12 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * @param target 
  */
 export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
-    activeElementParameters: {
-        getDocument,
-        onActiveElementChange,
-        onLastActiveElementChange,
-        onWindowFocusedChange,
-        ...void3
-    },
-    blockingElementParameters: {
-        enabled,
-        getTarget,
-        ...void1
-    },
+    [PropNames.BlockingElementParameters.enabled]: enabled,
+    [PropNames.BlockingElementParameters.getTarget]: getTarget,
     ...void2
-}: UseBlockingElementParameters<E>) {
-
+}: UseBlockingElementParameters<E>): UseBlockingElementReturnType<E> {
+    assertEmptyObject(void2);
     const stableGetTarget = useStableCallback(getTarget);
-
-    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
-    useActiveElement({
-        activeElementParameters: {
-            getDocument,
-            onActiveElementChange,
-            onWindowFocusedChange,
-            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
-                onLastActiveElementChange?.(e, prev, reason);
-
-                if (e) {
-                    if (enabled)
-                        setLastActiveWhenOpen(e as HTMLElement, reason);
-                    else
-                        setLastActiveWhenClosed(e as HTMLElement, reason);
-                }
-            })
-        }
-    })
 
     const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
     const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
@@ -97,7 +95,20 @@ export const useBlockingElement = monitored(function useBlockingElement<E extend
         }
     }, [enabled]);
 
-    return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen }
+    return {
+        [PropNames.BlockingElementReturn.getTop]: getTop,
+        [PropNames.BlockingElementReturn.getTarget]: getTarget,
+        [PropNames.BlockingElementReturn.getLastActiveWhenOpen]: getLastActiveWhenOpen,
+        [PropNames.BlockingElementReturn.getLastActiveWhenClosed]: getLastActiveWhenClosed,
+        [PropNames.ActiveElementParameters.onLastActiveElementChange]: useStableCallback((e, prev, reason) => {
+            if (e) {
+                if (enabled)
+                    setLastActiveWhenOpen(e as HTMLElement, reason);
+                else
+                    setLastActiveWhenClosed(e as HTMLElement, reason);
+            }
+        })
+    }
 })
 
 export function getTopElement() {

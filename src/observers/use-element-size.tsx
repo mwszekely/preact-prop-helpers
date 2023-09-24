@@ -1,8 +1,29 @@
 import { getDocument } from "../dom-helpers/use-document-class.js";
-import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
+import { PropNames } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+
+
+declare module "../util/types.js" { interface PropNames { ElementSizeParameters: typeof PNames } }
+declare module "../util/types.js" { interface PropNames { ElementSizeReturn: typeof RNames } }
+
+const P = `PropNames.ElementSizeParameters`;
+const R = `PropNames.ElementSizeReturn`;
+
+
+export const PNames = {
+    onSizeChange: `${P}.onSizeChange`,
+    getObserveBox: `${P}.getObserveBox`
+} as const satisfies Record<any, any>;
+
+export const RNames = {
+    getSize: `${R}.getSize`
+} as const;
+
+PropNames.ElementSizeParameters ??=  PNames;
+PropNames.ElementSizeReturn ??=  RNames;
 
 export interface UseElementSizeParametersSelf {
     /**
@@ -13,7 +34,7 @@ export interface UseElementSizeParametersSelf {
      * 
      * @stable
      */
-    onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
+    [PropNames.ElementSizeParameters.onSizeChange](sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
 
     /**
      * Passed as an argument to the created ResizeObserver.
@@ -22,13 +43,10 @@ export interface UseElementSizeParametersSelf {
      * 
      * @stable 
      */
-    getObserveBox: null | (() => ResizeObserverOptions["box"]);
+    [PropNames.ElementSizeParameters.getObserveBox]: null | (() => ResizeObserverOptions["box"]);
 }
 
 
-export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: UseElementSizeParametersSelf;
-}
 
 export interface ElementSize {
     clientWidth: number;
@@ -47,27 +65,27 @@ export interface ElementSize {
 
 export interface UseElementSizeReturnTypeSelf<E extends Element> {
     /** @stable */
-    getSize(): ElementSize | null;
+    [PropNames.ElementSizeReturn.getSize](): ElementSize | null;
 }
 
 
-export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf<E>;
-}
+export interface UseElementSizeParameters<T extends Element> extends UseElementSizeParametersSelf, Pick<UseRefElementReturnType<T>, (typeof PropNames)["RefElementReturn"]["getElement"]> { }
+export interface UseElementSizeReturnType<E extends Element> extends UseElementSizeReturnTypeSelf<E>, Pick<UseRefElementParameters<E>, (typeof PropNames)["RefElementParameters"]["onElementChange"]> { }
 
 /**
  * Measures an element, allowing you to react to its changes in size.
  * 
  * @compositeParams
  */
-export const useElementSize = monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
-    const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
-
-    useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
-
+export const useElementSize = monitored(function useElementSize<E extends Element>({ 
+    [PropNames.ElementSizeParameters.getObserveBox]: getObserveBox, 
+    [PropNames.ElementSizeParameters.onSizeChange]: onSizeChange,
+    [PropNames.RefElementReturn.getElement]: getElement
+ }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+    useEnsureStability("useElementSize", getObserveBox, onSizeChange);
+    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
     const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, runImmediately);
 
-    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 
     const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
@@ -94,17 +112,7 @@ export const useElementSize = monitored(function useElementSize<E extends Elemen
                 return () => document.removeEventListener("resize", handleUpdate);
             }
         }
-    }, [])
-
-    const { refElementReturn, ...rest } = useRefElement<E>({
-        refElementParameters: {
-            onElementChange: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
-            onMount,
-            onUnmount
-        }
-    });
-
-    const { getElement } = refElementReturn;
+    }, []);
 
     useEffect(() => {
         if (getObserveBox) {
@@ -114,10 +122,7 @@ export const useElementSize = monitored(function useElementSize<E extends Elemen
     });
 
     return {
-        elementSizeReturn: { getSize },
-        refElementReturn,
-        ...rest
+        [PropNames.RefElementParameters.onElementChange]: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); }, []),
+        [PropNames.ElementSizeReturn.getSize]: getSize
     }
-
-
-})
+});

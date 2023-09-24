@@ -1,6 +1,24 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { Nullable } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
+declare const RefElementParameters: {
+    readonly onElementChange: "PropNames.RefElementParameters.onElementChange";
+    readonly onMount: "PropNames.RefElementParameters.onMount";
+    readonly onUnmount: "PropNames.RefElementParameters.onUnmount";
+};
+declare const RefElementReturn: {
+    readonly getElement: "PropNames.RefElementReturn.getElement";
+};
+declare module "../util/types.js" {
+    interface PropNames {
+        RefElementParameters: typeof RefElementParameters;
+    }
+}
+declare module "../util/types.js" {
+    interface PropNames {
+        RefElementReturn: typeof RefElementReturn;
+    }
+}
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
@@ -8,36 +26,34 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      *
      * @stable
      */
-    getElement(): T | null;
+    [RefElementReturn.getElement]: () => T | null;
+    /**
+     * @stable
+     */
+    props: ElementProps<T>;
 }
-export interface UseRefElementReturnType<T extends EventTarget> {
-    /** @stable */
-    propsStable: ElementProps<T>;
-    refElementReturn: UseRefElementReturnTypeSelf<T>;
-}
-export interface UseRefElementParametersSelf<T> {
+export interface UseRefElementParametersSelf<T extends EventTarget> {
     /**
      * Called with the `Element` when it mounts, called with `null` when it unmounts.
      *
      * @stable
      */
-    onElementChange?: Nullable<OnPassiveStateChange<T | null, never>>;
+    [RefElementParameters.onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
     /**
      * Called when the element mounts
      *
      * @stable
      */
-    onMount?: Nullable<(element: T) => void>;
+    [RefElementParameters.onMount]?: Nullable<(element: T) => void>;
     /**
      * Called when the element unmounts
      *
      * @stable
      */
-    onUnmount?: Nullable<(element: T) => void>;
+    [RefElementParameters.onUnmount]?: Nullable<(element: T) => void>;
 }
-export interface UseRefElementParameters<T> {
-    refElementParameters: UseRefElementParametersSelf<T>;
-}
+export type UseRefElementParameters<T extends EventTarget> = UseRefElementParametersSelf<T>;
+export type UseRefElementReturnType<T extends EventTarget> = UseRefElementReturnTypeSelf<T>;
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -73,5 +89,6 @@ export interface UseRefElementParameters<T> {
  *
  * @compositeParams
  */
-export declare const useRefElement: <T extends EventTarget>(args: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
+export declare const useRefElement: <T extends EventTarget>({ [RefElementParameters.onElementChange]: onElementChange, [RefElementParameters.onMount]: onMount, [RefElementParameters.onUnmount]: onUnmount }: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
+export {};
 //# sourceMappingURL=use-ref-element.d.ts.map

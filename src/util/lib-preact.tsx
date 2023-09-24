@@ -3,7 +3,7 @@ export type { JSX, Ref, RefCallback, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 export type { EffectCallback, Inputs, MutableRef, Reducer, StateUpdater } from "preact/hooks";
-export { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
+export { type ExtendMerge, type Nullable, type OmitStrong, type TargetedOmit, type TargetedPick } from "./lib-shared.js";
 import type { JSX } from "preact";
 import { options } from "preact";
 import { EventMapping as em } from "./lib-shared.js";

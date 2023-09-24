@@ -3,37 +3,51 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
+import { PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
+declare module "../../util/types.js" { interface PropNames { BackdropDismissParameters: typeof PNames } }
+declare module "../../util/types.js" { interface PropNames { BackdropDismissReturn: typeof RNames } }
+
+const P = `PropNames.BackdropDismissParameters`;
+const R = `PropNames.BackdropDismissReturn`;
+
+export const PNames = {
+    dismissBackdropActive: `${P}.dismissBackdropActive`,
+    onDismissBackdrop: `${P}.onDismissBackdrop`
+} as const;
+
+export const RNames = {} as const;
+
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
-    
+
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    dismissBackdropActive: B | false;
-    
+    [PropNames.BackdropDismissParameters.dismissBackdropActive]: B | false;
+
     /**
      * Called when the component is dismissed by clicking outside of the element.
      * 
      * @nonstable
      */
-    onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
+    [PropNames.BackdropDismissParameters.onDismissBackdrop]: Nullable<(e: MouseEventType<any>) => void>;
 }
 
-export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> {
-    backdropDismissParameters: UseBackdropDismissParametersSelf<B>;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-}
+export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> extends UseBackdropDismissParametersSelf<B>, Pick<UseRefElementReturnType<PopupElement>, (typeof PropNames)["RefElementReturn"]["getElement"]> { }
 
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  * 
  * @compositeParams
  */
-export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
+export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({
+    [PropNames.BackdropDismissParameters.dismissBackdropActive]: open,
+    [PropNames.BackdropDismissParameters.onDismissBackdrop]: onCloseUnstable,
+    [PropNames.RefElementReturn.getElement]: getElement,
+    ..._void2
+}: UseBackdropDismissParameters<PopupElement, B>): void {
+    assertEmptyObject(_void2);
     const getOpen = useStableGetter(open);
     const onClose = useStableGetter(onCloseUnstable);
 

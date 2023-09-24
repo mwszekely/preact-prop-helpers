@@ -5,10 +5,48 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
+import { ElementProps, OmitStrong, PropNames } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+
+
+
+declare module "../../util/types.js" { interface PropNames { StaggeredParameters: typeof P1Names } }
+declare module "../../util/types.js" { interface PropNames { StaggeredReturn: typeof R1Names } }
+declare module "../../util/types.js" { interface PropNames { StaggeredChildParameters: typeof P2Names } }
+declare module "../../util/types.js" { interface PropNames { StaggeredChildReturn: typeof R2Names } }
+
+const P1 = `PropNames.StaggeredParameters`;
+const P2 = `PropNames.StaggeredChildParameters`;
+const R1 = `PropNames.StaggeredReturn`;
+const R2 = `PropNames.StaggeredChildReturn`;
+
+export const P1Names = {
+    staggered: `${P1}.staggered`,
+    childCount: `${P1}.childCount`,
+    untabbable: `${P1}.untabbable`,
+    untabbableBehavior: `${P1}.untabbableBehavior`,
+    onTabbableIndexChange: `${P1}.onTabbableIndexChange`,
+} as const;
+
+export const R1Names = {
+    stillStaggering: `${R1}.stillStaggering`
+} as const;
+
+export const P2Names = {
+} as const;
+
+export const R2Names = {
+    parentIsStaggered: `${R2}.parentIsStaggered`,
+    hideBecauseStaggered: `${R2}.hideBecauseStaggered`,
+    childUseEffect: `${R2}.childUseEffect`
+} as const;
+
+PropNames.StaggeredParameters ??= P1Names;
+PropNames.StaggeredReturn ??= R1Names;
+PropNames.StaggeredChildParameters ??= P2Names;
+PropNames.StaggeredChildReturn ??= R2Names;
 
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
@@ -20,15 +58,16 @@ export interface UseStaggeredChildrenParametersSelf {
     /**
      * If true, each child will delay rendering itself until the one before it has.
      */
-    staggered: boolean;
+    [PropNames.StaggeredParameters.staggered]: boolean;
 
-    childCount: number | null;
+    [PropNames.StaggeredParameters.childCount]: number | null;
 }
 
 export interface UseStaggeredChildrenParameters extends
-    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">,
-    TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
-    staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
+    UseStaggeredChildrenParametersSelf,
+    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, typeof PropNames.ManagedChildrenReturn.getChildren>,
+    Pick<UseRefElementReturnType<any>, typeof PropNames.RefElementReturn.getElement> {
+
 }
 
 export interface UseStaggeredChildContextSelf {
@@ -45,8 +84,7 @@ export interface UseStaggeredChildContext {
     staggeredChildContext: UseStaggeredChildContextSelf;
 }
 
-export interface UseStaggeredChildrenReturnType {
-    staggeredChildrenReturn: UseStaggeredChildrenReturnTypeSelf;
+export interface UseStaggeredChildrenReturnType extends UseStaggeredChildrenReturnTypeSelf {
     context: UseStaggeredChildContext;
 }
 
@@ -54,7 +92,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
     /**
      * Whether any children are still waiting to show themselves because of the staggering behavior
      */
-    stillStaggering: boolean;
+    [PropNames.StaggeredReturn.stillStaggering]: boolean;
 }
 
 
@@ -66,25 +104,26 @@ export interface UseStaggeredChildReturnTypeSelf {
     /** 
      * Whether the parent has indicated that all of its children, including this one, are staggered. 
      */
-    parentIsStaggered: boolean;
+    [PropNames.StaggeredChildReturn.parentIsStaggered]: boolean;
 
     /** 
      * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
-    hideBecauseStaggered: boolean;
+    [PropNames.StaggeredChildReturn.hideBecauseStaggered]: boolean;
 
     /**
      * Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).
      * 
      * This is generally passed to an inner child, if this is the outer child.
      */
-    childUseEffect(): void;
+    [PropNames.StaggeredChildReturn.childUseEffect](): void;
 }
 
-export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> extends
+    UseStaggeredChildReturnTypeSelf,
+    Pick<UseRefElementParameters<ChildElement>, typeof PropNames.RefElementParameters.onElementChange> {
     props: ElementProps<ChildElement>;
-    staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
 
@@ -103,9 +142,13 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * @hasChild {@link useStaggeredChild}
  */
 export const useStaggeredChildren = monitored(function useStaggeredChildren({
-    managedChildrenReturn: { getChildren },
-    staggeredChildrenParameters: { staggered, childCount },
-    refElementReturn: { getElement }
+    //managedChildrenReturn: { getChildren },
+    //staggeredChildrenParameters: { staggered, childCount },
+    //refElementReturn: { getElement }
+    [PropNames.ManagedChildrenReturn.getChildren]: getChildren,
+    [PropNames.StaggeredParameters.childCount]: childCount,
+    [PropNames.StaggeredParameters.staggered]: staggered,
+    [PropNames.RefElementReturn.getElement]: getElement,
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
 
 
@@ -259,7 +302,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
     }, [])
 
     return {
-        staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
+        [PropNames.StaggeredReturn.stillStaggering]: currentlyStaggering,
         context: useMemo(() => ({
             staggeredChildContext
         }), [staggeredChildContext]),
@@ -320,23 +363,25 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
 
     // This is the element that the IntersectionObserver will watch.
     const e = useRef<Element | null>(null);
-    
+
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
-        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },
+
+        [PropNames.StaggeredChildReturn.hideBecauseStaggered]: parentIsStaggered ? !staggeredVisible : false,
+        [PropNames.StaggeredChildReturn.childUseEffect]: childUseEffect,
+        [PropNames.StaggeredChildReturn.parentIsStaggered]: parentIsStaggered,
         info: { setStaggeredVisible, getStaggeredVisible },
-        refElementParameters: {
-            onElementChange: useStableCallback((element) => {
-                setElementToIndexMap(index, element);
-                e.current = (element || e.current);
-                const io = getIntersectionObserver();
-                if (e.current) {
-                    io?.observe(e.current);
-                }
-                else {
-                    io?.unobserve(e.current!);
-                }
-            })
-        }
+
+        [PropNames.RefElementParameters.onElementChange]: useStableCallback((element) => {
+            setElementToIndexMap(index, element);
+            e.current = (element || e.current);
+            const io = getIntersectionObserver();
+            if (e.current) {
+                io?.observe(e.current);
+            }
+            else {
+                io?.unobserve(e.current!);
+            }
+        })
     }
 })
