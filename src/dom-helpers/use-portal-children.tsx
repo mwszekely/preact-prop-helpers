@@ -59,7 +59,7 @@ export const usePortalChildren = monitored(function usePortalChildren({ target }
     });
 
     const element = useMemo(() => { return target == null ? null : typeof target == "string" ? document.getElementById(target) : target; }, [target]);
-    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element!);
+    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }) as VNode, element!);
 
     return {
         children: children,

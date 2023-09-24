@@ -1,8 +1,8 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { StateUpdater, useCallback, useContext, useMemo } from "preact/hooks";
+import { StateUpdater, useCallback, useContext, useEffect, useMemo } from "preact/hooks";
 import { TabbableColumnInfo } from "../../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useRefElement, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -213,7 +213,7 @@ const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIn
         context,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
-        staggeredChildrenReturn
+        staggeredChildrenReturn,
     } = useCompleteGridNavigationRows({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
@@ -247,23 +247,27 @@ const GridCellContext = createContext<CompleteGridNavigationCellContext<HTMLTabl
 
 
 const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLLIElement, any>;
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLLIElement>({
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLTableRowElement, any>;
+    const { props, managedChildReturn, refElementParameters, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLTableRowElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index },
-        
+
     })
-    const ch = useMemo(() => <DemoUseGridRow index={index} />, [index]);
-    return (
-        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : ch}</li>
-    )
+    const {  childUseEffect } = staggeredChildReturn;
+    if (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered) {
+        return <tr {...props}><td colSpan={99}>&nbsp;</td></tr>
+    }
+    else {
+        return (
+            <DemoUseGridRow index={index} childUseEffect={childUseEffect} {...props} />
+        )
+    }
 }));
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DemoUseGridRow = memo((({ index }: { index: number }) => {
+const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: number, childUseEffect: () => void }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-
+    useEffect(childUseEffect, [childUseEffect]);
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<number | null>(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
     //const getChildren = useCallback(() => { return getChildren2() }, []);
@@ -297,7 +301,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     } = ret;
 
     return (
-        <tr {...props} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
+        <tr {...useMergedProps(props, props2)} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
             <GridCellContext.Provider value={contextToChild}>
                 <td>{_tabbableColumn}, {tabbable.toString()}</td>
                 {Array.from((function* () {

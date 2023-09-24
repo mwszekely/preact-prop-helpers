@@ -19,6 +19,7 @@ export type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), reason?:
  */
 export interface SearchParamStates {
 }
+export declare const SearchParamStates: SearchParamStates;
 export interface UseSearchParamStateParameters<Key extends keyof SearchParamStates, T = SearchParamStates[Key]> {
     key: Key;
     /** If there is no value in the URL for this state, then `initialValue` will be used instead. */

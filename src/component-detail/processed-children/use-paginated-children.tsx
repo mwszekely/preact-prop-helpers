@@ -1,4 +1,4 @@
-import { UseChildrenHaveFocusReturnType } from "../../index.js";
+import { UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";

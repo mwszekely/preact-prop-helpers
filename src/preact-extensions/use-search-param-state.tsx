@@ -25,6 +25,7 @@ export type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), reason?:
  * ```
  */
 export interface SearchParamStates { }
+export const SearchParamStates: SearchParamStates = undefined!; // Needed for the isolatedModules flag?
 
 function parseParam<Key extends keyof SearchParamStates, T = SearchParamStates[Key]>(url: Nullable<URL>, paramKey: Nullable<Key>, fromString: ((value: string | null) => T | null)): T | undefined {
     if (paramKey == undefined)

@@ -7673,20 +7673,24 @@
   var GridRowContext = G(null);
   var GridCellContext = G(null);
   var DemoUseGridRowOuter = x3(monitored(function DemoUseRovingTabIndexChildOuter({ index }) {
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = q2(ListChildContext);
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
+    const { props, managedChildReturn, refElementParameters, paginatedChildReturn, staggeredChildReturn } = useProcessedChild({
       context: { managedChildContext, paginatedChildContext, staggeredChildContext },
       info: { index }
     });
-    const ch = F2(() => /* @__PURE__ */ o3(DemoUseGridRow, { index }), [index]);
-    return /* @__PURE__ */ o3("li", { ...useMergedProps(props, propsStable), children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : ch });
+    const { childUseEffect } = staggeredChildReturn;
+    if (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered) {
+      return /* @__PURE__ */ o3("tr", { ...props, children: /* @__PURE__ */ o3("td", { colSpan: 99, children: "\xA0" }) });
+    } else {
+      return /* @__PURE__ */ o3(DemoUseGridRow, { index, childUseEffect, ...props });
+    }
   }));
-  var DemoUseGridRow = x3(({ index }) => {
+  var DemoUseGridRow = x3(({ index, childUseEffect, ...props2 }) => {
     const [_randomWord] = useState(() => RandomWords[
       index
       /*Math.floor(Math.random() * (RandomWords.length - 1))*/
     ]);
+    p2(childUseEffect, [childUseEffect]);
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const hidden = index === 3;
     const disabled = hidden;
@@ -7713,7 +7717,7 @@
       context: contextToChild,
       rovingTabIndexChildReturn: { tabbable }
     } = ret;
-    return /* @__PURE__ */ o3("tr", { ...props, "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ o3(GridCellContext.Provider, { value: contextToChild, children: [
+    return /* @__PURE__ */ o3("tr", { ...useMergedProps(props, props2), "data-tabbable": ret.rovingTabIndexChildReturn.tabbable, children: /* @__PURE__ */ o3(GridCellContext.Provider, { value: contextToChild, children: [
       /* @__PURE__ */ o3("td", { children: [
         _tabbableColumn,
         ", ",
@@ -8777,7 +8781,6 @@
     return /* @__PURE__ */ o3("div", { hidden: true });
   });
   var Component = () => {
-    return /* @__PURE__ */ o3(DemoUseRovingTabIndex, {});
     return /* @__PURE__ */ o3("div", { class: "flex", style: { flexWrap: "wrap" }, children: [
       /* @__PURE__ */ o3(DemoPress, { remaining: 2 }),
       /* @__PURE__ */ o3("input", {}),

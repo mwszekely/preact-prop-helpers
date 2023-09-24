@@ -1,5 +1,6 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { UseChildrenHaveFocusReturnTypeSelf, UseRefElementReturnTypeSelf } from "../../index.js";
+import { UseRefElementReturnTypeSelf } from "../../dom-helpers/use-ref-element.js";
+import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
 import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";

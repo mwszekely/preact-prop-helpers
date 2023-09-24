@@ -551,9 +551,6 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 
 const Component = () => {
-    return (
-        <DemoUseRovingTabIndex />
-    )
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

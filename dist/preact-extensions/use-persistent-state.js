@@ -4,6 +4,7 @@ import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
+export const PersistentStates = undefined; // Needed for the isolatedModules flag?
 export function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
     try {
         const item = storage.getItem(key);

@@ -1,4 +1,5 @@
-import { UseChildrenHaveFocusReturnTypeSelf, UseRefElementReturnTypeSelf } from "../../index.js";
+import { UseRefElementReturnTypeSelf } from "../../dom-helpers/use-ref-element.js";
+import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
 import { UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters } from "../../preact-extensions/use-managed-children.js";
 import { OmitStrong, TargetedOmit } from "../../util/lib.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { runImmediately, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
+export const SearchParamStates = undefined; // Needed for the isolatedModules flag?
 function parseParam(url, paramKey, fromString) {
     if (paramKey == undefined)
         return paramKey ?? undefined;

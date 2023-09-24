@@ -21,6 +21,7 @@ import { useState } from "./use-state.js";
  * ```
  */
 export interface PersistentStates { }
+export const PersistentStates: PersistentStates = undefined!; // Needed for the isolatedModules flag?
 
 export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage: Storage = localStorage): PersistentStates[Key] | null {
     try {
