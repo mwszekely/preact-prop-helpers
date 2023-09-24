@@ -138,5 +138,5 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  *
  * @compositeParams
  */
-export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.RearrangeableParameters.children": children, "PropNames.RearrangeableParameters.adjust": adjust, "PropNames.RearrangeableParameters.getIndex": getIndex, "PropNames.RearrangeableParameters.onRearranged": onRearranged, "PropNames.RearrangeableParameters.compare": userCompare, context: { rearrangeableChildrenContext: { provideManglers } } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
+export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ context: { rearrangeableChildrenContext: { provideManglers } }, "PropNames.RearrangeableParameters.getIndex": getIndex, "PropNames.RearrangeableParameters.onRearranged": onRearranged, "PropNames.ManagedChildrenReturn.getChildren": getChildren, "PropNames.RearrangeableParameters.compare": userCompare, "PropNames.RearrangeableParameters.children": children, "PropNames.RearrangeableParameters.adjust": adjust, ...void1 }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
 //# sourceMappingURL=use-rearrangeable-children.d.ts.map

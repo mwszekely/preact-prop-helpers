@@ -58,45 +58,18 @@ export interface UseSelectionChildReturnType<ChildElement extends Element, M ext
  * 
  * @hasChild {@link useSelectionChild}
  */
-export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
-    "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
-    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
-    "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
-    "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
-    "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
-    "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-    "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
-    "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
-    "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
-    "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode,
-    ...void1
-}: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
+export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>(args: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
     const {
         "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": ocfc1,
         context: contextSS,
         ...singleSelectionReturn
-    } = useSingleSelection<ParentOrChildElement, ChildElement>({
-        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-        "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
-        "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
-        "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
-        "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode
-    });
+    } = useSingleSelection<ParentOrChildElement, ChildElement>(args);
     const {
         "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": ocfc2,
         context: contextMS,
         props: propsStable,
         ...multiSelectionReturn
-    } = useMultiSelection<ParentOrChildElement, ChildElement>({
-        "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
-        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
-        "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
-        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
-        "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
-
-    });
-    assertEmptyObject(void1);
+    } = useMultiSelection<ParentOrChildElement, ChildElement>(args);
 
     return {
         ...multiSelectionReturn,
@@ -118,11 +91,7 @@ export function useSelectionChild<ChildElement extends Element>({
         untabbable,
         ...void2
     },
-    "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
-    "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
-    "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
-    "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled,
-    ...void3
+    ...args
 }: UseSelectionChildParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionChildReturnType<ChildElement, UseSelectionChildInfo<ChildElement>> {
     const {
         props: p1,
@@ -133,7 +102,7 @@ export function useSelectionChild<ChildElement extends Element>({
     } = useSingleSelectionChild<ChildElement>({
         context,
         info: { index, untabbable },
-        "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled
+       ...args
     });
     const {
         props: p2,
@@ -144,13 +113,10 @@ export function useSelectionChild<ChildElement extends Element>({
     } = useMultiSelectionChild<ChildElement>({
         context,
         info: { index },
-        "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
-        "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
-        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
+        ...args
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    assertEmptyObject(void3);
     assertEmptyObject(void5);
 
     return {

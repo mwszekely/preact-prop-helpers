@@ -4,7 +4,6 @@ import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children
 import { UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenParametersSelf, UseManagedChildrenReturnTypeSelf, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
-import { assertEmptyObject } from "../../util/assert.js";
 import { OmitStrong } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -113,45 +112,26 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * @hasChild {@link useProcessedChild}
  */
 export const useProcessedChildren = monitored(function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
-    "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
-    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
-    "PropNames.PaginatedParameters.paginationMax": paginationMax,
-    "PropNames.PaginatedParameters.paginationMin": paginationMin,
-    "PropNames.StaggeredParameters.staggered": staggered,
-    "PropNames.RearrangeableParameters.adjust": adjust,
-    "PropNames.RearrangeableParameters.onRearranged": onRearranged,
-    "PropNames.RearrangeableParameters.children": childrenUnsorted,
-    "PropNames.RearrangeableParameters.compare": compare,
-    "PropNames.RearrangeableParameters.getIndex": getIndex,
-    "PropNames.RovingTabIndexReturn.getTabbableIndex": getTabbableIndex,
-    "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-    "PropNames.RefElementReturn.getElement": getElement,
-    "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-    "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-    "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange,
     context,
-    ...void4
+    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+    "PropNames.RearrangeableParameters.children": childrenUnsorted,
+    "PropNames.RearrangeableParameters.onRearranged": onRearranged,
+    ...args
 }: UseProcessedChildrenParameters<TabbableChildElement, M>): UseProcessedChildrenReturnType<TabbableChildElement, M> {
-
+    const { "PropNames.PaginatedParameters.paginationMax": paginationMax, "PropNames.PaginatedParameters.paginationMin": paginationMin } = args;
     const childCount = childrenUnsorted.length;
 
     const {
         context: { managedChildContext },
         ...managedChildrenReturn
-    } = useManagedChildren<M>({
-        "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-        "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-        "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange
-    })
+    } = useManagedChildren<M>(args)
 
     const {
         ...rearrangeableChildrenReturn
     } = useRearrangeableChildren<M>({
-        "PropNames.RearrangeableParameters.adjust": adjust,
         "PropNames.RearrangeableParameters.onRearranged": useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
         "PropNames.RearrangeableParameters.children": childrenUnsorted,
-        "PropNames.RearrangeableParameters.compare": compare,
-        "PropNames.RearrangeableParameters.getIndex": getIndex,
+        ...args,
         ...managedChildrenReturn,
         context
     });
@@ -160,14 +140,10 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
         context: { paginatedChildContext },
         ...paginatedChildrenReturn
     }: UsePaginatedChildrenReturnType = usePaginatedChildren<TabbableChildElement>({
-        "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
-        "PropNames.ManagedChildrenReturn.getChildren": getChildren,
+        "PropNames.ManagedChildrenReturn.getChildren": managedChildrenReturn["PropNames.ManagedChildrenReturn.getChildren"],
         "PropNames.PaginatedParameters.childCount": childCount,
-        "PropNames.PaginatedParameters.paginationMax": paginationMax,
-        "PropNames.PaginatedParameters.paginationMin": paginationMin,
         "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
-        "PropNames.RovingTabIndexReturn.getTabbableIndex": getTabbableIndex,
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
+        ...args
     });
     const refreshPagination = paginatedChildrenReturn["PropNames.PaginatedReturn.refreshPagination"];
     const {
@@ -176,11 +152,8 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     }: UseStaggeredChildrenReturnType = useStaggeredChildren({
         "PropNames.ManagedChildrenReturn.getChildren": managedChildrenReturn["PropNames.ManagedChildrenReturn.getChildren"],
         "PropNames.StaggeredParameters.childCount": childCount,
-        "PropNames.StaggeredParameters.staggered": staggered,
-        "PropNames.RefElementReturn.getElement": getElement,
+        ...args
     });
-
-    assertEmptyObject(void4);
 
     return {
         ...paginatedChildrenReturn,

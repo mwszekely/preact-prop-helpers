@@ -1,9 +1,11 @@
 
+
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { Nullable, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { OmitStrong, VNode } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
@@ -225,16 +227,17 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  * @compositeParams
  */
 export const useRearrangeableChildren = monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
-    //rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
-    //managedChildrenReturn: { getChildren },
-    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
-    "PropNames.RearrangeableParameters.children": children,
-    "PropNames.RearrangeableParameters.adjust": adjust,
+    context: { rearrangeableChildrenContext: { provideManglers } },
+
     "PropNames.RearrangeableParameters.getIndex": getIndex,
     "PropNames.RearrangeableParameters.onRearranged": onRearranged,
+    "PropNames.ManagedChildrenReturn.getChildren": getChildren,
     "PropNames.RearrangeableParameters.compare": userCompare,
-    context: { rearrangeableChildrenContext: { provideManglers } }
+    "PropNames.RearrangeableParameters.children": children,
+    "PropNames.RearrangeableParameters.adjust": adjust,
+    ...void1
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
+    assertEmptyObject(void1);
     useEnsureStability("useRearrangeableChildren", getIndex);
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.

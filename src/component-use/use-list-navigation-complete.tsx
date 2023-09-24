@@ -144,37 +144,8 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * @compositeParams
  */
 export const useCompleteListNavigation = monitored(function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
-    "PropNames.RefElementParameters.onElementChange": onElementChange,
-    "PropNames.RefElementParameters.onMount": onMount,
-    "PropNames.RefElementParameters.onUnmount": onUnmount,
-    "PropNames.LinearNavigationParameters.arrowKeyDirection": arrowKeyDirection,
-    "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys,
-    "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
-    "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
-    "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear,
-    "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize,
-    "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
-    "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
-    "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
-    "PropNames.PaginatedParameters.paginationMax": paginationMax,
-    "PropNames.PaginatedParameters.paginationMin": paginationMin,
-    "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent,
-    "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex,
-    "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange,
-    "PropNames.RovingTabIndexParameters.untabbable": untabbable,
-    "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
-    "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
-    "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
-    "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode,
-    "PropNames.TypeaheadNavigationParameters.collator": collator,
-    "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
-    "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
-    "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout,
-    "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-    "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-    "PropNames.ManagedChildrenParameters.onChildrenMountChange": ocmc1,
-    "PropNames.StaggeredParameters.staggered": staggered,
-    ...void4
+    "PropNames.ManagedChildrenParameters.onChildrenMountChange": ocmc2,
+    ...args
 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
     const getChildren: () => ManagedChildren<M> = useCallback(() => getChildren2(), []);
     const getLowestIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
@@ -192,11 +163,7 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
         props: propsRef,
         "PropNames.RefElementReturn.getElement": getElement,
         ...void3
-    } = useRefElement<ParentElement>({
-        "PropNames.RefElementParameters.onElementChange": onElementChange,
-        "PropNames.RefElementParameters.onMount": onMount,
-        "PropNames.RefElementParameters.onUnmount": onUnmount
-    });
+    } = useRefElement<ParentElement>(args);
 
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
@@ -216,49 +183,20 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
         context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
         props,
         "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": ocfc2,
-        "PropNames.RovingTabIndexReturn.focusSelf": focusSelf,
-        "PropNames.RovingTabIndexReturn.getTabbableIndex": getTabbableIndex,
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-        "PropNames.SingleSelectionReturn.changeSingleSelectedIndex": changeSingleSelectedIndex,
-        "PropNames.SingleSelectionReturn.getSingleSelectedIndex": getSingleSelectedIndex,
-        "PropNames.TypeaheadNavigationReturn.getCurrentTypeahead": getCurrentTypeahead,
-        "PropNames.TypeaheadNavigationReturn.typeaheadStatus": typeaheadStatus,
-        "PropNames.ManagedChildrenParameters.onChildrenMountChange": ocmc2,
-        ...void2
+        "PropNames.ManagedChildrenParameters.onChildrenMountChange": ocmc1,
+       ...retLNS
     } = useListNavigationSelection<ParentElement, ChildElement>({
         "PropNames.ChildrenHaveFocusReturn.getAnyFocused": useStableCallback(() => getAnyFocused()),
-        "PropNames.LinearNavigationParameters.arrowKeyDirection": arrowKeyDirection,
-        "PropNames.LinearNavigationParameters.disableHomeEndKeys": disableHomeEndKeys,
-        "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForNavigation,
-        "PropNames.LinearNavigationParameters.navigatePastEnd": navigatePastEnd,
-        "PropNames.LinearNavigationParameters.navigatePastStart": navigatePastStart,
-        "PropNames.LinearNavigationParameters.onNavigateLinear": onNavigateLinear,
-        "PropNames.LinearNavigationParameters.pageNavigationSize": pageNavigationSize,
-        "PropNames.MultiSelectionParameters.multiSelectionAriaPropName": multiSelectionAriaPropName,
-        "PropNames.MultiSelectionParameters.multiSelectionMode": multiSelectionMode,
-        "PropNames.MultiSelectionParameters.onSelectionChange": onSelectionChange,
-        "PropNames.PaginatedParameters.paginationMax": paginationMax,
-        "PropNames.PaginatedParameters.paginationMin": paginationMin,
-        "PropNames.RovingTabIndexParameters.focusSelfParent": focusSelfParent,
-        "PropNames.RovingTabIndexParameters.initiallyTabbedIndex": initiallyTabbedIndex,
-        "PropNames.RovingTabIndexParameters.onTabbableIndexChange": onTabbableIndexChange,
-        "PropNames.RovingTabIndexParameters.untabbable": untabbable,
         "PropNames.RovingTabIndexParameters.untabbableBehavior": "focus-parent",
-        "PropNames.SingleSelectionParameters.initiallySingleSelectedIndex": initiallySingleSelectedIndex,
-        "PropNames.SingleSelectionParameters.onSingleSelectedIndexChange": onSingleSelectedIndexChange,
-        "PropNames.SingleSelectionParameters.singleSelectionAriaPropName": singleSelectionAriaPropName,
-        "PropNames.SingleSelectionParameters.singleSelectionMode": singleSelectionMode,
-        "PropNames.TypeaheadNavigationParameters.collator": collator,
+        "PropNames.LinearNavigationParameters.isValidForLinearNavigation": isValidForNavigation,
         "PropNames.TypeaheadNavigationParameters.isValidForTypeaheadNavigation": isValidForNavigation,
-        "PropNames.TypeaheadNavigationParameters.noTypeahead": noTypeahead,
-        "PropNames.TypeaheadNavigationParameters.onNavigateTypeahead": onNavigateTypeahead,
-        "PropNames.TypeaheadNavigationParameters.typeaheadTimeout": typeaheadTimeout,
         "PropNames.LinearNavigationParameters.getHighestIndex": getHighestIndex,
         "PropNames.LinearNavigationParameters.getLowestIndex": getLowestIndex,
         "PropNames.ManagedChildrenReturn.getChildren": getChildren,
         "PropNames.RearrangeableReturn.indexDemangler": indexDemangler,
         "PropNames.RearrangeableReturn.indexMangler": indexMangler,
         "PropNames.RefElementReturn.getElement": getElement,
+        ...args,
     });
 
     const {
@@ -273,11 +211,7 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
         "PropNames.ManagedChildrenReturn.getChildren": getChildren2,
         context: managedChildRTIContext,
         ...void6
-    }: UseManagedChildrenReturnType<M> = useManagedChildren<M>({
-        "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-        "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-        "PropNames.ManagedChildrenParameters.onChildrenMountChange": useStableCallback((...a) => { ocmc1?.(...a); ocmc2?.(...a) })
-    });
+    }: UseManagedChildrenReturnType<M> = useManagedChildren<M>(args);
 
     const contextChildren = useMemoObject<CompleteListNavigationContext<ChildElement, M>>({
         childrenHaveFocusChildContext,
@@ -289,20 +223,18 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
     });
 
     assertEmptyObject(void1);
-    assertEmptyObject(void2);
     assertEmptyObject(void3);
-    assertEmptyObject(void4);
     assertEmptyObject(void5);
     assertEmptyObject(void6);
 
     const processedChildrenContext = useMemoObject<UseProcessedChildrenContext["processedChildrenContext"]>({
         "PropNames.ChildrenHaveFocusReturn.getAnyFocused": getAnyFocused,
         "PropNames.RefElementReturn.getElement": getElement,
-        "PropNames.RovingTabIndexReturn.getTabbableIndex": getTabbableIndex,
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-        "PropNames.PaginatedParameters.paginationMin": paginationMin,
-        "PropNames.PaginatedParameters.paginationMax": paginationMax,
-        "PropNames.StaggeredParameters.staggered": staggered,
+        "PropNames.RovingTabIndexReturn.getTabbableIndex": retLNS["PropNames.RovingTabIndexReturn.getTabbableIndex"],
+        "PropNames.RovingTabIndexReturn.setTabbableIndex": retLNS["PropNames.RovingTabIndexReturn.setTabbableIndex"],
+        "PropNames.PaginatedParameters.paginationMin": args["PropNames.PaginatedParameters.paginationMin"],
+        "PropNames.PaginatedParameters.paginationMax": args["PropNames.PaginatedParameters.paginationMax"],
+        "PropNames.StaggeredParameters.staggered": args["PropNames.StaggeredParameters.staggered"],
         "PropNames.ManagedChildrenReturn.getChildren": getChildren
     });
 
@@ -323,13 +255,7 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
         "PropNames.ManagedChildrenReturn.getChildren": getChildren,
         "PropNames.ChildrenHaveFocusParameters.onCompositeFocusChange": useStableCallback((...a) => { ocfc2?.(...a); }),
         "PropNames.ManagedChildrenParameters.onChildrenMountChange": useStableCallback((...a) => { ocmc1?.(...a); ocmc2?.(...a) }),
-        "PropNames.RovingTabIndexReturn.focusSelf": focusSelf,
-        "PropNames.RovingTabIndexReturn.getTabbableIndex": getTabbableIndex,
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": setTabbableIndex,
-        "PropNames.SingleSelectionReturn.changeSingleSelectedIndex": changeSingleSelectedIndex,
-        "PropNames.SingleSelectionReturn.getSingleSelectedIndex": getSingleSelectedIndex,
-        "PropNames.TypeaheadNavigationReturn.getCurrentTypeahead": getCurrentTypeahead,
-        "PropNames.TypeaheadNavigationReturn.typeaheadStatus": typeaheadStatus
+        ...retLNS
     }
 });
 
@@ -340,40 +266,15 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
  */
 export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
     context,
-    "PropNames.PaginatedParameters.paginationMax": paginationMax,
-    "PropNames.PaginatedParameters.paginationMin": paginationMin,
-    "PropNames.RearrangeableParameters.adjust": adjust,
-    "PropNames.RearrangeableParameters.children": children,
-    "PropNames.RearrangeableParameters.compare": compare,
-    "PropNames.RearrangeableParameters.getIndex": getIndex,
-    "PropNames.RearrangeableParameters.onRearranged": onRearranged,
-    "PropNames.StaggeredParameters.staggered": staggered,
-    "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-    "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-    "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange,
-    ...void1
+    ...args
 }: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M>): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, M> {
     const {
         context: contextRPS,
         ...retPC
     } = useProcessedChildren<TabbableChildElement, M>({
-        "PropNames.RefElementReturn.getElement": context.processedChildrenContext["PropNames.RefElementReturn.getElement"],
-        "PropNames.ChildrenHaveFocusReturn.getAnyFocused": context.processedChildrenContext["PropNames.ChildrenHaveFocusReturn.getAnyFocused"],
-        "PropNames.ManagedChildrenReturn.getChildren": context.processedChildrenContext["PropNames.ManagedChildrenReturn.getChildren"],
-        "PropNames.PaginatedParameters.paginationMax": paginationMax,
-        "PropNames.PaginatedParameters.paginationMin": paginationMin,
-        "PropNames.RearrangeableParameters.adjust": adjust,
-        "PropNames.RearrangeableParameters.children": children,
-        "PropNames.RearrangeableParameters.compare": compare,
-        "PropNames.RearrangeableParameters.getIndex": getIndex,
-        "PropNames.RearrangeableParameters.onRearranged": onRearranged,
-        "PropNames.RovingTabIndexReturn.getTabbableIndex": context.processedChildrenContext["PropNames.RovingTabIndexReturn.getTabbableIndex"],
-        "PropNames.RovingTabIndexReturn.setTabbableIndex": context.processedChildrenContext["PropNames.RovingTabIndexReturn.setTabbableIndex"],
-        "PropNames.StaggeredParameters.staggered": staggered,
-        "PropNames.ManagedChildrenParameters.onAfterChildLayoutEffect": onAfterChildLayoutEffect,
-        "PropNames.ManagedChildrenParameters.onChildrenCountChange": onChildrenCountChange,
-        "PropNames.ManagedChildrenParameters.onChildrenMountChange": onChildrenMountChange,
+        ...context.processedChildrenContext,
         context,
+        ...args,
     });
 
     return {
@@ -387,33 +288,15 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
  * @compositeParams
  */
 export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
-    info: { index, focusSelf, untabbable, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-    "PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged": onCurrentFocusedChanged,
+    info: { index, focusSelf, untabbable, ...customUserInfo },
+    context,
     "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic3,
-    "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
-    "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
-    "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
-    "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled,
-    "PropNames.TextContentParameters.getText": getText,
-    "PropNames.RefElementParameters.onElementChange": onElementChange,
-    "PropNames.RefElementParameters.onMount": onMount,
-    "PropNames.RefElementParameters.onUnmount": onUnmount,
-    //textContentParameters,
-    //refElementParameters,
-    //hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 },
-    //singleSelectionChildParameters,
-    //multiSelectionChildParameters,
-    context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 },
-    ...void1
+    ...args
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     const {
         props: propsStable,
         ...retRE
-    } = useRefElement<ChildElement>({
-        "PropNames.RefElementParameters.onElementChange": onElementChange,
-        "PropNames.RefElementParameters.onMount": onMount,
-        "PropNames.RefElementParameters.onUnmount": onUnmount
-    });
+    } = useRefElement<ChildElement>(args);
     const { "PropNames.RefElementReturn.getElement": getElement } = retRE;
     const {
         info: infoFromListNav,
@@ -422,28 +305,24 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
         ...retLN
     } = useListNavigationSelectionChild<ChildElement>({
         info: { index, untabbable },
-        context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
-        "PropNames.MultiSelectionChildParameters.initiallyMultiSelected": initiallyMultiSelected,
-        "PropNames.MultiSelectionChildParameters.multiSelectionDisabled": multiSelectionDisabled,
-        "PropNames.MultiSelectionChildParameters.onMultiSelectChange": onMultiSelectChange,
+        context,
         "PropNames.RefElementReturn.getElement": getElement,
-        "PropNames.SingleSelectionChildParameters.singleSelectionDisabled": singleSelectionDisabled,
-        "PropNames.TextContentParameters.getText": getText
+        ...args
     });
 
 
     const allStandardInfo: UseCompleteListNavigationChildInfo<ChildElement> = {
         index,
         focusSelf,
-        getElement: getElement,
         untabbable,
+        getElement,
         ...infoFromListNav,
     }
 
-    const retMC = useManagedChild<M>({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } as M });
+    const retMC = useManagedChild<M>({ context, info: { ...allStandardInfo, ...customUserInfo } as M });
 
     const { "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic1 } = retLN;
-    const { "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic2 } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    const { "PropNames.HasCurrentFocusParameters.onCurrentFocusedInnerChanged": ocfic2 } = useChildrenHaveFocusChild({ context });
 
     const {
         props: props2,
@@ -454,8 +333,8 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
             ocfic2?.(focused, prev, e);
             ocfic3?.(focused, prev, e);
         }),
-        "PropNames.HasCurrentFocusParameters.onCurrentFocusedChanged": onCurrentFocusedChanged,
-        "PropNames.RefElementReturn.getElement": getElement
+        "PropNames.RefElementReturn.getElement": getElement,
+        ...args
     });
 
 
@@ -464,9 +343,6 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
         props2,
         ...propsChild
     ];
-
-    assertEmptyObject(void1);
-    assertEmptyObject(void5);
 
     return {
         propsChild: props,
