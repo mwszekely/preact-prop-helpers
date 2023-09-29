@@ -155,6 +155,10 @@ export const usePress = monitored(function usePress(args) {
         setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
     }, []);
+    const preventClickEventsOnIosSafari = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }, []);
     const onTouchEnd = useCallback((e) => {
         pressLog("touchend", e);
         e.preventDefault();
@@ -384,7 +388,7 @@ export const usePress = monitored(function usePress(args) {
             onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
             onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
             onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
-            onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+            onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : preventClickEventsOnIosSafari),
             onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
             onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
             onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
