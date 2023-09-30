@@ -3,12 +3,12 @@
  *
  * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.
  *
- * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
+ * Everything from keyboard navigation (arrow keys,ahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
  *
  * [See below a more complete list of goals](#conventions-and-goals), but in general this library aims to be both performant (no unnecessary re-renders, no repeat calls to [`useRefElement`](#userefelement) or other super-common hooks) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.
  *
  * Many of these hooks get really complicated, especially around grid navigation, but everything has been extremely carefully [typed](https://www.typescriptlang.org/) and named so that you can generally just use Intellisense to guide you through the whole process.
- * Hook dependencies are managed by just swizzling their parameters and return types back and forth &mdash; [see the conventions section below for the naming rules that make it work](#conventions-and-goals).
+ * Hook dependencies are managed by just swizzling their parameters and returns back and forth &mdash; [see the conventions section below for the naming rules that make it work](#conventions-and-goals).
  *
  * As a full example:
  *
@@ -28,14 +28,14 @@
  *         onTabbableIndexChange: setTabbableRow,
  *     },
  *     // `useSingleSelection` is a separate hook that you could call with these parameters:
- *     typeaheadNavigationParameters: {
+ *    aheadNavigationParameters: {
  *         // Determines how children are searched for (`Intl.Collator`)
  *         collator: null,
- *         // Whether typeahead behavior is disabled
+ *         // Whetherahead behavior is disabled
  *         noTypeahead: false,
- *         // How long a period of no input is required before typeahead clears itself
- *         typeaheadTimeout: 1000,
- *         // This can be used to track when the user navigates between rows via typeahead
+ *         // How long a period of no input is required beforeahead clears itself
+ *        aheadTimeout: 1000,
+ *         // This can be used to track when the user navigates between rows viaahead
  *         onNavigateTypeahead: null
  *     },
  *     // (etc. etc.)
@@ -95,7 +95,7 @@
  *     refElementParameters: {}
  * });
  *
- * // Those were the parameters, these are the return types:
+ * // Those were the parameters, these are the returns:
  * const {
  *     // Spread these props to the HTMLElement that will implement this grid behavior
  *     props,
@@ -111,11 +111,11 @@
  *         setTabbableIndex
  *     },
  *     // This is what `useTypeaheadNavigation` returned; use it for whatever you need:
- *     typeaheadNavigationReturn: {
- *         // Returns the current value the user has typed for typeahead (cannot be used during render)
+ *    aheadNavigationReturn: {
+ *         // Returns the current value the user hasd forahead (cannot be used during render)
  *         getCurrentTypeahead,
- *         // Whether the user's typeahead is invalid/valid/nonexistent.
- *         typeaheadStatus
+ *         // Whether the user'sahead is invalid/valid/nonexistent.
+ *        aheadStatus
  *     },
  *     // (etc. etc.)
  *     singleSelectionReturn: {
@@ -275,7 +275,7 @@
  * ```md-literal
  * ## Conventions and goals
  *
- * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same type, is also fine.
+ * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same, is also fine.
  *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.
  * * A parent hook never needs to be directly passed child data because the children will provide it themselves.
  *     * E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that. If a child that is focused becomes filtered, for example, the parent has enough information to be able to move focus to an adjacent child.
@@ -285,12 +285,12 @@
  * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then it:
  *     * ...**will always** take a single parameter that's at least like `{ fooParameters: {...} }`.
  *         * E.G. `useRefElement({ refElementParameters: { onMount: ... } })`
- *         * `UseFooParameters` is the type of the hook's 1 argument.
- *         * `UseFooParametersSelf` is the type of the `fooParameters` member.
+ *         * `UseFooParameters` is the of the hook's 1 argument.
+ *         * `UseFooParametersSelf` is the of the `fooParameters` member.
  *     * ...**will always** return a single object that's at least like `{ fooReturn: { ... } }`.
  *         * E.G. `const { refElementReturn: { getElement } } = useRefElement(...)`
- *         * `UseFooReturnType` is the type of the hook's return type.
- *         * `UseFooReturnTypeSelf` is the type of the `fooReturn` member.
+ *         * `UseFooReturnType` is the of the hook's return.
+ *         * `UseFooReturnTypeSelf` is the of the `fooReturn` member.
  *     * ...*may also* return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsSource` and `propsTarget`, etc.
  *         * E.G. `const { propsStable } = useRefElement(...)`, then `<div {...propsStable} />`
  *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
@@ -300,8 +300,8 @@
  *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
  *     * ...*may also*, as a child of a parent component, require or return pieces of `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
  *         * E.G. `useSingleSelectionChild` requires `info.index` to function, and returns some other pieces of the `info` object, like `info.getSelected`. Just keep swizzling back and forth to create the complete `info` object.
- *         * The `info` type can be customized with a generic type parameter generally named `M` (grid navigation has `RM` for rows' info and `CM` for cells' info).
- *             * If you have a custom hook that calls this child, you can customize the `info` it expects via that type parameter.
+ *         * The `info` can be customized with a generic parameter generally named `M` (grid navigation has `RM` for rows' info and `CM` for cells' info).
+ *             * If you have a custom hook that calls this child, you can customize the `info` it expects via that parameter.
  *     * When hooks themselves use other hooks:
  *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
  *         * If `useFoo` relies on `useBar` (but doesn't call it itself, to avoid redundant calls to the same common hook, like [`useRefElement`](#userefelement)), then will do one of the following:
@@ -346,7 +346,7 @@ export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
 export { getTopElement, useBlockingElement } from "./dom-helpers/use-blocking-element.js";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable } from "./dom-helpers/use-draggable.js";
-export { useDroppable } from "./dom-helpers/use-droppable.js";
+export { DroppableFileError, useDroppable } from "./dom-helpers/use-droppable.js";
 export { useGlobalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
 export { ImperativeElement, useImperativeProps } from "./dom-helpers/use-imperative-props.js";

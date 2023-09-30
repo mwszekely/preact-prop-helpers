@@ -6254,6 +6254,10 @@
       setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e3);
       setHovering(hoveringAtAnyPoint);
     }, []);
+    const preventClickEventsOnIosSafari = T2((e3) => {
+      e3.preventDefault();
+      e3.stopPropagation();
+    }, []);
     const onTouchEnd = T2((e3) => {
       pressLog("touchend", e3);
       e3.preventDefault();
@@ -6433,7 +6437,7 @@
         onTouchStart: !hasPressEvent ? void 0 : !p3 ? onTouchStart : void 0,
         onTouchCancel: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : void 0,
         onTouchMove: !hasPressEvent ? void 0 : !p3 ? onTouchMove : void 0,
-        onTouchEnd: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : void 0,
+        onTouchEnd: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : preventClickEventsOnIosSafari,
         onPointerDown: !hasPressEvent ? void 0 : p3 ? onPointerDown : void 0,
         onPointerCancel: !hasPressEvent ? void 0 : p3 ? onPointerDown : void 0,
         onPointerMove: !pointerDownStartedHere || !hasPressEvent ? void 0 : p3 ? onPointerMove : void 0,
