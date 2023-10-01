@@ -1,6 +1,5 @@
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { StateUpdater, useLayoutEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
@@ -67,7 +66,7 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  * @param toString -  
  * @returns 
  */
-export const usePersistentState = monitored(function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] {
+export const usePersistentState = (function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] {
 
     const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
