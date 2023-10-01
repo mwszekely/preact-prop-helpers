@@ -6254,6 +6254,10 @@
       setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e3);
       setHovering(hoveringAtAnyPoint);
     }, []);
+    const preventClickEventsOnIosSafari = T2((e3) => {
+      e3.preventDefault();
+      e3.stopPropagation();
+    }, []);
     const onTouchEnd = T2((e3) => {
       pressLog("touchend", e3);
       e3.preventDefault();
@@ -6433,7 +6437,7 @@
         onTouchStart: !hasPressEvent ? void 0 : !p3 ? onTouchStart : void 0,
         onTouchCancel: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : void 0,
         onTouchMove: !hasPressEvent ? void 0 : !p3 ? onTouchMove : void 0,
-        onTouchEnd: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : void 0,
+        onTouchEnd: !hasPressEvent ? void 0 : !p3 ? onTouchEnd : preventClickEventsOnIosSafari,
         onPointerDown: !hasPressEvent ? void 0 : p3 ? onPointerDown : void 0,
         onPointerCancel: !hasPressEvent ? void 0 : p3 ? onPointerDown : void 0,
         onPointerMove: !pointerDownStartedHere || !hasPressEvent ? void 0 : p3 ? onPointerMove : void 0,
@@ -7340,63 +7344,6 @@
   // ../dist/preact-extensions/use-layout-effect-debug.js
   var useLayoutEffectDebug = monitored(function useLayoutEffectDebug2(effect, inputs) {
     return useEffectDebug(effect, inputs, y2);
-  });
-
-  // ../dist/preact-extensions/use-persistent-state.js
-  function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
-    try {
-      const item = storage.getItem(key);
-      if (item == null)
-        return null;
-      return converter(item);
-    } catch (e3) {
-      debugger;
-      return null;
-    }
-  }
-  function storeToLocalStorage(key, value, converter = JSON.stringify, storage = localStorage) {
-    try {
-      if (value == null)
-        storage.removeItem(key);
-      else
-        storage.setItem(key, converter(value));
-    } catch (e3) {
-      debugger;
-    }
-  }
-  var usePersistentState = monitored(function usePersistentState2(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
-    const [localCopy, setLocalCopy, getLocalCopy] = useState(() => (key ? getFromLocalStorage(key, fromString, storage) : null) ?? initialValue);
-    const getInitialValue = useStableGetter(initialValue);
-    y2(() => {
-      if (key) {
-        const newCopy = getFromLocalStorage(key, fromString, storage);
-        setLocalCopy(newCopy ?? getInitialValue());
-      }
-    }, [key, storage]);
-    useGlobalHandler(window, "storage", useStableCallback((e3) => {
-      if (key && e3.key === key && e3.storageArea == storage) {
-        const newValue = e3.newValue;
-        if (newValue != null)
-          setLocalCopy(fromString(newValue));
-        else
-          setLocalCopy(initialValue);
-      }
-    }));
-    const setValueWrapper = useStableCallback((valueOrSetter) => {
-      const value = typeof valueOrSetter === "function" ? valueOrSetter(getLocalCopy()) : valueOrSetter;
-      setLocalCopy(valueOrSetter);
-      if (key) {
-        storeToLocalStorage(key, value, toString, storage);
-        if (typeof value == "object" && value instanceof Date) {
-          console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
-        }
-      }
-    });
-    const getValue = useStableCallback(() => {
-      const trueValue = !key ? void 0 : getFromLocalStorage(key, fromString, storage);
-      return trueValue ?? localCopy;
-    });
-    return [localCopy, setValueWrapper, getValue];
   });
 
   // ../node_modules/.pnpm/preact@10.17.1/node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js

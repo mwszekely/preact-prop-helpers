@@ -46,7 +46,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  * @param toString -
  * @returns
  */
-export const usePersistentState = (function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
+export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     // Ensure that if our key changes, we also update `localCopy` to match.
@@ -83,5 +83,5 @@ export const usePersistentState = (function usePersistentState(key, initialValue
         return trueValue ?? localCopy;
     });
     return [localCopy, setValueWrapper, getValue];
-});
+}
 //# sourceMappingURL=use-persistent-state.js.map
