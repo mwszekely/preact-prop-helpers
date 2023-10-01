@@ -15,6 +15,7 @@ import { StateUpdater } from "../util/lib.js";
  */
 export interface PersistentStates {
 }
+export declare const PersistentStates: PersistentStates;
 export declare function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter?: ((input: string) => PersistentStates[Key]), storage?: Storage): PersistentStates[Key] | null;
 export declare function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter?: ((input: PersistentStates[Key]) => string), storage?: Storage): void;
 /**

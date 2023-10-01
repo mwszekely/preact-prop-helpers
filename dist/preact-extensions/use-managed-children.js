@@ -93,19 +93,6 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
     const hasRemoteULEChildMounted = useRef(null);
-    const remoteULEChildChangedCausers = useRef(new Set());
-    const remoteULEChildChanged = useCallback((index) => {
-        if (remoteULEChildChangedCausers.current.size == 0) {
-            if (onAfterChildLayoutEffect != null) {
-                debounceRendering(() => {
-                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                    remoteULEChildChangedCausers.current.clear();
-                });
-            }
-        }
-        remoteULEChildChangedCausers.current.add(index);
-        return () => { };
-    }, [ /* Must remain stable */]);
     const remoteULEChildMounted = useCallback((index, mounted) => {
         if (!hasRemoteULEChildMounted.current) {
             hasRemoteULEChildMounted.current = {
@@ -168,7 +155,7 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
             managedChildContext: useMemoObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
-                remoteULEChildChanged,
+                //remoteULEChildChanged,
                 getChildren
             })
         }),
@@ -179,14 +166,14 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
  * @compositeParams
  */
 export const useManagedChild = monitored(function useManagedChild({ context, info }) {
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
     // and multiple children updating in the same tick will all be sent at once.
     useLayoutEffect(() => {
-        if (managedChildrenArray == null || remoteULEChildChanged == null)
+        if (managedChildrenArray == null)
             return;
         // Insert this information in-place
         if (typeof index == "number") {
@@ -195,8 +182,8 @@ export const useManagedChild = monitored(function useManagedChild({ context, inf
         else {
             managedChildrenArray.rec[index] = { ...info };
         }
-        return remoteULEChildChanged(index);
-    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+        //return remoteULEChildChanged(index as IndexType);
+    });
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
     // Do the same on unmount.

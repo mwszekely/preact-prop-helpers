@@ -8,8 +8,8 @@
     "packageManager": "pnpm@8.6.11",
     "browserslist": "defaults",
     "scripts": {
-        "watch": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --watch",
-        "build": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"development\\\"  --bundle --outfile=bundle.js --format=iife --sourcemap --analyze",
+        "watch": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"production\\\" --bundle --outfile=bundle.js --format=iife --sourcemap --watch",
+        "build": "npx esbuild ./index.tsx --define:process.env.NODE_ENV=\\\"production\\\" --bundle --outfile=bundle.js --format=iife --sourcemap --analyze",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",

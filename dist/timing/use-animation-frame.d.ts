@@ -1,11 +1,19 @@
 import { ElementProps, Nullable } from "../util/types.js";
+type RafCallbackType = (msSinceLast: number, tag?: any) => void;
+interface ContextType {
+    addCallback: (callback: RafCallbackType, tag?: any) => void;
+    removeCallback: (callback: RafCallbackType) => void;
+}
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
-}): import("preact").VNode<any>;
+}): import("preact").VNode<{
+    value: ContextType | null;
+    children: import("preact").ComponentChildren;
+}>;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`
@@ -24,4 +32,5 @@ export interface UseAnimationFrameParameters {
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
 export declare const useAnimationFrame: ({ callback }: UseAnimationFrameParameters) => void;
+export {};
 //# sourceMappingURL=use-animation-frame.d.ts.map

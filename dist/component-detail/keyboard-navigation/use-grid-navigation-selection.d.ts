@@ -1,9 +1,9 @@
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
-import { UseSelectionChildInfo, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType } from "../use-selection.js";
+import { UseListNavigationSelectionChildInfoKeysParameters } from "../selection/use-list-navigation-selection.js";
+import { UseSelectionChildInfo, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType } from "../selection/use-selection.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./use-list-navigation-partial.js";
-import { UseListNavigationSelectionChildInfoKeysParameters } from "./use-list-navigation-selection.js";
 export type UseGridNavigationSelectionRowInfoKeysParameters = UseListNavigationSelectionChildInfoKeysParameters;
 export type UseGridNavigationSelectionRowInfoKeysReturnType = UseGridNavigationRowInfoKeysReturnType | UseSelectionChildInfoKeysReturnType;
 export type UseGridNavigationSelectionCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;

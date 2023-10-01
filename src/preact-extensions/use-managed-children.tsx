@@ -33,7 +33,7 @@ export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> 
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
     remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-    remoteULEChildChanged: (index: M["index"]) => (() => void);
+    //remoteULEChildChanged: (index: M["index"]) => (() => void);
 }
 
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
@@ -299,24 +299,6 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
     const hasRemoteULEChildMounted = useRef<{ mounts: Set<IndexType>, unmounts: Set<IndexType> } | null>(null);
-    const remoteULEChildChangedCausers = useRef(new Set<IndexType>());
-    const remoteULEChildChanged = useCallback((index: IndexType) => {
-
-        if (remoteULEChildChangedCausers.current.size == 0) {
-            if (onAfterChildLayoutEffect != null) {
-                debounceRendering(() => {
-                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                    remoteULEChildChangedCausers.current.clear();
-                });
-            }
-        }
-
-        remoteULEChildChangedCausers.current.add(index);
-
-        return () => { };
-
-    }, [/* Must remain stable */]);
-
     const remoteULEChildMounted = useCallback((index: IndexType, mounted: boolean): void => {
         if (!hasRemoteULEChildMounted.current) {
             hasRemoteULEChildMounted.current = {
@@ -387,7 +369,7 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
             managedChildContext: useMemoObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
-                remoteULEChildChanged,
+                //remoteULEChildChanged,
                 getChildren
             })
         }),
@@ -403,14 +385,14 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
 export const useManagedChild = monitored(function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
     // and multiple children updating in the same tick will all be sent at once.
     useLayoutEffect(() => {
-        if (managedChildrenArray == null || remoteULEChildChanged == null) return;
+        if (managedChildrenArray == null) return;
 
         // Insert this information in-place
         if (typeof index == "number") {
@@ -419,8 +401,8 @@ export const useManagedChild = monitored(function useManagedChild<M extends Mana
         else {
             managedChildrenArray.rec[index as IndexType] = { ...info };
         }
-        return remoteULEChildChanged(index as IndexType);
-    }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
+        //return remoteULEChildChanged(index as IndexType);
+    });
 
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)

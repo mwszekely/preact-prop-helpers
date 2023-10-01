@@ -10,14 +10,14 @@ import { useStack } from "../util/stack.js";
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-export function useState(initialState) {
+export const useState = (function useState(initialState) {
     const getStack = useStack();
     // We keep both, but override the `setState` functionality
     const [state, setStateP] = useStateP(initialState);
     const ref = useRef(state);
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useCallback(value => {
+    const setState = useRef(value => {
         if (process.env.NODE_ENV === 'development') {
             window._setState_stack = getStack();
         }
@@ -41,8 +41,8 @@ export function useState(initialState) {
             ref.current = value;
             setStateP(value);
         }
-    }, []);
+    });
     const getState = useCallback(() => { return ref.current; }, []);
-    return [state, setState, getState];
-}
+    return [state, setState.current, getState];
+});
 //# sourceMappingURL=use-state.js.map

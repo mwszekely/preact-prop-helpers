@@ -5,11 +5,14 @@
     <meta charset="UTF-8">
 
     <style>
-        html, body, #root {
+        html,
+        body,
+        #root {
             height: 100%;
             width: 100%;
             max-width: 50em;
         }
+
         .demo {
             display: flex;
             flex-direction: column;
@@ -34,7 +37,13 @@
             pointer-events: none;
         }
 
-        .demo > hr {
+        li {
+            contain: strict;
+            height: 1.2em;
+            width: 100%;
+        }
+
+        .demo>hr {
             width: 100%;
         }
 

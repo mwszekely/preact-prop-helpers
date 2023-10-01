@@ -3,7 +3,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { monitored } from "../../util/use-call-count.js";
-import { useSelection, useSelectionChild } from "../use-selection.js";
+import { useSelection, useSelectionChild } from "../selection/use-selection.js";
 import { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
 /**
  * List navigation gets  selection, so grid navigation does too.

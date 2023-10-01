@@ -1,6 +1,29 @@
 import { createContext } from "preact";
-import { memo, useCallback, useContext } from "preact/compat";
-import { CompleteListNavigationContext, EventDetail, GetIndex, MultiSelectionChangeEvent, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, focus, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
+import { StateUpdater, memo, useCallback, useContext, useEffect } from "preact/compat";
+import { UseProcessedChildReturnType, UseProcessedChildrenContext } from "../../dist/component-detail/processed-children/use-processed-children.js";
+import {
+    CompleteListNavigationContext,
+    EventDetail,
+    GetIndex,
+    MultiSelectionChangeEvent,
+    UseProcessedChildContext as NormalListChildContext,
+    UseCompleteListNavigationChildInfo,
+    UseCompleteListNavigationDeclarativeReturnType,
+    VNode,
+
+    focus,
+    monitored,
+    useCompleteListNavigationChildDeclarative,
+    useCompleteListNavigationChildren,
+    useCompleteListNavigationDeclarative,
+    useProcessedChild as useListChild,
+    useMemo,
+    useMergedProps,
+    usePress,
+    useRefElement,
+    useStableCallback,
+    useState
+} from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -11,8 +34,10 @@ function _getDocument() {
 const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
 const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
 const UntabbableContext = createContext(false);
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!)
-export const DemoUseRovingTabIndex = memo(() => {
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
+const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
+const WeirdContext = createContext<UseProcessedChildrenContext>(null!);
+export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
 
@@ -40,13 +65,8 @@ export const DemoUseRovingTabIndex = memo(() => {
         singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
-        rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-        },
         refElementParameters: {},
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
-        sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
-        staggeredChildrenParameters: { staggered },
         singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode }
     });
@@ -54,22 +74,16 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const {
         props,
-        context,
+        contextChildren,
+        contextProcessing,
         rovingTabIndexReturn: { setTabbableIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
-        rearrangeableChildrenReturn: { useRearrangedChildren, shuffle, reverse }
-        //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
+        rearrangeableChildrenReturn: { shuffle, reverse, sort: _sort },
     } = r;
-    //useSingleSelectionDeclarative({ singleSelectionReturn: {  changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
 
 
-
-    const jsxChildren = Array.from((function* () {
-        for (let i = 0; i < (count); ++i) {
-            yield <DemoUseRovingTabIndexChild index={i} key={i} />
-        }
-    })());
+    const [staggering, setStaggering] = useState(false);
 
     return (
         <div className="demo">
@@ -115,29 +129,84 @@ export const DemoUseRovingTabIndex = memo(() => {
                 <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
+            <div>Staggering status: {staggered? staggering? "Staggering..." : "Done staggering" : "Not staggered"}</div>
             {<div>Typeahead status: {typeaheadStatus}</div>}
             {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
             <UntabbableContext.Provider value={untabbable}>
                 <SingleSelectionModeContext.Provider value={singleSelectionMode}>
                     <MultiSelectionModeContext.Provider value={multiSelectionMode}>
-                        <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                            <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
+                        <ListNavigationSingleSelectionChildContext.Provider value={contextChildren}>
+                            <WeirdContext.Provider value={contextProcessing}>
+                                <ol start={0} {...props}>
+                                    <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
+                                </ol>
+                            </WeirdContext.Provider>
                         </ListNavigationSingleSelectionChildContext.Provider>
                     </MultiSelectionModeContext.Provider>
                 </SingleSelectionModeContext.Provider>
             </UntabbableContext.Provider>
         </div>
     );
-})
+}))
+
+export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
+    const { 
+        context,
+        paginatedChildrenReturn,
+        rearrangeableChildrenReturn,
+        staggeredChildrenReturn
+    } = useCompleteListNavigationChildren({
+        paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
+        rearrangeableChildrenParameters: {
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+            onRearranged: null,
+            compare: null,
+            adjust: null,
+            children: useMemo(() => Array.from((function* () {
+                for (let i = 0; i < (count); ++i) {
+                    yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
+                }
+            })()), [count]),
+        },
+        managedChildrenParameters: {},
+        staggeredChildrenParameters: { staggered },
+        context: useContext(WeirdContext)
+    })
+
+    useEffect(() => {
+        setStaggering(staggeredChildrenReturn.stillStaggering);
+    }, [staggeredChildrenReturn.stillStaggering])
+
+    return (
+        <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
+    )
+}));
 
 interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElement> {
     foo: "bar";
 }
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
+
+
+const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
+    const { propsStable, refElementReturn: { getElement } } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: useStableCallback((e, p, r) => {
+        onElementChange?.(e, p, r);
+    }) } })
+    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
+        context: { managedChildContext, paginatedChildContext, staggeredChildContext },
+        info: { index }
+    })
+    const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
+    return (
+        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : c}</li>
+    )
+}));
+
+const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndexChild({ index }: { index: number }) {
     if (index == 1)
-        return <li>(Item {index} is a <strong>hole in the array</strong> and does not exist)</li>;
+        return <span>(Item {index} is a <strong>hole in the array</strong> and does not exist)</span>;
 
     let disabled = (index == 6);
     let hidden = (index == 7);
@@ -162,12 +231,10 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         rovingTabIndexChildReturn: { tabbable },
         singleSelectionChildReturn: { singleSelected, getSingleSelected, singleSelectedOffset, getSingleSelectedOffset },
         multiSelectionChildReturn: { getMultiSelected },
-        paginatedChildReturn: { hideBecausePaginated },
-        staggeredChildReturn: { hideBecauseStaggered },
         pressParameters: { onPressSync, excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
-        info: { index, focusSelf, foo: "bar", untabbable: hidden, getSortValue },
+        info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
@@ -184,6 +251,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...useMergedProps(propsChild, propsTabbable, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></span>
     )
 }));

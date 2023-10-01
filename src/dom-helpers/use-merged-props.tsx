@@ -47,7 +47,7 @@ export const useMergedProps = (function useMergedProps<E extends EventTarget>(..
 
 const knowns = new Set<string>(["children", "ref", "className", "class", "style"])
 
-const mergeUnknown = ( function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
+const mergeUnknown = (function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
 
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
 

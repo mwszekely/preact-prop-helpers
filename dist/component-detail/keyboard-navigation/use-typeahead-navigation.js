@@ -66,9 +66,9 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
     });
     const typeaheadComparator = useStableCallback((lhs, rhs) => {
         if (typeof lhs === "string" && typeof rhs.text === "string") {
-            // During typeahead, all strings longer than ours should be truncated
-            // so that they're all considered equally by that point.
-            return comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+            // TODO: Doing this substring BEFORE normalization is, like, pretty not great?
+            let trimmedRet = comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+            return trimmedRet;
         }
         return lhs - rhs;
     });
@@ -173,15 +173,15 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
                 // These two are only set for elements that are ahead of us, but the principle's the same otherwise
                 let lowestUnsortedIndexNext = null;
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
-                const updateBestFit = (u) => {
-                    if (!isValidForTypeaheadNavigation(u))
+                const updateBestFit = (unsortedIndex) => {
+                    if (!isValidForTypeaheadNavigation(unsortedIndex))
                         return;
-                    if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
-                        lowestUnsortedIndexAll = u;
+                    if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
+                        lowestUnsortedIndexAll = unsortedIndex;
                         lowestSortedIndexAll = i;
                     }
-                    if ((lowestUnsortedIndexNext == null || u < lowestUnsortedIndexNext) && u > (getIndex() ?? -Infinity)) {
-                        lowestUnsortedIndexNext = u;
+                    if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
+                        lowestUnsortedIndexNext = unsortedIndex;
                         lowestSortedIndexNext = i;
                     }
                 };
@@ -226,7 +226,19 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
                 if (text) {
                     // Find where to insert this item.
                     // Because all index values should be unique, the returned sortedIndex
-                    // should always refer to a new location (i.e. be negative)                
+                    // should always refer to a new location (i.e. be negative)   
+                    //
+                    // TODO: adding things on mount/unmount means that it's 
+                    // hard to make grid navigation typeahead work smoothly with tables -- 
+                    // every time we change columns, every row resorts itself, even though
+                    // each row should be able to just do that on mount.
+                    // 
+                    // We probably need to instead just sort on-demand, which is better for
+                    // performance anyway, but is tricky to code without major lag on the
+                    // first keystroke.
+                    //
+                    // Or we need to be able to support columns here, within typeahead?
+                    // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
                     const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
                     console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
                     if (sortedIndex < 0) {

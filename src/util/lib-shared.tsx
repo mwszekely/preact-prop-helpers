@@ -111,6 +111,7 @@ export const EventMapping = {
     fullscreenerror: null!,
     ratechange: null!,
     resize: null!,
+    scrollend: null!,
     securitypolicyviolation: null!,
     selectionchange: null!,
     selectstart: null!,

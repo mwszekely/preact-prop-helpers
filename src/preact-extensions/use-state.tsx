@@ -13,7 +13,7 @@ import { useStack } from "../util/stack.js";
  * 
  * @param initialState - Same as the built-in `setState`'s
  */
-export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
+export const useState = (function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
     const getStack = useStack();
 
     // We keep both, but override the `setState` functionality
@@ -22,7 +22,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
 
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useCallback<StateUpdater<T>>(value => {
+    const setState = useRef<StateUpdater<T>>(value => {
         if (process.env.NODE_ENV === 'development') {
             (window as any)._setState_stack = getStack();
         }
@@ -46,9 +46,9 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
             ref.current = value;
             setStateP(value);
         }
-    }, []);
+    });
 
     const getState = useCallback(() => { return ref.current; }, []);
 
-    return [state, setState, getState] as const;
-}
+    return [state, setState.current, getState] as const;
+})
