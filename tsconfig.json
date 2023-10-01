@@ -9,6 +9,7 @@
     "sourceMap": true,                        /* Generates corresponding '.map' file. */
     "outDir": "./dist",
     "rootDir": "./src/",
+    "isolatedModules": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable", "ES2021", "ES2021.String"],
     "exactOptionalPropertyTypes": false,    
     "strict": true,                            /* Enable all strict type-checking options. */
