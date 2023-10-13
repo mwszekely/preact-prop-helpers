@@ -6161,11 +6161,10 @@
     },
     ...void1
   }) {
-    let s = multiSelected || false;
     let reasonRef = _(undefined);
     p(() => {
-      changeMultiSelected(reasonRef.current, s);
-    }, [s]);
+      if (multiSelected != null) changeMultiSelected(reasonRef.current, multiSelected);
+    }, [multiSelected]);
     const omsc = useStableCallback(e => {
       reasonRef.current = e;
       return onMultiSelectedChange?.(e);

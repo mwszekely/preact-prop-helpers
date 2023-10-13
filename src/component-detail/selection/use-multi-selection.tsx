@@ -528,11 +528,11 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
     multiSelectionChildReturn: { changeMultiSelected, ...void2 },
     ...void1
 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>> {
-    let s = (multiSelected || false);
     let reasonRef = useRef<MultiSelectChildChangeEvent | undefined>(undefined);
     useEffect(() => {
-        changeMultiSelected(reasonRef.current!, s);
-    }, [s]);
+        if (multiSelected != null)
+            changeMultiSelected(reasonRef.current!, multiSelected);
+    }, [multiSelected]);
 
     const omsc = useStableCallback<NonNullable<UseMultiSelectionChildParametersSelf<E>["onMultiSelectChange"]>>((e) => {
         reasonRef.current = e;

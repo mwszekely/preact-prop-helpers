@@ -281,11 +281,11 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
  * @compositeParams
  */
 export function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }) {
-    let s = (multiSelected || false);
     let reasonRef = useRef(undefined);
     useEffect(() => {
-        changeMultiSelected(reasonRef.current, s);
-    }, [s]);
+        if (multiSelected != null)
+            changeMultiSelected(reasonRef.current, multiSelected);
+    }, [multiSelected]);
     const omsc = useStableCallback((e) => {
         reasonRef.current = e;
         return onMultiSelectedChange?.(e);
