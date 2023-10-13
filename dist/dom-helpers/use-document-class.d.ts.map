@@ -1,1 +1,0 @@
-{"version":3,"file":"use-document-class.d.ts","sourceRoot":"","sources":["../../src/dom-helpers/use-document-class.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAE,IAAI,EAAE,MAAM,MAAM,CAAC;AAI5B,wBAAgB,WAAW,CAAC,OAAO,CAAC,EAAE,IAAI,YAA4F;AAEtI,KAAK,CAAC,GAAG,UAAU,CAAC,OAAO,IAAI,CAAC,CAAC;AAEjC;;;;;;GAMG;AACH,eAAO,MAAM,gBAAgB,cAAkD,CAAC,CAAC,CAAC,CAAC,WAAW,OAAO,YAAY,WAAW,SAc1H,CAAA"}

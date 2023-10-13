@@ -4,30 +4,30 @@
   "version": "0.0.1",
   "description": "A small set of hooks and other functions related to modifying Preact props.",
   "source": "src/index.tsx",
-  "module": "/dist/index.js",
-  "types": "/dist/index.d.ts",
-  "packageManager": "pnpm@8.6.12",
+  "module": "/dist/preact/index.js",
+  "types": "/dist/preact/index.d.ts",
+  "typings": "./dist/preact/index.d.ts",
+  "packageManager": "pnpm@8.9.0",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "browser": "./dist/index.js",
-      "import": "./dist/index.js"
+      "types": "./dist/preact/index.d.ts",
+      "browser": "./dist/preact/index.js",
+      "import": "./dist/preact/index.js"
     },
     "./react": {
-      "types": "./dist/index.react.d.ts",
-      "browser": "./dist/index.react.js",
-      "import": "./dist/index.react.js"
+      "types": "./dist/react/index.d.ts",
+      "browser": "./dist/react/index.js",
+      "import": "./dist/react/index.js"
     },
     "./package.json": "./package.json"
   },
-  "typings": "./dist/index.d.ts",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc clean build:*",
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
     "watch:preact": "tsc --watch",
     "build:preact": "tsc",
-    "watch:react": "npx rollup -c ./rollup.config.js --watch --no-watch.clearScreen",
-    "build:react": "npx rollup -c ./rollup.config.js",
+    "watch:react": "tsc --project ./tsconfig.react.json --watch",
+    "build:react": "tsc --project ./tsconfig.react.json",
     "test": "playwright test --ui",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
@@ -41,19 +41,19 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.38.1",
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-node-resolve": "^15.2.1",
-    "@rollup/plugin-replace": "^5.0.2",
-    "@rollup/plugin-typescript": "^11.1.4",
+    "@playwright/test": "^1.39.0",
+    "@rollup/plugin-commonjs": "^25.0.5",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.3",
+    "@rollup/plugin-typescript": "^11.1.5",
     "@types/lodash-es": "^4.17.9",
-    "@types/react": "^18.2.23",
-    "@types/react-dom": "^18.2.8",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
-    "eslint": "^8.50.0",
+    "@types/react": "^18.2.28",
+    "@types/react-dom": "^18.2.13",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
+    "eslint": "^8.51.0",
     "npm-run-all": "^4.1.5",
-    "rollup": "^3.29.4",
+    "rollup": "^4.0.2",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-ts": "^3.4.5",
     "typescript": "5.2.2"

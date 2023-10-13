@@ -1,0 +1,1 @@
+{"version":3,"file":"use-media-query.d.ts","sourceRoot":"","sources":["../../../src/observers/use-media-query.tsx"],"names":[],"mappings":"AAIA;;;;;;;;;;;;GAYG;AACH,eAAO,MAAM,aAAa,UAA2C,MAAM,GAAG,IAAI,GAAG,SAAS,iBAAiB,OAAO,KAAG,uBAiCvH,CAAA;AAEF,MAAM,WAAW,uBAAuB;IACpC,OAAO,EAAE,OAAO,GAAG,IAAI,CAAC;IACxB,UAAU,IAAI,OAAO,GAAG,IAAI,CAAC;CAChC"}
