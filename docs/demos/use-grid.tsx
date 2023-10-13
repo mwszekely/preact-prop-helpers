@@ -1,8 +1,8 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
 import { StateUpdater, useCallback, useContext, useEffect, useMemo } from "preact/hooks";
-import { TabbableColumnInfo } from "../../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/index.js";
+import { TabbableColumnInfo } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "preact-prop-helpers";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 

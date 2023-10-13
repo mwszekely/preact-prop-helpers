@@ -1,6 +1,6 @@
 import { RenderableProps } from "preact";
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useForceUpdate, useSearchParamStateDeclarative } from "../dist/index.js";
+import { useForceUpdate, useSearchParamStateDeclarative } from "preact-prop-helpers";
 import { GridNavConstants } from "./fixtures/grid-nav.stage.js";
 import { ListNavConstants } from "./fixtures/list-nav.stage.js";
 import { PressConstants } from "./fixtures/press.stage.js";

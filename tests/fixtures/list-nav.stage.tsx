@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./list-nav.constants.js";

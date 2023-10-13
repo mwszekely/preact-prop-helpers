@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { useTimeout } from "../../dist/index.js";
+import { useTimeout } from "preact-prop-helpers";
 
 
 export const DemoUseTimeout = () => {

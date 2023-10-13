@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";

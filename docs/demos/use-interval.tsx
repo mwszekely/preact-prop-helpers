@@ -1,4 +1,4 @@
-import { useInterval, useState } from "../../dist/index.js";
+import { useInterval, useState } from "preact-prop-helpers";
 
 
 export const DemoUseInterval = () => {

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useMergedProps, usePress, useRefElement } from "../../dist/index.js";
+import { useMergedProps, usePress, useRefElement } from "preact-prop-helpers";
 import { fromStringBoolean, useTestSyncState } from "../util.js";
 
 export interface PressConstants {

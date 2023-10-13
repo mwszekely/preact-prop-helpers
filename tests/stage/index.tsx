@@ -1,7 +1,7 @@
 import { render } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { useSearchParamState, useState } from "../../dist/index.js";
-import { useSearchParamStateDeclarative } from "../../dist/preact-extensions/use-search-param-state.js";
+import { useSearchParamState, useState } from "preact-prop-helpers";
+import { useSearchParamStateDeclarative } from "preact-prop-helpers";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
@@ -92,7 +92,7 @@ const TestBases = {
     /*"menu": <TestBasesMenu />,*/
 }
 
-declare module "../../dist/index.js" {
+declare module "preact-prop-helpers" {
     export interface SearchParamStates {
         "test-base": string;
         "test-bool": boolean | null;
