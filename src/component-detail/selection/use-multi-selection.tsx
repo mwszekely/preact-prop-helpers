@@ -412,7 +412,7 @@ export function useMultiSelectionChild<E extends Element>({
         console.assert(selected != null);
         console.assert(!multiSelectionDisabled);
         console.assert(multiSelectIsEnabled);
-        
+
         // We're selected now (because someone told us we are, this hook doesn't call this function directly)
         //
         // So update our own internal state so we can re-render with the correct props,

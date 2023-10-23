@@ -8,10 +8,11 @@ import { MakeSelectionDeclarativeChildParameters, MakeSelectionDeclarativeParame
 import { UseListNavigationSelectionChildInfo, UseListNavigationSelectionChildInfoKeysParameters, UseListNavigationSelectionChildParameters, UseListNavigationSelectionChildReturnType, UseListNavigationSelectionParameters, UseListNavigationSelectionReturnType, useListNavigationSelection, useListNavigationSelectionChild } from "../component-detail/use-list-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../dom-helpers/use-text-content.js";
 import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
@@ -83,14 +84,16 @@ export type UseCompleteListNavigationChildInfoKeysParameters<M extends UseComple
 
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>,
-    OmitStrong<UseListNavigationSelectionChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn">,
+    OmitStrong<UseListNavigationSelectionChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn" | "textContentReturn">,
     Pick<UseRefElementParameters<ChildElement>, "refElementParameters">,
+    Pick<UseTextContentParameters<ChildElement>, "textContentParameters">,
     Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
-    OmitStrong<UseListNavigationSelectionChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">,
+    OmitStrong<UseListNavigationSelectionChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters" | "textContentParameters">,
     OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">,
+    Pick<UseTextContentReturnType, "textContentReturn">,
     UseHasCurrentFocusReturnType<ChildElement>,
     UseManagedChildReturnType<M>,
     TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
@@ -263,7 +266,7 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
  */
 export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, untabbable, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-    textContentParameters,
+    textContentParameters: { getText, onTextContentChange: otcc1, ...void10 },
     refElementParameters,
     hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 },
     singleSelectionChildParameters,
@@ -275,7 +278,7 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
         pressParameters: { excludeSpace, onPressSync, ...void2 },
-        textContentReturn,
+        textContentParameters: { onTextContentChange: otcc2, ...void8 },
         singleSelectionChildReturn,
         multiSelectionChildReturn,
         info: infoFromListNav,
@@ -289,8 +292,9 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
         singleSelectionChildParameters,
         multiSelectionChildParameters,
         refElementReturn,
-        textContentParameters
+        textContentReturn: { getTextContent: useStableCallback((): string | null => textContentReturn.getTextContent()) }
     });
+    const { textContentReturn, ...void9 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } })
 
     const allStandardInfo: UseCompleteListNavigationChildInfo<ChildElement> = {
         index,
@@ -303,11 +307,7 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     const { managedChildReturn } = useManagedChild<M>({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } as M });
 
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
-    const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, prev, e) => {
-        ocfic1?.(focused, prev, e);
-        ocfic2?.(focused, prev, e);
-        ocfic3?.(focused, prev, e);
-    })
+    const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
     const { hasCurrentFocusReturn } = useHasCurrentFocus<ChildElement>({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged,
@@ -330,6 +330,8 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     assertEmptyObject(void5);
     assertEmptyObject(void6);
     assertEmptyObject(void7);
+    assertEmptyObject(void8);
+    assertEmptyObject(void9);
 
     return {
         propsChild: props,

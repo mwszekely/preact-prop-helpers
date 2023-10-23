@@ -33,7 +33,7 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  * 
  * @compositeParams
  */
-export const useModal = monitored (function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
+export const useModal = monitored(function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void2 },
     escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 },
     focusTrapParameters: { trapActive, ...focusTrapParameters },

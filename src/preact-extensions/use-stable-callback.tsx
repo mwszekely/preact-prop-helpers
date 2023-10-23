@@ -56,3 +56,12 @@ export const useStableCallback = (function useStableCallback<T extends Function 
     }
 })
 
+export const useStableMergedCallback = (function useStableMergedCallback<T extends (Function | null | undefined)[]>(...fns: T) {
+    return useStableCallback<T[number]>((...args: any[]) => {
+        for (let i = 0; i < fns.length; ++i) {
+            fns[i]?.(...args);
+        }
+    });
+
+});
+

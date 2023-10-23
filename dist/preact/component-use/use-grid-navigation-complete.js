@@ -4,10 +4,11 @@ import { useSelectionDeclarative } from "../component-detail/selection/use-selec
 import { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { useTextContent } from "../dom-helpers/use-text-content.js";
 import { useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
@@ -112,7 +113,7 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     // Create some helper functions
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -136,13 +137,14 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info: { index, untabbable },
-        textContentParameters,
+        textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
         singleSelectionChildParameters,
         multiSelectionChildParameters
     };
     // Actually call useGridNavigationRow,
     // and get an enormous bag of return values
-    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
+    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentParameters: { onTextContentChange: otcc2 }, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
+    const { textContentReturn, ...void7 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
     // This is all the info the parent needs about us, the row
     // (NOT the info the cells provide to us, the row)
     const completeInfo = {
@@ -162,11 +164,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: ocfc1,
-            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused, reason) => {
-                // Call grid navigation's focus change
-                ocfic1?.(focused, prevFocused, reason);
-                ocfic3?.(focused, prevFocused, reason);
-            }),
+            onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic3),
         }
     });
     const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable);
@@ -176,18 +174,19 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
     assertEmptyObject(void4);
     assertEmptyObject(void5);
     assertEmptyObject(void6);
+    assertEmptyObject(void7);
     return {
         pressParameters,
         hasCurrentFocusReturn,
         managedChildrenReturn,
         context,
+        textContentReturn,
         managedChildReturn,
         linearNavigationReturn,
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
         singleSelectionChildReturn,
         multiSelectionChildReturn,
-        textContentReturn,
         typeaheadNavigationReturn,
         refElementReturn,
         props,
@@ -196,17 +195,20 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
+export const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters: { getText, onTextContentChange: otcc1, ...void4 }, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentParameters: { onTextContentChange: otcc2 }, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionCell({
         gridNavigationCellParameters,
         info: { index, untabbable },
         context,
         refElementReturn,
-        textContentParameters,
+        textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
     });
+    const { textContentReturn, ...void3 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     const { hasCurrentFocusReturn } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: null,

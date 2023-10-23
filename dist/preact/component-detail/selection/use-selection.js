@@ -1,5 +1,5 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
+import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
@@ -32,7 +32,7 @@ export function useSelection({ managedChildrenReturn, multiSelectionParameters, 
     assertEmptyObject(void4);
     return {
         propsStable,
-        childrenHaveFocusParameters: { onCompositeFocusChange: useStableCallback((...a) => { ocfc1(...a); ocfc2(...a); }) },
+        childrenHaveFocusParameters: { onCompositeFocusChange: useStableMergedCallback(ocfc1, ocfc2) },
         context: useMemoObject({ ...contextSS, ...contextMS }),
         multiSelectionReturn,
         singleSelectionReturn
@@ -51,7 +51,7 @@ export function useSelectionChild({ context, info: { index, untabbable, ...void2
     assertEmptyObject(void4);
     assertEmptyObject(void5);
     return {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((...a) => { ocfic1(...a); ocfic2(...a); }) },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
         info: {
             getMultiSelected,
             setSelectedFromParent,
@@ -61,7 +61,7 @@ export function useSelectionChild({ context, info: { index, untabbable, ...void2
             getMultiSelectionDisabled,
         },
         multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableCallback((...a) => { opc1(...a); opc2(...a); }) },
+        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
         props: useMergedProps(p1, p2),
         singleSelectionChildReturn
     };

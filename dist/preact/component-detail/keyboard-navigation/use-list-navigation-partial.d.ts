@@ -35,5 +35,5 @@ export declare const useListNavigation: <ParentOrChildElement extends Element, C
 /**
  * @compositeParams
  */
-export declare const useListNavigationChild: <ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
+export declare const useListNavigationChild: <ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentReturn, ...void2 }: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
 //# sourceMappingURL=use-list-navigation-partial.d.ts.map

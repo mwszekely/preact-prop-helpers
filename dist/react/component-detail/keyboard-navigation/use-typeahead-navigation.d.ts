@@ -77,9 +77,9 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>, TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">, TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
+export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>, TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">, TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
 }
-export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType, TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
+export interface UseTypeaheadNavigationChildReturnType extends TargetedPick<UseTextContentParameters<any>, "textContentParameters", "onTextContentChange">, TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
 }
 interface TypeaheadInfo {
     text: string | null;
@@ -99,7 +99,7 @@ export declare const useTypeaheadNavigation: <ParentOrChildElement extends Eleme
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
+export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ...void1 }, textContentReturn: { getTextContent, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.
  *

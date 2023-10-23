@@ -69,7 +69,7 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export const useFocusTrap = monitored (function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
+export const useFocusTrap = monitored(function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementReturn

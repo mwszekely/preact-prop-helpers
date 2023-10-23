@@ -320,7 +320,7 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
 
     // This is the element that the IntersectionObserver will watch.
     const e = useRef<Element | null>(null);
-    
+
     return {
         props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false, childUseEffect },

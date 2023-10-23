@@ -1,5 +1,5 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitored } from "../util/use-call-count.js";
@@ -46,18 +46,18 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
 /**
  * @compositeParams
  */
-export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
         info: { index, untabbable },
         context,
         multiSelectionChildParameters,
         singleSelectionChildParameters
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentParameters, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
         info: { index, untabbable },
         context,
         refElementReturn,
-        textContentParameters,
+        textContentReturn,
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -66,18 +66,13 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
     assertEmptyObject(void8);
     assertEmptyObject(void9);
     return {
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
-                ocfic1?.(focused, previouslyFocused, e);
-                ocfic2?.(focused, previouslyFocused, e);
-            })
-        },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
         pressParameters: { onPressSync, excludeSpace },
         info: { ...infoSS, ...infoLN },
         rovingTabIndexChildReturn,
         multiSelectionChildReturn,
         singleSelectionChildReturn,
-        textContentReturn,
+        textContentParameters,
         propsChild: propsSS,
         propsTabbable: propsLN
     };

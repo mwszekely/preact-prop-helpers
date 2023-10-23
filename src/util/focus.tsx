@@ -24,7 +24,7 @@ export function focus(e: Element | null) {
 export function findBackupFocus(unmountingElement: Element | null | undefined): HTMLElement {
     if (unmountingElement == null)
         return (globalThis.document.body);
-        
+
     let document = unmountingElement.ownerDocument;
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
 

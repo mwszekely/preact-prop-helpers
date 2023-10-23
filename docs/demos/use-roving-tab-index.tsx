@@ -1,6 +1,4 @@
 import { createContext } from "preact";
-import { StateUpdater, memo, useCallback, useContext, useEffect } from "preact/compat";
-import { UseProcessedChildReturnType, UseProcessedChildrenContext } from "preact-prop-helpers";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -8,8 +6,7 @@ import {
     MultiSelectionChangeEvent,
     UseProcessedChildContext as NormalListChildContext,
     UseCompleteListNavigationChildInfo,
-    UseCompleteListNavigationDeclarativeReturnType,
-    VNode,
+    UseCompleteListNavigationDeclarativeReturnType, UseProcessedChildReturnType, UseProcessedChildrenContext, VNode,
 
     focus,
     monitored,
@@ -24,6 +21,7 @@ import {
     useStableCallback,
     useState
 } from "preact-prop-helpers";
+import { StateUpdater, memo, useCallback, useContext, useEffect } from "preact/compat";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -236,7 +234,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
-        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
+        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
         refElementParameters: { onElementChange: null, onMount: null, onUnmount: null },
         multiSelectionChildParameters: { multiSelectionDisabled: disabled },

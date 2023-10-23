@@ -1,6 +1,6 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick, useEffect } from "../util/lib.js";
+import { Nullable, TargetedPick, useEffect } from "../util/lib.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
@@ -17,7 +17,7 @@ export interface UseTextContentParametersSelf<E extends Element> {
      * 
      * @see {@link useMutationObserver} for a more robust implementation of this idea
      */
-    onTextContentChange: OnPassiveStateChange<string | null, never>;
+    onTextContentChange: Nullable<OnPassiveStateChange<string | null, never>>;
 }
 
 export interface UseTextContentParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {

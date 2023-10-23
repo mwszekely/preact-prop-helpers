@@ -1,6 +1,6 @@
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { useActiveElement } from "../observers/use-active-element.js";
-import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitored } from "../util/use-call-count.js";
 import { useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
@@ -61,7 +61,7 @@ export const useDismiss = monitored(function useDismiss({ dismissParameters: { d
     });
     const { activeElementReturn: { getActiveElement: _getActiveElement, getLastActiveElement: _getLastActiveElement, getWindowFocused: _getWindowFocused } } = useActiveElement({
         activeElementParameters: {
-            onLastActiveElementChange: useStableCallback((a, b, r) => { olaec2?.(a, b, r); olaec1?.(a, b, r); }),
+            onLastActiveElementChange: useStableMergedCallback(olaec2, olaec1),
             onActiveElementChange,
             onWindowFocusedChange,
             getDocument

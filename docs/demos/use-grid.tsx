@@ -1,8 +1,7 @@
 import { createContext } from "preact";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "preact-prop-helpers";
 import { memo } from "preact/compat";
 import { StateUpdater, useCallback, useContext, useEffect, useMemo } from "preact/hooks";
-import { TabbableColumnInfo } from "preact-prop-helpers";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "preact-prop-helpers";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -282,7 +281,7 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
 
         context: contextFromParent,
         info: { index, foo: "bar", untabbable: hidden },
-        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
+        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
 
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
@@ -332,7 +331,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         gridNavigationCellParameters: { colSpan: 1 },
         info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), untabbable: false },
         context,
-        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
+        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) , onTextContentChange: null },
     });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")

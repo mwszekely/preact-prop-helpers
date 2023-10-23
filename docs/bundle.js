@@ -1142,6 +1142,13 @@
       return setIsStableGetter(T$1(fn, []));
     }
   };
+  const useStableMergedCallback = function useStableMergedCallback(...fns) {
+    return useStableCallback((...args) => {
+      for (let i = 0; i < fns.length; ++i) {
+        fns[i]?.(...args);
+      }
+    });
+  };
 
   // Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
   // (i.e. in a way that doesn't throw an error)
@@ -4231,37 +4238,6 @@
   });
 
   /**
-   * Allows examining the rendered component's text content whenever it renders and reacting to changes.
-   *
-   * @compositeParams
-   */
-  const useTextContent = function useTextContent({
-    refElementReturn: {
-      getElement
-    },
-    textContentParameters: {
-      getText,
-      onTextContentChange
-    }
-  }) {
-    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
-    p(() => {
-      const element = getElement();
-      if (element) {
-        const textContent = getText(element);
-        if (textContent) {
-          setTextContent(textContent);
-        }
-      }
-    });
-    return {
-      textContentReturn: {
-        getTextContent
-      }
-    };
-  };
-
-  /**
    * Allows for the selection of a managed child by typing the given text associated with it.
    *
    * @see useListNavigation, which packages everything up together.
@@ -4470,8 +4446,8 @@
       index,
       ...void1
     },
-    textContentParameters: {
-      getText,
+    textContentReturn: {
+      getTextContent,
       ...void5
     },
     context: {
@@ -4488,65 +4464,57 @@
     },
     ...void4
   }) {
-    const {
-      textContentReturn
-    } = useTextContent({
-      refElementReturn: {
-        getElement
-      },
-      textContentParameters: {
-        getText,
-        onTextContentChange: T$1(text => {
-          if (text) {
-            // Find where to insert this item.
-            // Because all index values should be unique, the returned sortedIndex
-            // should always refer to a new location (i.e. be negative)   
-            //
-            // TODO: adding things on mount/unmount means that it's 
-            // hard to make grid navigation typeahead work smoothly with tables -- 
-            // every time we change columns, every row resorts itself, even though
-            // each row should be able to just do that on mount.
-            // 
-            // We probably need to instead just sort on-demand, which is better for
-            // performance anyway, but is tricky to code without major lag on the
-            // first keystroke.
-            //
-            // Or we need to be able to support columns here, within typeahead?
-            // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
-            const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-            console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
-              unsortedIndex: index,
-              text
-            }) == 0);
-            if (sortedIndex < 0) {
-              sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, {
-                text,
-                unsortedIndex: index
-              });
-            } else {
-              sortedTypeaheadInfo.splice(sortedIndex, 0, {
-                text,
-                unsortedIndex: index
-              });
-            }
-            return () => {
-              // When unmounting, find where we were and remove ourselves.
-              // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-              const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-              console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
-                unsortedIndex: index,
-                text
-              }) == 0);
-              if (sortedIndex >= 0) {
-                sortedTypeaheadInfo.splice(sortedIndex, 1);
-              }
-            };
+    const onTextContentChange = T$1(text => {
+      if (text) {
+        // Find where to insert this item.
+        // Because all index values should be unique, the returned sortedIndex
+        // should always refer to a new location (i.e. be negative)   
+        //
+        // TODO: adding things on mount/unmount means that it's 
+        // hard to make grid navigation typeahead work smoothly with tables -- 
+        // every time we change columns, every row resorts itself, even though
+        // each row should be able to just do that on mount.
+        // 
+        // We probably need to instead just sort on-demand, which is better for
+        // performance anyway, but is tricky to code without major lag on the
+        // first keystroke.
+        //
+        // Or we need to be able to support columns here, within typeahead?
+        // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
+        const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+        console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
+          unsortedIndex: index,
+          text
+        }) == 0);
+        if (sortedIndex < 0) {
+          sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, {
+            text,
+            unsortedIndex: index
+          });
+        } else {
+          sortedTypeaheadInfo.splice(sortedIndex, 0, {
+            text,
+            unsortedIndex: index
+          });
+        }
+        return () => {
+          // When unmounting, find where we were and remove ourselves.
+          // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+          const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+          console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
+            unsortedIndex: index,
+            text
+          }) == 0);
+          if (sortedIndex >= 0) {
+            sortedTypeaheadInfo.splice(sortedIndex, 1);
           }
-        }, [])
+        };
       }
-    });
+    }, []);
     return {
-      textContentReturn,
+      textContentParameters: {
+        onTextContentChange
+      },
       pressParameters: {
         excludeSpace
       }
@@ -4656,7 +4624,7 @@
     },
     context,
     refElementReturn,
-    textContentParameters,
+    textContentReturn,
     ...void2
   }) {
     const {
@@ -4674,7 +4642,7 @@
       ...tncr
     } = useTypeaheadNavigationChild({
       refElementReturn,
-      textContentParameters,
+      textContentReturn,
       context,
       info: {
         index
@@ -4774,7 +4742,7 @@
       untabbable,
       ...void3
     },
-    textContentParameters,
+    textContentReturn,
     context: contextFromParent,
     // Stuff for the row as a parent of child cells
     linearNavigationParameters,
@@ -4846,7 +4814,7 @@
       hasCurrentFocusParameters,
       pressParameters,
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters,
       ...void6
     } = useListNavigationChild({
       info: {
@@ -4854,7 +4822,7 @@
         untabbable
       },
       refElementReturn,
-      textContentParameters,
+      textContentReturn,
       context: contextFromParent
     });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
@@ -4937,7 +4905,7 @@
       hasCurrentFocusParameters,
       pressParameters,
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters,
       linearNavigationReturn,
       managedChildrenParameters,
       rovingTabIndexReturn,
@@ -4969,7 +4937,7 @@
       ...void7
     },
     refElementReturn,
-    textContentParameters,
+    textContentReturn,
     gridNavigationCellParameters: {
       colSpan,
       ...void6
@@ -4983,7 +4951,7 @@
         ...void3
       },
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters,
       pressParameters,
       props,
       info: infoLs,
@@ -4997,7 +4965,7 @@
         rovingTabIndexContext,
         typeaheadNavigationContext
       },
-      textContentParameters,
+      textContentReturn,
       refElementReturn
     });
     return {
@@ -5009,7 +4977,7 @@
         }), e)
       }),
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters,
       pressParameters,
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -6423,10 +6391,7 @@
     return {
       propsStable,
       childrenHaveFocusParameters: {
-        onCompositeFocusChange: useStableCallback((...a) => {
-          ocfc1(...a);
-          ocfc2(...a);
-        })
+        onCompositeFocusChange: useStableMergedCallback(ocfc1, ocfc2)
       },
       context: useMemoObject({
         ...contextSS,
@@ -6499,10 +6464,7 @@
     });
     return {
       hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: useStableCallback((...a) => {
-          ocfic1(...a);
-          ocfic2(...a);
-        })
+        onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2)
       },
       info: {
         getMultiSelected,
@@ -6514,10 +6476,7 @@
       },
       multiSelectionChildReturn,
       pressParameters: {
-        onPressSync: useStableCallback((...a) => {
-          opc1(...a);
-          opc2(...a);
-        })
+        onPressSync: useStableMergedCallback(opc1, opc2)
       },
       props: useMergedProps(p1, p2),
       singleSelectionChildReturn
@@ -6840,10 +6799,7 @@
     });
     useActiveElement({
       activeElementParameters: {
-        onLastActiveElementChange: useStableCallback((a, b, r) => {
-          olaec2?.(a, b, r);
-          olaec1?.(a, b, r);
-        }),
+        onLastActiveElementChange: useStableMergedCallback(olaec2, olaec1),
         onActiveElementChange,
         onWindowFocusedChange,
         getDocument
@@ -8250,11 +8206,11 @@
     managedChildrenReturn,
     refElementReturn,
     rovingTabIndexParameters,
-    textContentParameters,
     typeaheadNavigationParameters,
     context,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
+    textContentReturn,
     ...void1
   }) {
     const {
@@ -8305,7 +8261,7 @@
       },
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
-      textContentReturn,
+      textContentParameters,
       typeaheadNavigationReturn,
       context: contextGridNavigation,
       ...void3
@@ -8316,7 +8272,7 @@
       managedChildrenReturn,
       refElementReturn,
       rovingTabIndexParameters,
-      textContentParameters,
+      textContentReturn,
       typeaheadNavigationParameters
     });
     return {
@@ -8339,17 +8295,14 @@
         excludeSpace
       },
       hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => {
-          ocfic1?.(hasFocus, hadFocus, reason);
-          ocfic2?.(hasFocus, hadFocus, reason);
-        })
+        onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2)
       },
       props: useMergedProps(propsGridNavigation, propsSelection),
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
       singleSelectionChildReturn,
       multiSelectionChildReturn,
-      textContentReturn,
+      textContentParameters,
       typeaheadNavigationReturn
     };
   });
@@ -8436,7 +8389,7 @@
     },
     context,
     refElementReturn,
-    textContentParameters,
+    textContentReturn,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
     ...void1
@@ -8472,7 +8425,7 @@
         excludeSpace
       },
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters,
       props: propsLN,
       info: infoLN,
       ...void8
@@ -8483,14 +8436,11 @@
       },
       context,
       refElementReturn,
-      textContentParameters
+      textContentReturn
     });
     return {
       hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
-          ocfic1?.(focused, previouslyFocused, e);
-          ocfic2?.(focused, previouslyFocused, e);
-        })
+        onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2)
       },
       pressParameters: {
         onPressSync,
@@ -8503,11 +8453,42 @@
       rovingTabIndexChildReturn,
       multiSelectionChildReturn,
       singleSelectionChildReturn,
-      textContentReturn,
+      textContentParameters,
       propsChild: propsSS,
       propsTabbable: propsLN
     };
   });
+
+  /**
+   * Allows examining the rendered component's text content whenever it renders and reacting to changes.
+   *
+   * @compositeParams
+   */
+  const useTextContent = function useTextContent({
+    refElementReturn: {
+      getElement
+    },
+    textContentParameters: {
+      getText,
+      onTextContentChange
+    }
+  }) {
+    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
+    p(() => {
+      const element = getElement();
+      if (element) {
+        const textContent = getText(element);
+        if (textContent) {
+          setTextContent(textContent);
+        }
+      }
+    });
+    return {
+      textContentReturn: {
+        getTextContent
+      }
+    };
+  };
 
   /**
    * Allows a composite component (such as a radio group or listbox) to listen
@@ -8812,7 +8793,10 @@
       ...customUserInfo
     },
     context: contextIncomingForRowAsChildOfTable,
-    textContentParameters,
+    textContentParameters: {
+      getText,
+      onTextContentChange: otcc1
+    },
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -8865,7 +8849,9 @@
         index,
         untabbable
       },
-      textContentParameters,
+      textContentReturn: {
+        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
+      },
       singleSelectionChildParameters,
       multiSelectionChildParameters
     };
@@ -8879,7 +8865,9 @@
       rovingTabIndexReturn,
       singleSelectionChildReturn,
       multiSelectionChildReturn,
-      textContentReturn,
+      textContentParameters: {
+        onTextContentChange: otcc2
+      },
       typeaheadNavigationReturn,
       context: contextGNR,
       info: infoRowReturn,
@@ -8890,6 +8878,16 @@
       },
       ...void2
     } = useGridNavigationSelectionRow(parameters);
+    const {
+      textContentReturn,
+      ...void7
+    } = useTextContent({
+      refElementReturn,
+      textContentParameters: {
+        getText,
+        onTextContentChange: useStableMergedCallback(otcc1, otcc2)
+      }
+    });
     // This is all the info the parent needs about us, the row
     // (NOT the info the cells provide to us, the row)
     const completeInfo = {
@@ -8925,11 +8923,7 @@
       refElementReturn,
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: ocfc1,
-        onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused, reason) => {
-          // Call grid navigation's focus change
-          ocfic1?.(focused, prevFocused, reason);
-          ocfic3?.(focused, prevFocused, reason);
-        })
+        onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic3)
       }
     });
     const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable);
@@ -8938,13 +8932,13 @@
       hasCurrentFocusReturn,
       managedChildrenReturn,
       context,
+      textContentReturn,
       managedChildReturn,
       linearNavigationReturn,
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
       singleSelectionChildReturn,
       multiSelectionChildReturn,
-      textContentReturn,
       typeaheadNavigationReturn,
       refElementReturn,
       props
@@ -8956,7 +8950,11 @@
   const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({
     gridNavigationCellParameters,
     context,
-    textContentParameters,
+    textContentParameters: {
+      getText,
+      onTextContentChange: otcc1,
+      ...void4
+    },
     info: {
       focusSelf,
       index,
@@ -8974,7 +8972,9 @@
     const {
       hasCurrentFocusParameters,
       rovingTabIndexChildReturn,
-      textContentReturn,
+      textContentParameters: {
+        onTextContentChange: otcc2
+      },
       pressParameters: {
         excludeSpace: es1
       },
@@ -8989,7 +8989,19 @@
       },
       context,
       refElementReturn,
-      textContentParameters
+      textContentReturn: {
+        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
+      }
+    });
+    const {
+      textContentReturn,
+      ...void3
+    } = useTextContent({
+      refElementReturn,
+      textContentParameters: {
+        getText,
+        onTextContentChange: useStableMergedCallback(otcc1, otcc2)
+      }
     });
     const {
       hasCurrentFocusReturn
@@ -9259,7 +9271,11 @@
       ...customUserInfo
     },
     // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-    textContentParameters,
+    textContentParameters: {
+      getText,
+      onTextContentChange: otcc1,
+      ...void10
+    },
     refElementParameters,
     hasCurrentFocusParameters: {
       onCurrentFocusedChanged,
@@ -9296,7 +9312,10 @@
         onPressSync,
         ...void2
       },
-      textContentReturn,
+      textContentParameters: {
+        onTextContentChange: otcc2,
+        ...void8
+      },
       singleSelectionChildReturn,
       multiSelectionChildReturn,
       info: infoFromListNav,
@@ -9318,7 +9337,19 @@
       singleSelectionChildParameters,
       multiSelectionChildParameters,
       refElementReturn,
-      textContentParameters
+      textContentReturn: {
+        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
+      }
+    });
+    const {
+      textContentReturn,
+      ...void9
+    } = useTextContent({
+      refElementReturn,
+      textContentParameters: {
+        getText,
+        onTextContentChange: useStableMergedCallback(otcc1, otcc2)
+      }
     });
     const allStandardInfo = {
       index,
@@ -9347,11 +9378,7 @@
         childrenHaveFocusChildContext
       }
     });
-    const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
-      ocfic1?.(focused, prev, e);
-      ocfic2?.(focused, prev, e);
-      ocfic3?.(focused, prev, e);
-    });
+    const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
     const {
       hasCurrentFocusReturn
     } = useHasCurrentFocus({
@@ -11309,7 +11336,8 @@
       textContentParameters: {
         getText: T$1(e => {
           return e?.textContent ?? "";
-        }, [])
+        }, []),
+        onTextContentChange: null
       },
       linearNavigationParameters: {
         navigatePastEnd: "wrap",
@@ -11395,7 +11423,8 @@
       textContentParameters: {
         getText: T$1(e => {
           return e?.textContent ?? "";
-        }, [])
+        }, []),
+        onTextContentChange: null
       }
     });
     const t = tabbable ? "(Tabbable)" : "(Not tabbable)";
@@ -11998,7 +12027,8 @@
       textContentParameters: {
         getText: T$1(e => {
           return e?.textContent ?? "";
-        }, [])
+        }, []),
+        onTextContentChange: null
       },
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: null,

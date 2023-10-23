@@ -150,7 +150,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = EventType<any, any>;
 
-    let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null? null : paginationMax - paginationMin);
+    let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -301,9 +301,9 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
                     case "PageDown":
                         if (truePageNavigationSize == null)
                             break;
-                        else if (truePageNavigationSize > 0) 
+                        else if (truePageNavigationSize > 0)
                             result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
-                        
+
                         break;
 
                     case "Home":

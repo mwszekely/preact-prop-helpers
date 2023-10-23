@@ -43,4 +43,11 @@ export const useStableCallback = (function useStableCallback(fn, noDeps) {
         return setIsStableGetter(useCallbackNative(fn, []));
     }
 });
+export const useStableMergedCallback = (function useStableMergedCallback(...fns) {
+    return useStableCallback((...args) => {
+        for (let i = 0; i < fns.length; ++i) {
+            fns[i]?.(...args);
+        }
+    });
+});
 //# sourceMappingURL=use-stable-callback.js.map

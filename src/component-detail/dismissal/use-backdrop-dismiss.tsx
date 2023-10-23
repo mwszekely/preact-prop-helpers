@@ -6,12 +6,12 @@ import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
-    
+
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
     dismissBackdropActive: B | false;
-    
+
     /**
      * Called when the component is dismissed by clicking outside of the element.
      * 

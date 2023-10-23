@@ -81,9 +81,9 @@ export const useListNavigation = monitored(function useListNavigation({ linearNa
 /**
  * @compositeParams
  */
-export const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }) {
+export const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentReturn, ...void2 }) {
     const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
-    const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentParameters, context, info: { index } });
+    const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentReturn, context, info: { index } });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {

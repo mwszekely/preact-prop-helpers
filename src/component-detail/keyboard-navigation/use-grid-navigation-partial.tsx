@@ -197,7 +197,7 @@ export const useGridNavigation = monitored(function useGridNavigation<ParentOrRo
 export const useGridNavigationRow = monitored(function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
     info: { index, untabbable, ...void3 },
-    textContentParameters,
+    textContentReturn,
     context: contextFromParent,
 
     // Stuff for the row as a parent of child cells
@@ -258,9 +258,9 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
         hasCurrentFocusParameters,
         pressParameters,
         rovingTabIndexChildReturn,
-        textContentReturn,
+        textContentParameters,
         ...void6
-    } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, textContentParameters, context: contextFromParent });
+    } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, textContentReturn, context: contextFromParent });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
 
     const {
@@ -321,7 +321,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
     // These will often have conflicting values, but we always use -1 for rows no matter what,
     // so instead of negotiating a resolution we can just give a straight answer.
     propsLN.tabIndex = propsLNC.tabIndex = -1;
-    const props = useMergedProps(propsLN, propsLNC, {
+    const props = useMergedProps<RowElement>(propsLN, propsLNC, {
         // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
         onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
     });
@@ -338,7 +338,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
         hasCurrentFocusParameters,
         pressParameters,
         rovingTabIndexChildReturn,
-        textContentReturn,
+        textContentParameters,
         linearNavigationReturn,
         managedChildrenParameters,
         rovingTabIndexReturn,
@@ -368,7 +368,7 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
     },
     info: { index, untabbable, ...void7 },
     refElementReturn,
-    textContentParameters,
+    textContentReturn,
     gridNavigationCellParameters: {
         colSpan,
         ...void6
@@ -380,7 +380,7 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
         rovingTabIndexChildReturn,
-        textContentReturn,
+        textContentParameters,
         pressParameters,
         props,
         info: infoLs,
@@ -388,7 +388,7 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
     } = useListNavigationChild<CellElement>({
         info: { index, untabbable },
         context: { rovingTabIndexContext, typeaheadNavigationContext },
-        textContentParameters,
+        textContentReturn,
         refElementReturn,
     });
 
@@ -404,7 +404,7 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
         info: infoLs,
         props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
         rovingTabIndexChildReturn,
-        textContentReturn,
+        textContentParameters,
         pressParameters,
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

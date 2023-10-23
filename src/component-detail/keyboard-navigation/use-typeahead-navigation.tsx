@@ -1,6 +1,6 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
+import { UseTextContentParameters, UseTextContentParametersSelf, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -104,12 +104,12 @@ export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
     UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>,
-    TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">,
+    TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">,
     TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends
-    UseTextContentReturnType,
+    TargetedPick<UseTextContentParameters<any>, "textContentParameters", "onTextContentChange">,
     TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
 }
 
@@ -125,7 +125,7 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
@@ -379,7 +379,7 @@ export const useTypeaheadNavigation = monitored( function useTypeaheadNavigation
  */
 export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },
-    textContentParameters: { getText, ...void5 },
+    textContentReturn: { getTextContent, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     ...void4
@@ -391,54 +391,48 @@ export const useTypeaheadNavigationChild = monitored(function useTypeaheadNaviga
     assertEmptyObject(void4);
     assertEmptyObject(void5);
 
-    const { textContentReturn } = useTextContent({
-        refElementReturn: { getElement },
-        textContentParameters: {
-            getText,
-            onTextContentChange: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
-                if (text) {
-                    // Find where to insert this item.
-                    // Because all index values should be unique, the returned sortedIndex
-                    // should always refer to a new location (i.e. be negative)   
-                    //
-                    // TODO: adding things on mount/unmount means that it's 
-                    // hard to make grid navigation typeahead work smoothly with tables -- 
-                    // every time we change columns, every row resorts itself, even though
-                    // each row should be able to just do that on mount.
-                    // 
-                    // We probably need to instead just sort on-demand, which is better for
-                    // performance anyway, but is tricky to code without major lag on the
-                    // first keystroke.
-                    //
-                    // Or we need to be able to support columns here, within typeahead?
-                    // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
-                    const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                    if (sortedIndex < 0) {
-                        sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-                    }
-                    else {
-                        sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
-                    }
+    const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+        if (text) {
+            // Find where to insert this item.
+            // Because all index values should be unique, the returned sortedIndex
+            // should always refer to a new location (i.e. be negative)   
+            //
+            // TODO: adding things on mount/unmount means that it's 
+            // hard to make grid navigation typeahead work smoothly with tables -- 
+            // every time we change columns, every row resorts itself, even though
+            // each row should be able to just do that on mount.
+            // 
+            // We probably need to instead just sort on-demand, which is better for
+            // performance anyway, but is tricky to code without major lag on the
+            // first keystroke.
+            //
+            // Or we need to be able to support columns here, within typeahead?
+            // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
+            const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+            console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+            if (sortedIndex < 0) {
+                sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+            }
+            else {
+                sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+            }
 
-                    return () => {
-                        // When unmounting, find where we were and remove ourselves.
-                        // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                        const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                        console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+            return () => {
+                // When unmounting, find where we were and remove ourselves.
+                // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
 
-                        if (sortedIndex >= 0) {
-                            sortedTypeaheadInfo.splice(sortedIndex, 1);
-                        }
-                    }
+                if (sortedIndex >= 0) {
+                    sortedTypeaheadInfo.splice(sortedIndex, 1);
                 }
-
-            }, [])
+            }
         }
-    })
+
+    }, []);
 
     return {
-        textContentReturn,
+        textContentParameters: { onTextContentChange },
         pressParameters: { excludeSpace }
     };
 

@@ -1,6 +1,8 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
-    "files.associations": { "*.json": "jsonc" },
+    "files.associations": {
+        "*.json": "jsonc"
+    },
     // english never got the vowels it needed so now we're all stuck with spellcheck yay
     "cSpell.words": [
         "clsx",
@@ -17,6 +19,7 @@
         "unmemoized",
         "unparse",
         "unselectable",
+        "unstaggered",
         "untabbable",
         "vnode"
     ]

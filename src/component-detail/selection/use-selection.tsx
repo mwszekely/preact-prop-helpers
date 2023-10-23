@@ -1,6 +1,6 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
+import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong } from "../../util/types.js";
@@ -32,7 +32,7 @@ export interface UseSelectionChildParameters<ChildElement extends Element, M ext
 }
 
 export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
-        ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>,
+    ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>,
         UseMultiSelectionChildReturnType<ChildElement, M>> {
 }
 
@@ -65,7 +65,7 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
 
     return {
         propsStable,
-        childrenHaveFocusParameters: { onCompositeFocusChange: useStableCallback((...a) => { ocfc1!(...a); ocfc2!(...a); }) },
+        childrenHaveFocusParameters: { onCompositeFocusChange: useStableMergedCallback(ocfc1, ocfc2) },
         context: useMemoObject({ ...contextSS, ...contextMS }),
         multiSelectionReturn,
         singleSelectionReturn
@@ -96,7 +96,7 @@ export function useSelectionChild<ChildElement extends Element>({
     assertEmptyObject(void5);
 
     return {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((...a) => { ocfic1!(...a); ocfic2!(...a); }) },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
         info: {
             getMultiSelected,
             setSelectedFromParent,
@@ -106,7 +106,7 @@ export function useSelectionChild<ChildElement extends Element>({
             getMultiSelectionDisabled,
         },
         multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableCallback((...a) => { opc1!(...a); opc2!(...a); }) },
+        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
         props: useMergedProps(p1, p2),
         singleSelectionChildReturn
     }

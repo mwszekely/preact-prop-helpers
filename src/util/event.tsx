@@ -12,7 +12,7 @@ import { EventType, Nullable } from "./lib.js";
 export const EventDetail = Symbol("event-detail");
 export type EventDetail = typeof EventDetail;
 export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
-export type TargetedEnhancedEvent<E extends Event | TargetedEnhancedEvent<any, any>, Detail> = E & { [EventDetail]: Detail & (E extends TargetedEnhancedEvent<any, infer D>? D : {}); };
+export type TargetedEnhancedEvent<E extends Event | TargetedEnhancedEvent<any, any>, Detail> = E & { [EventDetail]: Detail & (E extends TargetedEnhancedEvent<any, infer D> ? D : {}); };
 
 export function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): Detail { return e[EventDetail]; }
 
