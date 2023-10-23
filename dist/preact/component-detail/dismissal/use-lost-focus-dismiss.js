@@ -2,7 +2,6 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
-;
 /**
  * Invokes a callback when focus travels outside of the component's element.
  *

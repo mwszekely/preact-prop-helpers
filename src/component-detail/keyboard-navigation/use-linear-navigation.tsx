@@ -16,6 +16,7 @@ export interface LinearNavigationResult {
     status: "normal" | "past-start" | "past-end"
 }
 
+/* eslint-disable @typescript-eslint/no-empty-interface */
 export interface UseLinearNavigationReturnTypeSelf { }
 
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
@@ -164,7 +165,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
         const highestChildIndex = getHighestIndex();
         const lowestChildIndex = getLowestIndex();
-        const original = (getTabbableIndex() ?? 0);
+        const _original = (getTabbableIndex() ?? 0);
 
         const targetDemangled = indexDemangler(requestedIndexMangled);
         const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
@@ -226,7 +227,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
     const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
     const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
-        const highestChildIndex = getHighestIndex();
+        const _highestChildIndex = getHighestIndex();
         const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
         const original = (getTabbableIndex() ?? 0);
         /**

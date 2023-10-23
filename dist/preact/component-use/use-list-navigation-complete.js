@@ -104,7 +104,7 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
-        refElementReturn: context.processedChildrenContext,
+        //refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
@@ -126,8 +126,7 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
         context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
         singleSelectionChildParameters,
         multiSelectionChildParameters,
-        refElementReturn,
-        textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) }
+        refElementReturn
     });
     const { textContentReturn, ...void9 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
     const allStandardInfo = {
@@ -157,6 +156,7 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
     assertEmptyObject(void7);
     assertEmptyObject(void8);
     assertEmptyObject(void9);
+    assertEmptyObject(void10);
     return {
         propsChild: props,
         propsTabbable,
@@ -189,18 +189,21 @@ export function useCompleteListNavigationDeclarative({ singleSelectionParameters
     assertEmptyObject(void3);
     return { ...ret2, singleSelectionReturn: { getSingleSelectedIndex } };
 }
-export function useCompleteListNavigationChildDeclarative({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange }, ...rest }) {
+export function useCompleteListNavigationChildDeclarative({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange }, info: i1, ...rest }) {
+    const { multiSelectionChildParameters: { onMultiSelectChange }, info: i2, ...void2 } = useSelectionChildDeclarative({
+        multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected },
+        multiSelectionChildReturn: {
+            changeMultiSelected: useStableCallback((...args) => { ret.multiSelectionChildReturn.changeMultiSelected(...args); })
+        }
+    });
     const ret = useCompleteListNavigationChild({
         multiSelectionChildParameters: {
             initiallyMultiSelected: multiSelected,
             onMultiSelectChange: useStableCallback((e) => { onMultiSelectChange(e); }),
             ...multiSelectionChildParameters
         },
+        info: { ...i1, ...i2 },
         ...rest
-    });
-    const { multiSelectionChildParameters: { onMultiSelectChange }, info, ...void2 } = useSelectionChildDeclarative({
-        multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected },
-        multiSelectionChildReturn: ret.multiSelectionChildReturn
     });
     const { multiSelectionChildReturn, ...ret2 } = ret;
     assertEmptyObject(void2);

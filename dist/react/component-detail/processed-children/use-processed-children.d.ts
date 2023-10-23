@@ -1,4 +1,3 @@
-import { UseRefElementReturnTypeSelf } from "../../dom-helpers/use-ref-element.js";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
 import { UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters } from "../../preact-extensions/use-managed-children.js";
 import { OmitStrong, TargetedOmit } from "../../util/lib.js";
@@ -20,7 +19,7 @@ export interface UseProcessedChildReturnType<TabbableChildElement extends Elemen
 export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 }
 export interface UseProcessedChildrenContext extends UseRearrangedChildrenContext {
-    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused"> & Pick<UseRefElementReturnTypeSelf<any>, "getElement">;
+    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">;
 }
 /**
  * All of these functions **MUST** be stable across renders.

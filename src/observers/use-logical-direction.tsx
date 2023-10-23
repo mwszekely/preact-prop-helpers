@@ -1,4 +1,4 @@
-
+import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { ElementSize } from "./use-element-size.js";
@@ -18,9 +18,8 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
     return (str[0].toUpperCase() + str.substring(1)) as Capitalize<T>;
 }
 
-export interface UseLogicalDirectionParameters {
-    // logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
-}
+/* eslint-disable @typescript-eslint/no-empty-interface */
+export interface UseLogicalDirectionParameters { }
 
 export interface LogicalElementSize {
     clientInlineSize: number;
@@ -55,8 +54,8 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export const useLogicalDirection = monitored(function useLogicalDirection({ }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
-
+export const useLogicalDirection = monitored(function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
+    assertEmptyObject(void1);
     //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);

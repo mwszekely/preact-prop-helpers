@@ -99,7 +99,6 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
     info: { index, untabbable, ...void2 },
     context,
     refElementReturn,
-    textContentReturn,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
     ...void1
@@ -131,7 +130,6 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
         info: { index, untabbable },
         context,
         refElementReturn,
-        textContentReturn,
     });
 
     assertEmptyObject(void1);

@@ -100,7 +100,7 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
-        refElementReturn: context.processedChildrenContext,
+        //refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
@@ -137,7 +137,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info: { index, untabbable },
-        textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
+        //textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
         singleSelectionChildParameters,
         multiSelectionChildParameters
     };
@@ -202,7 +202,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
         info: { index, untabbable },
         context,
         refElementReturn,
-        textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
+        //textContentReturn: { getTextContent: useStableCallback((): string | null => textContentReturn.getTextContent()) },
     });
     const { textContentReturn, ...void3 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
     assertEmptyObject(void1);

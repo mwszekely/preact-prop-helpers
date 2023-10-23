@@ -2,7 +2,6 @@ import { EventMapping, createElement, forwardRef, memo, useCallback, useImperati
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
-let a = null;
 let templateElement = null;
 function htmlToElement(parent, html) {
     const document = parent.ownerDocument;

@@ -27,7 +27,7 @@ export const useLinearNavigation = (function useLinearNavigation({ linearNavigat
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
         const lowestChildIndex = getLowestIndex();
-        const original = (getTabbableIndex() ?? 0);
+        const _original = (getTabbableIndex() ?? 0);
         const targetDemangled = indexDemangler(requestedIndexMangled);
         const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
@@ -87,7 +87,7 @@ export const useLinearNavigation = (function useLinearNavigation({ linearNavigat
     const navigateToFirst = useStableCallback((e, fromUserInteraction) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
     const navigateToLast = useStableCallback((e, fromUserInteraction) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
     const navigateRelative2 = useStableCallback((e, offset, fromUserInteraction, mode) => {
-        const highestChildIndex = getHighestIndex();
+        const _highestChildIndex = getHighestIndex();
         const searchDirection = (Math.sign(offset) || 1);
         const original = (getTabbableIndex() ?? 0);
         /**

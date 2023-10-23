@@ -11,7 +11,7 @@ export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     randomIdReturn: UseRandomIdReturnTypeSelf;
 }
 
-export interface UseRandomIdReturnTypeSelf { id: string; };
+export interface UseRandomIdReturnTypeSelf { id: string; }
 
 export interface UseRandomIdParametersSelf {
     /**

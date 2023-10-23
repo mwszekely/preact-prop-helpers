@@ -18,7 +18,9 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link useStaggeredChild}
  */
-export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }) {
+export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
+//refElementReturn: { getElement }
+ }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
     // until they fill in.
@@ -95,10 +97,8 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
             );
             // Skip over any children that have already been made visible ahead
             // (through IntersectionObserver)
-            let s = 0;
             while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
                 ++next;
-                ++s;
             }
             return next;
         });
@@ -132,7 +132,6 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
         setElementToIndexMap
     }), [parentIsStaggered]);
     useEffect(() => {
-        const element = getElement();
         const io = intersectionObserver.current = new IntersectionObserver((entries) => {
             for (let entry of entries) {
                 if (entry.isIntersecting) {
@@ -169,7 +168,7 @@ context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisibl
     // (We don't ask when the child becomes visible due to screen-scrolling,
     // only when it becomes visible because we were next in line to do so)
     const becauseScreen = useRef(false);
-    const [getOnScreen, setOnScreen] = usePassiveState(useStableCallback((next, prev, reason) => {
+    const [_getOnScreen, _setOnScreen] = usePassiveState(useStableCallback((next, _prev, _reason) => {
         if (staggeredVisible)
             return;
         if (next) {

@@ -109,7 +109,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
         }
         startOfShiftSelect.current = originalEnd;
     });
-    const onCompositeFocusChange = useStableCallback((anyFocused, prevAnyFocused, event) => {
+    const onCompositeFocusChange = useStableCallback((anyFocused, _prevAnyFocused, _event) => {
         if (!anyFocused) {
             ctrlKeyHeld.current = shiftKeyHeld.current = false;
         }
@@ -233,20 +233,12 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
                         break;
                     case "toggle":
                         doContiguousSelection(event, index);
-                        //onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-                        //doContiguousSelection
-                        //setSelectedFromParent(event!, getLocalSelected())
                         break;
                     case "skip":
+                        /* eslint-disable no-debugger */
                         debugger;
                         break;
                 }
-                /*if (getShiftKeyDown()) {
-                    onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-                }
-                else {
-                    changeAllChildren(event!, i => (i == index));
-                }*/
             }
         }
         pressFreebie.current = false;

@@ -5,10 +5,10 @@ import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../p
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 import { ElementProps, EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
-export type MultiSelectChildChangeHandler = EnhancedEventHandler<Event, {
+export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, {
     multiSelected: boolean;
 }>;
-export type MultiSelectChildChangeEvent = TargetedEnhancedEvent<Event, {
+export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, {
     multiSelected: boolean;
 }>;
 export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, {
@@ -110,7 +110,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      * * Call `changeSelected`, if this is imperatively controlled.
      * ```
      */
-    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
     initiallyMultiSelected: boolean;
     /** When true, this child cannot be selected via multi-select, either by focusing it or by clicking it. */
     multiSelectionDisabled: boolean;
@@ -158,7 +158,7 @@ export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, 
 export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
     multiSelectionChildDeclarativeParameters: {
         multiSelected: boolean;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
     };
 }
 export type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<UseMultiSelectionChildParameters<any, any>, "multiSelectionChildParameters", never>;

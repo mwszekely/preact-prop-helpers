@@ -1,6 +1,6 @@
 import { createContext } from "preact";
-import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./list-nav.constants.js";
@@ -149,7 +149,6 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             compare: null,
             onRearranged: null
         },
-        refElementReturn,
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
     });
@@ -193,7 +192,7 @@ function Outer({ index }: { index: number }) {
         info: { index },
     });
 
-    const children = (hideBecausePaginated || hideBecauseStaggered)? null : <TestBasesListNavChild index={index} />
+    const children = (hideBecausePaginated || hideBecauseStaggered) ? null : <TestBasesListNavChild index={index} />
 
     return (<>{
         children ??
@@ -240,7 +239,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
             index,
             //getSortValue: getTextContent,
         },
-        textContentParameters: { getText: getTextContent },
+        textContentParameters: { getText: getTextContent, onTextContentChange: null },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
         refElementParameters: {},
         multiSelectionChildParameters: { multiSelectionDisabled: disabled, initiallyMultiSelected: false, onMultiSelectChange: null },

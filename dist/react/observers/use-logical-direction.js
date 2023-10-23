@@ -1,3 +1,4 @@
+import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 function capitalize(str) {
@@ -21,7 +22,8 @@ function capitalize(str) {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export const useLogicalDirection = monitored(function useLogicalDirection({}) {
+export const useLogicalDirection = monitored(function useLogicalDirection({ ...void1 }) {
+    assertEmptyObject(void1);
     //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
     // TODO: There's no way to refresh which writing mode we have once mounted.

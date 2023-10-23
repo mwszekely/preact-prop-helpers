@@ -35,12 +35,12 @@ export interface ElementSize {
     scrollTop: number;
     offsetTop: number | undefined;
 }
-export interface UseElementSizeReturnTypeSelf<E extends Element> {
+export interface UseElementSizeReturnTypeSelf {
     /** @stable */
     getSize(): ElementSize | null;
 }
 export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf<E>;
+    elementSizeReturn: UseElementSizeReturnTypeSelf;
 }
 /**
  * Measures an element, allowing you to react to its changes in size.

@@ -8,7 +8,6 @@ import { findBackupFocus } from "../../util/focus.js";
 import { useCallback, useEffect, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-;
 /**
  * Implements a roving tabindex system where only one "focusable"
  * component in a set is able to receive a tab focus.

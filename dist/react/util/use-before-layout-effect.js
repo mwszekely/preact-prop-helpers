@@ -19,7 +19,7 @@ const toRun = new Map();
 // but that probably won't be available in Preact for awhile.
 const commitName = "diffed";
 const newCommit = (vnode, ...args) => {
-    for (const [id, effectInfo] of toRun) {
+    for (const [_id, effectInfo] of toRun) {
         const oldInputs = effectInfo.prevInputs;
         if (argsChanged(oldInputs, effectInfo.inputs)) {
             effectInfo.cleanup?.();

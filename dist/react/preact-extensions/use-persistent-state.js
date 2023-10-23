@@ -29,7 +29,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
         debugger;
     }
 }
-function dummy(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) { return null; }
+//function dummy<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] { return null!; }
 /**
  * @remarks Use module augmentation to get the correct types for this function.
  *

@@ -76,7 +76,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
         staggeredChildrenParameters: { staggered, childCount },
-        refElementReturn: { getElement: context.processedChildrenContext.getElement }
+        //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
         rearrangeableChildrenReturn,

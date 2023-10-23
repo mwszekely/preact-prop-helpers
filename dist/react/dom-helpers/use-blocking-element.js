@@ -3,6 +3,7 @@ import "wicg-inert";
 import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useLayoutEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
@@ -17,6 +18,9 @@ function blockingElements() { return getDocument().$blockingElements; }
  * @param target
  */
 export const useBlockingElement = monitored(function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     const stableGetTarget = useStableCallback(getTarget);
     //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({

@@ -6,5 +6,11 @@
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
 export declare const useStableGetter: <T>(value: T) => () => T;
+/**
+ * Like useMemo, but checks objects (shallowly)
+ *
+ * @param t
+ * @returns
+ */
 export declare function useMemoObject<T extends {}>(t: T): T;
 //# sourceMappingURL=use-stable-getter.d.ts.map

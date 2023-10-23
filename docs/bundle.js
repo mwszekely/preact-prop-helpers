@@ -887,7 +887,7 @@
   // but that probably won't be available in Preact for awhile.
   const commitName = "diffed";
   const newCommit = (vnode, ...args) => {
-    for (const [id, effectInfo] of toRun) {
+    for (const [_id, effectInfo] of toRun) {
       const oldInputs = effectInfo.prevInputs;
       if (argsChanged(oldInputs, effectInfo.inputs)) {
         effectInfo.cleanup?.();
@@ -1108,6 +1108,12 @@
       return ref.current;
     }, []);
   };
+  /**
+   * Like useMemo, but checks objects (shallowly)
+   *
+   * @param t
+   * @returns
+   */
   function useMemoObject(t) {
     return F$1(() => {
       return t;
@@ -1179,7 +1185,7 @@
    * this function usually makes no sense on them. The performance monitoring takes more time
    * than the function itself.
    *
-   * Important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
+   * important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
    *
    * @param hook
    * @returns
@@ -4446,10 +4452,7 @@
       index,
       ...void1
     },
-    textContentReturn: {
-      getTextContent,
-      ...void5
-    },
+    //textContentReturn: { getTextContent, ...void5 },
     context: {
       typeaheadNavigationContext: {
         sortedTypeaheadInfo,
@@ -4457,10 +4460,6 @@
         excludeSpace,
         ...void2
       }
-    },
-    refElementReturn: {
-      getElement,
-      ...void3
     },
     ...void4
   }) {
@@ -4599,8 +4598,8 @@
     });
     // Merge the props while keeping them stable
     // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    const p = useMergedProps(propsStableTN, propsStableLN);
-    _(p);
+    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
+    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
     return {
       managedChildrenParameters,
       rovingTabIndexReturn,
@@ -4624,7 +4623,6 @@
     },
     context,
     refElementReturn,
-    textContentReturn,
     ...void2
   }) {
     const {
@@ -4641,8 +4639,6 @@
     const {
       ...tncr
     } = useTypeaheadNavigationChild({
-      refElementReturn,
-      textContentReturn,
       context,
       info: {
         index
@@ -4742,7 +4738,6 @@
       untabbable,
       ...void3
     },
-    textContentReturn,
     context: contextFromParent,
     // Stuff for the row as a parent of child cells
     linearNavigationParameters,
@@ -4781,7 +4776,7 @@
         // then we focus the cell that should be focused in this row.
         let {
           ideal,
-          actual
+          actual: _actual
         } = getTabbableColumn();
         let index = ideal ?? 0;
         let child = getChildren().getAt(index);
@@ -4822,7 +4817,6 @@
         untabbable
       },
       refElementReturn,
-      textContentReturn,
       context: contextFromParent
     });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
@@ -4937,7 +4931,6 @@
       ...void7
     },
     refElementReturn,
-    textContentReturn,
     gridNavigationCellParameters: {
       colSpan,
       ...void6
@@ -4965,7 +4958,6 @@
         rovingTabIndexContext,
         typeaheadNavigationContext
       },
-      textContentReturn,
       refElementReturn
     });
     return {
@@ -5386,10 +5378,8 @@
     staggeredChildrenParameters: {
       staggered,
       childCount
-    },
-    refElementReturn: {
-      getElement
     }
+    //refElementReturn: { getElement }
   }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -5464,7 +5454,8 @@
         // Don't go higher than the highest child
         1 + Math.max(prevIndex ?? 0, justMountedChildIndex) // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
         );
-
+        // Skip over any children that have already been made visible ahead
+        // (through IntersectionObserver)
         while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
           ++next;
         }
@@ -5498,7 +5489,6 @@
       setElementToIndexMap
     }), [parentIsStaggered]);
     p(() => {
-      getElement();
       const io = intersectionObserver.current = new IntersectionObserver(entries => {
         for (let entry of entries) {
           if (entry.isIntersecting) {
@@ -5549,7 +5539,7 @@
     // (We don't ask when the child becomes visible due to screen-scrolling,
     // only when it becomes visible because we were next in line to do so)
     const becauseScreen = _(false);
-    usePassiveState(useStableCallback((next, prev, reason) => {
+    usePassiveState(useStableCallback((next, _prev, _reason) => {
       if (staggeredVisible) return;
       if (next) {
         const io = getIntersectionObserver();
@@ -5722,11 +5712,10 @@
       staggeredChildrenParameters: {
         staggered,
         childCount
-      },
-      refElementReturn: {
-        getElement: context.processedChildrenContext.getElement
       }
+      //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
+
     return {
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
@@ -5914,7 +5903,7 @@
       }
       startOfShiftSelect.current = originalEnd;
     });
-    const onCompositeFocusChange = useStableCallback((anyFocused, prevAnyFocused, event) => {
+    const onCompositeFocusChange = useStableCallback((anyFocused, _prevAnyFocused, _event) => {
       if (!anyFocused) {
         ctrlKeyHeld.current = shiftKeyHeld.current = false;
       }
@@ -6065,23 +6054,14 @@
               break;
             case "toggle":
               doContiguousSelection(event, index);
-              //onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-              //doContiguousSelection
-              //setSelectedFromParent(event!, getLocalSelected())
               break;
             case "skip":
+              /* eslint-disable no-debugger */
               debugger;
               break;
           }
-          /*if (getShiftKeyDown()) {
-              onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-          }
-          else {
-              changeAllChildren(event!, i => (i == index));
-          }*/
         }
       }
-
       pressFreebie.current = false;
     });
     const setSelectedFromParent = useStableCallback((event, multiSelected) => {
@@ -8210,7 +8190,6 @@
     context,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
-    textContentReturn,
     ...void1
   }) {
     const {
@@ -8272,7 +8251,6 @@
       managedChildrenReturn,
       refElementReturn,
       rovingTabIndexParameters,
-      textContentReturn,
       typeaheadNavigationParameters
     });
     return {
@@ -8389,7 +8367,6 @@
     },
     context,
     refElementReturn,
-    textContentReturn,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
     ...void1
@@ -8435,8 +8412,7 @@
         untabbable
       },
       context,
-      refElementReturn,
-      textContentReturn
+      refElementReturn
     });
     return {
       hasCurrentFocusParameters: {
@@ -8773,7 +8749,7 @@
       rearrangeableChildrenParameters,
       staggeredChildrenParameters,
       managedChildrenParameters,
-      refElementReturn: context.processedChildrenContext,
+      //refElementReturn: context.processedChildrenContext,
       context
     });
     return {
@@ -8849,9 +8825,7 @@
         index,
         untabbable
       },
-      textContentReturn: {
-        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
-      },
+      //textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
       singleSelectionChildParameters,
       multiSelectionChildParameters
     };
@@ -8988,11 +8962,10 @@
         untabbable
       },
       context,
-      refElementReturn,
-      textContentReturn: {
-        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
-      }
+      refElementReturn
+      //textContentReturn: { getTextContent: useStableCallback((): string | null => textContentReturn.getTextContent()) },
     });
+
     const {
       textContentReturn,
       ...void3
@@ -9249,7 +9222,7 @@
       rearrangeableChildrenParameters,
       staggeredChildrenParameters,
       managedChildrenParameters,
-      refElementReturn: context.processedChildrenContext,
+      //refElementReturn: context.processedChildrenContext,
       context
     });
     return {
@@ -9336,10 +9309,7 @@
       },
       singleSelectionChildParameters,
       multiSelectionChildParameters,
-      refElementReturn,
-      textContentReturn: {
-        getTextContent: useStableCallback(() => textContentReturn.getTextContent())
-      }
+      refElementReturn
     });
     const {
       textContentReturn,
@@ -9448,8 +9418,26 @@
       multiSelected,
       onMultiSelectedChange
     },
+    info: i1,
     ...rest
   }) {
+    const {
+      multiSelectionChildParameters: {
+        onMultiSelectChange
+      },
+      info: i2,
+      ...void2
+    } = useSelectionChildDeclarative({
+      multiSelectionChildDeclarativeParameters: {
+        onMultiSelectedChange,
+        multiSelected
+      },
+      multiSelectionChildReturn: {
+        changeMultiSelected: useStableCallback((...args) => {
+          ret.multiSelectionChildReturn.changeMultiSelected(...args);
+        })
+      }
+    });
     const ret = useCompleteListNavigationChild({
       multiSelectionChildParameters: {
         initiallyMultiSelected: multiSelected,
@@ -9458,20 +9446,11 @@
         }),
         ...multiSelectionChildParameters
       },
+      info: {
+        ...i1,
+        ...i2
+      },
       ...rest
-    });
-    const {
-      multiSelectionChildParameters: {
-        onMultiSelectChange
-      },
-      info,
-      ...void2
-    } = useSelectionChildDeclarative({
-      multiSelectionChildDeclarativeParameters: {
-        onMultiSelectedChange,
-        multiSelected
-      },
-      multiSelectionChildReturn: ret.multiSelectionChildReturn
     });
     const {
       multiSelectionChildReturn,

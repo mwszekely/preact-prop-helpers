@@ -55,5 +55,5 @@ export declare function useSelectionDeclarative<ChildElement extends Element>(ar
         onSingleSelectedIndexChange: import("./use-single-selection.js").SelectedIndexChangeHandler;
     };
 };
-export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): import("./use-multi-selection.js").UseMultiSelectionChildDeclarativeReturnType<Element, UseMultiSelectionChildInfo<Element>>;
+export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): import("./use-multi-selection.js").UseMultiSelectionChildDeclarativeReturnType<ChildElement, UseMultiSelectionChildInfo<ChildElement>>;
 //# sourceMappingURL=use-selection.d.ts.map

@@ -1,7 +1,6 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useLinearNavigation } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
@@ -64,8 +63,8 @@ export const useListNavigation = monitored(function useListNavigation({ linearNa
     assertEmptyObject(void4);
     // Merge the props while keeping them stable
     // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    const p = useMergedProps(propsStableTN, propsStableLN);
-    const propsStable = useRef(p);
+    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
+    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
     return {
         managedChildrenParameters,
         rovingTabIndexReturn,
@@ -81,9 +80,9 @@ export const useListNavigation = monitored(function useListNavigation({ linearNa
 /**
  * @compositeParams
  */
-export const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentReturn, ...void2 }) {
+export const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
     const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
-    const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentReturn, context, info: { index } });
+    const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {

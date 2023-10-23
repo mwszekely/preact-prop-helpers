@@ -15,7 +15,7 @@ let i = 0;
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  *
- * Important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
+ * important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
  *
  * @param hook
  * @returns

@@ -45,14 +45,14 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnTypeSelf<E extends Element> {
+export interface UseElementSizeReturnTypeSelf {
     /** @stable */
     getSize(): ElementSize | null;
 }
 
 
 export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf<E>;
+    elementSizeReturn: UseElementSizeReturnTypeSelf;
 }
 
 /**

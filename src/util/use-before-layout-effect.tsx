@@ -25,7 +25,7 @@ const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | un
 const commitName = "diffed";
 
 const newCommit: typeof originalCommit = (vnode, ...args) => {
-    for (const [id, effectInfo] of toRun) {
+    for (const [_id, effectInfo] of toRun) {
         const oldInputs = effectInfo.prevInputs;
         if (argsChanged(oldInputs, effectInfo.inputs)) {
             effectInfo.cleanup?.();

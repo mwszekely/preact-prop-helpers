@@ -37,7 +37,7 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export declare const useLogicalDirection: ({}: UseLogicalDirectionParameters) => UseLogicalDirectionReturnType;
+export declare const useLogicalDirection: ({ ...void1 }: UseLogicalDirectionParameters) => UseLogicalDirectionReturnType;
 export interface UseLogicalDirectionReturnType {
     /** @stable */
     logicalDirectionReturn: {

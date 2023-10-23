@@ -1,5 +1,4 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { UseRefElementReturnTypeSelf } from "../../dom-helpers/use-ref-element.js";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
 import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -45,7 +44,10 @@ export interface UseProcessedChildInfo<TabbableChildElement extends Element> ext
 }
 
 export interface UseProcessedChildrenContext extends UseRearrangedChildrenContext {
-    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused"> & Pick<UseRefElementReturnTypeSelf<any>, "getElement">;
+    processedChildrenContext:
+    Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> &
+    Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">/* & 
+    Pick<UseRefElementReturnTypeSelf<any>, "getElement">*/;
 }
 
 /**
@@ -148,7 +150,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     }: UseStaggeredChildrenReturnType = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
         staggeredChildrenParameters: { staggered, childCount },
-        refElementReturn: { getElement: context.processedChildrenContext.getElement }
+        //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
 
     return {

@@ -1,4 +1,4 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -13,7 +13,7 @@ export interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
     childCount: number | null;
 }
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">, TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
@@ -73,7 +73,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, refElementReturn: { getElement } }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

@@ -46,7 +46,7 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
 /**
  * @compositeParams
  */
-export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
         info: { index, untabbable },
         context,
@@ -57,7 +57,6 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
         info: { index, untabbable },
         context,
         refElementReturn,
-        textContentReturn,
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);

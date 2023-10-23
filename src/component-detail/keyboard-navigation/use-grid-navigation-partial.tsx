@@ -197,7 +197,6 @@ export const useGridNavigation = monitored(function useGridNavigation<ParentOrRo
 export const useGridNavigationRow = monitored(function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
     info: { index, untabbable, ...void3 },
-    textContentReturn,
     context: contextFromParent,
 
     // Stuff for the row as a parent of child cells
@@ -227,7 +226,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
         else {
             // If the parent is tabbable (normal behavior), 
             // then we focus the cell that should be focused in this row.
-            let { ideal, actual } = (getTabbableColumn());
+            let { ideal, actual: _actual } = (getTabbableColumn());
 
             let index = (ideal ?? 0);
             let child = getChildren().getAt(index);
@@ -260,7 +259,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
         rovingTabIndexChildReturn,
         textContentParameters,
         ...void6
-    } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, textContentReturn, context: contextFromParent });
+    } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, context: contextFromParent });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
 
     const {
@@ -368,7 +367,6 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
     },
     info: { index, untabbable, ...void7 },
     refElementReturn,
-    textContentReturn,
     gridNavigationCellParameters: {
         colSpan,
         ...void6
@@ -388,7 +386,6 @@ export const useGridNavigationCell = monitored(function useGridNavigationCell<Ce
     } = useListNavigationChild<CellElement>({
         info: { index, untabbable },
         context: { rovingTabIndexContext, typeaheadNavigationContext },
-        textContentReturn,
         refElementReturn,
     });
 

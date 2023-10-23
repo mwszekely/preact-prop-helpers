@@ -30,13 +30,18 @@ export const useStableGetter = (function useStableGetter<T>(value: T) {
  * @param t 
  * @returns 
  */
-function useStableObject<T extends {}>(t: T): T {
+function _useStableObject<T extends {}>(t: T): T {
     const e = Object.entries(t);
     useEnsureStability("useStableObject", e.length, ...e.map(([_k, v]) => v));
     return useRef(t).current;
 }
 
-
+/**
+ * Like useMemo, but checks objects (shallowly)
+ * 
+ * @param t 
+ * @returns 
+ */
 export function useMemoObject<T extends {}>(t: T): T {
     return useMemo(() => { return t; }, Object.values(t));
 }

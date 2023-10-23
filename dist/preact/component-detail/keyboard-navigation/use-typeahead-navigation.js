@@ -211,12 +211,12 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
  *
  * @compositeParams
  */
-export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ...void1 }, textContentReturn: { getTextContent, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
+export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ...void1 }, 
+//textContentReturn: { getTextContent, ...void5 },
+context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    assertEmptyObject(void3);
     assertEmptyObject(void4);
-    assertEmptyObject(void5);
     const onTextContentChange = useCallback((text) => {
         if (text) {
             // Find where to insert this item.

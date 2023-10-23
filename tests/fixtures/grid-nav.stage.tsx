@@ -1,6 +1,6 @@
 import { createContext } from "preact";
-import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -112,7 +112,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         //staggeredChildrenReturn: { stillStaggering },
         refElementReturn,
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
-    } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
+    } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         gridNavigationParameters: { onTabbableColumnChange: null, initiallyTabbableColumn: 0 },
         //rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
@@ -149,7 +149,6 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             compare: null,
             onRearranged: null
         },
-        refElementReturn,
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
     });
@@ -186,7 +185,7 @@ function Outer({ index }: { index: number }) {
         info: { index }
     });
 
-    let children = hideBecausePaginated || hideBecauseStaggered? null : <TestBaseGridNavRow index={index} />;
+    let children = hideBecausePaginated || hideBecauseStaggered ? null : <TestBaseGridNavRow index={index} />;
 
     return <>{
         children ??
@@ -237,7 +236,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        textContentParameters: { getText: getTextContent },
+        textContentParameters: { getText: getTextContent, onTextContentChange: null },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null }
     });
 
@@ -301,7 +300,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
         context: useContext(CellContext),
         gridNavigationCellParameters: { colSpan },
         info: { index, untabbable: false, focusSelf: e => e.focus() },
-        textContentParameters: { getText: useStableCallback(() => textContent) }
+        textContentParameters: { getText: useStableCallback(() => textContent), onTextContentChange: null }
     })
     return (
         <>

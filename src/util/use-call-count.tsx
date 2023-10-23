@@ -32,7 +32,7 @@ let i = 0;
  * @param hook 
  * @returns 
  */
-export function monitored<T extends any>(hook: T): T {
+export function monitored<T>(hook: T): T {
     const h = (hook as (...args: any) => any);
 
     if (process.env.NODE_ENV === 'development') {

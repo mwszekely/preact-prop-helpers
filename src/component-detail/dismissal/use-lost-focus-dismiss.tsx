@@ -20,7 +20,7 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
     dismissLostFocusActive: B | false;
-};
+}
 
 export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> {
     lostFocusDismissParameters: UseLostFocusDismissParametersSelf<B>;

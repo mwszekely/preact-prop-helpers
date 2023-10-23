@@ -194,7 +194,7 @@ export interface RovingTabIndexChildContextSelf {
      * but it serves a slightly different purpose and is separate for clarity)
      */
     reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
-};
+}
 
 
 export interface RovingTabIndexChildContext {

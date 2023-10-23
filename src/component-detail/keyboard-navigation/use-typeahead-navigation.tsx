@@ -1,6 +1,5 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { UseTextContentParameters, UseTextContentParametersSelf, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
+import { UseTextContentParameters, UseTextContentParametersSelf } from "../../dom-helpers/use-text-content.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -103,9 +102,9 @@ export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
-    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>,
-    TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">,
-    TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
+    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>/*,
+    //TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">,
+    TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement">*/ {
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends
@@ -379,17 +378,14 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<
  */
 export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },
-    textContentReturn: { getTextContent, ...void5 },
+    //textContentReturn: { getTextContent, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
-    refElementReturn: { getElement, ...void3 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    assertEmptyObject(void3);
     assertEmptyObject(void4);
-    assertEmptyObject(void5);
 
     const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
         if (text) {

@@ -15,8 +15,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.
 import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
-export type MultiSelectChildChangeHandler = EnhancedEventHandler<Event, { multiSelected: boolean; }>;
-export type MultiSelectChildChangeEvent = TargetedEnhancedEvent<Event, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, { multiSelected: boolean; }>;
 
 export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, { selectedPercent: number; selectedIndices: Set<number>; }>;
 
@@ -69,8 +69,8 @@ export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInf
     multiSelectionParameters: UseMultiSelectionParametersSelf;
 }
 
-export interface UseMultiSelectionReturnTypeSelf {
-}
+/* eslint-disable @typescript-eslint/no-empty-interface */
+export interface UseMultiSelectionReturnTypeSelf { }
 
 export interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends
     TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
@@ -134,7 +134,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      * * Call `changeSelected`, if this is imperatively controlled.
      * ```
      */
-    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
 
     initiallyMultiSelected: boolean;
 
@@ -292,7 +292,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         startOfShiftSelect.current = originalEnd;
     });
 
-    const onCompositeFocusChange = useStableCallback<OnPassiveStateChange<boolean, FocusEventType<ChildElement> | undefined>>((anyFocused, prevAnyFocused, event) => {
+    const onCompositeFocusChange = useStableCallback<OnPassiveStateChange<boolean, FocusEventType<ChildElement> | undefined>>((anyFocused, _prevAnyFocused, _event) => {
         if (!anyFocused) {
             ctrlKeyHeld.current = shiftKeyHeld.current = false;
         }
@@ -455,21 +455,12 @@ export function useMultiSelectionChild<E extends Element>({
                         break;
                     case "toggle":
                         doContiguousSelection(event!, index);
-                        //onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-                        //doContiguousSelection
-                        //setSelectedFromParent(event!, getLocalSelected())
                         break;
                     case "skip":
+                        /* eslint-disable no-debugger */
                         debugger;
                         break;
                 }
-
-                /*if (getShiftKeyDown()) {
-                    onMultiSelectChange?.(enhanceEvent(event, { multiSelected: !localSelected }));
-                }
-                else {
-                    changeAllChildren(event!, i => (i == index));
-                }*/
             }
         }
         pressFreebie.current = false;
@@ -511,7 +502,7 @@ export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, 
     TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
     multiSelectionChildDeclarativeParameters: {
         multiSelected: boolean;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
     }
 }
 
@@ -528,7 +519,7 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
     multiSelectionChildReturn: { changeMultiSelected, ...void2 },
     ...void1
 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>> {
-    let reasonRef = useRef<MultiSelectChildChangeEvent | undefined>(undefined);
+    let reasonRef = useRef<MultiSelectChildChangeEvent<E> | undefined>(undefined);
     useEffect(() => {
         if (multiSelected != null)
             changeMultiSelected(reasonRef.current!, multiSelected);

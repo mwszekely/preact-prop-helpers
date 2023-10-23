@@ -1,4 +1,4 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -26,8 +26,8 @@ export interface UseStaggeredChildrenParametersSelf {
 }
 
 export interface UseStaggeredChildrenParameters extends
-    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">,
-    TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> {
+    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">/*,
+    TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> */ {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 
@@ -105,7 +105,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
 export const useStaggeredChildren = monitored(function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered, childCount },
-    refElementReturn: { getElement }
+    //refElementReturn: { getElement }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
 
 
@@ -201,10 +201,8 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
             );
             // Skip over any children that have already been made visible ahead
             // (through IntersectionObserver)
-            let s = 0;
             while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
                 ++next;
-                ++s;
             }
 
             return next;
@@ -244,7 +242,6 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
     }), [parentIsStaggered]);
 
     useEffect(() => {
-        const element = getElement();
         const io = intersectionObserver.current = new IntersectionObserver((entries) => {
             for (let entry of entries) {
                 if (entry.isIntersecting) {
@@ -288,7 +285,7 @@ export const useStaggeredChild = monitored(function useStaggeredChild<ChildEleme
     // only when it becomes visible because we were next in line to do so)
     const becauseScreen = useRef(false);
 
-    const [getOnScreen, setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, prev, reason) => {
+    const [_getOnScreen, _setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, _prev, _reason) => {
 
         if (staggeredVisible)
             return;

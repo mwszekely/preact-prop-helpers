@@ -21,7 +21,7 @@ export const DemoUseGrid = memo(() => {
     const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null as number | null);
 
     // Entirely complete, fully spelt-out version:
-    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
         // `useRovingTabIndex` is a separate hook that you could call with these same parameters:
         rovingTabIndexParameters: {
             // If true, the entire grid is removed from the tab order
@@ -252,7 +252,7 @@ const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOu
         info: { index },
 
     })
-    const {  childUseEffect } = staggeredChildReturn;
+    const { childUseEffect } = staggeredChildReturn;
     if (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered) {
         return <tr {...props}><td colSpan={99}>&nbsp;</td></tr>
     }
@@ -331,7 +331,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         gridNavigationCellParameters: { colSpan: 1 },
         info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), untabbable: false },
         context,
-        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) , onTextContentChange: null },
+        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
     });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")
