@@ -377,7 +377,7 @@ export { returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runIm
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { usePropsOnChildren } from "./preact-extensions/use-props-on-children.js";
 export { SearchParamStates, useSearchParamState, useSearchParamStateDeclarative, type OnParamValueChanged, type SetParamWithHistory, type UseSearchParamStateParameters } from "./preact-extensions/use-search-param-state.js";
-export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
+export { useStableCallback, useStableMergedCallback } from "./preact-extensions/use-stable-callback.js";
 export { useMemoObject, useStableGetter } from "./preact-extensions/use-stable-getter.js";
 export { useState } from "./preact-extensions/use-state.js";
 export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render.js";
