@@ -1,5 +1,4 @@
-import { createElement, Fragment } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { createElement, ElementProps, Fragment } from "../util/lib.js";
 
 /**
  * Combines two `children`.

@@ -2,12 +2,12 @@
 import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { Nullable, OmitStrong } from "../util/types.js";
+import { Nullable, OmitStrong, Parameter } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
-export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
+interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 
      * and presented as the first argument of the event handler?
@@ -24,7 +24,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitS
     asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
 }
 
-export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
+interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
 
     /**
      * The most recently captured value. In other words, represents what
@@ -53,6 +53,8 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
     hasCapture: boolean;
 
 }
+
+export type UseAsyncHandler<EventType, CaptureType> = (params: UseAsyncHandlerParameters<EventType, CaptureType>) => UseAsyncHandlerReturnType<EventType, CaptureType>;
 
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
@@ -119,7 +121,7 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * 
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export const useAsyncHandler = monitored(function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
+export const useAsyncHandler = monitored(function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: Parameter<UseAsyncHandler<EventType, CaptureType>>): ReturnType<UseAsyncHandler<EventType, CaptureType>> {
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
     const [hasCapture, setHasCapture] = useState(false);

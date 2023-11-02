@@ -1,4 +1,4 @@
-import { VNode } from "../util/types.js";
+import { VNode } from "../util/lib.js";
 export interface UsePortalChildrenParameters {
     /**
      * The element that will contain the portal's children, or the string of its `id`.

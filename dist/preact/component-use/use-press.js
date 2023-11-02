@@ -1,5 +1,4 @@
 import { noop } from "lodash-es";
-import { useAsyncHandler } from "../dom-helpers/use-async-handler.js";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
@@ -400,15 +399,31 @@ export const usePress = monitored(function usePress(args) {
         },
     };
 });
-export function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
-    const asyncHandlerReturn = useAsyncHandler({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+/*
+export interface UsePressAsyncParameters<E extends Element> extends
+    OmitStrong<UsePressParameters<E>, "pressParameters">,
+    TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+}
+
+export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+}
+
+export function usePressAsync<E extends Element>({
+    asyncHandlerParameters: { debounce, throttle, asyncHandler },
+    pressParameters,
+    refElementReturn
+}: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E> {
+    const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ asyncHandler, capture: noop, debounce, throttle });
+    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+
     return {
         asyncHandlerReturn,
         pressReturn,
         props
-    };
-}
+    }
+}*/
 /**
  * selection.containsNode doesn't account for selection.isCollapsed,
  * so here's a workaround for that.

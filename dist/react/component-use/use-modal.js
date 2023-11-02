@@ -4,6 +4,18 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitored } from "../util/use-call-count.js";
+/*
+export interface UseModalParameters<Listeners extends DismissListenerTypes> extends
+    UseDismissParameters<Listeners>,
+    UseRefElementParameters<any>,
+    OmitStrong<UseFocusTrapParameters<any, any>, "refElementReturn"> {
+    modalParameters: UseModalParametersSelf;
+}
+
+export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
+    propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
+}
+*/
 /**
  * Combines dismissal hooks and focus trap hooks into one.
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
@@ -37,9 +49,9 @@ export const useModal = monitored(function useModal({ dismissParameters: { dismi
     assertEmptyObject(void7);
     assertEmptyObject(void8);
     return {
-        propsFocusContainer: useMergedProps(propsStable, props),
         refElementPopupReturn,
         refElementSourceReturn,
+        propsFocusContainer: useMergedProps(propsStable, props),
         propsStablePopup,
         propsStableSource
     };

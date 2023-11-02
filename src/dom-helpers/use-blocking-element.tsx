@@ -2,24 +2,27 @@ import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import "wicg-inert";
 
-import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
+import { UseActiveElement, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsPick } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 
-export interface UseBlockingElementParametersSelf<E extends Element> {
+export interface UseBlockingElementParametersSelf {
     enabled: boolean;
-    getTarget(): (E | null)
+    getTarget(): (Element | null)
 }
 
-export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
-    blockingElementParameters: UseBlockingElementParametersSelf<E>;
-}
+export type UseBlockingElement = GenericHook<
+    "blockingElement", 
+    UseBlockingElementParametersSelf, [StandardDepsPick<"params", UseActiveElement>],
+    never, [StandardDepsPick<"return", UseActiveElement>]
+>;
 
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -30,7 +33,7 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * 
  * @param target 
  */
-export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
+export const useBlockingElement = monitored(function useBlockingElement({
     activeElementParameters: {
         getDocument,
         onActiveElementChange,
@@ -44,7 +47,7 @@ export const useBlockingElement = monitored(function useBlockingElement<E extend
         ...void1
     },
     ...void2
-}: UseBlockingElementParameters<E>) {
+}: Parameter<UseBlockingElement>) {
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);

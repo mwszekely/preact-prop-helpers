@@ -1,4 +1,4 @@
-import { ElementProps } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
 /**
  * Merges two style objects, returning the result.
  *

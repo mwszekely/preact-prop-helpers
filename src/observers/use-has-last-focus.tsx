@@ -1,12 +1,12 @@
 
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { TargetedPick, useCallback, useEffect } from "../util/lib.js";
-import { Nullable } from "../util/types.js";
+import { useCallback, useEffect } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
+import { UseActiveElement, useActiveElement } from "./use-active-element.js";
 
 export interface UseHasLastFocusParametersSelf {
     /**
@@ -26,21 +26,25 @@ export interface UseHasLastFocusParametersSelf {
     onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
 
-
-export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasLastFocusParameters: UseHasLastFocusParametersSelf;
-}
-
-export interface HasLastFocusReturnTypeSelf {
+export interface UseHasLastFocusReturnTypeSelf {
     /** @stable */
     getLastFocused(): boolean;
     /** @stable */
     getLastFocusedInner(): boolean;
 }
 
-export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
-    hasLastFocusReturn: HasLastFocusReturnTypeSelf;
-}
+
+export type UseHasLastFocus<E extends Element> = GenericHook<
+    "hasLastFocus", 
+    UseHasLastFocusParametersSelf, [ 
+        StandardDepsPick<"params", UseActiveElement, "activeElementParameters">,
+        StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">
+    ],
+    UseHasLastFocusReturnTypeSelf, [
+        StandardDepsPick<"return", UseActiveElement>
+    ]
+>;
+
 
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
@@ -49,11 +53,12 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export const useHasLastFocus = monitored(function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
+export const useHasLastFocus = monitored(function useHasLastFocus<T extends Element>(args: Parameter<UseHasLastFocus<T>>): ReturnType<UseHasLastFocus<T>> {
     const {
         refElementReturn: { getElement },
         activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
-        hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 }
+        hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 },
+        ...void3
     } = args;
 
     assertEmptyObject(void1);
@@ -64,7 +69,7 @@ export const useHasLastFocus = monitored(function useHasLastFocus<T extends Node
     const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, runImmediately);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, runImmediately);
 
-    const { activeElementReturn } = useActiveElement({
+    const { activeElementReturn, ...void2 } = useActiveElement({
         activeElementParameters: {
             onLastActiveElementChange: useCallback<NonNullable<typeof onLastActiveElementChange>>((lastActiveElement, prevLastActiveElement, e) => {
                 const selfElement = getElement();
@@ -84,6 +89,10 @@ export const useHasLastFocus = monitored(function useHasLastFocus<T extends Node
             setLastFocusedInner(false, undefined);
         }
     }, []);
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
 
     return {
         activeElementReturn,

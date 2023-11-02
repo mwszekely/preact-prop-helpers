@@ -15,14 +15,14 @@ import { useSelection, useSelectionChild } from "./selection/use-selection.js";
  * @compositeParams
  */
 export const useListNavigationSelection = monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
-    const { context: contextSS, propsStable, ...retSS } = useSelection({
+    const { context: contextSS, propsStable, childrenHaveFocusParameters, ...retSS } = useSelection({
         childrenHaveFocusReturn,
         rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
         managedChildrenReturn,
         singleSelectionParameters,
         multiSelectionParameters
     });
-    const { context: contextLN, props, rovingTabIndexReturn, ...retLN } = useListNavigation({
+    const { context: contextLN, props, rovingTabIndexReturn, managedChildrenParameters, ...retLN } = useListNavigation({
         rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
         linearNavigationParameters,
         paginatedChildrenParameters,
@@ -34,6 +34,8 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
     assertEmptyObject(void3);
     return {
         rovingTabIndexReturn,
+        managedChildrenParameters,
+        childrenHaveFocusParameters,
         ...retSS,
         ...retLN,
         context: useMemoObject({
@@ -50,8 +52,8 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
         info: { index, untabbable },
         context,
-        multiSelectionChildParameters,
-        singleSelectionChildParameters
+        singleSelectionChildParameters,
+        multiSelectionChildParameters
     });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentParameters, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
         info: { index, untabbable },
@@ -69,8 +71,8 @@ export const useListNavigationSelectionChild = monitored(function useListNavigat
         pressParameters: { onPressSync, excludeSpace },
         info: { ...infoSS, ...infoLN },
         rovingTabIndexChildReturn,
-        multiSelectionChildReturn,
         singleSelectionChildReturn,
+        multiSelectionChildReturn,
         textContentParameters,
         propsChild: propsSS,
         propsTabbable: propsLN

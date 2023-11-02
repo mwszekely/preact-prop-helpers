@@ -1,9 +1,9 @@
 
-import { PressEventReason, UsePressParameters } from "../../component-use/use-press.js";
+import { PressEventReason, UsePress } from "../../component-use/use-press.js";
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
-import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
-import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { UseChildrenHaveFocus } from "../../observers/use-children-have-focus.js";
+import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
+import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, returnFalse, returnTrue } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -11,8 +11,8 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
-import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { EventType, FocusEventType, KeyboardEventType, useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
+import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
@@ -20,7 +20,7 @@ export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEve
 
 export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, { selectedPercent: number; selectedIndices: Set<number>; }>;
 
-export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionParametersSelf, "multiSelectionAriaPropName" | "multiSelectionMode"> {
+export interface UseMultiSelectionChildContextSelf extends Pick<UseMultiSelectionParametersSelf, "multiSelectionAriaPropName" | "multiSelectionMode"> {
     notifyParentOfChildSelectChange(event: EventType<any, any>, childIndex: number, selected: boolean | undefined, previous: boolean | undefined): void;
     /**
      * When the user presses Shift+Space or Ctrl+Space (depending on selectionMode),
@@ -39,8 +39,8 @@ export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionPara
 
     getAnyFocused(): boolean;
 }
-export interface UseMultiSelectionContext {
-    multiSelectionContext: UseMultiSelectionContextSelf;
+export interface UseMultiSelectionChildContext {
+    multiSelectionContext: UseMultiSelectionChildContextSelf;
 }
 
 export interface UseMultiSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -63,21 +63,33 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
     getMultiSelectionDisabled(): boolean;
 }
 
-export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends
-    TargetedPick<UseChildrenHaveFocusReturnType<any>, "childrenHaveFocusReturn", "getAnyFocused">,
-    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    multiSelectionParameters: UseMultiSelectionParametersSelf;
-}
+export type UseMultiSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<
+    "multiSelection",
+    UseMultiSelectionParametersSelf, [
+        StandardDepsPick<"return", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused">,
+        StandardDepsPick<"return", UseManagedChildren<UseMultiSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">
+    ],
+    never, [
+        StandardDepsPick<"params", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusParameters", "pick", "onCompositeFocusChange">,
+        StandardDepsContext<UseMultiSelectionChildContext>,
+        StandardDepsPropsStable<ParentElement>
+    ]
+>;
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
-export interface UseMultiSelectionReturnTypeSelf { }
+export type UseMultiSelectionChild<E extends Element> = GenericHook<
+    "multiSelectionChild",
+    UseMultiSelectionChildParametersSelf<E>, [
+        StandardDepsInfo<UseMultiSelectionChildInfo<E>, UseMultiSelectionChildInfoKeysParameters>,
+        StandardDepsContext<UseMultiSelectionChildContext, "multiSelectionContext">
+    ],
+    UseMultiSelectionChildReturnTypeSelf, [
+        StandardDepsPick<"params", UsePress<E>, "pressParameters", "pick", "onPressSync">,
+        StandardDepsPick<"params", UseHasCurrentFocus<E>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">,
+        StandardDepsInfo<UseMultiSelectionChildInfo<E>, UseMultiSelectionChildInfoKeysReturnType>,
+        StandardDepsProps<E>
+    ]
+>;
 
-export interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends
-    TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
-    context: UseMultiSelectionContext;
-    multiSelectionReturn: UseMultiSelectionReturnTypeSelf;
-    propsStable: ElementProps<ParentElement>
-}
 
 export type UseMultiSelectionChildInfoKeysParameters = "index";
 export type UseMultiSelectionChildInfoKeysReturnType = "setSelectedFromParent" | "getMultiSelected" | "getMultiSelectionDisabled";
@@ -117,12 +129,7 @@ export interface UseMultiSelectionParametersSelf {
      */
     multiSelectionAriaPropName: Nullable<`aria-${"pressed" | "selected" | "checked"}`>;
 }
-export interface UseMultiSelectionChildParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    UseGenericChildParameters<UseMultiSelectionContext, Pick<M, UseMultiSelectionChildInfoKeysParameters>> {
 
-    multiSelectionChildParameters: UseMultiSelectionChildParametersSelf<E>;
-    context: UseMultiSelectionContext;
-}
 export interface UseMultiSelectionChildParametersSelf<E extends Element> {
     /** 
      * Called when the child is requesting to change whether it's selected or not (generally because the user clicked it)
@@ -145,15 +152,8 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
     multiSelectionDisabled: boolean;
 }
 
-export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync">,
-    TargetedPick<UseHasCurrentFocusParameters<any>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
-    multiSelectionChildReturn: UseMultiSelectionChildReturnTypeSelf;
-    props: ElementProps<E>;
-    info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
-}
 
-export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseMultiSelectionContextSelf>, "multiSelectionMode"> {
+export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseMultiSelectionChildContextSelf>, "multiSelectionMode"> {
     /**
      * @stable
      */
@@ -187,7 +187,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
     managedChildrenReturn: { getChildren, ...void1 },
     childrenHaveFocusReturn: { getAnyFocused, ...void4 },
     ...void2
-}: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
+}: Parameter<UseMultiSelection<ParentOrChildElement, ChildElement>>): ReturnType<UseMultiSelection<ParentOrChildElement, ChildElement>> {
 
     // By having both we get the total number of children for free, even if there are holes in the array.
     // TODO: useManagedChildren should do that by default??
@@ -329,7 +329,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
 
     return {
         context: useMemoObject({
-            multiSelectionContext: useMemoObject<UseMultiSelectionContextSelf>({
+            multiSelectionContext: useMemoObject<UseMultiSelectionChildContextSelf>({
                 doContiguousSelection,
                 notifyParentOfChildSelectChange,
                 multiSelectionAriaPropName,
@@ -341,7 +341,6 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             })
         }),
         childrenHaveFocusParameters: { onCompositeFocusChange },
-        multiSelectionReturn: {},
         propsStable: useMemoObject({})
     }
 }
@@ -373,7 +372,7 @@ export function useMultiSelectionChild<E extends Element>({
         ...void3
     },
     ...void2
-}: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
+}: Parameter<UseMultiSelectionChild<E>>): ReturnType<UseMultiSelectionChild<E>> {
 
     // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
     // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
@@ -494,12 +493,12 @@ export function useMultiSelectionChild<E extends Element>({
 }
 
 export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
+    TargetedPick<Parameter<UseMultiSelectionChild<E>>, "multiSelectionChildParameters", "onMultiSelectChange"> {
     info: Pick<M, "setSelectedFromParent">;
 }
 
 export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
+    TargetedPick<ReturnType<UseMultiSelectionChild<E>>, "multiSelectionChildReturn", "changeMultiSelected"> {
     multiSelectionChildDeclarativeParameters: {
         multiSelected: boolean;
         onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
@@ -507,8 +506,8 @@ export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, 
 }
 
 
-export type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<UseMultiSelectionChildParameters<any, any>, "multiSelectionChildParameters", never>;
-export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<UseMultiSelectionChildReturnType<any, any>, "multiSelectionChildReturn", "changeMultiSelected">;
+export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
+export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
 
 /**
  * 

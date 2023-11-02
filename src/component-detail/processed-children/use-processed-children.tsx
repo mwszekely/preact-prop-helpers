@@ -1,43 +1,65 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
+import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
-import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildren, UseManagedChild, UseManagedChildContext, UseManagedChildren, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
-import { OmitStrong, TargetedOmit } from "../../util/lib.js";
+import { assertEmptyObject } from "../../util/assert.js";
+import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
-import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
-import { UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangedChildrenContext, useRearrangeableChildren } from "./use-rearrangeable-children.js";
-import { UseStaggeredChildContext, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
+import { UsePaginatedChild, UsePaginatedChildContext, UsePaginatedChildren, UsePaginatedChildrenInfo, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
+import { UseRearrangeableChildInfo, UseRearrangeableChildren, UseRearrangedChildrenContext, useRearrangeableChildren } from "./use-rearrangeable-children.js";
+import { UseStaggeredChild, UseStaggeredChildContext, UseStaggeredChildren, UseStaggeredChildrenInfo, useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
 
-export interface UseProcessedChildrenReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
-    OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
-    OmitStrong<UseStaggeredChildrenReturnType, never>,
-    OmitStrong<UsePaginatedChildrenReturnType, never> {
-    context: UseProcessedChildContext<TabbableChildElement, M>;
-}
+export type UseProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<
+    "processedChildren", 
+    never, [
+        StandardDepsContext<UseProcessedChildrenContext>,
+        StandardDepsPick<"params", UseManagedChildren<M>>,
+        StandardDepsOmit<"params", UseRearrangeableChildren<M>, "managedChildrenReturn">,
+        StandardDepsOmit<"params", UseStaggeredChildren, "managedChildrenReturn", [
+            StandardDepsPick<"params", UseStaggeredChildren, "staggeredChildrenParameters", "omit", "childCount">
+        ]>,
+        StandardDepsOmit<"params", UsePaginatedChildren<TabbableChildElement>, "paginatedChildrenParameters" | "rovingTabIndexReturn" | "managedChildrenReturn" | "rearrangeableChildrenReturn" | "childrenHaveFocusReturn", [
+            StandardDepsPick<"params", UsePaginatedChildren<TabbableChildElement>, "paginatedChildrenParameters", "omit", "childCount">
+        ]>
+    ],
+    never, [
+        StandardDepsContext<UseProcessedChildContext<TabbableChildElement, M>>,
+        StandardDepsPick<"return", UseManagedChildren<M>>,
+        StandardDepsPick<"return", UseRearrangeableChildren<M>>,
+        StandardDepsPick<"return", UseStaggeredChildren>,
+        StandardDepsPick<"return", UsePaginatedChildren<TabbableChildElement>>
+    ]
+>;
+
+export type UseProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<
+    "processedChild", 
+    never, [
+        StandardDepsContext<UseProcessedChildContext<TabbableChildElement, M>>,
+        StandardDepsInfo<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>
+    ],
+    never, [
+        StandardDepsProps<TabbableChildElement>,
+        StandardDepsPick<"params", UseRefElement<TabbableChildElement>, "refElementParameters", "pick", "onElementChange">,
+        StandardDepsPick<"return", UseManagedChild<M>>,
+        StandardDepsPick<"return", UsePaginatedChild<TabbableChildElement>>,
+        StandardDepsPick<"return", UseStaggeredChild<TabbableChildElement>>
+    ]
+>;
 
 // These are the info parameters required by useRovingTabIndexChild specifically
 export type UseProcessedChildInfoKeysParameters = "index";
 // These are the info parameters provided by useRovingTabIndexChild specifically
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
-    UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<M, UseProcessedChildInfoKeysParameters>>,
-    Pick<UsePaginatedChildParameters, never>,
-    Pick<UseManagedChildParameters<M>, never> {
-}
+
 
 export interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
     UsePaginatedChildContext,
     UseStaggeredChildContext,
-    UseManagedChildrenContext<M> { }
-
-export interface UseProcessedChildReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends
-    OmitStrong<UsePaginatedChildReturnType<TabbableChildElement>, "info">,
-    OmitStrong<UseStaggeredChildReturnType<TabbableChildElement>, "info" | "props">,
-    Pick<UseManagedChildReturnType<M>, "managedChildReturn"> {
-}
+    UseManagedChildContext<M> { }
 
 export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 
@@ -48,18 +70,6 @@ export interface UseProcessedChildrenContext extends UseRearrangedChildrenContex
     Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> &
     Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">/* & 
     Pick<UseRefElementReturnTypeSelf<any>, "getElement">*/;
-}
-
-/**
- * All of these functions **MUST** be stable across renders.
- */
-export interface UseProcessedChildrenParameters<TabbableChildElement extends Element, M extends UseRearrangeableChildInfo> extends
-    OmitStrong<UseRearrangeableChildrenParameters<M>, "managedChildrenReturn">,
-    OmitStrong<UseStaggeredChildrenParameters, "managedChildrenReturn" | "staggeredChildrenParameters">,
-    TargetedOmit<UseStaggeredChildrenParameters, "staggeredChildrenParameters", "childCount">,
-    Pick<UseManagedChildrenParameters<M>, "managedChildrenParameters">,
-    TargetedOmit<UsePaginatedChildrenParameters<TabbableChildElement>, "paginatedChildrenParameters", "childCount"> {
-    context: UseProcessedChildrenContext;
 }
 
 /**
@@ -113,16 +123,17 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     paginatedChildrenParameters,
     staggeredChildrenParameters,
     context,
-    managedChildrenParameters
-}: UseProcessedChildrenParameters<TabbableChildElement, M>): UseProcessedChildrenReturnType<TabbableChildElement, M> {
-
+    managedChildrenParameters,
+    ...void1
+}: Parameter<UseProcessedChildren<TabbableChildElement, M>>): ReturnType<UseProcessedChildren<TabbableChildElement, M>> {
+    assertEmptyObject(void1);
     const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
 
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, })
 
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren<M>({
+    const { rearrangeableChildrenReturn, } = useRearrangeableChildren<M>({
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
             children: childrenUnsorted,
@@ -136,7 +147,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
         paginatedChildrenReturn,
         paginatedChildrenReturn: { refreshPagination },
         context: { paginatedChildContext }
-    }: UsePaginatedChildrenReturnType = usePaginatedChildren<TabbableChildElement>({
+    }: ReturnType<UsePaginatedChildren<TabbableChildElement>> = usePaginatedChildren<TabbableChildElement>({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
         rovingTabIndexReturn: context.processedChildrenContext,
         childrenHaveFocusReturn: context.processedChildrenContext,
@@ -147,13 +158,14 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     const {
         context: { staggeredChildContext },
         staggeredChildrenReturn
-    }: UseStaggeredChildrenReturnType = useStaggeredChildren({
+    }: ReturnType<UseStaggeredChildren> = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
         staggeredChildrenParameters: { staggered, childCount },
         //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
 
     return {
+        managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
         paginatedChildrenReturn,
@@ -168,7 +180,9 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
 export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,
     info: { index, ...uinfo },
-}: UseProcessedChildParameters<TabbableChildElement, M>): UseProcessedChildReturnType<TabbableChildElement, M> {
+    ...void1
+}: Parameter<UseProcessedChild<TabbableChildElement, M>>): ReturnType<UseProcessedChild<TabbableChildElement, M>> {
+    assertEmptyObject(void1);
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild<TabbableChildElement>({ context: { staggeredChildContext }, info: { index } });

@@ -6,7 +6,12 @@ import {
     MultiSelectionChangeEvent,
     UseProcessedChildContext as NormalListChildContext,
     UseCompleteListNavigationChildInfo,
-    UseCompleteListNavigationDeclarativeReturnType, UseProcessedChildReturnType, UseProcessedChildrenContext, VNode,
+    UseCompleteListNavigationChildrenInfo,
+    UseCompleteListNavigationDeclarativeReturnType,
+    UseProcessedChild,
+    UseProcessedChildInfo,
+    UseProcessedChildrenContext,
+    VNode,
 
     focus,
     monitored,
@@ -32,8 +37,8 @@ function _getDocument() {
 const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
 const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
 const UntabbableContext = createContext(false);
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
-const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLSpanElement, CustomInfoType>>(null!);
+const ListChildContext = createContext<NormalListChildContext<HTMLSpanElement, any>>(null!);
 const WeirdContext = createContext<UseProcessedChildrenContext>(null!);
 export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
 
@@ -58,8 +63,10 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         setMultiSelectPercent(e[EventDetail].selectedPercent)
     }
 
-    const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
-        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
+    const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLSpanElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLSpanElement, CustomInfoType>({
+        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus, initiallyTabbedIndex: 0 },
+        childrenHaveFocusParameters: { onCompositeFocusChange: null },
+        managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenCountChange: null, onChildrenMountChange: null },
         singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
@@ -148,13 +155,17 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
 }))
 
 export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
+    type ChildElement=HTMLLIElement;
+    type M = UseProcessedChildInfo<ChildElement>;
+
     const { 
         context,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn
-    } = useCompleteListNavigationChildren({
+    } = useCompleteListNavigationChildren<HTMLLIElement, UseCompleteListNavigationChildrenInfo<HTMLLIElement>>({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
+        childrenHaveFocusParameters: { onCompositeFocusChange: null },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
             onRearranged: null,
@@ -168,6 +179,7 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
+
         context: useContext(WeirdContext)
     })
 
@@ -180,7 +192,7 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
     )
 }));
 
-interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElement> {
+interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLSpanElement> {
     foo: "bar";
 }
 
@@ -192,7 +204,7 @@ const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTab
         onElementChange?.(e, p, r);
     }) } })
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
+    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: ReturnType<UseProcessedChild<HTMLLIElement, any>> = useListChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
         info: { index }
     })
@@ -215,7 +227,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
     const [multiSelected, setMultiSelected] = useState(false);
 
     const [randomWord] = useState(() => RandomWords[index]);
-    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLSpanElement, CustomInfoType>;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
 
     const getSortValue = useStableCallback(() => index);
@@ -231,7 +243,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
         multiSelectionChildReturn: { getMultiSelected },
         pressParameters: { onPressSync, excludeSpace },
         refElementReturn
-    } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
+    } = useCompleteListNavigationChildDeclarative<HTMLSpanElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
@@ -242,7 +254,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
         multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
-    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
+    const { pressReturn, props: p2 } = usePress<HTMLSpanElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 

@@ -1,7 +1,7 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick } from "../util/lib.js";
-import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
+import { FocusEventType } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
     /**
      * Whether the element itself currently has focus.
@@ -20,22 +20,13 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      */
     onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
-export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
-}
-export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
-    propsStable: ElementProps<E>;
-    /**
-     * Modifies the element to be able to track its own focus state
-     */
+export interface UseHasCurrentFocusReturnTypeSelf {
     /** @stable */
     getCurrentFocused(): boolean;
     /** @stable */
     getCurrentFocusedInner(): boolean;
 }
-export interface UseHasCurrentFocusReturnType<E extends Element> {
-    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
-}
+export type UseHasCurrentFocus<E extends Element> = GenericHook<"hasCurrentFocus", UseHasCurrentFocusParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UseHasCurrentFocusReturnTypeSelf, [StandardDepsPropsStable<E>]>;
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
  *
@@ -43,5 +34,9 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare const useHasCurrentFocus: <T extends Element>(args: UseHasCurrentFocusParameters<T>) => UseHasCurrentFocusReturnType<T>;
+export declare const useHasCurrentFocus: <T extends Element>(args: {
+    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
+} & StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">) => {
+    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf;
+} & StandardDepsPropsStable<T>;
 //# sourceMappingURL=use-has-current-focus.d.ts.map

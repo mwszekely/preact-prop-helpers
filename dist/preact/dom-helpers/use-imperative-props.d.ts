@@ -1,6 +1,6 @@
-import { TargetedPick, createElement, type RenderableProps } from "../util/lib.js";
-import { CSSProperties, ElementProps, Ref } from "../util/types.js";
-import { UseRefElementReturnType } from "./use-ref-element.js";
+import { CSSProperties, ElementProps, Ref, createElement, type RenderableProps } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { UseRefElement } from "./use-ref-element.js";
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
 export type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"];
@@ -31,21 +31,11 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Applies the given event handler to the element and its props */
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
-export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-}
 interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
     handle: Ref<UseImperativePropsReturnTypeSelf<HTMLElementTagNameMap[T]>>;
 }
-export interface UseImperativePropsReturnType<T extends Element> {
-    /**
-     * @stable
-     *
-     *  (The object itself and everything within it are all stable and can be passed around freely)
-     */
-    imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
-    props: ElementProps<T>;
-}
+export type UseImperativeProps<T extends Element> = GenericHook<"imperativeProps", never, [StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">], UseImperativePropsReturnTypeSelf<T>, [StandardDepsProps<T>]>;
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  *
@@ -63,7 +53,9 @@ export declare const ImperativeElement: typeof ImperativeElementU;
  *
  * @compositeParams
  */
-export declare const useImperativeProps: <E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) => UseImperativePropsReturnType<E>;
+export declare const useImperativeProps: <E extends Element>({ refElementReturn: { getElement } }: {} & StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">) => {
+    imperativePropsReturn: UseImperativePropsReturnTypeSelf<E>;
+} & StandardDepsProps<E>;
 declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<import("preact").ClassAttributes<any> & createElement.JSX.HTMLAttributes<EventTarget> & createElement.JSX.SVGAttributes<SVGElement>>;
 export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

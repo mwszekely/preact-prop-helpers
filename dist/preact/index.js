@@ -339,7 +339,7 @@ export { useListNavigationSelection, useListNavigationSelectionChild } from "./c
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { useModal } from "./component-use/use-modal.js";
-export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
+export { setPressVibrate, usePress } from "./component-use/use-press.js";
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";

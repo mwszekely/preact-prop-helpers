@@ -1,5 +1,6 @@
-import { ElementProps } from "../util/types.js";
-export interface UseDroppableReturnType<E extends Element> {
+import { ElementProps } from "../util/lib.js";
+import { Parameter } from "../util/types.js";
+interface UseDroppableReturnType<E extends Element> {
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
      *
@@ -30,7 +31,7 @@ export interface UseDroppableReturnType<E extends Element> {
     } | null;
     dropError: unknown;
 }
-export interface UseDroppableParameters {
+interface UseDroppableParameters {
     /**
      * Maps to the Drag and Drop API -- effectively means "as close as possible, what's happening to the data when I drop it here?
      * Am I copying it and leaving the original, am I moving it and deleting the original, or am I linking it to the original?"
@@ -48,6 +49,7 @@ export interface DropFile extends DropFileMetadata {
 export interface DropFileMetadata {
     type: string | undefined;
 }
+export type UseDroppable<E extends Element> = (params: UseDroppableParameters) => UseDroppableReturnType<E>;
 type DroppableFileErrorType = "IndexSizeError" | "HierarchyRequestError" | "WrongDocumentError" | "InvalidCharacterError" | "NoModificationAllowedError" | "NotFoundError" | "NotSupportedError" | "InvalidStateError" | "InUseAttributeError" | "SyntaxError" | "InvalidModificationError" | "NamespaceError" | "InvalidAccessError" | "TypeMismatchError" | "SecurityError" | "NetworkError" | "AbortError" | "URLMismatchError" | "QuotaExceededError" | "TimeoutError" | "InvalidNodeTypeError" | "DataCloneError" | "EncodingError" | "NotReadableError" | "UnknownError" | "ConstraintError" | "DataError" | "TransactionInactiveError" | "ReadOnlyError" | "VersionError" | "OperationError" | "NotAllowedError";
 export declare class DroppableFileError extends Error {
     fileName: string;

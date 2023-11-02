@@ -33,7 +33,7 @@ export function useTagProps(props, tag) {
             triggerIndex: tag
         });
         return useMemo(() => {
-            return { ...props, [propsIdTag]: true /*, [tag as never]: true*/ };
+            return { ...props, [propsIdTag]: true };
         }, [props, tag]);
     }
     else {

@@ -1,6 +1,5 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { Nullable } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPropsStable } from "../util/types.js";
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
@@ -9,11 +8,6 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      * @stable
      */
     getElement(): T | null;
-}
-export interface UseRefElementReturnType<T extends EventTarget> {
-    /** @stable */
-    propsStable: ElementProps<T>;
-    refElementReturn: UseRefElementReturnTypeSelf<T>;
 }
 export interface UseRefElementParametersSelf<T> {
     /**
@@ -35,9 +29,7 @@ export interface UseRefElementParametersSelf<T> {
      */
     onUnmount?: Nullable<(element: T) => void>;
 }
-export interface UseRefElementParameters<T> {
-    refElementParameters: UseRefElementParametersSelf<T>;
-}
+export type UseRefElement<E extends Element> = GenericHook<"refElement", UseRefElementParametersSelf<E>, [], UseRefElementReturnTypeSelf<E>, [StandardDepsPropsStable<E>]>;
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -73,5 +65,9 @@ export interface UseRefElementParameters<T> {
  *
  * @compositeParams
  */
-export declare const useRefElement: <T extends EventTarget>(args: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
+export declare const useRefElement: <T extends Element>(args: {
+    refElementParameters: UseRefElementParametersSelf<T>;
+}) => {
+    refElementReturn: UseRefElementReturnTypeSelf<T>;
+} & StandardDepsPropsStable<T>;
 //# sourceMappingURL=use-ref-element.d.ts.map

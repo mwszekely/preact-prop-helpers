@@ -34,7 +34,7 @@ export const useGridNavigationSelection = monitored(function useGridNavigationSe
         rearrangeableChildrenReturn,
         refElementReturn
     });
-    const { childrenHaveFocusParameters, context: { singleSelectionContext, multiSelectionContext }, multiSelectionReturn, propsStable, singleSelectionReturn, ...void1 } = useSelection({
+    const { childrenHaveFocusParameters, context: { singleSelectionContext, multiSelectionContext }, propsStable, singleSelectionReturn, ...void1 } = useSelection({
         managedChildrenReturn,
         rovingTabIndexReturn,
         singleSelectionParameters,
@@ -57,7 +57,6 @@ export const useGridNavigationSelection = monitored(function useGridNavigationSe
         props: useMergedProps(props, propsStable),
         rovingTabIndexReturn,
         singleSelectionReturn,
-        multiSelectionReturn,
         typeaheadNavigationReturn
     };
 });

@@ -1,12 +1,13 @@
-import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
-import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
+import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseActiveElement, useActiveElement } from "../observers/use-active-element.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, EventType, TargetedOmit } from "../util/types.js";
+import { ElementProps, EventType } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsRename } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { UseBackdropDismissParameters, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
-import { UseEscapeDismissParameters, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
-import { UseLostFocusDismissParameters, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
+import { UseBackdropDismiss, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
+import { UseEscapeDismiss, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
+import { UseLostFocusDismiss, useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -59,33 +60,20 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
     //closeOnLostFocus: Listeners extends "lost-focus" ? true : false;
 }
 
-export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends
-    TargetedOmit<UseEscapeDismissParameters<any, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "getDocument">,
-    TargetedOmit<UseBackdropDismissParameters<any, Listeners extends "backdrop" ? true : false>, "backdropDismissParameters", never>,
-    TargetedOmit<UseLostFocusDismissParameters<any, any, Listeners extends "lost-focus" ? true : false>, "lostFocusDismissParameters", never>,
-    UseActiveElementParameters {
-    dismissParameters: UseDismissParametersSelf<Listeners>;
-}
-
-export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
-    /**
-     * If this dismissible component has a specific element that caused it to appear (a button, for example),
-     * provide it with these props.
-     * 
-     * * REQUIRED for things like menus that pop up from a button and for whom losing focus counts as requesting closure. 
-     * * OPTIONAL for things like dialogs that can appear out of nowhere and for whom losing focus is actively impossible (due to focus traps).
-     */
-    refElementSourceReturn: UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];
-
-    /**
-     * This one's always required though
-     */
-    refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
-
-    propsStableSource: ElementProps<NonNullable<SourceElement>>;
-    propsStablePopup: ElementProps<NonNullable<PopupElement>>;
-
-}
+export type UseDismiss<SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<
+    "dismiss", 
+    UseDismissParametersSelf<Listeners>, [
+        StandardDepsPick<"params", UseEscapeDismiss<PopupElement, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "omit", "getDocument">,
+        StandardDepsOmit<"params", UseBackdropDismiss<PopupElement, Listeners extends "backdrop" ? true : false>, "refElementPopupReturn">,
+        StandardDepsOmit<"params", UseLostFocusDismiss<SourceElement, PopupElement, Listeners extends "lost-focus" ? true : false>, "refElementPopupReturn" | "refElementSourceReturn">,
+        StandardDepsPick<"params", UseActiveElement>
+    ],
+    never, [
+        StandardDepsRename<StandardDepsPick<"return", UseRefElement<NonNullable<SourceElement>>>, "refElementReturn", "refElementSourceReturn">,
+        StandardDepsRename<StandardDepsPick<"return", UseRefElement<NonNullable<PopupElement>>>, "refElementReturn", "refElementPopupReturn">,
+        { propsStableSource: ElementProps<NonNullable<SourceElement>>; propsStablePopup: ElementProps<NonNullable<PopupElement>> }
+    ]
+>;
 
 /**
  * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
@@ -99,13 +87,9 @@ export const useDismiss = monitored(function useDismiss<Listeners extends Dismis
     escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 },
     activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 },
     ...void4
-}: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
+}: Parameter<UseDismiss<SourceElement, PopupElement, Listeners>>): ReturnType<UseDismiss<SourceElement, PopupElement, Listeners>> {
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement<PopupElement>({ refElementParameters: {} });
-
-    //const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
-    //const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
-    //const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus" as Listeners); }, [globalOnClose]);
 
     const void8 = useBackdropDismiss<PopupElement, Listeners extends "backdrop" ? true : false>({
         refElementPopupReturn,

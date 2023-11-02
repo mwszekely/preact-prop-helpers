@@ -1,15 +1,14 @@
 
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { useId, useRef } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, useId, useRef } from "../util/lib.js";
+import { GenericHook, Parameter } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
-export interface UseRandomIdReturnType<S extends Element, T extends Element> {
-    propsSource: ElementProps<S>;
-    propsReferencer: ElementProps<T>;
-
-    randomIdReturn: UseRandomIdReturnTypeSelf;
-}
+export type UseRandomId<S extends Element, T extends Element> = GenericHook<
+    "randomId", 
+    UseRandomIdParametersSelf, [],
+    UseRandomIdReturnTypeSelf, [{ propsSource: ElementProps<S>; propsReferencer: ElementProps<T>; }]
+>;
 
 export interface UseRandomIdReturnTypeSelf { id: string; }
 
@@ -27,16 +26,14 @@ export interface UseRandomIdParametersSelf {
     otherReferencerProp: keyof ElementProps<any> | null;
 }
 
-export interface UseRandomIdParameters {
-    randomIdParameters: UseRandomIdParametersSelf;
-}
 
 /**
  * Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
  * 
  * @compositeParams
  */
-export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ 
+    randomIdParameters: { prefix, otherReferencerProp } }: Parameter<UseRandomId<S, T>>): ReturnType<UseRandomId<S, T>> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 

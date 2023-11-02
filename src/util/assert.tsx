@@ -8,4 +8,4 @@
  *
  * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
  */
-export function assertEmptyObject<T extends {} | void>(_a: [keyof T] extends [never] ? T : [T] extends [void]? void : `Unhandled keys in this rest spread object!`): void {}
+export function assertEmptyObject<T extends {} | void>(_a: [Exclude<keyof T, "_e">] extends [never] ? T : [T] extends [void]? void : `Unhandled keys in this rest spread object!`): void {}

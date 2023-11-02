@@ -1,17 +1,17 @@
-import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
+import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
+import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
-    //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
     getStaggeredVisible(): boolean;
 }
@@ -25,16 +25,33 @@ export interface UseStaggeredChildrenParametersSelf {
     childCount: number | null;
 }
 
-export interface UseStaggeredChildrenParameters extends
-    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">/*,
-    TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> */ {
-    staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
-}
+export type UseStaggeredChildren = GenericHook<
+    "staggeredChildren", 
+    UseStaggeredChildrenParametersSelf, [
+        StandardDepsPick<"return", UseManagedChildren<UseStaggeredChildrenInfo>, "managedChildrenReturn", "pick", "getChildren">
+    ],
+    UseStaggeredChildrenReturnTypeSelf, [
+        StandardDepsContext<UseStaggeredChildContext>
+    ]
+>;
+
+export type UseStaggeredChild<E extends Element> = GenericHook<
+    "staggeredChild", 
+    never, [
+        StandardDepsInfo<UseStaggeredChildrenInfo, "index">,
+        StandardDepsContext<UseStaggeredChildContext>
+    ],
+    UseStaggeredChildReturnTypeSelf, [
+        StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">,
+        StandardDepsInfo<UseStaggeredChildrenInfo, "getStaggeredVisible" | "setStaggeredVisible">,
+        StandardDepsProps<E>
+    ]
+>;
+
 
 export interface UseStaggeredChildContextSelf {
     parentIsStaggered: boolean;
     childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
-    //childCallsThisToTellTheParentTheHighestIndex(index: number): void;
     getDefaultStaggeredVisible(i: number): boolean;
     getIntersectionObserver(): IntersectionObserver | null;
     setElementToIndexMap(index: number, element: any): void;
@@ -45,11 +62,6 @@ export interface UseStaggeredChildContext {
     staggeredChildContext: UseStaggeredChildContextSelf;
 }
 
-export interface UseStaggeredChildrenReturnType {
-    staggeredChildrenReturn: UseStaggeredChildrenReturnTypeSelf;
-    context: UseStaggeredChildContext;
-}
-
 export interface UseStaggeredChildrenReturnTypeSelf {
     /**
      * Whether any children are still waiting to show themselves because of the staggering behavior
@@ -57,9 +69,6 @@ export interface UseStaggeredChildrenReturnTypeSelf {
     stillStaggering: boolean;
 }
 
-
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
-}
 
 export interface UseStaggeredChildReturnTypeSelf {
 
@@ -82,11 +91,6 @@ export interface UseStaggeredChildReturnTypeSelf {
     childUseEffect(): void;
 }
 
-export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
-    props: ElementProps<ChildElement>;
-    staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: OmitStrong<UseStaggeredChildrenInfo, "index">;
-}
 
 
 /**
@@ -105,10 +109,10 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
 export const useStaggeredChildren = monitored(function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered, childCount },
-    //refElementReturn: { getElement }
-}: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
+    ...void1
+}: Parameter<UseStaggeredChildren>): ReturnType<UseStaggeredChildren> {
 
-
+    assertEmptyObject(void1);
 
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -273,11 +277,10 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({
+export const useStaggeredChild = monitored(function useStaggeredChild<E extends Element>({
     info: { index },
-    //refElementReturn: { getElement },
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
-}: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
+}: Parameter<UseStaggeredChild<E>>): ReturnType<UseStaggeredChild<E>> {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     // Controls whether we ask the parent to start mounting children after us.

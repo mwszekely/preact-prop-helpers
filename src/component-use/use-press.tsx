@@ -1,20 +1,16 @@
 import { noop } from "lodash-es";
-import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
-import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
+import { FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType, onfocusout, useCallback } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 
-export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    pressParameters: UsePressParametersSelf<E>;
-}
 
 function pressLog(...args: any[]) {
     if ((window as any).__log_press_events)
@@ -83,11 +79,11 @@ export interface UsePressReturnTypeSelf {
     longPress: boolean | null;
 }
 
-export interface UsePressReturnType<E extends Element> {
-    pressReturn: UsePressReturnTypeSelf;
-
-    props: ElementProps<E>;
-}
+export type UsePress<E extends Element> = GenericHook<
+    "press", 
+    UsePressParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">],
+    UsePressReturnTypeSelf, [StandardDepsProps<E>]
+>;
 
 function supportsPointerEvents() {
     return ("onpointerup" in window);
@@ -165,7 +161,7 @@ document.addEventListener("click", (e) => {
  * @compositeParams
  * 
  */
-export const usePress = monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
+export const usePress = monitored(function usePress<E extends Element>(args: Parameter<UsePress<E>>): ReturnType<UsePress<E>> {
     const {
         refElementReturn: { getElement },
         pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
@@ -527,7 +523,7 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
         },
     };
 })
-
+/*
 export interface UsePressAsyncParameters<E extends Element> extends
     OmitStrong<UsePressParameters<E>, "pressParameters">,
     TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
@@ -551,7 +547,7 @@ export function usePressAsync<E extends Element>({
         pressReturn,
         props
     }
-}
+}*/
 
 
 /**

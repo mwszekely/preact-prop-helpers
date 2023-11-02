@@ -1,7 +1,7 @@
 import { UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
 import { Nullable, OmitStrong } from "../util/types.js";
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
-export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
+interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event
      * and presented as the first argument of the event handler?
@@ -16,7 +16,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitS
      */
     asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
 }
-export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
+interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
     /**
      * The most recently captured value. In other words, represents what
      * the current value would be if this operation were synchronous and
@@ -41,6 +41,7 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      */
     hasCapture: boolean;
 }
+export type UseAsyncHandler<EventType, CaptureType> = (params: UseAsyncHandlerParameters<EventType, CaptureType>) => UseAsyncHandlerReturnType<EventType, CaptureType>;
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
  * along with some other information related to the current state.
@@ -107,4 +108,5 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
 export declare const useAsyncHandler: <EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>) => UseAsyncHandlerReturnType<EventType, CaptureType>;
+export {};
 //# sourceMappingURL=use-async-handler.d.ts.map

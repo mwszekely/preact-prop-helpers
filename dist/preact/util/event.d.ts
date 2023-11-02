@@ -5,7 +5,8 @@
  *
  * Get that extra information from the [EventDetail] symbol.
  */
-import { EventType, Nullable } from "./lib.js";
+import type { EventType } from "./lib.js";
+import type { Nullable } from "./types.js";
 export declare const EventDetail: unique symbol;
 export type EventDetail = typeof EventDetail;
 export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;

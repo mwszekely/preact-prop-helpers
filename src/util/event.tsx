@@ -7,7 +7,8 @@
  * Get that extra information from the [EventDetail] symbol.
  */
 
-import { EventType, Nullable } from "./lib.js";
+import type { EventType } from "./lib.js";
+import type { Nullable } from "./types.js";
 
 export const EventDetail = Symbol("event-detail");
 export type EventDetail = typeof EventDetail;

@@ -1,9 +1,10 @@
-import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
-import { useFocusTrap, UseFocusTrapParameters } from "../component-detail/use-focus-trap.js";
+import { DismissListenerTypes, useDismiss, UseDismiss } from "../component-detail/use-dismiss.js";
+import { useFocusTrap, UseFocusTrap } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, OmitStrong } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseModalParametersSelf {
@@ -12,6 +13,25 @@ export interface UseModalParametersSelf {
      */
     active: boolean;
 }
+
+export type UseModal<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<
+    "modal", 
+    UseModalParametersSelf, [
+        StandardDepsPick<"params", UseDismiss<SourceElement, PopupElement, Listeners>>,
+        StandardDepsPick<"params", UseRefElement<any>>,
+        StandardDepsOmit<"params", UseFocusTrap<any, any>,  "refElementReturn">
+    ],
+    never, [
+        StandardDepsPick<"return", UseDismiss<SourceElement, PopupElement, Listeners>>,
+        {
+            propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
+            propsStablePopup: ElementProps<NonNullable<PopupElement>>;
+            propsStableSource: ElementProps<NonNullable<SourceElement>>;
+        }
+    ]
+>;
+
+/*
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends
     UseDismissParameters<Listeners>,
     UseRefElementParameters<any>,
@@ -22,7 +42,7 @@ export interface UseModalParameters<Listeners extends DismissListenerTypes> exte
 export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
     propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
 }
-
+*/
 /**
  * Combines dismissal hooks and focus trap hooks into one. 
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
@@ -43,7 +63,7 @@ export const useModal = monitored(function useModal<Listeners extends DismissLis
     refElementParameters: { onElementChange, onMount, onUnmount, ...void7 },
     modalParameters: { active: modalActive, ...void8 },
     ...void1
-}: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
+}: Parameter<UseModal<FocusContainerElement, SourceElement, PopupElement, Listeners>>): ReturnType<UseModal<FocusContainerElement, SourceElement, PopupElement, Listeners>> {
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({
         dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
         escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
@@ -67,9 +87,9 @@ export const useModal = monitored(function useModal<Listeners extends DismissLis
     assertEmptyObject(void8);
 
     return {
-        propsFocusContainer: useMergedProps(propsStable, props),
         refElementPopupReturn,
         refElementSourceReturn,
+        propsFocusContainer: useMergedProps(propsStable, props),
         propsStablePopup,
         propsStableSource
     }

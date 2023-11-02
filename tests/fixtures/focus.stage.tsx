@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useState } from "preact/hooks";
 import { useHasCurrentFocus, useMergedProps, useRefElement, useStableCallback } from "preact-prop-helpers";
+import { useState } from "preact/hooks";
 
 export interface FocusConstants {
     /*onPress(e: Event): (void | Promise<void>);
@@ -27,7 +27,7 @@ function Impl({ tag, tabIndex, children }: { tag: string, tabIndex: number, chil
     const [focus, hasFocus] = useState(false);
     const [focusInner, hasFocusInner] = useState(false);
     const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn: { propsStable: p2, getCurrentFocused, getCurrentFocusedInner } } = useHasCurrentFocus({
+    const { propsStable: p2, hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner } } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: useStableCallback((e) => { console.log("IMPL focus", e); document.getElementById("steal-focus")?.focus(); hasFocus(e) }),
             onCurrentFocusedInnerChanged: useStableCallback((e) => { console.log("IMPL focus-inner", e); document.getElementById("steal-focus")?.focus(); hasFocusInner(e) })

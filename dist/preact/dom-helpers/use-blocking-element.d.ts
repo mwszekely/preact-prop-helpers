@@ -1,13 +1,12 @@
 import "blocking-elements";
 import "wicg-inert";
-import { UseActiveElementParameters } from "../observers/use-active-element.js";
-export interface UseBlockingElementParametersSelf<E extends Element> {
+import { UseActiveElement } from "../observers/use-active-element.js";
+import { GenericHook, Parameter, StandardDepsPick } from "../util/types.js";
+export interface UseBlockingElementParametersSelf {
     enabled: boolean;
-    getTarget(): (E | null);
+    getTarget(): (Element | null);
 }
-export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
-    blockingElementParameters: UseBlockingElementParametersSelf<E>;
-}
+export type UseBlockingElement = GenericHook<"blockingElement", UseBlockingElementParametersSelf, [StandardDepsPick<"params", UseActiveElement>], never, [StandardDepsPick<"return", UseActiveElement>]>;
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  *
@@ -17,7 +16,7 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  *
  * @param target
  */
-export declare const useBlockingElement: <E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>) => {
+export declare const useBlockingElement: ({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: Parameter<UseBlockingElement>) => {
     getTop: () => HTMLElement | null;
     getLastActiveWhenClosed: () => HTMLElement | null;
     getLastActiveWhenOpen: () => HTMLElement | null;

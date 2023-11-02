@@ -1,13 +1,10 @@
 import { useState } from "../preact-extensions/use-state.js";
-import { DragEventType, ElementProps, Nullable } from "../util/types.js";
+import { DragEventType, ElementProps } from "../util/lib.js";
+import { Nullable, Parameter } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
-/*
-export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
-    return [r.propsUnstable, ...otherProps];
-}*/
 
-export interface UseDraggableReturnType<E extends EventTarget> {
+interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
     propsUnstable: ElementProps<E>;
 
@@ -33,7 +30,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
 }
 
 
-export interface UseDraggableParameters {
+interface UseDraggableParameters {
 
     /**
      * Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped.
@@ -56,6 +53,8 @@ export interface UseDraggableParameters {
     data: { [mimeType: string]: string };
 }
 
+export type UseDraggable<E extends Element> = (params: UseDraggableParameters) => UseDraggableReturnType<E>;
+
 /**
  * Allows an element to start a drag operation.
  * 
@@ -63,7 +62,7 @@ export interface UseDraggableParameters {
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-export const useDraggable = monitored(function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
+export const useDraggable = monitored(function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: Parameter<UseDraggable<E>>): ReturnType<UseDraggable<E>> {
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
 

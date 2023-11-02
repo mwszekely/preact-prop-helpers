@@ -1,8 +1,7 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick } from "../util/lib.js";
-import { Nullable } from "../util/types.js";
-import { UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { UseActiveElement } from "./use-active-element.js";
 export interface UseHasLastFocusParametersSelf {
     /**
      * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
@@ -19,18 +18,18 @@ export interface UseHasLastFocusParametersSelf {
      */
     onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
-export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasLastFocusParameters: UseHasLastFocusParametersSelf;
-}
-export interface HasLastFocusReturnTypeSelf {
+export interface UseHasLastFocusReturnTypeSelf {
     /** @stable */
     getLastFocused(): boolean;
     /** @stable */
     getLastFocusedInner(): boolean;
 }
-export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
-    hasLastFocusReturn: HasLastFocusReturnTypeSelf;
-}
+export type UseHasLastFocus<E extends Element> = GenericHook<"hasLastFocus", UseHasLastFocusParametersSelf, [
+    StandardDepsPick<"params", UseActiveElement, "activeElementParameters">,
+    StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">
+], UseHasLastFocusReturnTypeSelf, [
+    StandardDepsPick<"return", UseActiveElement>
+]>;
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
  *
@@ -38,5 +37,9 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  *
  * @compositeParams
  */
-export declare const useHasLastFocus: <T extends Node>(args: UseHasLastFocusParameters<T>) => UseHasLastFocusReturnType;
+export declare const useHasLastFocus: <T extends Element>(args: {
+    hasLastFocusParameters: UseHasLastFocusParametersSelf;
+} & StandardDepsPick<"params", UseActiveElement, "activeElementParameters"> & StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">) => {
+    hasLastFocusReturn: UseHasLastFocusReturnTypeSelf;
+} & StandardDepsPick<"return", UseActiveElement>;
 //# sourceMappingURL=use-has-last-focus.d.ts.map

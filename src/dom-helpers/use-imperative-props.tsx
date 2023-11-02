@@ -1,8 +1,8 @@
-import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
-import { CSSProperties, ElementProps, Ref } from "../util/types.js";
+import { CSSProperties, ElementProps, EventMapping, Ref, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
+import { UseRefElement, useRefElement } from "./use-ref-element.js";
 
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
@@ -37,22 +37,21 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
-export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> { }
-
 interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
     handle: Ref<UseImperativePropsReturnTypeSelf<HTMLElementTagNameMap[T]>>;
 }
 
+/*
 export interface UseImperativePropsReturnType<T extends Element> {
     /**
      * @stable
      * 
      *  (The object itself and everything within it are all stable and can be passed around freely)
-     */
+     *\/
     imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
     props: ElementProps<T>;
-}
+}*/
 
 let templateElement: HTMLTemplateElement | null = null;
 
@@ -62,6 +61,12 @@ function htmlToElement(parent: Element, html: string) {
     templateElement.innerHTML = html.trim();   // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
     return templateElement.content.firstChild! as Element;
 }
+
+export type UseImperativeProps<T extends Element> = GenericHook<
+    "imperativeProps", 
+    never, [StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">],
+    UseImperativePropsReturnTypeSelf<T>, [StandardDepsProps<T>]
+>;
 
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
@@ -81,7 +86,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as 
  * 
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
+export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: Parameter<UseImperativeProps<E>>): ReturnType<UseImperativeProps<E>> {
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 

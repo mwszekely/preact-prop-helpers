@@ -1,5 +1,4 @@
-import { Nullable } from "../util/lib.js";
-import { OmitStrong } from "../util/types.js";
+import { Nullable, OmitStrong } from "../util/types.js";
 import { OnPassiveStateChange } from "./use-passive-state.js";
 export type OnParamValueChanged<T> = OnPassiveStateChange<T, never>;
 export type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), reason?: "push" | "replace") => void;

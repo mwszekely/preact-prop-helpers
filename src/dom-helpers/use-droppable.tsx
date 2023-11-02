@@ -1,10 +1,10 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { DragEventType, useEffect, useRef } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { DragEventType, ElementProps, useEffect, useRef } from "../util/lib.js";
+import { Parameter } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
-export interface UseDroppableReturnType<E extends Element> {
+interface UseDroppableReturnType<E extends Element> {
 
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
@@ -40,7 +40,7 @@ export interface UseDroppableReturnType<E extends Element> {
     dropError: unknown;
 }
 
-export interface UseDroppableParameters {
+interface UseDroppableParameters {
     /**
      * Maps to the Drag and Drop API -- effectively means "as close as possible, what's happening to the data when I drop it here? 
      * Am I copying it and leaving the original, am I moving it and deleting the original, or am I linking it to the original?"
@@ -53,6 +53,7 @@ export interface UseDroppableParameters {
 export interface DropFile extends DropFileMetadata { name: string, data: ArrayBuffer, size: number | undefined, lastModified: number | undefined }
 export interface DropFileMetadata { type: string | undefined }
 
+export type UseDroppable<E extends Element> = (params: UseDroppableParameters) => UseDroppableReturnType<E>;
 
 type DroppableFileErrorType = "IndexSizeError" | "HierarchyRequestError" | "WrongDocumentError" | "InvalidCharacterError" | "NoModificationAllowedError" | "NotFoundError" | "NotSupportedError" | "InvalidStateError" | "InUseAttributeError" | "SyntaxError" | "InvalidModificationError" | "NamespaceError" | "InvalidAccessError" | "TypeMismatchError" | "SecurityError" | "NetworkError" | "AbortError" | "URLMismatchError" | "QuotaExceededError" | "TimeoutError" | "InvalidNodeTypeError" | "DataCloneError" | "EncodingError" | "NotReadableError" | "UnknownError" | "ConstraintError" | "DataError" | "TransactionInactiveError" | "ReadOnlyError" | "VersionError" | "OperationError" | "NotAllowedError";
 
@@ -77,7 +78,7 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-export const useDroppable = monitored(function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
+export const useDroppable = monitored(function useDroppable<E extends Element>({ effect }: Parameter<UseDroppable<E>>): ReturnType<UseDroppable<E>> {
 
     const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
     const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);

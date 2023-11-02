@@ -1,30 +1,5 @@
-import { Nullable } from "../util/types.js";
+import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
-export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
-    getChildren(): ManagedChildren<M>;
-    managedChildrenArray: InternalChildInfo<M>;
-    remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-}
-export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    managedChildContext: UseManagedChildrenContextSelf<M>;
-}
-/**
- * Information that children and parents use to communicate with each other.
- *
- * Other hooks will inherit from this to provide more complicated behavior.
- */
-export interface ManagedChildInfo<T extends string | number> {
-    /**
-     * A unique value representing this child.
-     *
-     * If a `number`, then it's like the index to an array. There can be holes/gaps, even negative numbers, but children are contiguous to a degree. There can be a child "before" or "after" this one.
-     *
-     * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
-     */
-    index: T;
-}
-export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
-export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any>> {
     /**
      * Runs after one or more children have updated their information (index, etc.).
@@ -49,36 +24,6 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
      */
     onChildrenCountChange?: Nullable<((count: number) => void)>;
 }
-export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
-}
-/**
- * Basically all `use*Child` functions contain the same two parameters, plus the extras:
- *
- * `context` and `info`
- *
- * This provides them both, then you provide all the other `use*Parameters` members.
- */
-export interface UseGenericChildParameters<C extends {} | null, M extends {}> {
-    context: C;
-    info: M;
-}
-/**
- * Note: Child parameter types should not inherit from this unless they actually call `useManagedChild`.
- *
- * E.G. `UseRovingTabIndexChildParameters` won't extend this, even though it has `info` and `context` parameters.
- * They look similar, should there be a GenericChildParameters type that provides those?
- */
-export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> extends UseGenericChildParameters<UseManagedChildrenContext<M> | null, M> {
-    /**
-     * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
-     */
-    context: UseManagedChildrenContext<M> | null;
-    /**
-     * The exact data that's available from the parent/each sibling element via `getAt` or the other methods on `ManagedChildren`.
-     */
-    info: M;
-}
 export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
     /**
      * @stable
@@ -89,29 +34,36 @@ export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any
      */
     getChildren(): ManagedChildren<M>;
 }
-export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
-    /**
-     * Returns information about the child that rendered itself with the requested key.
-     *
-     * **Everything about this object is stable**. E.G. `managedChildrenReturn` itself, `managedChildrenReturn.getChildren`,
-     * `managedChildrenReturn.getChildren()`, and `managedChildrenReturn.getChildren().getAt`, are all stable.
-     *
-     * @stable
-     */
-    managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
-    context: UseManagedChildrenContext<M>;
+export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> extends Pick<UseManagedChildrenReturnTypeSelf<M>, "getChildren"> {
 }
-export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
-    /**
-     * Returns a proxy to all the information each child rendered with. The function, returned object, and every function within it are all stable.
-     *
-     * @stable
-     */
+export type UseManagedChildParametersSelf<_M> = never;
+export interface UseManagedChildContextSelf<M extends ManagedChildInfo<any>> {
     getChildren(): ManagedChildren<M>;
+    managedChildrenArray: InternalChildInfo<M>;
+    remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
 }
-export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
-    managedChildReturn: UseManagedChildReturnTypeSelf<M>;
+export interface UseManagedChildContext<M extends ManagedChildInfo<any>> {
+    managedChildContext: UseManagedChildContextSelf<M>;
 }
+/**
+ * Information that children and parents use to communicate with each other.
+ *
+ * Other hooks will inherit from this to provide more complicated behavior.
+ */
+export interface ManagedChildInfo<T extends string | number> {
+    /**
+     * A unique value representing this child.
+     *
+     * If a `number`, then it's like the index to an array. There can be holes/gaps, even negative numbers, but children are contiguous to a degree. There can be a child "before" or "after" this one.
+     *
+     * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
+     */
+    index: T;
+}
+export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
+export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
+export type UseManagedChildren<M extends ManagedChildInfo<any>> = GenericHook<"managedChildren", UseManagedChildrenParametersSelf<M>, [], UseManagedChildrenReturnTypeSelf<M>, [StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">]>;
+export type UseManagedChild<M extends ManagedChildInfo<any>> = GenericHook<"managedChild", UseManagedChildParametersSelf<M>, [StandardDepsInfo<M, keyof M>, StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">], UseManagedChildReturnTypeSelf<M>, []>;
 /**
  * Abstraction over the managed children
  */
@@ -181,11 +133,17 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  * @compositeParams
  */
-export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
+export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>(parentParameters: {
+    managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
+}) => {
+    managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
+} & StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">;
 /**
  * @compositeParams
  */
-export declare const useManagedChild: <M extends ManagedChildInfo<string | number>>({ context, info }: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
+export declare const useManagedChild: <M extends ManagedChildInfo<string | number>>({ context, info }: {} & StandardDepsInfo<M, keyof M> & StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">) => {
+    managedChildReturn: UseManagedChildReturnTypeSelf<M>;
+};
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /**
      * Which child is considered active on mount.

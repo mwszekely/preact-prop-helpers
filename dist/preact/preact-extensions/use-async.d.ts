@@ -1,5 +1,5 @@
 import { CaptureFunctionType } from "async-to-sync";
-import { Nullable } from "../util/lib.js";
+import { Nullable } from "../util/types.js";
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {

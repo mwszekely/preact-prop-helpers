@@ -2,6 +2,16 @@ import { EventMapping, createElement, forwardRef, memo, useCallback, useImperati
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
+/*
+export interface UseImperativePropsReturnType<T extends Element> {
+    /**
+     * @stable
+     *
+     *  (The object itself and everything within it are all stable and can be passed around freely)
+     *\/
+    imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
+    props: ElementProps<T>;
+}*/
 let templateElement = null;
 function htmlToElement(parent, html) {
     const document = parent.ownerDocument;

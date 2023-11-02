@@ -61,10 +61,6 @@ export const useListNavigation = monitored(function useListNavigation({ linearNa
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    // Merge the props while keeping them stable
-    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
     return {
         managedChildrenParameters,
         rovingTabIndexReturn,
@@ -81,12 +77,19 @@ export const useListNavigation = monitored(function useListNavigation({ linearNa
  * @compositeParams
  */
 export const useListNavigationChild = monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
-    const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
-    const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
+    const { props, hasCurrentFocusParameters, info, rovingTabIndexChildReturn, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
+    const { pressParameters, textContentParameters, ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    assertEmptyObject(tncr);
+    assertEmptyObject(rticr);
     return {
+        info,
         props,
+        hasCurrentFocusParameters,
+        rovingTabIndexChildReturn,
+        pressParameters,
+        textContentParameters,
         ...tncr,
         ...rticr
     };

@@ -69,7 +69,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow({
 // Stuff for the row as a child of the parent grid
 info: { index, untabbable, ...void3 }, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
-linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
+linearNavigationParameters: { onNavigateLinear, ...linearNavigationParameters }, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
@@ -129,6 +129,7 @@ refElementReturn, ...void1 }) {
         linearNavigationParameters: {
             onNavigateLinear: useStableCallback((next, event) => {
                 setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
+                onNavigateLinear?.(next, event);
             }),
             disableHomeEndKeys: true,
             pageNavigationSize: 0,

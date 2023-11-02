@@ -1,10 +1,12 @@
-import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
-export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
+export interface UseMutationObserverParametersSelf<E extends Element> {
     onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
     onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
     onCharacterData: null | ((info: MutationRecord) => void);
@@ -14,14 +16,11 @@ export interface UseMutationObserverParametersSelf<E extends Element> extends Us
     attributeFilter: string | string[];
 }
 
-
-export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
-    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
-}
-
-export interface UseMutationObserverReturnType<E extends Element> extends UseRefElementReturnType<E> {
-
-}
+export type UseMutationObserver<E extends Element> = GenericHook<
+    "mutationObserver",
+    UseMutationObserverParametersSelf<E>, [StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">],
+    never, [StandardDepsPick<"return", UseRefElement<E>>, StandardDepsPropsStable<E>]
+>;
 
 /**
  * Effectively just a wrapper around a `MutationObserver`.
@@ -30,11 +29,13 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  */
 export const useMutationObserver = monitored(function useMutationObserver<E extends Element>({
     refElementParameters,
-    mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
-}: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
+    mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue },
+    ...void1
+}: Parameter<UseMutationObserver<E>>): ReturnType<UseMutationObserver<E>> {
 
     const { onElementChange, ...rest } = (refElementParameters || {})
 
+    assertEmptyObject(void1);
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];

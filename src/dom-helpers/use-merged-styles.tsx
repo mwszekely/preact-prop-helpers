@@ -1,5 +1,6 @@
 
-import { CSSProperties, ElementProps } from "../util/types.js";
+import { CSSProperties, ElementProps } from "../util/lib.js";
+import { } from "../util/types.js";
 
 function styleStringToObject(style: string): CSSProperties {
     // TODO: This sucks D:

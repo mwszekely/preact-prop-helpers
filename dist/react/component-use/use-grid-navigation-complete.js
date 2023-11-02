@@ -40,7 +40,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
     const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
         singleSelectionParameters,
         multiSelectionParameters,
@@ -84,7 +84,6 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         childrenHaveFocusReturn,
         linearNavigationReturn,
         singleSelectionReturn,
-        multiSelectionReturn,
         typeaheadNavigationReturn,
         rearrangeableChildrenReturn: { rearrange, reverse, shuffle, sort }
     };
@@ -160,14 +159,14 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         ...contextGNR,
         ...contextMC,
     });
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+    const { hasCurrentFocusReturn, propsStable: hcfrPropsStable } = useHasCurrentFocus({
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: ocfc1,
             onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic3),
         }
     });
-    const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, p3, hcfrPropsStable);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -209,7 +208,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+    const { hasCurrentFocusReturn, propsStable: hcfPropsStable } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: null,
             ...hasCurrentFocusParameters
@@ -225,7 +224,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
         untabbable
     };
     const { managedChildReturn } = useManagedChild({ context, info: { ...baseInfo, ...customUserInfo } });
-    const props = useMergedProps(propsStable, propsRti, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, propsRti, hcfPropsStable);
     return {
         props,
         refElementReturn,

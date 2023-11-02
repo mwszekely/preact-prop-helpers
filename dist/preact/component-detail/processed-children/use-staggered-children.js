@@ -2,6 +2,7 @@ import { returnFalse, returnNull, usePassiveState } from "../../preact-extension
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -18,9 +19,8 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link useStaggeredChild}
  */
-export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
-//refElementReturn: { getElement }
- }) {
+export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, ...void1 }) {
+    assertEmptyObject(void1);
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
     // until they fill in.
@@ -160,9 +160,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
  *
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, 
-//refElementReturn: { getElement },
-context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }) {
+export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     // Controls whether we ask the parent to start mounting children after us.
     // (We don't ask when the child becomes visible due to screen-scrolling,

@@ -1,6 +1,6 @@
-import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { Nullable, TargetedPick } from "../../util/lib.js";
-import { OmitStrong, VNode } from "../../util/types.js";
+import { ManagedChildInfo, UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
+import { VNode } from "../../util/lib.js";
+import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick } from "../../util/types.js";
 export interface UseRearrangedChildrenContextSelf {
     provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
 }
@@ -62,16 +62,6 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      */
     children: (VNode | null)[];
 }
-/**
- * All of these functions **MUST** be stable across renders.
- */
-export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
-    context: UseRearrangedChildrenContext;
-}
-export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
-    rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
-}
 export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
     /**
      * Pass an array of not-sorted child information to this function
@@ -117,6 +107,10 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      */
     sort: (direction: "ascending" | "descending") => Promise<void> | void;
 }
+export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = GenericHook<"rearrangeableChildren", UseRearrangeableChildrenParametersSelf<M>, [
+    StandardDepsContext<UseRearrangedChildrenContext, "rearrangeableChildrenContext">,
+    StandardDepsPick<"return", UseManagedChildren<M>, "managedChildrenReturn", "pick", "getChildren">
+], UseRearrangeableChildrenReturnTypeSelf<M>, []>;
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -140,5 +134,9 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  *
  * @compositeParams
  */
-export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
+export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }: {
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
+} & StandardDepsContext<UseRearrangedChildrenContext, "rearrangeableChildrenContext"> & StandardDepsPick<"return", UseManagedChildren<M>, "managedChildrenReturn", "pick", "getChildren">) => {
+    rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
+};
 //# sourceMappingURL=use-rearrangeable-children.d.ts.map

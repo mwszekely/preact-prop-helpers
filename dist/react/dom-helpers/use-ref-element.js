@@ -49,7 +49,7 @@ export const useRefElement = (function useRefElement(args) {
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback((e, prevValue) => {
         if (!(e == null || e instanceof Element)) {
-            console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+            console.assert(e == null || (typeof e == "object" && e instanceof Element), `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
             nonElementWarn.current = true;
         }
         const cleanup = onElementChange?.(e, prevValue);

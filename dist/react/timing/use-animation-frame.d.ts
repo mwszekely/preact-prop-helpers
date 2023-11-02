@@ -1,4 +1,5 @@
-import { ElementProps, Nullable } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
+import { Nullable } from "../util/types.js";
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 interface ContextType {
     addCallback: (callback: RafCallbackType, tag?: any) => void;

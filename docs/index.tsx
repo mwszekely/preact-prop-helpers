@@ -1,9 +1,9 @@
 //import "preact/debug";
 
 import { createContext, render } from "preact";
+import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusContext, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "preact-prop-helpers";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "preact-prop-helpers";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -48,7 +48,7 @@ const DemoUseDraggable = () => {
         </div>)
 }
 
-const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<HTMLDivElement>["context"]>(null!);
+const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusContext<HTMLDivElement>>(null!);
 const DemoUseChildrenHaveFocus = () => {
     const [animate, setAnimate] = useState(false);
     const [maxChildCount, setMaxChildCount] = useState(10);
@@ -93,9 +93,9 @@ const DemoUseChildrenHaveFocus = () => {
 const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ context: useContext(ChildrenHaveFocusContext) });
     const { refElementReturn, propsStable } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
+    const { hasCurrentFocusReturn, propsStable: hcfrPropsStable } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
     return (
-        <div tabIndex={0} {...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable)}>
+        <div tabIndex={0} {...useMergedProps(propsStable, hcfrPropsStable)}>
             Focusable child #{index}
             <input />
             <input />
@@ -322,7 +322,8 @@ const DemoFocus = memo(() => {
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
     const { refElementReturn, propsStable: p2 } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: undefined } });
     const {
-        hasCurrentFocusReturn: { propsStable: p1 }
+        propsStable: hcfrPropsStable,
+        hasCurrentFocusReturn: {  }
     } = useHasCurrentFocus<HTMLDivElement>({
         refElementReturn,
         hasCurrentFocusParameters: {
@@ -360,7 +361,7 @@ const DemoFocus = memo(() => {
                 <li>Regardless of if focus was lost because the <code>body</code> was clicked, was this element (or, optionally, any element within it), the last to be actually focused?</li>
                 <li>Does the window have focus?</li>
             </ul>
-            <div {...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 }))}><span>Outer element</span><input /><input />
+            <div {...(useMergedProps(p2, hcfrPropsStable, { style: { border: "1px solid black" }, tabIndex: 0 }))}><span>Outer element</span><input /><input />
                 <div tabIndex={0} style={{ border: "1px solid black" }}><span>Inner element</span><input /><input /></div>
             </div>
             <div>

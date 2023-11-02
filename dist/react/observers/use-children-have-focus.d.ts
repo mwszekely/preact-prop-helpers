@@ -1,6 +1,7 @@
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
-import { FocusEventType, TargetedPick } from "../util/types.js";
-import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
+import { FocusEventType } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsContext, StandardDepsPick } from "../util/types.js";
+import { UseHasCurrentFocus } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
@@ -9,28 +10,19 @@ export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
      */
     onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
-export interface UseChildrenHaveFocusParameters<T extends Element> {
-    childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<T>;
-}
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
-}
 export interface UseChildrenHaveFocusReturnTypeSelf {
     /** @stable */
     getAnyFocused(): boolean;
 }
-export interface UseChildrenHaveFocusReturnType<T extends Element> {
-    childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeSelf;
-    context: UseChildrenHaveFocusContext<T>;
+export interface UseChildrenHaveFocusContextSelf<T extends Element> {
+    /** @stable */
+    setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
 }
 export interface UseChildrenHaveFocusContext<T extends Element> {
-    childrenHaveFocusChildContext: {
-        /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
-    };
+    childrenHaveFocusChildContext: UseChildrenHaveFocusContextSelf<T>;
 }
-export interface UseChildrenHaveFocusChildParameters<T extends Element> {
-    context: UseChildrenHaveFocusContext<T>;
-}
+export type UseChildrenHaveFocus<ChildElement extends Element> = GenericHook<"childrenHaveFocus", UseChildrenHaveFocusParametersSelf<ChildElement>, [], UseChildrenHaveFocusReturnTypeSelf, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>>]>;
+export type UseChildrenHaveFocusChild<ChildElement extends Element> = GenericHook<"childrenHaveFocusChild", never, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>, "childrenHaveFocusChildContext">], never, [StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">]>;
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -42,9 +34,13 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export declare const useChildrenHaveFocus: <ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>) => UseChildrenHaveFocusReturnType<ChildElement>;
+export declare const useChildrenHaveFocus: <ChildElement extends Element>(args: {
+    childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<ChildElement>;
+}) => {
+    childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeSelf;
+} & StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>, "childrenHaveFocusChildContext">;
 /**
  * @compositeParams
  */
-export declare const useChildrenHaveFocusChild: <E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
+export declare const useChildrenHaveFocusChild: <E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: {} & StandardDepsContext<UseChildrenHaveFocusContext<E>, "childrenHaveFocusChildContext">) => {} & StandardDepsPick<"params", UseHasCurrentFocus<E>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">;
 //# sourceMappingURL=use-children-have-focus.d.ts.map

@@ -1,25 +1,35 @@
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { ElementProps, OmitStrong } from "../../util/types.js";
-import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
-import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
+import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
+import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { UseLinearNavigation } from "./use-linear-navigation.js";
+import { RovingTabIndexChildContext, UseRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
+import { UseTypeaheadNavigation, UseTypeaheadNavigationChild, UseTypeaheadNavigationChildContext, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType } from "./use-typeahead-navigation.js";
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> {
 }
-export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">, OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
-}
-export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">, OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
-    props: ElementProps<ParentOrChildElement>;
-    context: UseListNavigationContext;
-}
+export type UseListNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"listNavigation", never, [
+    StandardDepsPick<"params", UseRovingTabIndex<ParentOrChildElement, ChildElement>>,
+    StandardDepsOmit<"params", UseTypeaheadNavigation<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">,
+    StandardDepsOmit<"params", UseLinearNavigation<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">
+], never, [
+    StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>>,
+    StandardDepsPick<"return", UseTypeaheadNavigation<ParentOrChildElement, ChildElement>>,
+    StandardDepsPick<"return", UseLinearNavigation<ParentOrChildElement, ChildElement>>,
+    StandardDepsContext<UseListNavigationChildContext>,
+    StandardDepsProps<ParentOrChildElement>
+]>;
+export type UseListNavigationChild<ChildElement extends Element> = GenericHook<"listNavigationChild", never, [
+    StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysParameters>,
+    StandardDepsContext<UseListNavigationChildContext>,
+    StandardDepsPick<"return", UseRefElement<ChildElement>, "refElementReturn", "pick", "getElement">
+], never, [
+    StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysReturnType>,
+    StandardDepsProps<ChildElement>,
+    StandardDepsPick<"return", UseTypeaheadNavigationChild<ChildElement>>,
+    StandardDepsPick<"return", UseRovingTabIndexChild<ChildElement>>
+]>;
 /** {@link useListNavigationChild} requires the same `info` that {@link useRovingTabIndexChild} and {@link useTypeaheadNavigationChild} do (there is no `useLinearNavigationChild`) */
 export type UseListNavigationChildInfoKeysParameters = UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters;
 export type UseListNavigationChildInfoKeysReturnType = UseRovingTabIndexChildInfoKeysReturnType | UseTypeaheadNavigationChildInfoKeysReturnType;
-export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationContext, Pick<UseListNavigationChildInfo<ChildElement>, UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters>>, OmitStrong<UseRovingTabIndexChildParameters<ChildElement>, "info" | "context">, OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement>, "info" | "context"> {
-}
-export interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext {
-}
-export interface UseListNavigationChildReturnType<ChildElement extends Element> extends UseRovingTabIndexChildReturnType<ChildElement>, UseTypeaheadNavigationChildReturnType {
-    info: Pick<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysReturnType>;
+export interface UseListNavigationChildContext extends RovingTabIndexChildContext, UseTypeaheadNavigationChildContext {
 }
 /**
  * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
@@ -31,9 +41,9 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  *
  * @hasChild {@link useListNavigationChild}
  */
-export declare const useListNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>) => UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
+export declare const useListNavigation: <ParentElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }: {} & StandardDepsPick<"params", UseRovingTabIndex<ParentElement, ChildElement>> & StandardDepsOmit<"params", UseTypeaheadNavigation<ParentElement, ChildElement>, "rovingTabIndexReturn"> & StandardDepsOmit<"params", UseLinearNavigation<ParentElement, ChildElement>, "rovingTabIndexReturn">) => {} & StandardDepsPick<"return", UseRovingTabIndex<ParentElement, ChildElement>> & StandardDepsPick<"return", UseTypeaheadNavigation<ParentElement, ChildElement>> & StandardDepsPick<"return", UseLinearNavigation<ParentElement, ChildElement>> & StandardDepsContext<UseListNavigationChildContext, keyof UseListNavigationChildContext> & StandardDepsProps<ParentElement>;
 /**
  * @compositeParams
  */
-export declare const useListNavigationChild: <ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
+export declare const useListNavigationChild: <ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }: {} & StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysParameters> & StandardDepsContext<UseListNavigationChildContext, keyof UseListNavigationChildContext> & StandardDepsPick<"return", UseRefElement<ChildElement>, "refElementReturn", "pick", "getElement">) => {} & StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysReturnType> & StandardDepsProps<ChildElement> & StandardDepsPick<"return", UseTypeaheadNavigationChild<ChildElement>> & StandardDepsPick<"return", UseRovingTabIndexChild<ChildElement>>;
 //# sourceMappingURL=use-list-navigation-partial.d.ts.map

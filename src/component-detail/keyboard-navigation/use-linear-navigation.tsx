@@ -3,12 +3,12 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
-import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
+import { ElementProps, EventType, KeyboardEventType, useCallback, useRef } from "../../util/lib.js";
+import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseRearrangeableChildrenReturnType } from "../processed-children/use-rearrangeable-children.js";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { UsePaginatedChildren } from "../processed-children/use-paginated-children.js";
+import { UseRearrangeableChildren } from "../processed-children/use-rearrangeable-children.js";
+import { UseRovingTabIndex } from "./use-roving-tabindex.js";
 export { identity };
 
 export interface LinearNavigationResult {
@@ -19,20 +19,6 @@ export interface LinearNavigationResult {
 /* eslint-disable @typescript-eslint/no-empty-interface */
 export interface UseLinearNavigationReturnTypeSelf { }
 
-export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
-    linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
-}
-
-//export interface UseLinearNavigationChildInfo { }
-
-/** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
-    TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">,
-    TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
-    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
-}
 
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
 
@@ -131,6 +117,16 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     getLowestIndex(): number;
 }
 
+export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<
+    "linearNavigation", 
+    UseLinearNavigationParametersSelf<ChildElement>, [
+        StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">,
+        StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexMangler" | "indexDemangler">,
+        StandardDepsPick<"params", UsePaginatedChildren<ChildElement>, "paginatedChildrenParameters", "pick", "paginationMin" | "paginationMax">
+    ],
+    UseLinearNavigationReturnTypeSelf, [StandardDepsPropsStable<ParentOrChildElement>]
+>;
+
 
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -148,7 +144,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },
     ...void1
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
+}: Parameter<UseLinearNavigation<ParentOrChildElement, ChildElement>>): ReturnType<UseLinearNavigation<ParentOrChildElement, ChildElement>> {
     type R = EventType<any, any>;
 
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);

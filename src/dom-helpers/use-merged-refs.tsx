@@ -1,7 +1,7 @@
 
 
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps, MutableRef, Ref } from "../util/types.js";
+import { ElementProps, MutableRef, Ref } from "../util/lib.js";
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {

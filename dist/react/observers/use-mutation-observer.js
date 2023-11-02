@@ -1,6 +1,7 @@
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 /**
@@ -8,8 +9,9 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
+export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }, ...void1 }) {
     const { onElementChange, ...rest } = (refElementParameters || {});
+    assertEmptyObject(void1);
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
     const attributeKey = attributeFilter?.join(";");

@@ -1,9 +1,8 @@
-import { UsePressParameters } from "../../component-use/use-press.js";
-import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { TargetedPick } from "../../util/lib.js";
-import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { UsePress } from "../../component-use/use-press.js";
+import { UseTextContent } from "../../dom-helpers/use-text-content.js";
+import { KeyboardEventType } from "../../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
     getCurrentTypeahead(): string | null;
@@ -16,7 +15,7 @@ export interface UseTypeaheadNavigationReturnTypeSelf {
      */
     typeaheadStatus: "invalid" | "valid" | "none";
 }
-export interface UseTypeaheadNavigationContextSelf {
+export interface UseTypeaheadNavigationChildContextSelf {
     /**
      * Stable, but don't call during render.
      *
@@ -60,26 +59,26 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      */
     typeaheadTimeout: number;
 }
-export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
-    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
-    context: UseTypeaheadNavigationContext;
-}
-export interface UseTypeaheadNavigationContext {
-    typeaheadNavigationContext: UseTypeaheadNavigationContextSelf;
+export interface UseTypeaheadNavigationChildContext {
+    typeaheadNavigationContext: UseTypeaheadNavigationChildContextSelf;
 }
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
 }
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
-    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
-}
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
-/** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>> {
-}
-export interface UseTypeaheadNavigationChildReturnType extends TargetedPick<UseTextContentParameters<any>, "textContentParameters", "onTextContentChange">, TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
-}
+export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"typeaheadNavigation", UseTypeaheadNavigationParametersSelf<ChildElement>, [
+    StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">
+], UseTypeaheadNavigationReturnTypeSelf, [
+    StandardDepsPropsStable<ParentOrChildElement>,
+    StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">
+]>;
+export type UseTypeaheadNavigationChild<E extends Element> = GenericHook<"typeaheadNavigationChild", never, [
+    StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">,
+    StandardDepsInfo<UseTypeaheadNavigationChildInfo<E>, UseTypeaheadNavigationChildInfoKeysParameters>
+], never, [
+    StandardDepsPick<"params", UseTextContent<E>, "textContentParameters", "pick", "onTextContentChange">,
+    StandardDepsPick<"params", UsePress<E>, "pressParameters", "pick", "excludeSpace">
+]>;
 interface TypeaheadInfo {
     text: string | null;
     unsortedIndex: number;
@@ -93,12 +92,16 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>) => UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: {
+    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<ChildElement>;
+} & StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex" | "getTabbableIndex">) => {
+    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
+} & StandardDepsPropsStable<ParentOrChildElement> & StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">;
 /**
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ...void1 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
+export declare const useTypeaheadNavigationChild: <ChildElement extends Element>({ info: { index, ...void1 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, ...void4 }: {} & StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext"> & StandardDepsInfo<UseTypeaheadNavigationChildInfo<ChildElement>, "index">) => {} & StandardDepsPick<"params", UseTextContent<ChildElement>, "textContentParameters", "pick", "onTextContentChange"> & StandardDepsPick<"params", UsePress<ChildElement>, "pressParameters", "pick", "excludeSpace">;
 /**
  * Your usual binary search implementation.
  *

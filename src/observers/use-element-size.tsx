@@ -1,7 +1,8 @@
 import { getDocument } from "../dom-helpers/use-document-class.js";
-import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPropsStable } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseElementSizeParametersSelf {
@@ -26,10 +27,6 @@ export interface UseElementSizeParametersSelf {
 }
 
 
-export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: UseElementSizeParametersSelf;
-}
-
 export interface ElementSize {
     clientWidth: number;
     scrollWidth: number;
@@ -50,17 +47,18 @@ export interface UseElementSizeReturnTypeSelf {
     getSize(): ElementSize | null;
 }
 
-
-export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf;
-}
+export type UseElementSize<T extends Element> = GenericHook<
+    "elementSize", 
+    UseElementSizeParametersSelf, [StandardDepsOmit<"params", UseRefElement<T>>],
+    UseElementSizeReturnTypeSelf, [StandardDepsOmit<"return", UseRefElement<T>>, StandardDepsPropsStable<T>]
+>;
 
 /**
  * Measures an element, allowing you to react to its changes in size.
  * 
  * @compositeParams
  */
-export const useElementSize = monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+export const useElementSize = monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: Parameter<UseElementSize<E>>): ReturnType<UseElementSize<E>> {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);

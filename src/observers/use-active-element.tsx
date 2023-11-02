@@ -2,7 +2,8 @@
 import { MapOfSets } from "map-and-set-extensions";
 
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
+import { StateUpdater, useEffect } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 
@@ -144,12 +145,6 @@ export interface UseActiveElementParametersSelf {
     //getWindow: Nullable<((document: Document) => Window)>;
 }
 
-
-export interface UseActiveElementParameters {
-
-    activeElementParameters: UseActiveElementParametersSelf;
-}
-
 export interface UseActiveElementReturnTypeSelf {
     /** 
      * Returns whatever element is currently focused, or `null` if there's no focused element
@@ -168,9 +163,11 @@ export interface UseActiveElementReturnTypeSelf {
     getWindowFocused: () => boolean;
 }
 
-export interface UseActiveElementReturnType {
-    activeElementReturn: UseActiveElementReturnTypeSelf;
-}
+export type UseActiveElement = GenericHook<
+    "activeElement", 
+    UseActiveElementParametersSelf, [],
+    UseActiveElementReturnTypeSelf, []
+>;
 
 /**
  * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus 
@@ -183,7 +180,7 @@ export interface UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
+export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: Parameter<UseActiveElement>): ReturnType<UseActiveElement> {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
 
     useEffect(() => {

@@ -1,4 +1,4 @@
-import { ElementProps, Ref } from "../util/types.js";
+import { ElementProps, Ref } from "../util/lib.js";
 /**
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
  *

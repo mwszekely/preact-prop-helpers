@@ -1,4 +1,4 @@
-import { ElementProps } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
 /**
  * When `useMergedProps` encounters a conflict, the function passed here will be called.
  *

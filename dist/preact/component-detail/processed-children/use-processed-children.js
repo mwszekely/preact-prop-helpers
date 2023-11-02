@@ -2,6 +2,7 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { monitored } from "../../util/use-call-count.js";
 import { usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
 import { useRearrangeableChildren } from "./use-rearrangeable-children.js";
@@ -52,12 +53,13 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @hasChild {@link useProcessedChild}
  */
-export const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
+export const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters, ...void1 }) {
+    assertEmptyObject(void1);
     const childCount = childrenUnsorted.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({
+    const { rearrangeableChildrenReturn, } = useRearrangeableChildren({
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
             children: childrenUnsorted,
@@ -79,6 +81,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
+        managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
         paginatedChildrenReturn,
@@ -89,7 +92,8 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, }) {
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, ...void1 }) {
+    assertEmptyObject(void1);
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });

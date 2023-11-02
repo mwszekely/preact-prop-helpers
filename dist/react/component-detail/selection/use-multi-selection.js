@@ -153,7 +153,6 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
             })
         }),
         childrenHaveFocusParameters: { onCompositeFocusChange },
-        multiSelectionReturn: {},
         propsStable: useMemoObject({})
     };
 }

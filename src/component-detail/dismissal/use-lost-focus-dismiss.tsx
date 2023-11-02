@@ -1,10 +1,10 @@
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { UseActiveElementParameters } from "../../observers/use-active-element.js";
+import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
+import { UseActiveElement } from "../../observers/use-active-element.js";
 import { OnPassiveStateChange } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback } from "../../util/lib.js";
-import { FocusEventType, Nullable } from "../../util/types.js";
+import { FocusEventType, useCallback } from "../../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
@@ -22,14 +22,17 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
     dismissLostFocusActive: B | false;
 }
 
-export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> {
-    lostFocusDismissParameters: UseLostFocusDismissParametersSelf<B>;
-    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-}
 
-export interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> extends TargetedPick<UseActiveElementParameters, "activeElementParameters", "onLastActiveElementChange"> {
-}
+
+export type UseLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> = GenericHook<
+    "lostFocusDismiss", 
+    UseLostFocusDismissParametersSelf<B>, [
+        StandardDepsRename<StandardDepsPick<"return", UseRefElement<NonNullable<SourceElement>>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementSourceReturn">,
+        StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">
+    ],
+    never, [StandardDepsPick<"params", UseActiveElement, "activeElementParameters", "pick", "onLastActiveElementChange">]
+>;
+
 
 /**
  * Invokes a callback when focus travels outside of the component's element.
@@ -47,7 +50,7 @@ export const useLostFocusDismiss = monitored(function useLostFocusDismiss<Source
         ...void4
     },
     ...void1
-}: UseLostFocusDismissParameters<SourceElement, PopupElement, B>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
+}: Parameter<UseLostFocusDismiss<SourceElement, PopupElement, B>>): ReturnType<UseLostFocusDismiss<SourceElement, PopupElement, B>> {
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
     assertEmptyObject(void1);

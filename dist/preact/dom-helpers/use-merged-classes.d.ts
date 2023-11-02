@@ -1,4 +1,4 @@
-import { ElementProps } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
 /**
  * Merged the `class` and `className` properties of two sets of props into a single string.
  *

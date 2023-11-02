@@ -1,5 +1,6 @@
-import { ElementProps, Nullable } from "../util/types.js";
-export interface UseDraggableReturnType<E extends EventTarget> {
+import { ElementProps } from "../util/lib.js";
+import { Nullable, Parameter } from "../util/types.js";
+interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
     propsUnstable: ElementProps<E>;
     /**
@@ -19,7 +20,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
     /** @stable */
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
-export interface UseDraggableParameters {
+interface UseDraggableParameters {
     /**
      * Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped.
      * For example, setting this to "copyLink" will allow this this to be dropped onto
@@ -40,6 +41,7 @@ export interface UseDraggableParameters {
         [mimeType: string]: string;
     };
 }
+export type UseDraggable<E extends Element> = (params: UseDraggableParameters) => UseDraggableReturnType<E>;
 /**
  * Allows an element to start a drag operation.
  *
@@ -48,4 +50,5 @@ export interface UseDraggableParameters {
  * {@include } {@link UseDraggableReturnType}
  */
 export declare const useDraggable: <E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters) => UseDraggableReturnType<E>;
+export {};
 //# sourceMappingURL=use-draggable.d.ts.map

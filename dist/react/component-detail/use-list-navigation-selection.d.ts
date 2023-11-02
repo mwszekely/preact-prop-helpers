@@ -1,25 +1,36 @@
-import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
-import { ElementProps, ExtendMerge, OmitStrong, TargetedOmit } from "../util/types.js";
-import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./keyboard-navigation/use-list-navigation-partial.js";
-import { UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType } from "./selection/use-selection.js";
+import { ElementProps } from "../util/lib.js";
+import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { UseListNavigation, UseListNavigationChild, UseListNavigationChildContext, UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType } from "./keyboard-navigation/use-list-navigation-partial.js";
+import { UseSelection, UseSelectionChild, UseSelectionChildContext, UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType } from "./selection/use-selection.js";
 export interface UseListNavigationSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSelectionChildInfo<TabbableChildElement> {
 }
-export interface UseListNavigationSelectionChildContext extends UseListNavigationContext, UseSelectionContext {
+export interface UseListNavigationSelectionChildContext extends UseListNavigationChildContext, UseSelectionChildContext {
 }
-export interface UseListNavigationSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex">, OmitStrong<UseSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn"> {
-}
-export interface UseListNavigationSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseSelectionReturnType<ParentOrChildElement, ChildElement>, "propsStable"> {
-    context: UseListNavigationSelectionChildContext;
-    props: ElementProps<ParentOrChildElement>;
-}
+export type UseListNavigationSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<"listNavigationSelection", never, [
+    StandardDepsPick<"params", UseListNavigation<ParentElement, ChildElement>>,
+    StandardDepsOmit<"params", UseSelection<ParentElement, ChildElement>, "rovingTabIndexReturn">
+], never, [
+    StandardDepsPick<"return", UseListNavigation<ParentElement, ChildElement>>,
+    StandardDepsPick<"return", UseSelection<ParentElement, ChildElement>>,
+    StandardDepsContext<UseListNavigationSelectionChildContext>,
+    StandardDepsProps<ParentElement>
+]>;
+export type UseListNavigationSelectionChild<ChildElement extends Element> = GenericHook<"listNavigationSelectionChild", never, [
+    StandardDepsInfo<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysParameters>,
+    StandardDepsContext<UseListNavigationSelectionChildContext>,
+    StandardDepsPick<"params", UseListNavigationChild<ChildElement>>,
+    StandardDepsPick<"params", UseSelectionChild<ChildElement>>
+], never, [
+    StandardDepsPick<"return", UseListNavigationChild<ChildElement>>,
+    StandardDepsPick<"return", UseSelectionChild<ChildElement>>,
+    StandardDepsInfo<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysReturnType>,
+    {
+        propsChild: ElementProps<ChildElement>;
+        propsTabbable: ElementProps<ChildElement>;
+    }
+]>;
 export type UseListNavigationSelectionChildInfoKeysParameters = UseListNavigationChildInfoKeysParameters | UseSelectionChildInfoKeysParameters;
 export type UseListNavigationSelectionChildInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | UseSelectionChildInfoKeysReturnType;
-export interface UseListNavigationSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseListNavigationSelectionChildContext, Pick<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<ChildElement>, "context" | "info">, OmitStrong<UseSelectionChildParameters<ChildElement, M>, "context" | "info"> {
-}
-export interface UseListNavigationSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement>, UseSelectionChildReturnType<ChildElement, M>>, "props"> {
-    propsTabbable: ElementProps<any>;
-    propsChild: ElementProps<any>;
-}
 /**
  * Combines {@link useListNavigation} and {@link useSelection}.
  *
@@ -29,9 +40,12 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  *
  * @compositeParams
  */
-export declare const useListNavigationSelection: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>) => UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement>;
+export declare const useListNavigationSelection: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }: {} & StandardDepsPick<"params", UseListNavigation<ParentOrChildElement, ChildElement>> & StandardDepsOmit<"params", UseSelection<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">) => {} & StandardDepsPick<"return", UseListNavigation<ParentOrChildElement, ChildElement>> & StandardDepsPick<"return", UseSelection<ParentOrChildElement, ChildElement>> & StandardDepsContext<UseListNavigationSelectionChildContext, keyof UseListNavigationSelectionChildContext> & StandardDepsProps<ParentOrChildElement>;
 /**
  * @compositeParams
  */
-export declare const useListNavigationSelectionChild: <ChildElement extends Element>({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>) => UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>;
+export declare const useListNavigationSelectionChild: <ChildElement extends Element>({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: {} & StandardDepsInfo<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysParameters> & StandardDepsContext<UseListNavigationSelectionChildContext, keyof UseListNavigationSelectionChildContext> & StandardDepsPick<"params", UseListNavigationChild<ChildElement>> & StandardDepsPick<"params", UseSelectionChild<ChildElement>>) => {} & StandardDepsPick<"return", UseListNavigationChild<ChildElement>> & StandardDepsPick<"return", UseSelectionChild<ChildElement>> & StandardDepsInfo<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysReturnType> & {
+    propsChild: ElementProps<ChildElement>;
+    propsTabbable: ElementProps<ChildElement>;
+};
 //# sourceMappingURL=use-list-navigation-selection.d.ts.map

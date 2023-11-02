@@ -106,7 +106,6 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
             focusSelf(true);
         }
     }, [untabbable]);
-    // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
     const setTabbableAt = useCallback((child, t) => { child.setLocallyTabbable(t); }, []);
     const isTabbableValid = useStableCallback((child) => { return !child.untabbable; });

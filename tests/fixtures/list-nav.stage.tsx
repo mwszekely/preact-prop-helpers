@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteListNavigationContext, EventDetail, Nullable, Parameter, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelection, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -17,8 +17,8 @@ export interface ListNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setSingleSelectionAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
-    setSingleSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
+    setSingleSelectionAriaPropName(ariaPropName: Parameter<UseSingleSelection<any, any>>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
+    setSingleSelectionMode(ariaPropName: Parameter<UseSingleSelection<any, any>>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
@@ -115,7 +115,9 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
-        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
+        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus, initiallyTabbedIndex: null },
+        managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenCountChange: null, onChildrenMountChange: null },
+        childrenHaveFocusParameters: { onCompositeFocusChange: null },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         singleSelectionDeclarativeParameters: {
             singleSelectedIndex,
@@ -187,7 +189,7 @@ function TestBasesListNavChildren({ count }: { count: number }) {
 }*/
 
 function Outer({ index }: { index: number }) {
-    const { managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
+    const { managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild<HTMLLIElement>({
         context: useContext(Context3),
         info: { index },
     });

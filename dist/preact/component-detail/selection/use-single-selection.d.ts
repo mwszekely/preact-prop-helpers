@@ -1,12 +1,11 @@
-import { UsePressParameters } from "../../component-use/use-press.js";
-import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { UsePress } from "../../component-use/use-press.js";
+import { UseChildrenHaveFocus } from "../../observers/use-children-have-focus.js";
+import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
+import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
-import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
-import { TargetedPick } from "../../util/lib.js";
-import { ElementProps, Nullable } from "../../util/types.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+import { GenericHook, Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     singleSelected: boolean;
@@ -82,7 +81,7 @@ export interface UseSingleSelectionReturnTypeSelf {
      */
     getSingleSelectedIndex(): number | null;
 }
-export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<SingleSelectionContextSelf>, "singleSelectionMode"> {
+export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<SingleSelectionChildContextSelf>, "singleSelectionMode"> {
     /**
      * Is this child currently the selected child among all its siblings?
      */
@@ -100,32 +99,33 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
     /** @stable */
     getSingleSelectedOffset: () => (number | null);
 }
-export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
-    singleSelectionParameters: UseSingleSelectionParametersSelf;
-}
+export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"singleSelection", UseSingleSelectionParametersSelf, [
+    StandardDepsPick<"return", UseManagedChildren<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
+    StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex">
+], UseSingleSelectionReturnTypeSelf, [
+    StandardDepsContext<UseSingleSelectionChildContext>,
+    StandardDepsPick<"params", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusParameters", "pick", "onCompositeFocusChange">
+]>;
+export type UseSingleSelectionChild<ChildElement extends Element> = GenericHook<"singleSelectionChild", UseSingleSelectionChildParametersSelf, [
+    StandardDepsContext<UseSingleSelectionChildContext>,
+    StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysParameters>
+], UseSingleSelectionChildReturnTypeSelf, [
+    StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">,
+    StandardDepsPick<"params", UsePress<ChildElement>, "pressParameters", "pick", "onPressSync">,
+    StandardDepsProps<ChildElement>,
+    StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysReturnType>
+]>;
 export type UseSingleSelectionChildInfoKeysParameters = "index" | "untabbable";
 export type UseSingleSelectionChildInfoKeysReturnType = "getSingleSelected" | "setLocalSingleSelected" | "singleSelected";
 export interface UseSingleSelectionChildParametersSelf {
     /** When true, this child cannot be selected via single-select, either by focusing it or by clicking it. */
     singleSelectionDisabled: boolean;
 }
-export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseGenericChildParameters<UseSingleSelectionContext, Pick<M, UseSingleSelectionChildInfoKeysParameters>> {
-    singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
-}
-export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
-    props: ElementProps<E>;
-    info: Pick<M, UseSingleSelectionChildInfoKeysReturnType>;
-    singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
-}
-export interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
-    singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
-    context: UseSingleSelectionContext;
-}
-export interface SingleSelectionContextSelf extends RequiredN<Pick<UseSingleSelectionParametersSelf, "singleSelectionMode" | "onSingleSelectedIndexChange">>, Pick<UseSingleSelectionParametersSelf, "singleSelectionAriaPropName"> {
+export interface SingleSelectionChildContextSelf extends RequiredN<Pick<UseSingleSelectionParametersSelf, "singleSelectionMode" | "onSingleSelectedIndexChange">>, Pick<UseSingleSelectionParametersSelf, "singleSelectionAriaPropName"> {
     getSingleSelectedIndex(): number | null;
 }
-export interface UseSingleSelectionContext {
-    singleSelectionContext: SingleSelectionContextSelf;
+export interface UseSingleSelectionChildContext {
+    singleSelectionContext: SingleSelectionChildContextSelf;
 }
 /**
  * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
@@ -136,21 +136,29 @@ export interface UseSingleSelectionContext {
  *
  * @compositeParams
  */
-export declare const useSingleSelection: <ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>) => UseSingleSelectionReturnType<ChildElement>;
+export declare const useSingleSelection: <ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }: {
+    singleSelectionParameters: UseSingleSelectionParametersSelf;
+} & StandardDepsPick<"return", UseManagedChildren<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren"> & StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex">) => {
+    singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
+} & StandardDepsContext<UseSingleSelectionChildContext, "singleSelectionContext"> & StandardDepsPick<"params", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusParameters", "pick", "onCompositeFocusChange">;
 /**
  *
  *
  * @compositeParams
  */
-export declare const useSingleSelectionChild: <ChildElement extends Element>({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>) => UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>>;
+export declare const useSingleSelectionChild: <ChildElement extends Element>({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }: {
+    singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
+} & StandardDepsContext<UseSingleSelectionChildContext, "singleSelectionContext"> & StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysParameters>) => {
+    singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
+} & StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged"> & StandardDepsPick<"params", UsePress<ChildElement>, "pressParameters", "pick", "onPressSync"> & StandardDepsProps<ChildElement> & StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysReturnType>;
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
     singleSelectedIndex: Nullable<number>;
 }
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
+export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<ReturnType<UseSingleSelection<any, ChildElement>>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
 }
-export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<UseSingleSelectionParameters<any, any, any>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
-export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<UseSingleSelectionReturnType<any>, "singleSelectionReturn", "changeSingleSelectedIndex">;
+export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<Parameter<UseSingleSelection<any, any>>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
+export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<ReturnType<UseSingleSelection<any, any>>, "singleSelectionReturn", "changeSingleSelectedIndex">;
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */

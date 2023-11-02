@@ -1,5 +1,6 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
+import { GenericHook, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
+export interface UseMutationObserverParametersSelf<E extends Element> {
     onChildList: null | ((info: {
         addedNodes: NodeList;
         removedNodes: NodeList;
@@ -15,15 +16,13 @@ export interface UseMutationObserverParametersSelf<E extends Element> extends Us
     attributeOldValue: boolean;
     attributeFilter: string | string[];
 }
-export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
-    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
-}
-export interface UseMutationObserverReturnType<E extends Element> extends UseRefElementReturnType<E> {
-}
+export type UseMutationObserver<E extends Element> = GenericHook<"mutationObserver", UseMutationObserverParametersSelf<E>, [StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">], never, [StandardDepsPick<"return", UseRefElement<E>>, StandardDepsPropsStable<E>]>;
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
  */
-export declare const useMutationObserver: <E extends Element>({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }: UseMutationObserverParameters<E>) => UseMutationObserverReturnType<E>;
+export declare const useMutationObserver: <E extends Element>({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }, ...void1 }: {
+    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
+} & StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">) => {} & StandardDepsPick<"return", UseRefElement<E>> & StandardDepsPropsStable<E>;
 //# sourceMappingURL=use-mutation-observer.d.ts.map

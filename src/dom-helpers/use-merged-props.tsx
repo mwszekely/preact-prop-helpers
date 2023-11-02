@@ -1,5 +1,5 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps } from "../util/lib.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";

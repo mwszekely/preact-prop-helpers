@@ -1,23 +1,15 @@
 import { identity } from "lodash-es";
-import { TargetedPick } from "../../util/lib.js";
-import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
-import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseRearrangeableChildrenReturnType } from "../processed-children/use-rearrangeable-children.js";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { KeyboardEventType } from "../../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { UsePaginatedChildren } from "../processed-children/use-paginated-children.js";
+import { UseRearrangeableChildren } from "../processed-children/use-rearrangeable-children.js";
+import { UseRovingTabIndex } from "./use-roving-tabindex.js";
 export { identity };
 export interface LinearNavigationResult {
     valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end";
 }
 export interface UseLinearNavigationReturnTypeSelf {
-}
-export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
-    linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
-}
-/** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">, TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
-    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
     /**
@@ -103,6 +95,11 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      */
     getLowestIndex(): number;
 }
+export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"linearNavigation", UseLinearNavigationParametersSelf<ChildElement>, [
+    StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">,
+    StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexMangler" | "indexDemangler">,
+    StandardDepsPick<"params", UsePaginatedChildren<ChildElement>, "paginatedChildrenParameters", "pick", "paginationMin" | "paginationMax">
+], UseLinearNavigationReturnTypeSelf, [StandardDepsPropsStable<ParentOrChildElement>]>;
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
@@ -113,7 +110,11 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  *
  * @compositeParams
  */
-export declare const useLinearNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>) => UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare const useLinearNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }: {
+    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
+} & StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex" | "getTabbableIndex"> & StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexDemangler" | "indexMangler"> & StandardDepsPick<"params", UsePaginatedChildren<ChildElement>, "paginatedChildrenParameters", "pick", "paginationMax" | "paginationMin">) => {
+    linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
+} & StandardDepsPropsStable<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;

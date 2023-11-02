@@ -25,7 +25,7 @@ import { monitored } from "../util/use-call-count.js";
  */
 export const useCompleteListNavigation = monitored(function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
-refElementParameters, ...void1 }) {
+refElementParameters, managedChildrenParameters, childrenHaveFocusParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -42,7 +42,7 @@ refElementParameters, ...void1 }) {
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
     const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
+    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...chfp }, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
@@ -74,6 +74,8 @@ refElementParameters, ...void1 }) {
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    assertEmptyObject(chfp);
+    assertEmptyObject(mcp1);
     const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     return {
         contextChildren,
@@ -86,7 +88,6 @@ refElementParameters, ...void1 }) {
         linearNavigationReturn,
         rovingTabIndexReturn,
         singleSelectionReturn,
-        multiSelectionReturn,
         typeaheadNavigationReturn,
         childrenHaveFocusReturn,
         refElementReturn,
@@ -99,19 +100,19 @@ refElementParameters, ...void1 }) {
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
 export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
-    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
+    const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, managedChildrenReturn } = useProcessedChildren({
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
-        //refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
         context: contextRPS,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
-        staggeredChildrenReturn
+        staggeredChildrenReturn,
+        managedChildrenReturn
     };
 });
 /**
@@ -139,14 +140,14 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+    const { hasCurrentFocusReturn, propsStable: hcfrPropsStable } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged,
             onCurrentFocusedChanged
         },
         refElementReturn
     });
-    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild);
+    const props = useMergedProps(propsStable, hcfrPropsStable, propsChild);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

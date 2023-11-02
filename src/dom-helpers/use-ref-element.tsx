@@ -1,6 +1,6 @@
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { Nullable, useCallback, useRef } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, useCallback, useRef } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPropsStable } from "../util/types.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
@@ -12,11 +12,8 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      */
     getElement(): T | null;
 }
-export interface UseRefElementReturnType<T extends EventTarget> {
-    /** @stable */
-    propsStable: ElementProps<T>;
-    refElementReturn: UseRefElementReturnTypeSelf<T>;
-}
+
+
 export interface UseRefElementParametersSelf<T> {
     /**
      * Called with the `Element` when it mounts, called with `null` when it unmounts.
@@ -38,9 +35,13 @@ export interface UseRefElementParametersSelf<T> {
     onUnmount?: Nullable<(element: T) => void>;
 }
 
-export interface UseRefElementParameters<T> {
-    refElementParameters: UseRefElementParametersSelf<T>;
-}
+
+export type UseRefElement<E extends Element> = GenericHook<
+    "refElement", 
+    UseRefElementParametersSelf<E>, [],
+    UseRefElementReturnTypeSelf<E>, [StandardDepsPropsStable<E>]
+>;
+
 
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
@@ -77,7 +78,7 @@ export interface UseRefElementParameters<T> {
  * 
  * @compositeParams
  */
-export const useRefElement = (function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
+export const useRefElement = (function useRefElement<T extends Element>(args: Parameter<UseRefElement<T>>): ReturnType<UseRefElement<T>> {
     const nonElementWarn = useRef(false);
     if (nonElementWarn.current) {
         nonElementWarn.current = false;
@@ -92,7 +93,7 @@ export const useRefElement = (function useRefElement<T extends EventTarget>(args
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback<OnPassiveStateChange<T | null, never>>((e, prevValue) => {
         if (!(e == null || e instanceof Element)) {
-            console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+            console.assert(e == null || (typeof e == "object" && (e as any) instanceof Element), `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
             nonElementWarn.current = true;
         }
         const cleanup = onElementChange?.(e, prevValue);

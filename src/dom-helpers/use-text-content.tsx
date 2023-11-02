@@ -1,7 +1,8 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { Nullable, TargetedPick, useEffect } from "../util/lib.js";
-import { UseRefElementReturnType } from "./use-ref-element.js";
+import { useEffect } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { UseRefElement } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
     /**
@@ -20,25 +21,23 @@ export interface UseTextContentParametersSelf<E extends Element> {
     onTextContentChange: Nullable<OnPassiveStateChange<string | null, never>>;
 }
 
-export interface UseTextContentParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    textContentParameters: UseTextContentParametersSelf<E>;
-}
-
 export interface UseTextContentReturnTypeSelf {
     /** Returns the last known value of the element's text content */
     getTextContent: () => string | null;
 }
 
-export interface UseTextContentReturnType {
-    textContentReturn: UseTextContentReturnTypeSelf;
-}
 
+export type UseTextContent<E extends Element> = GenericHook<
+    "textContent", 
+    UseTextContentParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">],
+    UseTextContentReturnTypeSelf, []
+>;
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  * 
  * @compositeParams
  */
-export const useTextContent = (function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
+export const useTextContent = (function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: Parameter<UseTextContent<E>>): ReturnType<UseTextContent<E>> {
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();

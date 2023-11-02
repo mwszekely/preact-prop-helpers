@@ -1,13 +1,9 @@
-import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "../dom-helpers/use-async-handler.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
+import { FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType } from "../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
-export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    pressParameters: UsePressParametersSelf<E>;
-}
 export interface UsePressParametersSelf<E extends EventTarget> {
     /**  */
     onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
@@ -62,10 +58,7 @@ export interface UsePressReturnTypeSelf {
      */
     longPress: boolean | null;
 }
-export interface UsePressReturnType<E extends Element> {
-    pressReturn: UsePressReturnTypeSelf;
-    props: ElementProps<E>;
-}
+export type UsePress<E extends Element> = GenericHook<"press", UsePressParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UsePressReturnTypeSelf, [StandardDepsProps<E>]>;
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
@@ -91,14 +84,11 @@ export interface UsePressReturnType<E extends Element> {
  * @compositeParams
  *
  */
-export declare const usePress: <E extends Element>(args: UsePressParameters<E>) => UsePressReturnType<E>;
-export interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
-    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
-}
-export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
-    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
-}
-export declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
+export declare const usePress: <E extends Element>(args: {
+    pressParameters: UsePressParametersSelf<E>;
+} & StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">) => {
+    pressReturn: UsePressReturnTypeSelf;
+} & StandardDepsProps<E>;
 /**
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *

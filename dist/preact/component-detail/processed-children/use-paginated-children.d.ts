@@ -1,9 +1,9 @@
-import { UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
-import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { TargetedPick } from "../../util/lib.js";
-import { ElementProps, Nullable } from "../../util/types.js";
-import { UseLinearNavigationParameters } from "../keyboard-navigation/use-linear-navigation.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+import { UseChildrenHaveFocus } from "../../observers/use-children-have-focus.js";
+import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
+import { ElementProps } from "../../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+import { UseRearrangeableChildren } from "./use-rearrangeable-children.js";
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
@@ -13,16 +13,6 @@ export interface UsePaginatedChildrenParametersSelf {
     paginationMax: Nullable<number>;
     childCount: Nullable<number>;
 }
-export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
-    paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
-}
-export interface UsePaginatedChildContextSelf {
-    parentIsPaginated: boolean;
-    getDefaultPaginationVisible(i: number): boolean;
-}
-export interface UsePaginatedChildContext {
-    paginatedChildContext: UsePaginatedChildContextSelf;
-}
 export interface UsePaginatedChildrenReturnTypeSelf {
     /**
      * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
@@ -31,9 +21,25 @@ export interface UsePaginatedChildrenReturnTypeSelf {
      */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
 }
-export interface UsePaginatedChildrenReturnType {
-    paginatedChildrenReturn: UsePaginatedChildrenReturnTypeSelf;
-    context: UsePaginatedChildContext;
+export type UsePaginatedChildren<TabbableChildElement extends Element> = GenericHook<"paginatedChildren", UsePaginatedChildrenParametersSelf, [
+    StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexDemangler">,
+    StandardDepsPick<"return", UseManagedChildren<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
+    StandardDepsPick<"return", UseChildrenHaveFocus<TabbableChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused">,
+    StandardDepsPick<"return", UseRovingTabIndex<any, TabbableChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">
+], UsePaginatedChildrenReturnTypeSelf, [StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">]>;
+export type UsePaginatedChild<TabbableChildElement extends Element> = GenericHook<"paginatedChild", never, [
+    StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">,
+    StandardDepsInfo<UsePaginatedChildrenInfo<TabbableChildElement>, "index">
+], UsePaginatedChildReturnTypeSelf, [
+    StandardDepsProps<TabbableChildElement>,
+    StandardDepsInfo<UsePaginatedChildrenInfo<TabbableChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">
+]>;
+export interface UsePaginatedChildContextSelf {
+    parentIsPaginated: boolean;
+    getDefaultPaginationVisible(i: number): boolean;
+}
+export interface UsePaginatedChildContext {
+    paginatedChildContext: UsePaginatedChildContextSelf;
 }
 /**
  * Allows children to stop themselves from rendering outside of a narrow range.
@@ -44,7 +50,11 @@ export interface UsePaginatedChildrenReturnType {
  *
  * @hasChild {@link usePaginatedChild}
  */
-export declare const usePaginatedChildren: <TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }: UsePaginatedChildrenParameters<TabbableChildElement>) => UsePaginatedChildrenReturnType;
+export declare const usePaginatedChildren: <TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }: {
+    paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
+} & StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexDemangler"> & StandardDepsPick<"return", UseManagedChildren<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn", "pick", "getChildren"> & StandardDepsPick<"return", UseChildrenHaveFocus<TabbableChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused"> & StandardDepsPick<"return", UseRovingTabIndex<any, TabbableChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex" | "getTabbableIndex">) => {
+    paginatedChildrenReturn: UsePaginatedChildrenReturnTypeSelf;
+} & StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">;
 export interface UsePaginatedChildParameters {
     info: {
         index: number;
@@ -74,5 +84,7 @@ export interface UsePaginatedChildReturnTypeSelf {
  *
  * @compositeParams
  */
-export declare const usePaginatedChild: <ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters) => UsePaginatedChildReturnType<ChildElement>;
+export declare const usePaginatedChild: <ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: {} & StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext"> & StandardDepsInfo<UsePaginatedChildrenInfo<ChildElement>, "index">) => {
+    paginatedChildReturn: UsePaginatedChildReturnTypeSelf;
+} & StandardDepsProps<ChildElement> & StandardDepsInfo<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">;
 //# sourceMappingURL=use-paginated-children.d.ts.map

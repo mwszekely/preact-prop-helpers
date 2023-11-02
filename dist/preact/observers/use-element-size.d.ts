@@ -1,4 +1,5 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
+import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPropsStable } from "../util/types.js";
 export interface UseElementSizeParametersSelf {
     /**
      * Called any time the browser detects a size change
@@ -18,9 +19,6 @@ export interface UseElementSizeParametersSelf {
      */
     getObserveBox: null | (() => ResizeObserverOptions["box"]);
 }
-export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: UseElementSizeParametersSelf;
-}
 export interface ElementSize {
     clientWidth: number;
     scrollWidth: number;
@@ -39,13 +37,15 @@ export interface UseElementSizeReturnTypeSelf {
     /** @stable */
     getSize(): ElementSize | null;
 }
-export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf;
-}
+export type UseElementSize<T extends Element> = GenericHook<"elementSize", UseElementSizeParametersSelf, [StandardDepsOmit<"params", UseRefElement<T>>], UseElementSizeReturnTypeSelf, [StandardDepsOmit<"return", UseRefElement<T>>, StandardDepsPropsStable<T>]>;
 /**
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
  */
-export declare const useElementSize: <E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
+export declare const useElementSize: <E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: {
+    elementSizeParameters: UseElementSizeParametersSelf;
+} & StandardDepsOmit<"params", UseRefElement<E>>) => {
+    elementSizeReturn: UseElementSizeReturnTypeSelf;
+} & StandardDepsOmit<"return", UseRefElement<E>> & StandardDepsPropsStable<E>;
 //# sourceMappingURL=use-element-size.d.ts.map

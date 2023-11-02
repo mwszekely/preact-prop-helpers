@@ -1,9 +1,10 @@
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
-import { KeyboardEventType, Nullable, useEffect } from "../../util/lib.js";
+import { KeyboardEventType, useEffect } from "../../util/lib.js";
+import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 
@@ -38,10 +39,14 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
     parentDepth: number;
 }
 
-export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> {
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-    escapeDismissParameters: UseEscapeDismissParametersSelf<B>;
-}
+
+export type UseEscapeDismiss<PopupElement extends Element, B extends boolean> = GenericHook<
+    "escapeDismiss",
+    UseEscapeDismissParametersSelf<B>, [
+        StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">
+    ],
+    never, []
+>;
 
 
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__") as keyof Window;
@@ -70,7 +75,10 @@ function getElementDepth(element: Element) {
  * 
  * @compositeParams 
  */
-export const useEscapeDismiss = monitored(function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void {
+export const useEscapeDismiss = monitored(function useEscapeDismiss<PopupElement extends Element, B extends boolean>({
+    escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 },
+    refElementPopupReturn: { getElement, ...void2 }
+}: Parameter<UseEscapeDismiss<PopupElement, B>>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 

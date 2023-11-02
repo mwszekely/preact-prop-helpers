@@ -1,8 +1,7 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
+import { Fragment, VNode, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
-import { VNode } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {

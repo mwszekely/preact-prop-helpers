@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, Parameter, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelection, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -17,8 +17,8 @@ export interface GridNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setSingleSelectionAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
-    setSingleSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
+    setSingleSelectionAriaPropName(ariaPropName: Parameter<UseSingleSelection<any, any>>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
+    setSingleSelectionMode(ariaPropName: Parameter<UseSingleSelection<any, any>>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
@@ -116,7 +116,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         gridNavigationParameters: { onTabbableColumnChange: null, initiallyTabbableColumn: 0 },
         //rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
-        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
+        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus, initiallyTabbedIndex: null },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         refElementParameters: {},
         singleSelectionDeclarativeParameters: {
@@ -180,7 +180,7 @@ function Outer({ index }: { index: number }) {
         props,
         paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
-    } = useProcessedChild({
+    } = useProcessedChild<HTMLTableRowElement>({
         context: useContext(ProcessingChildContext),
         info: { index }
     });
@@ -233,7 +233,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         //gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: returnZero },
         multiSelectionChildParameters: { initiallyMultiSelected: false, multiSelectionDisabled: true, onMultiSelectChange: null },
         singleSelectionChildParameters: { singleSelectionDisabled: disabled },
-        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap", onNavigateLinear: null },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         textContentParameters: { getText: getTextContent, onTextContentChange: null },

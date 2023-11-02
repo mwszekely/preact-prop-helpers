@@ -4076,7 +4076,6 @@
         focusSelf(true);
       }
     }, [untabbable]);
-    // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = T$1(child => {
       return child.getLocallyTabbable();
     }, []);
@@ -4452,7 +4451,6 @@
       index,
       ...void1
     },
-    //textContentReturn: { getTextContent, ...void5 },
     context: {
       typeaheadNavigationContext: {
         sortedTypeaheadInfo,
@@ -4596,10 +4594,6 @@
       paginatedChildrenParameters,
       rearrangeableChildrenReturn
     });
-    // Merge the props while keeping them stable
-    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
     return {
       managedChildrenParameters,
       rovingTabIndexReturn,
@@ -4627,6 +4621,9 @@
   }) {
     const {
       props,
+      hasCurrentFocusParameters,
+      info,
+      rovingTabIndexChildReturn,
       ...rticr
     } = useRovingTabIndexChild({
       context,
@@ -4637,6 +4634,8 @@
       refElementReturn
     });
     const {
+      pressParameters,
+      textContentParameters,
       ...tncr
     } = useTypeaheadNavigationChild({
       context,
@@ -4645,7 +4644,12 @@
       }
     });
     return {
+      info,
       props,
+      hasCurrentFocusParameters,
+      rovingTabIndexChildReturn,
+      pressParameters,
+      textContentParameters,
       ...tncr,
       ...rticr
     };
@@ -4740,7 +4744,10 @@
     },
     context: contextFromParent,
     // Stuff for the row as a parent of child cells
-    linearNavigationParameters,
+    linearNavigationParameters: {
+      onNavigateLinear,
+      ...linearNavigationParameters
+    },
     rovingTabIndexParameters: {
       untabbable: rowIsUntabbableAndSoAreCells,
       initiallyTabbedIndex,
@@ -4855,6 +4862,7 @@
             ideal: next,
             actual: prev?.actual ?? next
           }), event);
+          onNavigateLinear?.(next, event);
         }),
         disableHomeEndKeys: true,
         pageNavigationSize: 0,
@@ -5121,7 +5129,7 @@
         "aria-posinset": index + 1
       }),
       paginatedChildReturn: {
-        /*paginatedVisible,*/parentIsPaginated,
+        parentIsPaginated,
         hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false
       },
       info: {
@@ -5378,8 +5386,8 @@
     staggeredChildrenParameters: {
       staggered,
       childCount
-    }
-    //refElementReturn: { getElement }
+    },
+    ...void1
   }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
     // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -5523,7 +5531,6 @@
     info: {
       index
     },
-    //refElementReturn: { getElement },
     context: {
       staggeredChildContext: {
         parentIsStaggered,
@@ -5647,7 +5654,8 @@
     paginatedChildrenParameters,
     staggeredChildrenParameters,
     context,
-    managedChildrenParameters
+    managedChildrenParameters,
+    ...void1
   }) {
     const childCount = childrenUnsorted.length;
     const {
@@ -5717,6 +5725,7 @@
     });
 
     return {
+      managedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
       paginatedChildrenReturn,
@@ -5732,7 +5741,8 @@
     info: {
       index,
       ...uinfo
-    }
+    },
+    ...void1
   }) {
     const {
       paginatedChildContext,
@@ -5952,7 +5962,6 @@
       childrenHaveFocusParameters: {
         onCompositeFocusChange
       },
-      multiSelectionReturn: {},
       propsStable: useMemoObject({})
     };
   }
@@ -6360,7 +6369,6 @@
         ...void4
       },
       context: contextMS,
-      multiSelectionReturn,
       propsStable,
       ...void2
     } = useMultiSelection({
@@ -6377,7 +6385,6 @@
         ...contextSS,
         ...contextMS
       }),
-      multiSelectionReturn,
       singleSelectionReturn
     };
   }
@@ -6520,7 +6527,7 @@
     // Called (indirectly) by the ref that the element receives.
     const handler = T$1((e, prevValue) => {
       if (!(e == null || e instanceof Element)) {
-        console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+        console.assert(e == null || typeof e == "object" && e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
         nonElementWarn.current = true;
       }
       const cleanup = onElementChange?.(e, prevValue);
@@ -6736,9 +6743,6 @@
     } = useRefElement({
       refElementParameters: {}
     });
-    //const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
-    //const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
-    //const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus" as Listeners); }, [globalOnClose]);
     useBackdropDismiss({
       refElementPopupReturn,
       backdropDismissParameters: {
@@ -8032,7 +8036,8 @@
       focusOpener: focusOpenerUnstable
     },
     activeElementParameters,
-    refElementReturn
+    refElementReturn,
+    ...void1
   }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
@@ -8148,7 +8153,6 @@
         singleSelectionContext,
         multiSelectionContext
       },
-      multiSelectionReturn,
       propsStable,
       singleSelectionReturn,
       ...void1
@@ -8173,7 +8177,6 @@
       props: useMergedProps(props, propsStable),
       rovingTabIndexReturn,
       singleSelectionReturn,
-      multiSelectionReturn,
       typeaheadNavigationReturn
     };
   });
@@ -8316,6 +8319,7 @@
     const {
       context: contextSS,
       propsStable,
+      childrenHaveFocusParameters,
       ...retSS
     } = useSelection({
       childrenHaveFocusReturn,
@@ -8332,6 +8336,7 @@
       context: contextLN,
       props,
       rovingTabIndexReturn,
+      managedChildrenParameters,
       ...retLN
     } = useListNavigation({
       rovingTabIndexParameters: {
@@ -8347,6 +8352,8 @@
     });
     return {
       rovingTabIndexReturn,
+      managedChildrenParameters,
+      childrenHaveFocusParameters,
       ...retSS,
       ...retLN,
       context: useMemoObject({
@@ -8390,8 +8397,8 @@
         untabbable
       },
       context,
-      multiSelectionChildParameters,
-      singleSelectionChildParameters
+      singleSelectionChildParameters,
+      multiSelectionChildParameters
     });
     const {
       hasCurrentFocusParameters: {
@@ -8427,8 +8434,8 @@
         ...infoLN
       },
       rovingTabIndexChildReturn,
-      multiSelectionChildReturn,
       singleSelectionChildReturn,
+      multiSelectionChildReturn,
       textContentParameters,
       propsChild: propsSS,
       propsTabbable: propsLN
@@ -8563,8 +8570,8 @@
       [onfocusout]: onFocusOut
     });
     return {
+      propsStable: propsStable.current,
       hasCurrentFocusReturn: {
-        propsStable: propsStable.current,
         getCurrentFocused: getFocused,
         getCurrentFocusedInner: getFocusedInner
       }
@@ -8633,7 +8640,6 @@
       rovingTabIndexReturn,
       linearNavigationReturn,
       singleSelectionReturn,
-      multiSelectionReturn,
       typeaheadNavigationReturn,
       ...void3
     } = useGridNavigationSelection({
@@ -8717,7 +8723,6 @@
       childrenHaveFocusReturn,
       linearNavigationReturn,
       singleSelectionReturn,
-      multiSelectionReturn,
       typeaheadNavigationReturn,
       rearrangeableChildrenReturn: {
         rearrange,
@@ -8892,7 +8897,8 @@
       ...contextMC
     });
     const {
-      hasCurrentFocusReturn
+      hasCurrentFocusReturn,
+      propsStable: hcfrPropsStable
     } = useHasCurrentFocus({
       refElementReturn,
       hasCurrentFocusParameters: {
@@ -8900,7 +8906,7 @@
         onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic3)
       }
     });
-    const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, p3, hcfrPropsStable);
     return {
       pressParameters,
       hasCurrentFocusReturn,
@@ -8977,7 +8983,8 @@
       }
     });
     const {
-      hasCurrentFocusReturn
+      hasCurrentFocusReturn,
+      propsStable: hcfPropsStable
     } = useHasCurrentFocus({
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: null,
@@ -9002,7 +9009,7 @@
         ...customUserInfo
       }
     });
-    const props = useMergedProps(propsStable, propsRti, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, propsRti, hcfPropsStable);
     return {
       props,
       refElementReturn,
@@ -9058,6 +9065,8 @@
     paginatedChildrenParameters,
     //staggeredChildrenParameters,
     refElementParameters,
+    managedChildrenParameters,
+    childrenHaveFocusParameters,
     ...void1
   }) {
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
@@ -9088,7 +9097,10 @@
       sort
     } = useCreateProcessedChildrenContext();
     const {
-      childrenHaveFocusParameters,
+      childrenHaveFocusParameters: {
+        onCompositeFocusChange: ocfc1,
+        ...chfp
+      },
       managedChildrenParameters: {
         onChildrenMountChange,
         ...mcp1
@@ -9102,7 +9114,6 @@
       linearNavigationReturn,
       rovingTabIndexReturn,
       singleSelectionReturn,
-      multiSelectionReturn,
       typeaheadNavigationReturn,
       props,
       ...void2
@@ -9188,7 +9199,6 @@
       linearNavigationReturn,
       rovingTabIndexReturn,
       singleSelectionReturn,
-      multiSelectionReturn,
       typeaheadNavigationReturn,
       childrenHaveFocusReturn,
       refElementReturn,
@@ -9216,20 +9226,21 @@
       context: contextRPS,
       paginatedChildrenReturn,
       rearrangeableChildrenReturn,
-      staggeredChildrenReturn
+      staggeredChildrenReturn,
+      managedChildrenReturn
     } = useProcessedChildren({
       paginatedChildrenParameters,
       rearrangeableChildrenParameters,
       staggeredChildrenParameters,
       managedChildrenParameters,
-      //refElementReturn: context.processedChildrenContext,
       context
     });
     return {
       context: contextRPS,
       paginatedChildrenReturn,
       rearrangeableChildrenReturn,
-      staggeredChildrenReturn
+      staggeredChildrenReturn,
+      managedChildrenReturn
     };
   });
   /**
@@ -9350,7 +9361,8 @@
     });
     const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
     const {
-      hasCurrentFocusReturn
+      hasCurrentFocusReturn,
+      propsStable: hcfrPropsStable
     } = useHasCurrentFocus({
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged,
@@ -9358,7 +9370,7 @@
       },
       refElementReturn
     });
-    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild);
+    const props = useMergedProps(propsStable, hcfrPropsStable, propsChild);
     return {
       propsChild: props,
       propsTabbable,
@@ -9462,6 +9474,17 @@
     };
   }
 
+  /*
+  export interface UseModalParameters<Listeners extends DismissListenerTypes> extends
+      UseDismissParameters<Listeners>,
+      UseRefElementParameters<any>,
+      OmitStrong<UseFocusTrapParameters<any, any>, "refElementReturn"> {
+      modalParameters: UseModalParametersSelf;
+  }
+   export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
+      propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
+  }
+  */
   /**
    * Combines dismissal hooks and focus trap hooks into one.
    * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
@@ -9573,370 +9596,11 @@
       refElementReturn
     });
     return {
-      propsFocusContainer: useMergedProps(propsStable, props),
       refElementPopupReturn,
       refElementSourceReturn,
+      propsFocusContainer: useMergedProps(propsStable, props),
       propsStablePopup,
       propsStableSource
-    };
-  });
-  function isPromise(p) {
-    return p instanceof Promise;
-  }
-  const Unset = Symbol("Unset");
-  /**
-   * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
-   *
-   * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
-   * Note that part of this is emulating the fact that the sync handler cannot have a return value,
-   * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
-   *
-   * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
-   */
-  function asyncToSync({
-    asyncInput,
-    onInvoke,
-    onInvoked,
-    onFinally: onFinallyAny,
-    onReject,
-    onResolve,
-    onHasError,
-    onHasResult,
-    onError,
-    onReturnValue,
-    capture,
-    onAsyncDebounce,
-    onSyncDebounce,
-    onPending,
-    throttle,
-    wait
-  }) {
-    let pending = false;
-    let syncDebouncing = false;
-    let asyncDebouncing = false;
-    let currentCapture = Unset;
-    const onFinally = () => {
-      // 8. This is run at the end of every invocation of the async handler,
-      // whether it completed or not, and whether it was async or not.
-      onFinallyAny?.();
-      onPending?.(pending = false);
-      let nothingElseToDo = !asyncDebouncing;
-      onAsyncDebounce?.(asyncDebouncing = false);
-      if (nothingElseToDo) ;else {
-        // 9b. Another request to run the async handler came in while we were running this one.
-        // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
-        // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-        console.assert(currentCapture !== Unset);
-        if (currentCapture != Unset) {
-          onSyncDebounce?.(syncDebouncing = true);
-          syncDebounced();
-        }
-      }
-    };
-    const sync = (...args) => {
-      // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
-      // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-      onPending?.(pending = true);
-      console.assert(syncDebouncing == false);
-      onHasError?.(null);
-      onHasResult?.(null);
-      let promiseOrReturn;
-      let hadSyncError = false;
-      try {
-        // 6. Run the function we were given.
-        // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
-        // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-        onInvoke?.();
-        promiseOrReturn = asyncInput(...args);
-        onHasError?.(false);
-      } catch (ex) {
-        hadSyncError = true;
-        onError?.(ex);
-        onInvoked?.("throw");
-      }
-      // 7. Either end immediately, or schedule to end when completed.
-      if (isPromise(promiseOrReturn)) {
-        onInvoked?.("async");
-        promiseOrReturn.then(r => {
-          onResolve?.();
-          onHasResult?.(true);
-          onReturnValue?.(r);
-          return r;
-        }).catch(e => {
-          onReject?.();
-          onHasError?.(true);
-          onError?.(e);
-          return e;
-        }).finally(onFinally);
-      } else {
-        onInvoked?.("sync");
-        if (!hadSyncError) {
-          onResolve?.();
-          onHasResult?.(true);
-          onHasError?.(false);
-        } else {
-          onReject?.();
-          onHasResult?.(false);
-          onHasError?.(true);
-        }
-        onReturnValue?.(promiseOrReturn);
-        onPending?.(pending = false);
-        onFinally();
-      }
-    };
-    // lodash uses "in" instead of checking for `undefined`...
-    const lodashOptions = {
-      leading: !wait,
-      trailing: true
-    };
-    if (throttle) {
-      if (wait == null || wait < throttle) wait = throttle;
-      lodashOptions.maxWait = throttle;
-    }
-    const syncDebounced = debounce(() => {
-      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
-      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-      onSyncDebounce?.(syncDebouncing = false);
-      if (!pending) {
-        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
-        // then we can just go ahead and run the debounced version of our function.
-        console.assert(currentCapture != Unset);
-        sync(...currentCapture);
-      } else {
-        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
-        // then we'll need to delay this one. When that previous invocation finishes, it'll check
-        // to see if it needs to run again, and it will use these new captured arguments from step 2.
-        onAsyncDebounce?.(asyncDebouncing = true);
-      }
-    }, wait || undefined, lodashOptions);
-    return {
-      syncOutput: (...args) => {
-        // 1. Someone just called the sync version of our async function.
-        // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
-        currentCapture = capture?.(...args) ?? [];
-        onSyncDebounce?.(syncDebouncing = true);
-        syncDebounced();
-      },
-      flushSyncDebounce: () => {
-        syncDebounced.flush();
-      },
-      cancelSyncDebounce: () => {
-        syncDebounced.cancel();
-      }
-    };
-  }
-  function identityCapture(...t) {
-    return t;
-  }
-  const AsyncFunction = async function () {}.constructor;
-  /**
-   * Given an async function, returns a function that's suitable for non-async APIs,
-   * along with other information about the current run's status.
-   *
-   * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
-   *
-   * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
-   * this works like Lodash's `throttle` function with the `wait` option always
-   * set to however long the handler takes to complete. A second call to the sync function will be
-   * throttled until the first call has finished. The return value of the function is the result
-   * of the previous invocation, or `undefined` on the first call.
-   *
-   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
-   * first call happens in the same event handler (which means things like calls to `element.focus()`
-   * will work as intended, since that fails when the event is "split up")
-   *
-   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
-   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
-   * is not stable across time because it's a "live" value -- you almost always want the value that it
-   * had at the original time the handler was called). The `capture` option allows you to save that kind of
-   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
-   * the parameters the async handler and sync handler expect respectively.
-   *
-   * {@include } {@link UseAsyncParameters}
-   *
-   * @param asyncHandler - The async function to make sync
-   * @param options - @see {@link UseAsyncParameters}
-   *
-   */
-  const useAsync = monitored(function useAsync(asyncHandler, options) {
-    // Things related to current execution
-    // Because we can both return and throw undefined, 
-    // we need separate state to track their existence too.
-    //
-    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    const [pending, setPending, _getPending] = useState(false);
-    const [result, setResult, _getResult] = useState(undefined);
-    const [error, setError, _getError] = useState(undefined);
-    const [hasError, setHasError, _getHasError] = useState(false);
-    const [hasResult, setHasResult, _getHasResult] = useState(false);
-    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-    const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
-    // Keep track of this for the caller's sake -- we don't really care.
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
-    const incrementCallCount = T$1(() => {
-      setRunCount(c => c + 1);
-    }, []);
-    const incrementResolveCount = T$1(() => {
-      setResolveCount(c => c + 1);
-    }, []);
-    const incrementRejectCount = T$1(() => {
-      setRejectCount(c => c + 1);
-    }, []);
-    const incrementFinallyCount = T$1(() => {
-      setSettleCount(c => c + 1);
-    }, []);
-    /* eslint-disable prefer-const */
-    let {
-      throttle,
-      debounce,
-      capture: captureUnstable
-    } = options ?? {};
-    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
-    const {
-      flushSyncDebounce,
-      syncOutput,
-      cancelSyncDebounce
-    } = F$1(() => {
-      return asyncToSync({
-        asyncInput: asyncHandlerStable,
-        capture: captureStable,
-        onAsyncDebounce: setAsyncDebouncing,
-        onError: setError,
-        onPending: setPending,
-        onReturnValue: setResult,
-        onSyncDebounce: setSyncDebouncing,
-        onHasError: setHasError,
-        onHasResult: setHasResult,
-        onInvoked: setInvocationResult,
-        onInvoke: incrementCallCount,
-        onFinally: incrementFinallyCount,
-        onReject: incrementRejectCount,
-        onResolve: incrementResolveCount,
-        throttle: options?.throttle ?? undefined,
-        wait: options?.debounce ?? undefined
-      });
-    }, [throttle, debounce]);
-    p(() => {
-      return () => cancelSyncDebounce();
-    }, [cancelSyncDebounce]);
-    return {
-      syncHandler: syncOutput,
-      pending,
-      result,
-      error,
-      hasError: hasError || false,
-      hasResult: hasResult || false,
-      resolveCount,
-      rejectCount,
-      settleCount,
-      debouncingAsync: asyncDebouncing,
-      debouncingSync: syncDebouncing,
-      invocationResult,
-      callCount: runCount,
-      flushDebouncedPromise: flushSyncDebounce
-    };
-  });
-
-  /**
-   * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
-   * along with some other information related to the current state.
-   * Does not modify any props.
-   *
-   * @remarks Note that because the handler you provide may be called with a delay, and
-   * because the `value` of, e.g., an `<input>` element will likely have changed by the
-   * time the delay is over, a `capture` function is necessary in order to
-   * save the relevant information from the DOM at call-time. Any other simple event data,
-   * like `mouseX` or `shiftKey` can stay on the event itself and don't
-   * need to be captured &ndash; it's never stale.
-   *
-   * The handler is automatically throttled to only run one at a time.
-   * If the handler is called, and then before it finishes, is called again,
-   * it will be put on hold until the current one finishes, at which point
-   * the second one will run.  If the handler is called a third time before
-   * the first has finished, it will *replace* the second, so only the most
-   * recently called iteration of the handler will run.
-   *
-   *
-   * You may optionally *also* specify debounce and throttle parameters that wait until the
-   * synchronous handler has not been called for the specified number of
-   * milliseconds, at which point we *actually* run the asynchronous handler
-   * according to the logic in the previous paragraph. This is in
-   * *addition* to throttling the handler, and does not replace that behavior.
-   *
-   *
-   * @example
-   * General use
-   * ```tsx
-   * const asyncHandler = async (value: number, e: Event) => {
-   *     [...] // Ex. send to a server and setState when done
-   * };
-   * const {
-   *     // A sync version of asyncHandler
-   *     syncHandler,
-   *     // True while the handler is running
-   *     pending,
-   *     // The error thrown, if any
-   *     error,
-   *     // Show this value while the operation's pending
-   *     currentCapture,
-   *     // And others, see `UseAsyncHandlerReturnType`
-   *     ...rest
-   * } = useAsyncHandler<HTMLInputElement>()({
-   *     asyncHandler,
-   *     // Pass in the capture function that saves event data
-   *     // from being stale.
-   *     capture: e => {
-   *         // `capture` can have side-effects because
-   *         // it's called exactly once per invocation
-   *         e.preventDefault();
-   *
-   *         // Save this value so that it's never stale
-   *         return e.currentTarget.valueAsNumber;
-   *     }
-   * });
-   *
-   * const onInput = pending? null : syncHandler;
-   * ```
-   *
-   * {@include } {@link UseAsyncHandlerParameters}
-   *
-   * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
-   */
-  const useAsyncHandler = monitored(function useAsyncHandler({
-    asyncHandler,
-    capture: originalCapture,
-    ...restAsyncOptions
-  }) {
-    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-    const [hasCapture, setHasCapture] = useState(false);
-    // Wrap around the normal `useAsync` `capture` function to also
-    // keep track of the last value the user actually input.
-    // 
-    // Without this there's no way to re-render the control with
-    // it being both controlled and also having the "correct" value,
-    // and at any rate also protects against sudden exceptions reverting
-    // your change out from under you.
-    const capture = useStableCallback(e => {
-      const captured = originalCapture(e);
-      setCurrentCapture(captured);
-      setHasCapture(true);
-      return [captured, e];
-    });
-    return {
-      getCurrentCapture,
-      currentCapture,
-      hasCapture,
-      ...useAsync(asyncHandler, {
-        capture,
-        ...restAsyncOptions
-      })
     };
   });
   function pressLog(...args) {
@@ -10385,6 +10049,365 @@
       randomIdLabelReturn
     };
   });
+  function isPromise(p) {
+    return p instanceof Promise;
+  }
+  const Unset = Symbol("Unset");
+  /**
+   * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
+   *
+   * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
+   * Note that part of this is emulating the fact that the sync handler cannot have a return value,
+   * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
+   *
+   * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
+   */
+  function asyncToSync({
+    asyncInput,
+    onInvoke,
+    onInvoked,
+    onFinally: onFinallyAny,
+    onReject,
+    onResolve,
+    onHasError,
+    onHasResult,
+    onError,
+    onReturnValue,
+    capture,
+    onAsyncDebounce,
+    onSyncDebounce,
+    onPending,
+    throttle,
+    wait
+  }) {
+    let pending = false;
+    let syncDebouncing = false;
+    let asyncDebouncing = false;
+    let currentCapture = Unset;
+    const onFinally = () => {
+      // 8. This is run at the end of every invocation of the async handler,
+      // whether it completed or not, and whether it was async or not.
+      onFinallyAny?.();
+      onPending?.(pending = false);
+      let nothingElseToDo = !asyncDebouncing;
+      onAsyncDebounce?.(asyncDebouncing = false);
+      if (nothingElseToDo) ;else {
+        // 9b. Another request to run the async handler came in while we were running this one.
+        // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
+        // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
+        console.assert(currentCapture !== Unset);
+        if (currentCapture != Unset) {
+          onSyncDebounce?.(syncDebouncing = true);
+          syncDebounced();
+        }
+      }
+    };
+    const sync = (...args) => {
+      // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
+      // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
+      onPending?.(pending = true);
+      console.assert(syncDebouncing == false);
+      onHasError?.(null);
+      onHasResult?.(null);
+      let promiseOrReturn;
+      let hadSyncError = false;
+      try {
+        // 6. Run the function we were given.
+        // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
+        // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
+        onInvoke?.();
+        promiseOrReturn = asyncInput(...args);
+        onHasError?.(false);
+      } catch (ex) {
+        hadSyncError = true;
+        onError?.(ex);
+        onInvoked?.("throw");
+      }
+      // 7. Either end immediately, or schedule to end when completed.
+      if (isPromise(promiseOrReturn)) {
+        onInvoked?.("async");
+        promiseOrReturn.then(r => {
+          onResolve?.();
+          onHasResult?.(true);
+          onReturnValue?.(r);
+          return r;
+        }).catch(e => {
+          onReject?.();
+          onHasError?.(true);
+          onError?.(e);
+          return e;
+        }).finally(onFinally);
+      } else {
+        onInvoked?.("sync");
+        if (!hadSyncError) {
+          onResolve?.();
+          onHasResult?.(true);
+          onHasError?.(false);
+        } else {
+          onReject?.();
+          onHasResult?.(false);
+          onHasError?.(true);
+        }
+        onReturnValue?.(promiseOrReturn);
+        onPending?.(pending = false);
+        onFinally();
+      }
+    };
+    // lodash uses "in" instead of checking for `undefined`...
+    const lodashOptions = {
+      leading: !wait,
+      trailing: true
+    };
+    if (throttle) {
+      if (wait == null || wait < throttle) wait = throttle;
+      lodashOptions.maxWait = throttle;
+    }
+    const syncDebounced = debounce(() => {
+      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
+      onSyncDebounce?.(syncDebouncing = false);
+      if (!pending) {
+        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+        // then we can just go ahead and run the debounced version of our function.
+        console.assert(currentCapture != Unset);
+        sync(...currentCapture);
+      } else {
+        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
+        // then we'll need to delay this one. When that previous invocation finishes, it'll check
+        // to see if it needs to run again, and it will use these new captured arguments from step 2.
+        onAsyncDebounce?.(asyncDebouncing = true);
+      }
+    }, wait || undefined, lodashOptions);
+    return {
+      syncOutput: (...args) => {
+        // 1. Someone just called the sync version of our async function.
+        // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
+        currentCapture = capture?.(...args) ?? [];
+        onSyncDebounce?.(syncDebouncing = true);
+        syncDebounced();
+      },
+      flushSyncDebounce: () => {
+        syncDebounced.flush();
+      },
+      cancelSyncDebounce: () => {
+        syncDebounced.cancel();
+      }
+    };
+  }
+  function identityCapture(...t) {
+    return t;
+  }
+  const AsyncFunction = async function () {}.constructor;
+  /**
+   * Given an async function, returns a function that's suitable for non-async APIs,
+   * along with other information about the current run's status.
+   *
+   * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
+   *
+   * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
+   * this works like Lodash's `throttle` function with the `wait` option always
+   * set to however long the handler takes to complete. A second call to the sync function will be
+   * throttled until the first call has finished. The return value of the function is the result
+   * of the previous invocation, or `undefined` on the first call.
+   *
+   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
+   * first call happens in the same event handler (which means things like calls to `element.focus()`
+   * will work as intended, since that fails when the event is "split up")
+   *
+   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
+   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
+   * is not stable across time because it's a "live" value -- you almost always want the value that it
+   * had at the original time the handler was called). The `capture` option allows you to save that kind of
+   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
+   * the parameters the async handler and sync handler expect respectively.
+   *
+   * {@include } {@link UseAsyncParameters}
+   *
+   * @param asyncHandler - The async function to make sync
+   * @param options - @see {@link UseAsyncParameters}
+   *
+   */
+  const useAsync = monitored(function useAsync(asyncHandler, options) {
+    // Things related to current execution
+    // Because we can both return and throw undefined, 
+    // we need separate state to track their existence too.
+    //
+    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState(undefined);
+    const [error, setError, _getError] = useState(undefined);
+    const [hasError, setHasError, _getHasError] = useState(false);
+    const [hasResult, setHasResult, _getHasResult] = useState(false);
+    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+    const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
+    // Keep track of this for the caller's sake -- we don't really care.
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
+    const incrementCallCount = T$1(() => {
+      setRunCount(c => c + 1);
+    }, []);
+    const incrementResolveCount = T$1(() => {
+      setResolveCount(c => c + 1);
+    }, []);
+    const incrementRejectCount = T$1(() => {
+      setRejectCount(c => c + 1);
+    }, []);
+    const incrementFinallyCount = T$1(() => {
+      setSettleCount(c => c + 1);
+    }, []);
+    /* eslint-disable prefer-const */
+    let {
+      throttle,
+      debounce,
+      capture: captureUnstable
+    } = options ?? {};
+    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
+    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
+    const {
+      flushSyncDebounce,
+      syncOutput,
+      cancelSyncDebounce
+    } = F$1(() => {
+      return asyncToSync({
+        asyncInput: asyncHandlerStable,
+        capture: captureStable,
+        onAsyncDebounce: setAsyncDebouncing,
+        onError: setError,
+        onPending: setPending,
+        onReturnValue: setResult,
+        onSyncDebounce: setSyncDebouncing,
+        onHasError: setHasError,
+        onHasResult: setHasResult,
+        onInvoked: setInvocationResult,
+        onInvoke: incrementCallCount,
+        onFinally: incrementFinallyCount,
+        onReject: incrementRejectCount,
+        onResolve: incrementResolveCount,
+        throttle: options?.throttle ?? undefined,
+        wait: options?.debounce ?? undefined
+      });
+    }, [throttle, debounce]);
+    p(() => {
+      return () => cancelSyncDebounce();
+    }, [cancelSyncDebounce]);
+    return {
+      syncHandler: syncOutput,
+      pending,
+      result,
+      error,
+      hasError: hasError || false,
+      hasResult: hasResult || false,
+      resolveCount,
+      rejectCount,
+      settleCount,
+      debouncingAsync: asyncDebouncing,
+      debouncingSync: syncDebouncing,
+      invocationResult,
+      callCount: runCount,
+      flushDebouncedPromise: flushSyncDebounce
+    };
+  });
+
+  /**
+   * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
+   * along with some other information related to the current state.
+   * Does not modify any props.
+   *
+   * @remarks Note that because the handler you provide may be called with a delay, and
+   * because the `value` of, e.g., an `<input>` element will likely have changed by the
+   * time the delay is over, a `capture` function is necessary in order to
+   * save the relevant information from the DOM at call-time. Any other simple event data,
+   * like `mouseX` or `shiftKey` can stay on the event itself and don't
+   * need to be captured &ndash; it's never stale.
+   *
+   * The handler is automatically throttled to only run one at a time.
+   * If the handler is called, and then before it finishes, is called again,
+   * it will be put on hold until the current one finishes, at which point
+   * the second one will run.  If the handler is called a third time before
+   * the first has finished, it will *replace* the second, so only the most
+   * recently called iteration of the handler will run.
+   *
+   *
+   * You may optionally *also* specify debounce and throttle parameters that wait until the
+   * synchronous handler has not been called for the specified number of
+   * milliseconds, at which point we *actually* run the asynchronous handler
+   * according to the logic in the previous paragraph. This is in
+   * *addition* to throttling the handler, and does not replace that behavior.
+   *
+   *
+   * @example
+   * General use
+   * ```tsx
+   * const asyncHandler = async (value: number, e: Event) => {
+   *     [...] // Ex. send to a server and setState when done
+   * };
+   * const {
+   *     // A sync version of asyncHandler
+   *     syncHandler,
+   *     // True while the handler is running
+   *     pending,
+   *     // The error thrown, if any
+   *     error,
+   *     // Show this value while the operation's pending
+   *     currentCapture,
+   *     // And others, see `UseAsyncHandlerReturnType`
+   *     ...rest
+   * } = useAsyncHandler<HTMLInputElement>()({
+   *     asyncHandler,
+   *     // Pass in the capture function that saves event data
+   *     // from being stale.
+   *     capture: e => {
+   *         // `capture` can have side-effects because
+   *         // it's called exactly once per invocation
+   *         e.preventDefault();
+   *
+   *         // Save this value so that it's never stale
+   *         return e.currentTarget.valueAsNumber;
+   *     }
+   * });
+   *
+   * const onInput = pending? null : syncHandler;
+   * ```
+   *
+   * {@include } {@link UseAsyncHandlerParameters}
+   *
+   * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
+   */
+  const useAsyncHandler = monitored(function useAsyncHandler({
+    asyncHandler,
+    capture: originalCapture,
+    ...restAsyncOptions
+  }) {
+    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+    const [hasCapture, setHasCapture] = useState(false);
+    // Wrap around the normal `useAsync` `capture` function to also
+    // keep track of the last value the user actually input.
+    // 
+    // Without this there's no way to re-render the control with
+    // it being both controlled and also having the "correct" value,
+    // and at any rate also protects against sudden exceptions reverting
+    // your change out from under you.
+    const capture = useStableCallback(e => {
+      const captured = originalCapture(e);
+      setCurrentCapture(captured);
+      setHasCapture(true);
+      return [captured, e];
+    });
+    return {
+      getCurrentCapture,
+      currentCapture,
+      hasCapture,
+      ...useAsync(asyncHandler, {
+        capture,
+        ...restAsyncOptions
+      })
+    };
+  });
 
   /**
    * Allows an element to start a drag operation.
@@ -10619,6 +10642,17 @@
       dropError
     };
   });
+
+  /*
+  export interface UseImperativePropsReturnType<T extends Element> {
+      /**
+       * @stable
+       *
+       *  (The object itself and everything within it are all stable and can be passed around freely)
+       *\/
+      imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
+      props: ElementProps<T>;
+  }*/
   let templateElement = null;
   function htmlToElement(parent, html) {
     const document = parent.ownerDocument;
@@ -10923,12 +10957,14 @@
         onLastFocusedChanged,
         onLastFocusedInnerChanged,
         ...void1
-      }
+      },
+      ...void3
     } = args;
     const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, runImmediately);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, runImmediately);
     const {
-      activeElementReturn
+      activeElementReturn,
+      ...void2
     } = useActiveElement({
       activeElementParameters: {
         onLastActiveElementChange: T$1((lastActiveElement, prevLastActiveElement, e) => {
@@ -11011,7 +11047,9 @@
         // A function provided by you that is only called when no children are tabbable
         focusSelfParent: focus,
         // This can be used to track when the user navigates between rows for any reason
-        onTabbableIndexChange: setTabbableRow
+        onTabbableIndexChange: setTabbableRow,
+        // Which row is initially tabbable? (Defaults to the selected row, if any)
+        initiallyTabbedIndex: null
       },
       // `useSingleSelection` is a separate hook that you could call with these parameters:
       typeaheadNavigationParameters: {
@@ -11111,8 +11149,11 @@
         // Largely convenience only (since the caller likely already knows the selected index, but just in case)
         getSingleSelectedIndex
       },
-      multiSelectionReturn: {},
-      refElementReturn: {},
+      //multiSelectionReturn: { },
+      refElementReturn: {
+        // Returns the TR element for this row
+        getElement
+      },
       rearrangeableChildrenReturn: {
         // You must call this hook on your array of children to implement the sorting behavior
         //     useRearrangedChildren,
@@ -11134,14 +11175,6 @@
         // Returns metadata about each row
         getChildren
       },
-      //paginatedChildrenReturn: {
-      // Largely internal use only
-      //    refreshPagination
-      //},
-      //staggeredChildrenReturn: {
-      // When the staggering behavior is currently hiding one or more children, this is true.
-      //     stillStaggering
-      // },
       childrenHaveFocusReturn: {
         // Returns true if any row in this grid is focused
         getAnyFocused
@@ -11320,7 +11353,8 @@
       },
       linearNavigationParameters: {
         navigatePastEnd: "wrap",
-        navigatePastStart: "wrap"
+        navigatePastStart: "wrap",
+        onNavigateLinear: null
       },
       rovingTabIndexParameters: {
         onTabbableIndexChange: useStableCallback(i => {
@@ -11589,7 +11623,16 @@
       rovingTabIndexParameters: {
         onTabbableIndexChange: null,
         untabbable,
-        focusSelfParent: focus
+        focusSelfParent: focus,
+        initiallyTabbedIndex: 0
+      },
+      childrenHaveFocusParameters: {
+        onCompositeFocusChange: null
+      },
+      managedChildrenParameters: {
+        onAfterChildLayoutEffect: null,
+        onChildrenCountChange: null,
+        onChildrenMountChange: null
       },
       singleSelectionDeclarativeParameters: {
         singleSelectedIndex,
@@ -11878,6 +11921,9 @@
       paginatedChildrenParameters: {
         paginationMax: max,
         paginationMin: min
+      },
+      childrenHaveFocusParameters: {
+        onCompositeFocusChange: null
       },
       rearrangeableChildrenParameters: {
         getIndex: T$1(a => a.props.index, []),
@@ -12280,7 +12326,8 @@
       refElementParameters: {}
     });
     const {
-      hasCurrentFocusReturn
+      hasCurrentFocusReturn,
+      propsStable: hcfrPropsStable
     } = useHasCurrentFocus({
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: null,
@@ -12290,7 +12337,7 @@
     });
     return o$1("div", {
       tabIndex: 0,
-      ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable),
+      ...useMergedProps(propsStable, hcfrPropsStable),
       children: ["Focusable child #", index, o$1("input", {}), o$1("input", {})]
     });
   };
@@ -12652,9 +12699,8 @@
       }
     });
     const {
-      hasCurrentFocusReturn: {
-        propsStable: p1
-      }
+      propsStable: hcfrPropsStable,
+      hasCurrentFocusReturn: {}
     } = useHasCurrentFocus({
       refElementReturn,
       hasCurrentFocusParameters: {
@@ -12698,7 +12744,7 @@
           children: "Does the window have focus?"
         })]
       }), o$1("div", {
-        ...useMergedProps(p2, p1, {
+        ...useMergedProps(p2, hcfrPropsStable, {
           style: {
             border: "1px solid black"
           },

@@ -1,11 +1,11 @@
 
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { Nullable, TargetedPick, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { OmitStrong, VNode } from "../../util/types.js";
+import { VNode, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
@@ -121,18 +121,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
     children: (VNode | null)[];
 }
 
-/**
- * All of these functions **MUST** be stable across renders.
- */
-export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
-    context: UseRearrangedChildrenContext;
-}
 
-
-export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
-    rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
-}
 
 export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
 
@@ -192,6 +181,14 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
 
 }
 
+export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = GenericHook<
+    "rearrangeableChildren", 
+    UseRearrangeableChildrenParametersSelf<M>, [
+        StandardDepsContext<UseRearrangedChildrenContext, "rearrangeableChildrenContext">,
+        StandardDepsPick<"return", UseManagedChildren<M>, "managedChildrenReturn", "pick","getChildren">
+    ],
+    UseRearrangeableChildrenReturnTypeSelf<M>, []
+>;
 
 
 /**
@@ -221,7 +218,7 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
     managedChildrenReturn: { getChildren },
     context: { rearrangeableChildrenContext: { provideManglers } }
-}: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
+}: Parameter<UseRearrangeableChildren<M>>): ReturnType<UseRearrangeableChildren<M>> {
     useEnsureStability("useRearrangeableChildren", getIndex);
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.

@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useMergedProps, useProcessedChild, useStableCallback, useState } from "preact-prop-helpers";
 import { memo } from "preact/compat";
 import { StateUpdater, useCallback, useContext, useEffect, useMemo } from "preact/hooks";
 
@@ -30,6 +30,8 @@ export const DemoUseGrid = memo(() => {
             focusSelfParent: focus,
             // This can be used to track when the user navigates between rows for any reason
             onTabbableIndexChange: setTabbableRow,
+            // Which row is initially tabbable? (Defaults to the selected row, if any)
+            initiallyTabbedIndex: null,
         },
         // `useSingleSelection` is a separate hook that you could call with these parameters:
         typeaheadNavigationParameters: {
@@ -131,10 +133,11 @@ export const DemoUseGrid = memo(() => {
             // Largely convenience only (since the caller likely already knows the selected index, but just in case)
             getSingleSelectedIndex,
         },
-        multiSelectionReturn: {
-            // Nothing, actually
+        //multiSelectionReturn: { },
+        refElementReturn: { 
+            // Returns the TR element for this row
+            getElement 
         },
-        refElementReturn: { },
         rearrangeableChildrenReturn: {
             // You must call this hook on your array of children to implement the sorting behavior
             //     useRearrangedChildren,
@@ -156,19 +159,10 @@ export const DemoUseGrid = memo(() => {
             // Returns metadata about each row
             getChildren
         },
-        //paginatedChildrenReturn: {
-        // Largely internal use only
-        //    refreshPagination
-        //},
-        //staggeredChildrenReturn: {
-        // When the staggering behavior is currently hiding one or more children, this is true.
-        //     stillStaggering
-        // },
         childrenHaveFocusReturn: {
             // Returns true if any row in this grid is focused
             getAnyFocused
         },
-
     } = allReturnInfo;
 
 
@@ -277,13 +271,13 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
 
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, CustomGridInfo>;
-    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+    const ret: ReturnType<UseCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
 
         context: contextFromParent,
         info: { index, foo: "bar", untabbable: hidden },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
 
-        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap", onNavigateLinear: null },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },

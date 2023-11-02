@@ -1,7 +1,6 @@
-import { UseBlockingElementParameters } from "../dom-helpers/use-blocking-element.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { TargetedPick } from "../util/lib.js";
-import { ElementProps, OmitStrong } from "../util/types.js";
+import { UseBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { UseRefElement } from "../dom-helpers/use-ref-element.js";
+import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -41,12 +40,10 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      */
     focusOpener(lastFocused: SourceElement | null): void;
 }
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">, OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
-    focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
-}
-export interface UseFocusTrapReturnType<E extends Element> {
-    props: ElementProps<E>;
-}
+export type UseFocusTrap<SourceElement extends Element | null, PopupElement extends Element> = GenericHook<"focusTrap", UseFocusTrapParametersSelf<SourceElement, PopupElement>, [
+    StandardDepsPick<"return", UseRefElement<NonNullable<PopupElement>>, "refElementReturn", "pick", "getElement">,
+    StandardDepsOmit<"params", UseBlockingElement, "blockingElementParameters">
+], never, [StandardDepsProps<PopupElement>]>;
 /**
  * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.
  *
@@ -55,7 +52,9 @@ export interface UseFocusTrapReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
+export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn, ...void1 }: {
+    focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
+} & StandardDepsPick<"return", UseRefElement<NonNullable<PopupElement>>, "refElementReturn", "pick", "getElement"> & StandardDepsOmit<"params", UseBlockingElement, "blockingElementParameters">) => {} & StandardDepsProps<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

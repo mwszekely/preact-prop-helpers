@@ -64,7 +64,7 @@ export function useTagProps<P>(props: P, tag: `data-${TagPropPrefices}`): P {
         });
 
         return useMemo(() => {
-            return { ...props, [propsIdTag]: true/*, [tag as never]: true*/ };
+            return { ...props, [propsIdTag]: true };
         }, [props, tag]);
     }
     else {
