@@ -3,7 +3,7 @@ import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EventType, StateUpdater } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> {
@@ -134,7 +134,7 @@ export interface RovingTabIndexChildContextSelf {
      */
     reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 }
-export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElement extends Element> = GenericHook<"rovingTabIndex", UseRovingTabIndexParametersSelf<ParentElement>, [
+export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElement extends Element> = StandardHook<"rovingTabIndex", UseRovingTabIndexParametersSelf<ParentElement>, [
     StandardDepsOmit<"return", UseManagedChildren<UseRovingTabIndexChildInfo<TabbableChildElement>>, never, [
         StandardDepsPick<"return", UseManagedChildren<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
         StandardDepsPick<"return", UseRefElement<ParentElement>, "refElementReturn", "pick", "getElement">
@@ -146,7 +146,7 @@ export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElemen
         StandardDepsPick<"params", UseManagedChildren<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenParameters", "pick", "onChildrenMountChange">
     ]>
 ]>;
-export type UseRovingTabIndexChild<TabbableChildElement extends Element> = GenericHook<"rovingTabIndexChild", never, [
+export type UseRovingTabIndexChild<TabbableChildElement extends Element> = StandardHook<"rovingTabIndexChild", never, [
     StandardDepsContext<RovingTabIndexChildContext, "rovingTabIndexContext">,
     StandardDepsInfo<UseRovingTabIndexChildInfo<TabbableChildElement>, UseRovingTabIndexChildInfoKeysParameters>,
     StandardDepsPick<"return", UseRefElement<TabbableChildElement>, "refElementReturn", "pick", "getElement">

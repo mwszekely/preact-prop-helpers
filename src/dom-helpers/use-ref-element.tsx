@@ -1,6 +1,6 @@
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, useCallback, useRef } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPropsStable } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
@@ -36,7 +36,7 @@ export interface UseRefElementParametersSelf<T> {
 }
 
 
-export type UseRefElement<E extends Element> = GenericHook<
+export type UseRefElement<E extends Element> = StandardHook<
     "refElement", 
     UseRefElementParametersSelf<E>, [],
     UseRefElementReturnTypeSelf<E>, [StandardDepsPropsStable<E>]

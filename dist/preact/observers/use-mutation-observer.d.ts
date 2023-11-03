@@ -1,5 +1,5 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
-import { GenericHook, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 export interface UseMutationObserverParametersSelf<E extends Element> {
     onChildList: null | ((info: {
         addedNodes: NodeList;
@@ -16,7 +16,7 @@ export interface UseMutationObserverParametersSelf<E extends Element> {
     attributeOldValue: boolean;
     attributeFilter: string | string[];
 }
-export type UseMutationObserver<E extends Element> = GenericHook<"mutationObserver", UseMutationObserverParametersSelf<E>, [StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">], never, [StandardDepsPick<"return", UseRefElement<E>>, StandardDepsPropsStable<E>]>;
+export type UseMutationObserver<E extends Element> = StandardHook<"mutationObserver", UseMutationObserverParametersSelf<E>, [StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">], never, [StandardDepsPick<"return", UseRefElement<E>>, StandardDepsPropsStable<E>]>;
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *

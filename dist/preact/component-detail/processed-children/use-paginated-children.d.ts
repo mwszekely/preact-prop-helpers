@@ -1,7 +1,7 @@
 import { UseChildrenHaveFocus } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UseRearrangeableChildren } from "./use-rearrangeable-children.js";
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
@@ -21,13 +21,13 @@ export interface UsePaginatedChildrenReturnTypeSelf {
      */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
 }
-export type UsePaginatedChildren<TabbableChildElement extends Element> = GenericHook<"paginatedChildren", UsePaginatedChildrenParametersSelf, [
+export type UsePaginatedChildren<TabbableChildElement extends Element> = StandardHook<"paginatedChildren", UsePaginatedChildrenParametersSelf, [
     StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexDemangler">,
     StandardDepsPick<"return", UseManagedChildren<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
     StandardDepsPick<"return", UseChildrenHaveFocus<TabbableChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused">,
     StandardDepsPick<"return", UseRovingTabIndex<any, TabbableChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">
 ], UsePaginatedChildrenReturnTypeSelf, [StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">]>;
-export type UsePaginatedChild<TabbableChildElement extends Element> = GenericHook<"paginatedChild", never, [
+export type UsePaginatedChild<TabbableChildElement extends Element> = StandardHook<"paginatedChild", never, [
     StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">,
     StandardDepsInfo<UsePaginatedChildrenInfo<TabbableChildElement>, "index">
 ], UsePaginatedChildReturnTypeSelf, [

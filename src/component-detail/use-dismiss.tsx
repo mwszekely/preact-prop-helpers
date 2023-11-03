@@ -3,7 +3,7 @@ import { UseActiveElement, useActiveElement } from "../observers/use-active-elem
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, EventType } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsRename } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsRename, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { UseBackdropDismiss, useBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
 import { UseEscapeDismiss, useEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
@@ -60,7 +60,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
     //closeOnLostFocus: Listeners extends "lost-focus" ? true : false;
 }
 
-export type UseDismiss<SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<
+export type UseDismiss<SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = StandardHook<
     "dismiss", 
     UseDismissParametersSelf<Listeners>, [
         StandardDepsPick<"params", UseEscapeDismiss<PopupElement, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "omit", "getDocument">,

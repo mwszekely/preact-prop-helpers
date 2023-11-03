@@ -3,7 +3,7 @@ import { MapOfSets } from "map-and-set-extensions";
 
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { StateUpdater, useEffect } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter } from "../util/types.js";
+import { Nullable, Parameter, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 
@@ -163,7 +163,7 @@ export interface UseActiveElementReturnTypeSelf {
     getWindowFocused: () => boolean;
 }
 
-export type UseActiveElement = GenericHook<
+export type UseActiveElement = StandardHook<
     "activeElement", 
     UseActiveElementParametersSelf, [],
     UseActiveElementReturnTypeSelf, []

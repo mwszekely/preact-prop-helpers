@@ -1,5 +1,5 @@
 import { CSSProperties, ElementProps, Ref, createElement, type RenderableProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { UseRefElement } from "./use-ref-element.js";
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
@@ -35,7 +35,7 @@ interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends 
     tag: T;
     handle: Ref<UseImperativePropsReturnTypeSelf<HTMLElementTagNameMap[T]>>;
 }
-export type UseImperativeProps<T extends Element> = GenericHook<"imperativeProps", never, [StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">], UseImperativePropsReturnTypeSelf<T>, [StandardDepsProps<T>]>;
+export type UseImperativeProps<T extends Element> = StandardHook<"imperativeProps", never, [StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">], UseImperativePropsReturnTypeSelf<T>, [StandardDepsProps<T>]>;
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  *

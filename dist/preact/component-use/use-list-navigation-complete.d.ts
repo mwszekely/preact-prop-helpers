@@ -9,12 +9,12 @@ import { UseChildrenHaveFocus, UseChildrenHaveFocusContext } from "../observers/
 import { UseHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { UseManagedChild, UseManagedChildContext, UseManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, TargetedOmit } from "../util/types.js";
+import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit } from "../util/types.js";
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionChildInfo<ChildElement> {
 }
 export interface UseCompleteListNavigationChildrenInfo<ChildElement extends Element> extends UseProcessedChildInfo<ChildElement> {
 }
-export type UseCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = GenericHook<"completeListNavigation", never, [
+export type UseCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<"completeListNavigation", never, [
     StandardDepsOmit<"params", UseRefElement<ParentElement>>,
     StandardDepsOmit<"params", UseManagedChildren<M>>,
     StandardDepsOmit<"params", UseChildrenHaveFocus<ChildElement>>,
@@ -35,7 +35,7 @@ export type UseCompleteListNavigation<ParentElement extends Element, ChildElemen
         contextProcessing: UseProcessedChildrenContext;
     }
 ]>;
-export type UseCompleteListNavigationChildren<ChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<ChildElement>> = GenericHook<"listNavigationChildren", never, [
+export type UseCompleteListNavigationChildren<ChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<ChildElement>> = StandardHook<"listNavigationChildren", never, [
     StandardDepsOmit<"params", UseProcessedChildren<ChildElement, M>>,
     StandardDepsOmit<"params", UseChildrenHaveFocus<ChildElement>>,
     StandardDepsContext<UseProcessedChildrenContext>
@@ -43,7 +43,7 @@ export type UseCompleteListNavigationChildren<ChildElement extends Element, M ex
     StandardDepsOmit<"return", UseProcessedChildren<ChildElement, M>>,
     StandardDepsContext<UseProcessedChildContext<ChildElement, M>>
 ]>;
-export type UseCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = GenericHook<"listNavigationSelectionChild", never, [
+export type UseCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<"listNavigationSelectionChild", never, [
     StandardDepsInfo<M, UseCompleteListNavigationChildInfoKeysParameters<M>>,
     StandardDepsContext<CompleteListNavigationContext<ChildElement, M>>,
     StandardDepsOmit<"params", UseListNavigationSelectionChild<ChildElement>, "refElementReturn">,

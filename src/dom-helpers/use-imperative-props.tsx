@@ -1,5 +1,5 @@
 import { CSSProperties, ElementProps, EventMapping, Ref, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElement, useRefElement } from "./use-ref-element.js";
@@ -62,7 +62,7 @@ function htmlToElement(parent: Element, html: string) {
     return templateElement.content.firstChild! as Element;
 }
 
-export type UseImperativeProps<T extends Element> = GenericHook<
+export type UseImperativeProps<T extends Element> = StandardHook<
     "imperativeProps", 
     never, [StandardDepsPick<"return", UseRefElement<T>, "refElementReturn", "pick", "getElement">],
     UseImperativePropsReturnTypeSelf<T>, [StandardDepsProps<T>]

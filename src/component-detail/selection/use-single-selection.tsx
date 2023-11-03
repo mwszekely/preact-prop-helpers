@@ -12,7 +12,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { EventType, useCallback, useEffect, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -130,7 +130,7 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
     getSingleSelectedOffset: () => (number | null);
 }
 
-export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
     "singleSelection", 
     UseSingleSelectionParametersSelf, [
         StandardDepsPick<"return", UseManagedChildren<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
@@ -142,7 +142,7 @@ export type UseSingleSelection<ParentOrChildElement extends Element, ChildElemen
     ]
 >;
 
-export type UseSingleSelectionChild<ChildElement extends Element> = GenericHook<
+export type UseSingleSelectionChild<ChildElement extends Element> = StandardHook<
     "singleSelectionChild", 
     UseSingleSelectionChildParametersSelf, [
         StandardDepsContext<UseSingleSelectionChildContext>,

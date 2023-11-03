@@ -1,6 +1,6 @@
 import { UseBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -40,7 +40,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      */
     focusOpener(lastFocused: SourceElement | null): void;
 }
-export type UseFocusTrap<SourceElement extends Element | null, PopupElement extends Element> = GenericHook<"focusTrap", UseFocusTrapParametersSelf<SourceElement, PopupElement>, [
+export type UseFocusTrap<SourceElement extends Element | null, PopupElement extends Element> = StandardHook<"focusTrap", UseFocusTrapParametersSelf<SourceElement, PopupElement>, [
     StandardDepsPick<"return", UseRefElement<NonNullable<PopupElement>>, "refElementReturn", "pick", "getElement">,
     StandardDepsOmit<"params", UseBlockingElement, "blockingElementParameters">
 ], never, [StandardDepsProps<PopupElement>]>;

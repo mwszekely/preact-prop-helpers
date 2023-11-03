@@ -7,7 +7,7 @@ import { returnNull, usePassiveState } from "../preact-extensions/use-passive-st
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
@@ -18,7 +18,7 @@ export interface UseBlockingElementParametersSelf {
     getTarget(): (Element | null)
 }
 
-export type UseBlockingElement = GenericHook<
+export type UseBlockingElement = StandardHook<
     "blockingElement", 
     UseBlockingElementParametersSelf, [StandardDepsPick<"params", UseActiveElement>],
     never, [StandardDepsPick<"return", UseActiveElement>]

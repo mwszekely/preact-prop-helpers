@@ -4,7 +4,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseModalParametersSelf {
@@ -14,7 +14,7 @@ export interface UseModalParametersSelf {
     active: boolean;
 }
 
-export type UseModal<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<
+export type UseModal<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = StandardHook<
     "modal", 
     UseModalParametersSelf, [
         StandardDepsPick<"params", UseDismiss<SourceElement, PopupElement, Listeners>>,

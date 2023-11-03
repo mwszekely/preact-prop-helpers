@@ -12,7 +12,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { EventType, FocusEventType, KeyboardEventType, useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
@@ -63,7 +63,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
     getMultiSelectionDisabled(): boolean;
 }
 
-export type UseMultiSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseMultiSelection<ParentElement extends Element, ChildElement extends Element> = StandardHook<
     "multiSelection",
     UseMultiSelectionParametersSelf, [
         StandardDepsPick<"return", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused">,
@@ -76,7 +76,7 @@ export type UseMultiSelection<ParentElement extends Element, ChildElement extend
     ]
 >;
 
-export type UseMultiSelectionChild<E extends Element> = GenericHook<
+export type UseMultiSelectionChild<E extends Element> = StandardHook<
     "multiSelectionChild",
     UseMultiSelectionChildParametersSelf<E>, [
         StandardDepsInfo<UseMultiSelectionChildInfo<E>, UseMultiSelectionChildInfoKeysParameters>,

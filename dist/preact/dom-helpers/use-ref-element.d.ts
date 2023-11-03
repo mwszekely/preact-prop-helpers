@@ -1,5 +1,5 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPropsStable } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
@@ -29,7 +29,7 @@ export interface UseRefElementParametersSelf<T> {
      */
     onUnmount?: Nullable<(element: T) => void>;
 }
-export type UseRefElement<E extends Element> = GenericHook<"refElement", UseRefElementParametersSelf<E>, [], UseRefElementReturnTypeSelf<E>, [StandardDepsPropsStable<E>]>;
+export type UseRefElement<E extends Element> = StandardHook<"refElement", UseRefElementParametersSelf<E>, [], UseRefElementReturnTypeSelf<E>, [StandardDepsPropsStable<E>]>;
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *

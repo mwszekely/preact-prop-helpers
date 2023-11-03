@@ -3,7 +3,7 @@ import { UseManagedChildren } from "../../preact-extensions/use-managed-children
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { ElementProps, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -30,7 +30,7 @@ export interface UsePaginatedChildrenReturnTypeSelf {
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
 }
 
-export type UsePaginatedChildren<TabbableChildElement extends Element> = GenericHook<
+export type UsePaginatedChildren<TabbableChildElement extends Element> = StandardHook<
     "paginatedChildren", 
     UsePaginatedChildrenParametersSelf, [
         StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexDemangler">,
@@ -41,7 +41,7 @@ export type UsePaginatedChildren<TabbableChildElement extends Element> = Generic
     UsePaginatedChildrenReturnTypeSelf, [StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">]
 >;
 
-export type UsePaginatedChild<TabbableChildElement extends Element> = GenericHook<
+export type UsePaginatedChild<TabbableChildElement extends Element> = StandardHook<
     "paginatedChild", 
     never, [
         StandardDepsContext<UsePaginatedChildContext, "paginatedChildContext">,

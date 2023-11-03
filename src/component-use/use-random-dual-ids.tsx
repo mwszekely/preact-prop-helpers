@@ -1,10 +1,10 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsPick, StandardDepsRename } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { UseRandomId, useRandomId } from "./use-random-id.js";
 
-export type UseRandomDualIds<InputElement extends Element, LabelElement extends Element> = GenericHook<
+export type UseRandomDualIds<InputElement extends Element, LabelElement extends Element> = StandardHook<
     "randomDualIds", 
     never, [
         StandardDepsRename<StandardDepsPick<"params", UseRandomId<InputElement, LabelElement>>, "randomIdParameters", "randomIdInputParameters">,

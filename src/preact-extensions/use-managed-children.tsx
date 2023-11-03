@@ -1,6 +1,6 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -108,14 +108,14 @@ export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Ite
 
 
 export type UseManagedChildren<M extends ManagedChildInfo<any>> =
-    GenericHook<
+    StandardHook<
         "managedChildren", 
         UseManagedChildrenParametersSelf<M>, [],
         UseManagedChildrenReturnTypeSelf<M>, [StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">]
     >;
 
 
-export type UseManagedChild<M extends ManagedChildInfo<any>> = GenericHook<
+export type UseManagedChild<M extends ManagedChildInfo<any>> = StandardHook<
     "managedChild", 
     UseManagedChildParametersSelf<M>, [StandardDepsInfo<M, keyof M>, StandardDepsContext<UseManagedChildContext<M>, "managedChildContext">],
     UseManagedChildReturnTypeSelf<M>, []

@@ -4,7 +4,7 @@ import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, useEffect } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
@@ -52,7 +52,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
     focusOpener(lastFocused: SourceElement | null): void;
 }
 
-export type UseFocusTrap<SourceElement extends Element | null, PopupElement extends Element> = GenericHook<
+export type UseFocusTrap<SourceElement extends Element | null, PopupElement extends Element> = StandardHook<
     "focusTrap", 
     UseFocusTrapParametersSelf<SourceElement, PopupElement>, [
         StandardDepsPick<"return", UseRefElement<NonNullable<PopupElement>>, "refElementReturn", "pick", "getElement">,

@@ -1,6 +1,6 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     setStaggeredVisible(visible: boolean): void;
@@ -13,12 +13,12 @@ export interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
     childCount: number | null;
 }
-export type UseStaggeredChildren = GenericHook<"staggeredChildren", UseStaggeredChildrenParametersSelf, [
+export type UseStaggeredChildren = StandardHook<"staggeredChildren", UseStaggeredChildrenParametersSelf, [
     StandardDepsPick<"return", UseManagedChildren<UseStaggeredChildrenInfo>, "managedChildrenReturn", "pick", "getChildren">
 ], UseStaggeredChildrenReturnTypeSelf, [
     StandardDepsContext<UseStaggeredChildContext>
 ]>;
-export type UseStaggeredChild<E extends Element> = GenericHook<"staggeredChild", never, [
+export type UseStaggeredChild<E extends Element> = StandardHook<"staggeredChild", never, [
     StandardDepsInfo<UseStaggeredChildrenInfo, "index">,
     StandardDepsContext<UseStaggeredChildContext>
 ], UseStaggeredChildReturnTypeSelf, [

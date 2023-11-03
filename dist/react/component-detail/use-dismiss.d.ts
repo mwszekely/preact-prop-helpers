@@ -1,7 +1,7 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElement } from "../observers/use-active-element.js";
 import { ElementProps, EventType } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsRename } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardDepsRename, StandardHook } from "../util/types.js";
 import { UseBackdropDismiss } from "./dismissal/use-backdrop-dismiss.js";
 import { UseEscapeDismiss } from "./dismissal/use-escape-dismiss.js";
 import { UseLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
@@ -23,7 +23,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      */
     onDismiss: (e: EventType<any, any>, reason: Listeners) => void;
 }
-export type UseDismiss<SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<"dismiss", UseDismissParametersSelf<Listeners>, [
+export type UseDismiss<SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = StandardHook<"dismiss", UseDismissParametersSelf<Listeners>, [
     StandardDepsPick<"params", UseEscapeDismiss<PopupElement, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "omit", "getDocument">,
     StandardDepsOmit<"params", UseBackdropDismiss<PopupElement, Listeners extends "backdrop" ? true : false>, "refElementPopupReturn">,
     StandardDepsOmit<"params", UseLostFocusDismiss<SourceElement, PopupElement, Listeners extends "lost-focus" ? true : false>, "refElementPopupReturn" | "refElementSourceReturn">,

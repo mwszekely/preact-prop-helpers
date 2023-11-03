@@ -1,6 +1,6 @@
 import { identity } from "lodash-es";
 import { KeyboardEventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { UsePaginatedChildren } from "../processed-children/use-paginated-children.js";
 import { UseRearrangeableChildren } from "../processed-children/use-rearrangeable-children.js";
 import { UseRovingTabIndex } from "./use-roving-tabindex.js";
@@ -95,7 +95,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      */
     getLowestIndex(): number;
 }
-export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"linearNavigation", UseLinearNavigationParametersSelf<ChildElement>, [
+export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"linearNavigation", UseLinearNavigationParametersSelf<ChildElement>, [
     StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">,
     StandardDepsPick<"return", UseRearrangeableChildren<any>, "rearrangeableChildrenReturn", "pick", "indexMangler" | "indexDemangler">,
     StandardDepsPick<"params", UsePaginatedChildren<ChildElement>, "paginatedChildrenParameters", "pick", "paginationMin" | "paginationMax">

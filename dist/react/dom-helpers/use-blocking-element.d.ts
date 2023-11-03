@@ -1,12 +1,12 @@
 import "blocking-elements";
 import "wicg-inert";
 import { UseActiveElement } from "../observers/use-active-element.js";
-import { GenericHook, Parameter, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 export interface UseBlockingElementParametersSelf {
     enabled: boolean;
     getTarget(): (Element | null);
 }
-export type UseBlockingElement = GenericHook<"blockingElement", UseBlockingElementParametersSelf, [StandardDepsPick<"params", UseActiveElement>], never, [StandardDepsPick<"return", UseActiveElement>]>;
+export type UseBlockingElement = StandardHook<"blockingElement", UseBlockingElementParametersSelf, [StandardDepsPick<"params", UseActiveElement>], never, [StandardDepsPick<"return", UseActiveElement>]>;
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  *

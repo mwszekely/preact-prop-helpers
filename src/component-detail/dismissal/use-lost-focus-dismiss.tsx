@@ -4,7 +4,7 @@ import { OnPassiveStateChange } from "../../preact-extensions/use-passive-state.
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { FocusEventType, useCallback } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
@@ -24,7 +24,7 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
 
 
 
-export type UseLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> = GenericHook<
+export type UseLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> = StandardHook<
     "lostFocusDismiss", 
     UseLostFocusDismissParametersSelf<B>, [
         StandardDepsRename<StandardDepsPick<"return", UseRefElement<NonNullable<SourceElement>>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementSourceReturn">,

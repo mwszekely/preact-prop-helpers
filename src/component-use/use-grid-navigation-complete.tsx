@@ -17,7 +17,7 @@ import { useStableCallback, useStableMergedCallback } from "../preact-extensions
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
-import { GenericHook, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, TargetedOmit } from "../util/types.js";
+import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> =
@@ -37,7 +37,7 @@ export interface UseCompleteGridNavigationRowsInfo<ChildElement extends Element>
     UseProcessedChildInfo<ChildElement>,
     ManagedChildInfo<number> { }
 
-export type UseCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> = GenericHook<
+export type UseCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> = StandardHook<
     "completeGridNavigation", 
     never, [
         StandardDepsOmit<"params", UseGridNavigationSelection<ParentOrRowElement, RowElement>, "rearrangeableChildrenReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn", [
@@ -63,7 +63,7 @@ export type UseCompleteGridNavigation<ParentOrRowElement extends Element, RowEle
     ]
 >;
 
-export type UseCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> = GenericHook<
+export type UseCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> = StandardHook<
     "completeGridNavigationRows", 
     never, [
         StandardDepsPick<"params", UseProcessedChildren<TabbableChildElement, M>>,
@@ -76,7 +76,7 @@ export type UseCompleteGridNavigationRows<TabbableChildElement extends Element, 
         StandardDepsContext<UseProcessedChildContext<TabbableChildElement, M>>
     ]
 >;
-export type UseCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = GenericHook<
+export type UseCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = StandardHook<
     "completeGridNavigationRow", 
     never, [
         StandardDepsInfo<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>,
@@ -101,7 +101,7 @@ export type UseCompleteGridNavigationRow<RowElement extends Element, CellElement
     ]
 
 >;
-export type UseCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = GenericHook<
+export type UseCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = StandardHook<
     "completeGridNavigationCell", 
     never, [
         StandardDepsInfo<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>>,

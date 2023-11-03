@@ -4,7 +4,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ElementProps, EventType, KeyboardEventType, useCallback, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { Nullable, OmitStrong, Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildren } from "../processed-children/use-paginated-children.js";
 import { UseRearrangeableChildren } from "../processed-children/use-rearrangeable-children.js";
@@ -117,7 +117,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     getLowestIndex(): number;
 }
 
-export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
     "linearNavigation", 
     UseLinearNavigationParametersSelf<ChildElement>, [
         StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">,

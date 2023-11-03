@@ -1,5 +1,5 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 import { UseRefElement } from "./use-ref-element.js";
 export interface UseTextContentParametersSelf<E extends Element> {
     /**
@@ -20,7 +20,7 @@ export interface UseTextContentReturnTypeSelf {
     /** Returns the last known value of the element's text content */
     getTextContent: () => string | null;
 }
-export type UseTextContent<E extends Element> = GenericHook<"textContent", UseTextContentParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UseTextContentReturnTypeSelf, []>;
+export type UseTextContent<E extends Element> = StandardHook<"textContent", UseTextContentParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UseTextContentReturnTypeSelf, []>;
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *

@@ -1,7 +1,7 @@
 import { UsePress } from "../../component-use/use-press.js";
 import { UseTextContent } from "../../dom-helpers/use-text-content.js";
 import { KeyboardEventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
@@ -66,13 +66,13 @@ export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends El
 }
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
-export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"typeaheadNavigation", UseTypeaheadNavigationParametersSelf<ChildElement>, [
+export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"typeaheadNavigation", UseTypeaheadNavigationParametersSelf<ChildElement>, [
     StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">
 ], UseTypeaheadNavigationReturnTypeSelf, [
     StandardDepsPropsStable<ParentOrChildElement>,
     StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">
 ]>;
-export type UseTypeaheadNavigationChild<E extends Element> = GenericHook<"typeaheadNavigationChild", never, [
+export type UseTypeaheadNavigationChild<E extends Element> = StandardHook<"typeaheadNavigationChild", never, [
     StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">,
     StandardDepsInfo<UseTypeaheadNavigationChildInfo<E>, UseTypeaheadNavigationChildInfoKeysParameters>
 ], never, [

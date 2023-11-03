@@ -4,7 +4,7 @@ import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 import { EventType } from "../../util/lib.js";
-import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, {
     multiSelected: boolean;
@@ -52,7 +52,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
     getMultiSelected(): boolean;
     getMultiSelectionDisabled(): boolean;
 }
-export type UseMultiSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<"multiSelection", UseMultiSelectionParametersSelf, [
+export type UseMultiSelection<ParentElement extends Element, ChildElement extends Element> = StandardHook<"multiSelection", UseMultiSelectionParametersSelf, [
     StandardDepsPick<"return", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusReturn", "pick", "getAnyFocused">,
     StandardDepsPick<"return", UseManagedChildren<UseMultiSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">
 ], never, [
@@ -60,7 +60,7 @@ export type UseMultiSelection<ParentElement extends Element, ChildElement extend
     StandardDepsContext<UseMultiSelectionChildContext>,
     StandardDepsPropsStable<ParentElement>
 ]>;
-export type UseMultiSelectionChild<E extends Element> = GenericHook<"multiSelectionChild", UseMultiSelectionChildParametersSelf<E>, [
+export type UseMultiSelectionChild<E extends Element> = StandardHook<"multiSelectionChild", UseMultiSelectionChildParametersSelf<E>, [
     StandardDepsInfo<UseMultiSelectionChildInfo<E>, UseMultiSelectionChildInfoKeysParameters>,
     StandardDepsContext<UseMultiSelectionChildContext, "multiSelectionContext">
 ], UseMultiSelectionChildReturnTypeSelf, [

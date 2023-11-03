@@ -1,10 +1,10 @@
 
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, useId, useRef } from "../util/lib.js";
-import { GenericHook, Parameter } from "../util/types.js";
+import { Parameter, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
-export type UseRandomId<S extends Element, T extends Element> = GenericHook<
+export type UseRandomId<S extends Element, T extends Element> = StandardHook<
     "randomId", 
     UseRandomIdParametersSelf, [],
     UseRandomIdReturnTypeSelf, [{ propsSource: ElementProps<S>; propsReferencer: ElementProps<T>; }]

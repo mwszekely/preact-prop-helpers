@@ -1,5 +1,5 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPropsStable } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 export interface UseElementSizeParametersSelf {
     /**
      * Called any time the browser detects a size change
@@ -37,7 +37,7 @@ export interface UseElementSizeReturnTypeSelf {
     /** @stable */
     getSize(): ElementSize | null;
 }
-export type UseElementSize<T extends Element> = GenericHook<"elementSize", UseElementSizeParametersSelf, [StandardDepsOmit<"params", UseRefElement<T>>], UseElementSizeReturnTypeSelf, [StandardDepsOmit<"return", UseRefElement<T>>, StandardDepsPropsStable<T>]>;
+export type UseElementSize<T extends Element> = StandardHook<"elementSize", UseElementSizeParametersSelf, [StandardDepsOmit<"params", UseRefElement<T>>], UseElementSizeReturnTypeSelf, [StandardDepsOmit<"return", UseRefElement<T>>, StandardDepsPropsStable<T>]>;
 /**
  * Measures an element, allowing you to react to its changes in size.
  *

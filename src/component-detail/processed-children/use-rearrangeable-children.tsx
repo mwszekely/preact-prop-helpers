@@ -5,7 +5,7 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { VNode, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick } from "../../util/types.js";
+import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
@@ -181,7 +181,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
 
 }
 
-export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = GenericHook<
+export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = StandardHook<
     "rearrangeableChildren", 
     UseRearrangeableChildrenParametersSelf<M>, [
         StandardDepsContext<UseRearrangedChildrenContext, "rearrangeableChildrenContext">,

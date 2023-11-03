@@ -3,7 +3,7 @@ import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { MouseEventType, useCallback } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
@@ -21,7 +21,7 @@ export interface UseBackdropDismissParametersSelf<B extends boolean> {
     onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
 }
 
-export type UseBackdropDismiss<PopupElement extends Element, B extends boolean> = GenericHook<
+export type UseBackdropDismiss<PopupElement extends Element, B extends boolean> = StandardHook<
     "backdropDismiss", 
     UseBackdropDismissParametersSelf<B>, [
         StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">

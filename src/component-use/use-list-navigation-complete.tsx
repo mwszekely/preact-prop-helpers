@@ -14,13 +14,13 @@ import { useStableCallback, useStableMergedCallback } from "../preact-extensions
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, useCallback } from "../util/lib.js";
-import { GenericHook, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, TargetedOmit } from "../util/types.js";
+import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionChildInfo<ChildElement> { }
 export interface UseCompleteListNavigationChildrenInfo<ChildElement extends Element> extends UseProcessedChildInfo<ChildElement> { }
 
-export type UseCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = GenericHook<
+export type UseCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<
     "completeListNavigation", 
     never, [
         // Ask for parameters for all the hooks this hook calls
@@ -63,7 +63,7 @@ export type UseCompleteListNavigation<ParentElement extends Element, ChildElemen
     ]
 >;
 
-export type UseCompleteListNavigationChildren<ChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<ChildElement>> = GenericHook<
+export type UseCompleteListNavigationChildren<ChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<ChildElement>> = StandardHook<
     "listNavigationChildren", 
     never, [
         StandardDepsOmit<"params", UseProcessedChildren<ChildElement, M>>,
@@ -76,7 +76,7 @@ export type UseCompleteListNavigationChildren<ChildElement extends Element, M ex
     ]
 >;
 
-export type UseCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = GenericHook<
+export type UseCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<
     "listNavigationSelectionChild", 
     never, [
         StandardDepsInfo<M, UseCompleteListNavigationChildInfoKeysParameters<M>>,

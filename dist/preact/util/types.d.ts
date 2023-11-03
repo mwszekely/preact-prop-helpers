@@ -29,12 +29,13 @@ type GenericReturnType<N extends string, R extends {}, Deps extends any[]> = Omi
  * Describes the parameters and return type for a generic "composite args" hook.
  *
  * @param Name -   The name of the hook, as a string
- * @param PSelf -      The "Self" object that this hook needs to operate
+ * @param PSelf -  The "Self" object that this hook needs to operate
  * @param PDeps -  The dependencies that this hook needs to operate (props, context, other hooks, etc.)
- * @param RSelf -      The "Self" object that this hook returns
+ * @param RSelf -  The "Self" object that this hook returns
  * @param RDeps -  The dependencies that this hook returns for other hooks
  */
-export type GenericHook<Name extends string, PSelf extends {}, PDeps extends any[], RSelf extends {}, RDeps extends any[]> = (args: GenericParameters<Name, PSelf, PDeps>) => GenericReturnType<Name, RSelf, RDeps>;
+export type StandardHook<Name extends string, PSelf extends {}, PDeps extends any[], RSelf extends {}, RDeps extends any[]> = (args: GenericParameters<Name, PSelf, PDeps>) => GenericReturnType<Name, RSelf, RDeps>;
+/** Just `Parameters<T>[0]` */
 export type Parameter<T extends (...args: any) => any> = Parameters<T>[0];
 type OmitNever<T> = {
     [K in keyof T as T[K] extends never ? never : K]: T[K];

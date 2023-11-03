@@ -1,6 +1,6 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { KeyboardEventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 export interface UseEscapeDismissParametersSelf<B extends boolean> {
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
@@ -27,7 +27,7 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      */
     parentDepth: number;
 }
-export type UseEscapeDismiss<PopupElement extends Element, B extends boolean> = GenericHook<"escapeDismiss", UseEscapeDismissParametersSelf<B>, [
+export type UseEscapeDismiss<PopupElement extends Element, B extends boolean> = StandardHook<"escapeDismiss", UseEscapeDismissParametersSelf<B>, [
     StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">
 ], never, []>;
 /**

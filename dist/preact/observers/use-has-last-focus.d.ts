@@ -1,6 +1,6 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 import { UseActiveElement } from "./use-active-element.js";
 export interface UseHasLastFocusParametersSelf {
     /**
@@ -24,7 +24,7 @@ export interface UseHasLastFocusReturnTypeSelf {
     /** @stable */
     getLastFocusedInner(): boolean;
 }
-export type UseHasLastFocus<E extends Element> = GenericHook<"hasLastFocus", UseHasLastFocusParametersSelf, [
+export type UseHasLastFocus<E extends Element> = StandardHook<"hasLastFocus", UseHasLastFocusParametersSelf, [
     StandardDepsPick<"params", UseActiveElement, "activeElementParameters">,
     StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">
 ], UseHasLastFocusReturnTypeSelf, [

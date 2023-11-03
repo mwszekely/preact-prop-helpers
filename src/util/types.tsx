@@ -1,4 +1,4 @@
-//export type { CSSProperties, CompositionEventType, DragEventType, EffectCallback, ElementProps, EventMapping, EventType, ExtendMerge, FocusEventType, Fragment, GenericHook, Inputs, JSX, KeyboardEventType, MouseEventType, MutableRef, Nullable, OmitStrong, Parameter, PointerEventType, Reducer, Ref, RefCallback, RenderableProps, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardDepsRename, StateUpdater, TouchEventType, VNode } from "./lib.js";
+//export type { CSSProperties, CompositionEventType, DragEventType, EffectCallback, ElementProps, EventMapping, EventType, ExtendMerge, FocusEventType, Fragment, StandardHook, Inputs, JSX, KeyboardEventType, MouseEventType, MutableRef, Nullable, OmitStrong, Parameter, PointerEventType, Reducer, Ref, RefCallback, RenderableProps, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardDepsRename, StateUpdater, TouchEventType, VNode } from "./lib.js";
 
 import type { ElementProps } from "./lib.js";
 
@@ -32,22 +32,24 @@ type GenericReturnType<N extends string, R extends {}, Deps extends any[]> = Omi
  * Describes the parameters and return type for a generic "composite args" hook.
  * 
  * @param Name -   The name of the hook, as a string
- * @param PSelf -      The "Self" object that this hook needs to operate
+ * @param PSelf -  The "Self" object that this hook needs to operate
  * @param PDeps -  The dependencies that this hook needs to operate (props, context, other hooks, etc.)
- * @param RSelf -      The "Self" object that this hook returns
+ * @param RSelf -  The "Self" object that this hook returns
  * @param RDeps -  The dependencies that this hook returns for other hooks
  */
-export type GenericHook<
+export type StandardHook<
     Name extends string,
     PSelf extends {}, PDeps extends any[],
     RSelf extends {}, RDeps extends any[]
 > = (args: GenericParameters<Name, PSelf, PDeps>) => GenericReturnType<Name, RSelf, RDeps>
 
+/** Just `Parameters<T>[0]` */
 export type Parameter<T extends (...args: any) => any> = Parameters<T>[0];
 
 type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] }
 
 // These types all add something to the parameters/returntype of the hook in question:
+// (as convenience -- they're not strictly necessary)
 
 // These two add props/propsStable
 export interface StandardDepsProps<E extends Element> { props: ElementProps<E>; }

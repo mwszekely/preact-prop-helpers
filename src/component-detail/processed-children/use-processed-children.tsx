@@ -5,14 +5,14 @@ import { ManagedChildren, UseManagedChild, UseManagedChildContext, UseManagedChi
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChild, UsePaginatedChildContext, UsePaginatedChildren, UsePaginatedChildrenInfo, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
 import { UseRearrangeableChildInfo, UseRearrangeableChildren, UseRearrangedChildrenContext, useRearrangeableChildren } from "./use-rearrangeable-children.js";
 import { UseStaggeredChild, UseStaggeredChildContext, UseStaggeredChildren, UseStaggeredChildrenInfo, useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
 
-export type UseProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<
+export type UseProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = StandardHook<
     "processedChildren", 
     never, [
         StandardDepsContext<UseProcessedChildrenContext>,
@@ -34,7 +34,7 @@ export type UseProcessedChildren<TabbableChildElement extends Element, M extends
     ]
 >;
 
-export type UseProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<
+export type UseProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = StandardHook<
     "processedChild", 
     never, [
         StandardDepsContext<UseProcessedChildContext<TabbableChildElement, M>>,

@@ -3,7 +3,7 @@ import { returnNull, runImmediately, usePassiveState } from "../preact-extension
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
+import { Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseMutationObserverParametersSelf<E extends Element> {
@@ -16,7 +16,7 @@ export interface UseMutationObserverParametersSelf<E extends Element> {
     attributeFilter: string | string[];
 }
 
-export type UseMutationObserver<E extends Element> = GenericHook<
+export type UseMutationObserver<E extends Element> = StandardHook<
     "mutationObserver",
     UseMutationObserverParametersSelf<E>, [StandardDepsPick<"params", UseRefElement<E>, "refElementParameters", "pick", "onElementChange">],
     never, [StandardDepsPick<"return", UseRefElement<E>>, StandardDepsPropsStable<E>]

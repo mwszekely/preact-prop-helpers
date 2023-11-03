@@ -4,7 +4,7 @@ import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
-import { GenericHook, Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -99,14 +99,14 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
     /** @stable */
     getSingleSelectedOffset: () => (number | null);
 }
-export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"singleSelection", UseSingleSelectionParametersSelf, [
+export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"singleSelection", UseSingleSelectionParametersSelf, [
     StandardDepsPick<"return", UseManagedChildren<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
     StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex">
 ], UseSingleSelectionReturnTypeSelf, [
     StandardDepsContext<UseSingleSelectionChildContext>,
     StandardDepsPick<"params", UseChildrenHaveFocus<ChildElement>, "childrenHaveFocusParameters", "pick", "onCompositeFocusChange">
 ]>;
-export type UseSingleSelectionChild<ChildElement extends Element> = GenericHook<"singleSelectionChild", UseSingleSelectionChildParametersSelf, [
+export type UseSingleSelectionChild<ChildElement extends Element> = StandardHook<"singleSelectionChild", UseSingleSelectionChildParametersSelf, [
     StandardDepsContext<UseSingleSelectionChildContext>,
     StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysParameters>
 ], UseSingleSelectionChildReturnTypeSelf, [

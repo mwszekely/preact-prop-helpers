@@ -4,7 +4,7 @@ import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { UseActiveElement, useActiveElement } from "./use-active-element.js";
 
@@ -34,7 +34,7 @@ export interface UseHasLastFocusReturnTypeSelf {
 }
 
 
-export type UseHasLastFocus<E extends Element> = GenericHook<
+export type UseHasLastFocus<E extends Element> = StandardHook<
     "hasLastFocus", 
     UseHasLastFocusParametersSelf, [ 
         StandardDepsPick<"params", UseActiveElement, "activeElementParameters">,

@@ -2,14 +2,14 @@ import { DismissListenerTypes, UseDismiss } from "../component-detail/use-dismis
 import { UseFocusTrap } from "../component-detail/use-focus-trap.js";
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPick, StandardHook } from "../util/types.js";
 export interface UseModalParametersSelf {
     /**
      * When `false`, all dismissal/focus trapping behavior is disabled. When `true`, they're allowed via their individual parameters.
      */
     active: boolean;
 }
-export type UseModal<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = GenericHook<"modal", UseModalParametersSelf, [
+export type UseModal<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element, Listeners extends DismissListenerTypes> = StandardHook<"modal", UseModalParametersSelf, [
     StandardDepsPick<"params", UseDismiss<SourceElement, PopupElement, Listeners>>,
     StandardDepsPick<"params", UseRefElement<any>>,
     StandardDepsOmit<"params", UseFocusTrap<any, any>, "refElementReturn">

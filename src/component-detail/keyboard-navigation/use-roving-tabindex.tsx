@@ -8,7 +8,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
 import { EventType, FocusEventType, StateUpdater, useCallback, useEffect, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 
@@ -167,7 +167,7 @@ export interface RovingTabIndexChildContextSelf {
     reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 }
 
-export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElement extends Element> = GenericHook<
+export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElement extends Element> = StandardHook<
     "rovingTabIndex", 
     UseRovingTabIndexParametersSelf<ParentElement>, [
         StandardDepsOmit<"return", 
@@ -193,7 +193,7 @@ export type UseRovingTabIndex<ParentElement extends Element, TabbableChildElemen
 
 
 
-export type UseRovingTabIndexChild<TabbableChildElement extends Element> = GenericHook<
+export type UseRovingTabIndexChild<TabbableChildElement extends Element> = StandardHook<
     "rovingTabIndexChild", 
     never, [
         StandardDepsContext<RovingTabIndexChildContext, "rovingTabIndexContext">,

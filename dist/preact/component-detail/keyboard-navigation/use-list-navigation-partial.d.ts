@@ -1,11 +1,11 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { UseLinearNavigation } from "./use-linear-navigation.js";
 import { RovingTabIndexChildContext, UseRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigation, UseTypeaheadNavigationChild, UseTypeaheadNavigationChildContext, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType } from "./use-typeahead-navigation.js";
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> {
 }
-export type UseListNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<"listNavigation", never, [
+export type UseListNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"listNavigation", never, [
     StandardDepsPick<"params", UseRovingTabIndex<ParentOrChildElement, ChildElement>>,
     StandardDepsOmit<"params", UseTypeaheadNavigation<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">,
     StandardDepsOmit<"params", UseLinearNavigation<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">
@@ -16,7 +16,7 @@ export type UseListNavigation<ParentOrChildElement extends Element, ChildElement
     StandardDepsContext<UseListNavigationChildContext>,
     StandardDepsProps<ParentOrChildElement>
 ]>;
-export type UseListNavigationChild<ChildElement extends Element> = GenericHook<"listNavigationChild", never, [
+export type UseListNavigationChild<ChildElement extends Element> = StandardHook<"listNavigationChild", never, [
     StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysParameters>,
     StandardDepsContext<UseListNavigationChildContext>,
     StandardDepsPick<"return", UseRefElement<ChildElement>, "refElementReturn", "pick", "getElement">

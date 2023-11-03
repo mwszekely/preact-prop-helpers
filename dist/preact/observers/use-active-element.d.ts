@@ -1,5 +1,5 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { GenericHook, Nullable, Parameter } from "../util/types.js";
+import { Nullable, Parameter, StandardHook } from "../util/types.js";
 export interface UseActiveElementParametersSelf {
     /**
      * Called any time the active element changes.
@@ -45,7 +45,7 @@ export interface UseActiveElementReturnTypeSelf {
      */
     getWindowFocused: () => boolean;
 }
-export type UseActiveElement = GenericHook<"activeElement", UseActiveElementParametersSelf, [], UseActiveElementReturnTypeSelf, []>;
+export type UseActiveElement = StandardHook<"activeElement", UseActiveElementParametersSelf, [], UseActiveElementReturnTypeSelf, []>;
 /**
  * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
  *

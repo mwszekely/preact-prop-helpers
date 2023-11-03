@@ -1,6 +1,6 @@
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, Parameter } from "../util/types.js";
-export type UseRandomId<S extends Element, T extends Element> = GenericHook<"randomId", UseRandomIdParametersSelf, [], UseRandomIdReturnTypeSelf, [{
+import { Parameter, StandardHook } from "../util/types.js";
+export type UseRandomId<S extends Element, T extends Element> = StandardHook<"randomId", UseRandomIdParametersSelf, [], UseRandomIdReturnTypeSelf, [{
     propsSource: ElementProps<S>;
     propsReferencer: ElementProps<T>;
 }]>;

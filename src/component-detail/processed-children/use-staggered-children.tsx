@@ -6,7 +6,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -25,7 +25,7 @@ export interface UseStaggeredChildrenParametersSelf {
     childCount: number | null;
 }
 
-export type UseStaggeredChildren = GenericHook<
+export type UseStaggeredChildren = StandardHook<
     "staggeredChildren", 
     UseStaggeredChildrenParametersSelf, [
         StandardDepsPick<"return", UseManagedChildren<UseStaggeredChildrenInfo>, "managedChildrenReturn", "pick", "getChildren">
@@ -35,7 +35,7 @@ export type UseStaggeredChildren = GenericHook<
     ]
 >;
 
-export type UseStaggeredChild<E extends Element> = GenericHook<
+export type UseStaggeredChild<E extends Element> = StandardHook<
     "staggeredChild", 
     never, [
         StandardDepsInfo<UseStaggeredChildrenInfo, "index">,

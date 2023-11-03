@@ -1,7 +1,7 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, FocusEventType, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
@@ -34,7 +34,7 @@ export interface UseHasCurrentFocusReturnTypeSelf {
 
 
 export type UseHasCurrentFocus<E extends Element> =
-    GenericHook<
+    StandardHook<
         "hasCurrentFocus", 
         UseHasCurrentFocusParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">],
         UseHasCurrentFocusReturnTypeSelf, [StandardDepsPropsStable<E>]

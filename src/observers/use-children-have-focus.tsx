@@ -2,7 +2,7 @@ import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnZero, run
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { FocusEventType } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsPick, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { UseHasCurrentFocus } from "./use-has-current-focus.js";
 
@@ -30,13 +30,13 @@ export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: UseChildrenHaveFocusContextSelf<T>
 }
 
-export type UseChildrenHaveFocus<ChildElement extends Element> = GenericHook<
+export type UseChildrenHaveFocus<ChildElement extends Element> = StandardHook<
     "childrenHaveFocus", 
     UseChildrenHaveFocusParametersSelf<ChildElement>, [],
     UseChildrenHaveFocusReturnTypeSelf, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>>]
 >;
 
-export type UseChildrenHaveFocusChild<ChildElement extends Element> = GenericHook<
+export type UseChildrenHaveFocusChild<ChildElement extends Element> = StandardHook<
     "childrenHaveFocusChild", 
     never, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>, "childrenHaveFocusChildContext">],
     never, [StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">]

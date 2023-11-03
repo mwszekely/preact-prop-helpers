@@ -4,7 +4,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { KeyboardEventType, useEffect } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 
 
@@ -40,7 +40,7 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
 }
 
 
-export type UseEscapeDismiss<PopupElement extends Element, B extends boolean> = GenericHook<
+export type UseEscapeDismiss<PopupElement extends Element, B extends boolean> = StandardHook<
     "escapeDismiss",
     UseEscapeDismissParametersSelf<B>, [
         StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">

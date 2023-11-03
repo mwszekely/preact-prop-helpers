@@ -1,7 +1,7 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { UseActiveElement } from "../../observers/use-active-element.js";
 import { FocusEventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
     /**
      * Called when the component is dismissed by losing focus
@@ -14,7 +14,7 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
      */
     dismissLostFocusActive: B | false;
 }
-export type UseLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> = GenericHook<"lostFocusDismiss", UseLostFocusDismissParametersSelf<B>, [
+export type UseLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> = StandardHook<"lostFocusDismiss", UseLostFocusDismissParametersSelf<B>, [
     StandardDepsRename<StandardDepsPick<"return", UseRefElement<NonNullable<SourceElement>>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementSourceReturn">,
     StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">
 ], never, [StandardDepsPick<"params", UseActiveElement, "activeElementParameters", "pick", "onLastActiveElementChange">]>;

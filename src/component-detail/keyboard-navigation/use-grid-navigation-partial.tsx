@@ -8,7 +8,7 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { EventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseListNavigation, UseListNavigationChild, UseListNavigationChildContext, UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
@@ -54,7 +54,7 @@ export interface UseGridNavigationRowContextSelf {
     setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
 
-export type UseGridNavigation<ParentElement extends Element, RowElement extends Element> = GenericHook<
+export type UseGridNavigation<ParentElement extends Element, RowElement extends Element> = StandardHook<
     "gridNavigation", 
     UseGridNavigationParametersSelf, [
         StandardDepsOmit<"params", UseListNavigation<ParentElement, RowElement>, "linearNavigationParameters", [
@@ -68,7 +68,7 @@ export type UseGridNavigation<ParentElement extends Element, RowElement extends 
     ]
 >;
 
-export type UseGridNavigationRow<RowElement extends Element, CellElement extends Element> = GenericHook<
+export type UseGridNavigationRow<RowElement extends Element, CellElement extends Element> = StandardHook<
     "gridNavigationRow", 
     never, [
         StandardDepsOmit<"params", UseListNavigation<RowElement, CellElement>, "rearrangeableChildrenReturn" | "paginatedChildrenParameters", [
@@ -89,7 +89,7 @@ export type UseGridNavigationRow<RowElement extends Element, CellElement extends
     ]
 >;
 
-export type UseGridNavigationCell<CellElement extends Element> = GenericHook<
+export type UseGridNavigationCell<CellElement extends Element> = StandardHook<
     "gridNavigationCell", 
     UseGridNavigationCellParametersSelf, [
         StandardDepsPick<"return", UseRefElement<CellElement>, "refElementReturn", "pick", "getElement">,

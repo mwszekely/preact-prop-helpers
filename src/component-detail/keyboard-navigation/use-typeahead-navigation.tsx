@@ -6,7 +6,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsPropsStable } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
@@ -90,7 +90,7 @@ export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends El
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 
-export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
     "typeaheadNavigation", 
     UseTypeaheadNavigationParametersSelf<ChildElement>, [
         StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "getTabbableIndex" | "setTabbableIndex">
@@ -101,7 +101,7 @@ export type UseTypeaheadNavigation<ParentOrChildElement extends Element, ChildEl
     ]
 >;
 
-export type UseTypeaheadNavigationChild<E extends Element> = GenericHook<
+export type UseTypeaheadNavigationChild<E extends Element> = StandardHook<
     "typeaheadNavigationChild", 
     never, [
         StandardDepsContext<UseTypeaheadNavigationChildContext, "typeaheadNavigationContext">,

@@ -1,12 +1,12 @@
 import { ElementProps } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { UseListNavigation, UseListNavigationChild, UseListNavigationChildContext, UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType } from "./keyboard-navigation/use-list-navigation-partial.js";
 import { UseSelection, UseSelectionChild, UseSelectionChildContext, UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType } from "./selection/use-selection.js";
 export interface UseListNavigationSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSelectionChildInfo<TabbableChildElement> {
 }
 export interface UseListNavigationSelectionChildContext extends UseListNavigationChildContext, UseSelectionChildContext {
 }
-export type UseListNavigationSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<"listNavigationSelection", never, [
+export type UseListNavigationSelection<ParentElement extends Element, ChildElement extends Element> = StandardHook<"listNavigationSelection", never, [
     StandardDepsPick<"params", UseListNavigation<ParentElement, ChildElement>>,
     StandardDepsOmit<"params", UseSelection<ParentElement, ChildElement>, "rovingTabIndexReturn">
 ], never, [
@@ -15,7 +15,7 @@ export type UseListNavigationSelection<ParentElement extends Element, ChildEleme
     StandardDepsContext<UseListNavigationSelectionChildContext>,
     StandardDepsProps<ParentElement>
 ]>;
-export type UseListNavigationSelectionChild<ChildElement extends Element> = GenericHook<"listNavigationSelectionChild", never, [
+export type UseListNavigationSelectionChild<ChildElement extends Element> = StandardHook<"listNavigationSelectionChild", never, [
     StandardDepsInfo<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysParameters>,
     StandardDepsContext<UseListNavigationSelectionChildContext>,
     StandardDepsPick<"params", UseListNavigationChild<ChildElement>>,

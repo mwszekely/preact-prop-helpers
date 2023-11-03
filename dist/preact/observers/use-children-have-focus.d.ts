@@ -1,6 +1,6 @@
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
 import { FocusEventType } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsPick } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsPick, StandardHook } from "../util/types.js";
 import { UseHasCurrentFocus } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
@@ -21,8 +21,8 @@ export interface UseChildrenHaveFocusContextSelf<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: UseChildrenHaveFocusContextSelf<T>;
 }
-export type UseChildrenHaveFocus<ChildElement extends Element> = GenericHook<"childrenHaveFocus", UseChildrenHaveFocusParametersSelf<ChildElement>, [], UseChildrenHaveFocusReturnTypeSelf, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>>]>;
-export type UseChildrenHaveFocusChild<ChildElement extends Element> = GenericHook<"childrenHaveFocusChild", never, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>, "childrenHaveFocusChildContext">], never, [StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">]>;
+export type UseChildrenHaveFocus<ChildElement extends Element> = StandardHook<"childrenHaveFocus", UseChildrenHaveFocusParametersSelf<ChildElement>, [], UseChildrenHaveFocusReturnTypeSelf, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>>]>;
+export type UseChildrenHaveFocusChild<ChildElement extends Element> = StandardHook<"childrenHaveFocusChild", never, [StandardDepsContext<UseChildrenHaveFocusContext<ChildElement>, "childrenHaveFocusChildContext">], never, [StandardDepsPick<"params", UseHasCurrentFocus<ChildElement>, "hasCurrentFocusParameters", "pick", "onCurrentFocusedInnerChanged">]>;
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has

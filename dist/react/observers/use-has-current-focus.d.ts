@@ -1,7 +1,7 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { FocusEventType } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
     /**
      * Whether the element itself currently has focus.
@@ -26,7 +26,7 @@ export interface UseHasCurrentFocusReturnTypeSelf {
     /** @stable */
     getCurrentFocusedInner(): boolean;
 }
-export type UseHasCurrentFocus<E extends Element> = GenericHook<"hasCurrentFocus", UseHasCurrentFocusParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UseHasCurrentFocusReturnTypeSelf, [StandardDepsPropsStable<E>]>;
+export type UseHasCurrentFocus<E extends Element> = StandardHook<"hasCurrentFocus", UseHasCurrentFocusParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UseHasCurrentFocusReturnTypeSelf, [StandardDepsPropsStable<E>]>;
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
  *

@@ -1,6 +1,6 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { MouseEventType } from "../../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsRename } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsRename, StandardHook } from "../../util/types.js";
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
@@ -13,7 +13,7 @@ export interface UseBackdropDismissParametersSelf<B extends boolean> {
      */
     onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
 }
-export type UseBackdropDismiss<PopupElement extends Element, B extends boolean> = GenericHook<"backdropDismiss", UseBackdropDismissParametersSelf<B>, [
+export type UseBackdropDismiss<PopupElement extends Element, B extends boolean> = StandardHook<"backdropDismiss", UseBackdropDismissParametersSelf<B>, [
     StandardDepsRename<StandardDepsPick<"return", UseRefElement<PopupElement>, "refElementReturn", "pick", "getElement">, "refElementReturn", "refElementPopupReturn">
 ], never, []>;
 /**

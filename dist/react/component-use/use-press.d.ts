@@ -1,7 +1,7 @@
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 export interface UsePressParametersSelf<E extends EventTarget> {
@@ -58,7 +58,7 @@ export interface UsePressReturnTypeSelf {
      */
     longPress: boolean | null;
 }
-export type UsePress<E extends Element> = GenericHook<"press", UsePressParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UsePressReturnTypeSelf, [StandardDepsProps<E>]>;
+export type UsePress<E extends Element> = StandardHook<"press", UsePressParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">], UsePressReturnTypeSelf, [StandardDepsProps<E>]>;
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,

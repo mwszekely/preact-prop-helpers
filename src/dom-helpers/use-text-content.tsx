@@ -1,7 +1,7 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
-import { GenericHook, Nullable, Parameter, StandardDepsPick } from "../util/types.js";
+import { Nullable, Parameter, StandardDepsPick, StandardHook } from "../util/types.js";
 import { UseRefElement } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
@@ -27,7 +27,7 @@ export interface UseTextContentReturnTypeSelf {
 }
 
 
-export type UseTextContent<E extends Element> = GenericHook<
+export type UseTextContent<E extends Element> = StandardHook<
     "textContent", 
     UseTextContentParametersSelf<E>, [StandardDepsPick<"return", UseRefElement<E>, "refElementReturn", "pick", "getElement">],
     UseTextContentReturnTypeSelf, []

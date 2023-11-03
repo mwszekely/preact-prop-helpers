@@ -1,6 +1,6 @@
 import { ManagedChildInfo, UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { VNode } from "../../util/lib.js";
-import { GenericHook, Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick } from "../../util/types.js";
+import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsPick, StandardHook } from "../../util/types.js";
 export interface UseRearrangedChildrenContextSelf {
     provideManglers(args: Pick<UseRearrangeableChildrenReturnTypeSelf<any>, "indexDemangler" | "indexMangler" | "reverse" | "shuffle" | "sort">): void;
 }
@@ -107,7 +107,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      */
     sort: (direction: "ascending" | "descending") => Promise<void> | void;
 }
-export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = GenericHook<"rearrangeableChildren", UseRearrangeableChildrenParametersSelf<M>, [
+export type UseRearrangeableChildren<M extends UseRearrangeableChildInfo> = StandardHook<"rearrangeableChildren", UseRearrangeableChildrenParametersSelf<M>, [
     StandardDepsContext<UseRearrangedChildrenContext, "rearrangeableChildrenContext">,
     StandardDepsPick<"return", UseManagedChildren<M>, "managedChildrenReturn", "pick", "getChildren">
 ], UseRearrangeableChildrenReturnTypeSelf<M>, []>;

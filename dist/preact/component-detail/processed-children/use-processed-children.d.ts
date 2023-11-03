@@ -1,12 +1,12 @@
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { UseChildrenHaveFocusReturnTypeSelf } from "../../observers/use-children-have-focus.js";
 import { UseManagedChild, UseManagedChildContext, UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChild, UsePaginatedChildContext, UsePaginatedChildren, UsePaginatedChildrenInfo } from "./use-paginated-children.js";
 import { UseRearrangeableChildInfo, UseRearrangeableChildren, UseRearrangedChildrenContext } from "./use-rearrangeable-children.js";
 import { UseStaggeredChild, UseStaggeredChildContext, UseStaggeredChildren, UseStaggeredChildrenInfo } from "./use-staggered-children.js";
-export type UseProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<"processedChildren", never, [
+export type UseProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = StandardHook<"processedChildren", never, [
     StandardDepsContext<UseProcessedChildrenContext>,
     StandardDepsPick<"params", UseManagedChildren<M>>,
     StandardDepsOmit<"params", UseRearrangeableChildren<M>, "managedChildrenReturn">,
@@ -23,7 +23,7 @@ export type UseProcessedChildren<TabbableChildElement extends Element, M extends
     StandardDepsPick<"return", UseStaggeredChildren>,
     StandardDepsPick<"return", UsePaginatedChildren<TabbableChildElement>>
 ]>;
-export type UseProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = GenericHook<"processedChild", never, [
+export type UseProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> = StandardHook<"processedChild", never, [
     StandardDepsContext<UseProcessedChildContext<TabbableChildElement, M>>,
     StandardDepsInfo<UseProcessedChildInfo<TabbableChildElement>, UseProcessedChildInfoKeysParameters>
 ], never, [

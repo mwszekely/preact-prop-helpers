@@ -2,7 +2,7 @@ import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElement, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { GenericHook, Parameter, StandardDepsOmit, StandardDepsPropsStable } from "../util/types.js";
+import { Parameter, StandardDepsOmit, StandardDepsPropsStable, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 export interface UseElementSizeParametersSelf {
@@ -47,7 +47,7 @@ export interface UseElementSizeReturnTypeSelf {
     getSize(): ElementSize | null;
 }
 
-export type UseElementSize<T extends Element> = GenericHook<
+export type UseElementSize<T extends Element> = StandardHook<
     "elementSize", 
     UseElementSizeParametersSelf, [StandardDepsOmit<"params", UseRefElement<T>>],
     UseElementSizeReturnTypeSelf, [StandardDepsOmit<"return", UseRefElement<T>>, StandardDepsPropsStable<T>]

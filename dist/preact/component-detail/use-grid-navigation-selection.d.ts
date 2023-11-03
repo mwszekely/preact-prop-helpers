@@ -1,4 +1,4 @@
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigation, UseGridNavigationCell, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationRow, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType } from "./keyboard-navigation/use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./keyboard-navigation/use-list-navigation-partial.js";
 import { UseSelection, UseSelectionChild, UseSelectionChildContext, UseSelectionChildInfo, UseSelectionChildInfoKeysReturnType } from "./selection/use-selection.js";
@@ -15,7 +15,7 @@ export interface UseGridNavigationRowSelectionContext extends UseGridNavigationR
 }
 export interface UseGridNavigationCellSelectionContext extends UseGridNavigationCellContext {
 }
-export type UseGridNavigationSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<"gridNavigationSelection", never, [
+export type UseGridNavigationSelection<ParentElement extends Element, ChildElement extends Element> = StandardHook<"gridNavigationSelection", never, [
     StandardDepsPick<"params", UseGridNavigation<ParentElement, ChildElement>>,
     StandardDepsOmit<"params", UseSelection<ParentElement, ChildElement>, "rovingTabIndexReturn">
 ], never, [
@@ -24,7 +24,7 @@ export type UseGridNavigationSelection<ParentElement extends Element, ChildEleme
     StandardDepsContext<UseGridNavigationRowSelectionContext>,
     StandardDepsProps<ParentElement>
 ]>;
-export type UseGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element> = GenericHook<"gridNavigationSelectionRow", never, [
+export type UseGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element> = StandardHook<"gridNavigationSelectionRow", never, [
     StandardDepsInfo<GridSelectChildRowInfo<RowElement>, UseGridNavigationSelectionRowInfoKeysParameters>,
     StandardDepsContext<UseGridNavigationRowSelectionContext>,
     StandardDepsPick<"params", UseGridNavigationRow<RowElement, CellElement>>,

@@ -2,7 +2,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigation, UseGridNavigationCell, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationRow, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./keyboard-navigation/use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./keyboard-navigation/use-list-navigation-partial.js";
@@ -31,7 +31,7 @@ export interface UseGridNavigationCellSelectionContext extends UseGridNavigation
 
 
 
-export type UseGridNavigationSelection<ParentElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseGridNavigationSelection<ParentElement extends Element, ChildElement extends Element> = StandardHook<
     "gridNavigationSelection", 
     never, [
         StandardDepsPick<"params", UseGridNavigation<ParentElement, ChildElement>>,
@@ -45,7 +45,7 @@ export type UseGridNavigationSelection<ParentElement extends Element, ChildEleme
     ]
 >;
 
-export type UseGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element> = GenericHook<
+export type UseGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element> = StandardHook<
     "gridNavigationSelectionRow", 
     never, [
         StandardDepsInfo<GridSelectChildRowInfo<RowElement>, UseGridNavigationSelectionRowInfoKeysParameters>,
@@ -62,7 +62,7 @@ export type UseGridNavigationSelectionRow<RowElement extends Element, CellElemen
     ]
 >;
 
-export type UseGridNavigationSelectionCell<CellElement extends Element> = UseGridNavigationCell<CellElement>; /*GenericHook<
+export type UseGridNavigationSelectionCell<CellElement extends Element> = UseGridNavigationCell<CellElement>; /*StandardHook<
     "gridNavigationSelectionCell", CellElement,
     never, [StandardDepsParameters2<UseGridNavigationCell<CellElement>>],
     never, [StandardDepsReturnType2<UseGridNavigationCell<CellElement>>]

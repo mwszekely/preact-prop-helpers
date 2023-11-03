@@ -2,7 +2,7 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseRefElement } from "../../dom-helpers/use-ref-element.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { GenericHook, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps } from "../../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseLinearNavigation, useLinearNavigation } from "./use-linear-navigation.js";
 import { RovingTabIndexChildContext, UseRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
@@ -52,7 +52,7 @@ const _dummy: any = null;
 
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> { }
 
-export type UseListNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = GenericHook<
+export type UseListNavigation<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
     "listNavigation", 
     never, [
         StandardDepsPick<"params", UseRovingTabIndex<ParentOrChildElement, ChildElement>>,
@@ -68,7 +68,7 @@ export type UseListNavigation<ParentOrChildElement extends Element, ChildElement
     ]
 >;
 
-export type UseListNavigationChild<ChildElement extends Element> = GenericHook<
+export type UseListNavigationChild<ChildElement extends Element> = StandardHook<
     "listNavigationChild", 
     never, [
         StandardDepsInfo<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysParameters>,
