@@ -12,7 +12,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { EventType, useCallback, useEffect, useRef } from "../../util/lib.js";
-import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -131,7 +131,7 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
 }
 
 export type UseSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
-    "singleSelection", 
+    "singleSelection",
     UseSingleSelectionParametersSelf, [
         StandardDepsPick<"return", UseManagedChildren<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "pick", "getChildren">,
         StandardDepsPick<"return", UseRovingTabIndex<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "pick", "setTabbableIndex">
@@ -143,7 +143,7 @@ export type UseSingleSelection<ParentOrChildElement extends Element, ChildElemen
 >;
 
 export type UseSingleSelectionChild<ChildElement extends Element> = StandardHook<
-    "singleSelectionChild", 
+    "singleSelectionChild",
     UseSingleSelectionChildParametersSelf, [
         StandardDepsContext<UseSingleSelectionChildContext>,
         StandardDepsInfo<UseSingleSelectionChildInfo<ChildElement>, UseSingleSelectionChildInfoKeysParameters>,
@@ -323,20 +323,25 @@ export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSin
     singleSelectedIndex: Nullable<number>;
 }
 
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<ReturnType<UseSingleSelection<any, ChildElement>>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
-    singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
-}
 
-export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<Parameter<UseSingleSelection<any, any>>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
-export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<ReturnType<UseSingleSelection<any, any>>, "singleSelectionReturn", "changeSingleSelectedIndex">;
+export type UseSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<
+    "singleSelectionDeclarative",
+    UseSingleSelectionDeclarativeParametersSelf, [
+        StandardDepsPick<"return", UseSingleSelection<ParentOrChildElement, ChildElement>, "singleSelectionReturn", "pick", "changeSingleSelectedIndex">,
+    ],
+    never, [
+        StandardDepsPick<"params", UseSingleSelection<ParentOrChildElement, ChildElement>, "singleSelectionParameters", "pick", "onSingleSelectedIndexChange">
+    ]
+>;
 
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
 export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({
-    singleSelectionReturn: { changeSingleSelectedIndex },
-    singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange }
-}: UseSingleSelectionDeclarativeParameters<ChildElement>) {
+    singleSelectionReturn: { changeSingleSelectedIndex, ...void2 },
+    singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange, ...void1 },
+    ...void3
+}: Parameter<UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>>): ReturnType<UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>> {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef<SelectedIndexChangeEvent | undefined>(undefined);
     useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current!); }, [s]);
@@ -346,6 +351,9 @@ export function useSingleSelectionDeclarative<ParentOrChildElement extends Eleme
         return onSingleSelectedIndexChange?.(e);
     }, [onSingleSelectedIndexChange]);
 
-    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } satisfies Pick<Parameter<UseSingleSelection<ParentOrChildElement, ChildElement>>["singleSelectionParameters"], "onSingleSelectedIndexChange"> }
-}
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
 
+    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } }
+}

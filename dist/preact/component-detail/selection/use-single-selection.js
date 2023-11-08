@@ -130,7 +130,7 @@ export const useSingleSelectionChild = monitored(function useSingleSelectionChil
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
+export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex, ...void2 }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange, ...void1 }, ...void3 }) {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef(undefined);
     useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
@@ -138,6 +138,9 @@ export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeS
         reasonRef.current = e;
         return onSingleSelectedIndexChange?.(e);
     }, [onSingleSelectedIndexChange]);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } };
 }
 //# sourceMappingURL=use-single-selection.js.map

@@ -236,7 +236,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
     };
 });
 export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }) {
-    const ret2 = useCompleteGridNavigation({
+    const { childrenHaveFocusReturn, singleSelectionReturn, contextChildren, contextProcessing, linearNavigationReturn, managedChildrenReturn, props, rearrangeableChildrenReturn, refElementReturn, rovingTabIndexReturn, typeaheadNavigationReturn, ...void1 } = useCompleteGridNavigation({
         singleSelectionParameters: {
             initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
             onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)),
@@ -246,8 +246,22 @@ export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativ
     });
     const { singleSelectionParameters: { onSingleSelectedIndexChange } } = useSelectionDeclarative({
         singleSelectionDeclarativeParameters,
-        singleSelectionReturn: ret2.singleSelectionReturn
+        singleSelectionReturn
     });
-    return ret2;
+    assertEmptyObject(void1);
+    return {
+        singleSelectionReturn,
+        childrenHaveFocusReturn,
+        contextChildren,
+        contextProcessing,
+        linearNavigationReturn,
+        managedChildrenReturn,
+        props,
+        rearrangeableChildrenReturn,
+        refElementReturn,
+        rovingTabIndexReturn,
+        typeaheadNavigationReturn,
+        ...void1
+    };
 }
 //# sourceMappingURL=use-grid-navigation-complete.js.map

@@ -12,7 +12,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { EventType, FocusEventType, KeyboardEventType, useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
-import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
@@ -491,7 +491,7 @@ export function useMultiSelectionChild<E extends Element>({
         }
     }
 }
-
+/*
 export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
     TargetedPick<Parameter<UseMultiSelectionChild<E>>, "multiSelectionChildParameters", "onMultiSelectChange"> {
     info: Pick<M, "setSelectedFromParent">;
@@ -504,10 +504,26 @@ export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, 
         onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
     }
 }
+*/
 
+export interface UseMultiSelectionChildDeclarativeParametersSelf<E extends Element> {
+    multiSelected: boolean;
+    onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
+}
 
-export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
-export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
+export type UseMultiSelectionChildDeclarative<E extends Element, M extends UseMultiSelectionChildInfo<E>> = StandardHook<
+    "multiSelectionChildDeclarative",
+    UseMultiSelectionChildDeclarativeParametersSelf<E>, [
+        StandardDepsPick<"return",UseMultiSelectionChild< E>, "multiSelectionChildReturn", "pick", "changeMultiSelected">
+    ],
+    never, [
+        StandardDepsPick<"params", UseMultiSelectionChild<E>, "multiSelectionChildParameters", "pick", "onMultiSelectChange">,
+        StandardDepsInfo<M, "setSelectedFromParent">
+    ]
+>;
+
+//export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
+//export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
 
 /**
  * 
@@ -517,7 +533,7 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
     multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 },
     multiSelectionChildReturn: { changeMultiSelected, ...void2 },
     ...void1
-}: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>> {
+}: Parameter<UseMultiSelectionChildDeclarative<E, UseMultiSelectionChildInfo<E>>>): ReturnType<UseMultiSelectionChildDeclarative<E, UseMultiSelectionChildInfo<E>>> {
     let reasonRef = useRef<MultiSelectChildChangeEvent<E> | undefined>(undefined);
     useEffect(() => {
         if (multiSelected != null)

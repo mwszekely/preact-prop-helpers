@@ -4,7 +4,7 @@ import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 import { EventType } from "../../util/lib.js";
-import { Nullable, OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, {
     multiSelected: boolean;
@@ -151,20 +151,19 @@ export declare function useMultiSelection<ParentOrChildElement extends Element, 
  * @compositeParams
  */
 export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: Parameter<UseMultiSelectionChild<E>>): ReturnType<UseMultiSelectionChild<E>>;
-export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<Parameter<UseMultiSelectionChild<E>>, "multiSelectionChildParameters", "onMultiSelectChange"> {
-    info: Pick<M, "setSelectedFromParent">;
+export interface UseMultiSelectionChildDeclarativeParametersSelf<E extends Element> {
+    multiSelected: boolean;
+    onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
 }
-export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<ReturnType<UseMultiSelectionChild<E>>, "multiSelectionChildReturn", "changeMultiSelected"> {
-    multiSelectionChildDeclarativeParameters: {
-        multiSelected: boolean;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
-    };
-}
-export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
-export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
+export type UseMultiSelectionChildDeclarative<E extends Element, M extends UseMultiSelectionChildInfo<E>> = StandardHook<"multiSelectionChildDeclarative", UseMultiSelectionChildDeclarativeParametersSelf<E>, [
+    StandardDepsPick<"return", UseMultiSelectionChild<E>, "multiSelectionChildReturn", "pick", "changeMultiSelected">
+], never, [
+    StandardDepsPick<"params", UseMultiSelectionChild<E>, "multiSelectionChildParameters", "pick", "onMultiSelectChange">,
+    StandardDepsInfo<M, "setSelectedFromParent">
+]>;
 /**
  *
  * @compositeParams
  */
-export declare function useMultiSelectionChildDeclarative<E extends Element>({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>>;
+export declare function useMultiSelectionChildDeclarative<E extends Element>({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }: Parameter<UseMultiSelectionChildDeclarative<E, UseMultiSelectionChildInfo<E>>>): ReturnType<UseMultiSelectionChildDeclarative<E, UseMultiSelectionChildInfo<E>>>;
 //# sourceMappingURL=use-multi-selection.d.ts.map

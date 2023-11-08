@@ -267,6 +267,8 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
         }
     };
 }
+//export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
+//export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
 /**
  *
  * @compositeParams

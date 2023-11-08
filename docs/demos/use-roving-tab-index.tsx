@@ -7,7 +7,7 @@ import {
     UseProcessedChildContext as NormalListChildContext,
     UseCompleteListNavigationChildInfo,
     UseCompleteListNavigationChildrenInfo,
-    UseCompleteListNavigationDeclarativeReturnType,
+    UseCompleteListNavigationDeclarative,
     UseProcessedChild,
     UseProcessedChildInfo,
     UseProcessedChildrenContext,
@@ -63,7 +63,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         setMultiSelectPercent(e[EventDetail].selectedPercent)
     }
 
-    const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLSpanElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLSpanElement, CustomInfoType>({
+    const r: ReturnType<UseCompleteListNavigationDeclarative<HTMLOListElement, HTMLSpanElement, CustomInfoType>> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLSpanElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus, initiallyTabbedIndex: 0 },
         childrenHaveFocusParameters: { onCompositeFocusChange: null },
         managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenCountChange: null, onChildrenMountChange: null },

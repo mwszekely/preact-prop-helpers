@@ -4,7 +4,7 @@ import { UseHasCurrentFocus } from "../../observers/use-has-current-focus.js";
 import { UseManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
-import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, Parameter, RequiredN, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardHook } from "../../util/types.js";
 import { UseRovingTabIndex, UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -154,17 +154,13 @@ export declare const useSingleSelectionChild: <ChildElement extends Element>({ s
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
     singleSelectedIndex: Nullable<number>;
 }
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<ReturnType<UseSingleSelection<any, ChildElement>>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
-    singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
-}
-export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<Parameter<UseSingleSelection<any, any>>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
-export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<ReturnType<UseSingleSelection<any, any>>, "singleSelectionReturn", "changeSingleSelectedIndex">;
+export type UseSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"singleSelectionDeclarative", UseSingleSelectionDeclarativeParametersSelf, [
+    StandardDepsPick<"return", UseSingleSelection<ParentOrChildElement, ChildElement>, "singleSelectionReturn", "pick", "changeSingleSelectedIndex">
+], never, [
+    StandardDepsPick<"params", UseSingleSelection<ParentOrChildElement, ChildElement>, "singleSelectionParameters", "pick", "onSingleSelectedIndexChange">
+]>;
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): {
-    singleSelectionParameters: {
-        onSingleSelectedIndexChange: SelectedIndexChangeHandler;
-    };
-};
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex, ...void2 }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange, ...void1 }, ...void3 }: Parameter<UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>>): ReturnType<UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>>;
 //# sourceMappingURL=use-single-selection.d.ts.map

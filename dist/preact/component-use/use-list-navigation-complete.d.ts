@@ -1,7 +1,7 @@
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildren, UseProcessedChildrenContext } from "../component-detail/processed-children/use-processed-children.js";
-import { MakeSelectionDeclarativeChildParameters, MakeSelectionDeclarativeParameters, UseSelection, UseSelectionChild, UseSelectionChildContext } from "../component-detail/selection/use-selection.js";
+import { UseSelection, UseSelectionChild, UseSelectionChildContext, UseSelectionChildDeclarative, UseSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { UseListNavigationSelection, UseListNavigationSelectionChild, UseListNavigationSelectionChildInfo, UseListNavigationSelectionChildInfoKeysParameters } from "../component-detail/use-list-navigation-selection.js";
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseTextContent } from "../dom-helpers/use-text-content.js";
@@ -9,7 +9,7 @@ import { UseChildrenHaveFocus, UseChildrenHaveFocusContext } from "../observers/
 import { UseHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { UseManagedChild, UseManagedChildContext, UseManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/lib.js";
-import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit } from "../util/types.js";
+import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionChildInfo<ChildElement> {
 }
 export interface UseCompleteListNavigationChildrenInfo<ChildElement extends Element> extends UseProcessedChildInfo<ChildElement> {
@@ -92,14 +92,26 @@ export declare const useCompleteListNavigationChild: <ChildElement extends Eleme
     propsChild: ElementProps<ChildElement>;
     propsTabbable: ElementProps<ChildElement>;
 };
-export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSelectionDeclarativeParameters<Parameter<UseCompleteListNavigation<ParentElement, ChildElement, M>>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<Parameter<UseSelection<ParentElement, ChildElement>>, "singleSelectionParameters", "initiallySingleSelectedIndex" | "onSingleSelectedIndexChange"> {
-}
-export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<ReturnType<UseCompleteListNavigation<ParentElement, ChildElement, M>>, "singleSelectionReturn", "changeSingleSelectedIndex">, OmitStrong<ReturnType<UseCompleteListNavigation<ParentElement, ChildElement, M>>, "singleSelectionReturn"> {
-}
-export interface UseCompleteListNavigationChildDeclarativeParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSelectionDeclarativeChildParameters<Parameter<UseCompleteListNavigationChild<ChildElement, M>>>, "multiSelectionChildParameters" | "multiSelectionChildReturn">, TargetedOmit<Parameter<UseSelectionChild<ChildElement>>, "multiSelectionChildParameters", "initiallyMultiSelected" | "onMultiSelectChange"> {
-}
-export interface UseCompleteListNavigationChildDeclarativeReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<ReturnType<UseCompleteListNavigationChild<ChildElement, M>>, "singleSelectionChildReturn", never>, TargetedOmit<ReturnType<UseCompleteListNavigationChild<ChildElement, M>>, "multiSelectionChildReturn", "changeMultiSelected">, OmitStrong<ReturnType<UseCompleteListNavigationChild<ChildElement, M>>, "singleSelectionChildReturn" | "multiSelectionChildReturn"> {
-}
-export declare function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }: UseCompleteListNavigationDeclarativeParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationDeclarativeReturnType<ParentElement, ChildElement, M>;
-export declare function useCompleteListNavigationChildDeclarative<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange }, info: i1, ...rest }: UseCompleteListNavigationChildDeclarativeParameters<ChildElement, M>): UseCompleteListNavigationChildDeclarativeReturnType<ChildElement, M>;
+export type UseCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<"listNavigationCompleteDeclarative", never, [
+    StandardDepsOmit<"params", UseCompleteListNavigation<ParentElement, ChildElement, M>, never, [
+        StandardDepsOmit<"params", UseSelectionDeclarative<ParentElement, ChildElement>, "singleSelectionReturn">,
+        StandardDepsPick<"params", UseSelection<ParentElement, ChildElement>, "singleSelectionParameters", "omit", "initiallySingleSelectedIndex" | "onSingleSelectedIndexChange">
+    ]>
+], never, [
+    ReturnType<UseCompleteListNavigation<ParentElement, ChildElement, M>>,
+    StandardDepsOmit<"return", UseSelectionDeclarative<ParentElement, ChildElement>, "singleSelectionParameters">,
+    StandardDepsPick<"return", UseSelection<ParentElement, ChildElement>, "singleSelectionReturn", "omit", "changeSingleSelectedIndex">
+]>;
+export type UseCompleteListNavigationChildDeclarative<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> = StandardHook<"listNavigationSelectionChildDeclarative", never, [
+    StandardDepsInfo<M, UseCompleteListNavigationChildInfoKeysParameters<M>>,
+    StandardDepsContext<CompleteListNavigationContext<ChildElement, M>>,
+    StandardDepsOmit<"params", UseCompleteListNavigationChild<ChildElement, M>, never, [
+        StandardDepsOmit<"params", UseSelectionChildDeclarative<ChildElement, M>, "multiSelectionChildReturn">,
+        StandardDepsPick<"params", UseSelectionChild<ChildElement>, "multiSelectionChildParameters", "omit", "initiallyMultiSelected" | "onMultiSelectChange">
+    ]>
+], never, [
+    ReturnType<UseCompleteListNavigationChild<ChildElement, M>>
+]>;
+export declare function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ singleSelectionParameters, singleSelectionDeclarativeParameters, childrenHaveFocusParameters, linearNavigationParameters, managedChildrenParameters, multiSelectionParameters, paginatedChildrenParameters, refElementParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }: Parameter<UseCompleteListNavigationDeclarative<ParentElement, ChildElement, M>>): ReturnType<UseCompleteListNavigationDeclarative<ParentElement, ChildElement, M>>;
+export declare function useCompleteListNavigationChildDeclarative<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...void1 }, info: i1, hasCurrentFocusParameters, refElementParameters, singleSelectionChildParameters, textContentParameters, context, ...void4 }: Parameter<UseCompleteListNavigationChildDeclarative<ChildElement, M>>): ReturnType<UseCompleteListNavigationChildDeclarative<ChildElement, M>>;
 //# sourceMappingURL=use-list-navigation-complete.d.ts.map

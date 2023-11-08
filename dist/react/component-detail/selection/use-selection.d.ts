@@ -1,6 +1,6 @@
 import { Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsPick, StandardDepsProps, StandardDepsPropsStable, StandardHook } from "../../util/types.js";
-import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelection, UseMultiSelectionChild, UseMultiSelectionChildContext, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType } from "./use-multi-selection.js";
-import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelection, UseSingleSelectionChild, UseSingleSelectionChildContext, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionDeclarativeParameters } from "./use-single-selection.js";
+import { UseMultiSelection, UseMultiSelectionChild, UseMultiSelectionChildContext, UseMultiSelectionChildDeclarative, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType } from "./use-multi-selection.js";
+import { UseSingleSelection, UseSingleSelectionChild, UseSingleSelectionChildContext, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionDeclarative } from "./use-single-selection.js";
 export interface UseSelectionChildInfo<E extends Element> extends UseSingleSelectionChildInfo<E>, UseMultiSelectionChildInfo<E> {
 }
 export type UseSelectionChildInfoKeysParameters = UseSingleSelectionChildInfoKeysParameters | UseMultiSelectionChildInfoKeysParameters;
@@ -34,18 +34,8 @@ export declare function useSelection<ParentOrChildElement extends Element, Child
  * @compositeParams
  */
 export declare function useSelectionChild<ChildElement extends Element>({ context, info: { index, untabbable, ...void2 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void3 }: Parameter<UseSelectionChild<ChildElement>>): ReturnType<UseSelectionChild<ChildElement>>;
-export type MakeSelectionDeclarativeParameters<P> = MakeSingleSelectionDeclarativeParameters<P>;
-export type MakeSelectionDeclarativeReturnType<R> = MakeSingleSelectionDeclarativeReturnType<R>;
-export type MakeSelectionDeclarativeChildParameters<P extends Parameter<UseMultiSelectionChild<any>>> = MakeMultiSelectionChildDeclarativeParameters<P>;
-export type MakeSelectionDeclarativeChildReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = MakeMultiSelectionChildDeclarativeReturnType<R>;
-export interface UseSelectionDeclarativeParameters<ChildElement extends Element> extends UseSingleSelectionDeclarativeParameters<ChildElement> {
-}
-export interface UseSelectionChildDeclarativeParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseMultiSelectionChildDeclarativeParameters<ChildElement, M> {
-}
-export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): {
-    singleSelectionParameters: {
-        onSingleSelectedIndexChange: import("./use-single-selection.js").SelectedIndexChangeHandler;
-    };
-};
-export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): import("./use-multi-selection.js").UseMultiSelectionChildDeclarativeReturnType<ChildElement, UseMultiSelectionChildInfo<ChildElement>>;
+export type UseSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element> = StandardHook<"selectionDeclarative", never, [StandardDepsPick<"params", UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>>], never, [StandardDepsPick<"return", UseSingleSelectionDeclarative<ParentOrChildElement, ChildElement>>]>;
+export type UseSelectionChildDeclarative<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> = StandardHook<"selectionChildDeclarative", never, [StandardDepsPick<"params", UseMultiSelectionChildDeclarative<ChildElement, M>>], never, [StandardDepsPick<"return", UseMultiSelectionChildDeclarative<ChildElement, M>>, StandardDepsInfo<M, "setSelectedFromParent">]>;
+export declare function useSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>(args: Parameter<UseSelectionDeclarative<ParentOrChildElement, ChildElement>>): ReturnType<UseSelectionDeclarative<ParentOrChildElement, ChildElement>>;
+export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: Parameter<UseSelectionChildDeclarative<ChildElement, UseSelectionChildInfo<ChildElement>>>): ReturnType<UseSelectionChildDeclarative<ChildElement, UseSelectionChildInfo<ChildElement>>>;
 //# sourceMappingURL=use-selection.d.ts.map

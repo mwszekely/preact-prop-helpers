@@ -6102,6 +6102,8 @@
       }
     };
   }
+  //export type MakeMultiSelectionChildDeclarativeParameters<P extends Parameter<UseMultiSelectionChild<any>>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<Parameter<UseMultiSelectionChild<any>>, "multiSelectionChildParameters", never>;
+  //export type MakeMultiSelectionChildDeclarativeReturnType<R extends ReturnType<UseMultiSelectionChild<any>>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<ReturnType<UseMultiSelectionChild<any>>, "multiSelectionChildReturn", "changeMultiSelected">;
   /**
    *
    * @compositeParams
@@ -6301,12 +6303,15 @@
    */
   function useSingleSelectionDeclarative({
     singleSelectionReturn: {
-      changeSingleSelectedIndex
+      changeSingleSelectedIndex,
+      ...void2
     },
     singleSelectionDeclarativeParameters: {
       singleSelectedIndex,
-      onSingleSelectedIndexChange
-    }
+      onSingleSelectedIndexChange,
+      ...void1
+    },
+    ...void3
   }) {
     let s = singleSelectedIndex ?? null;
     let reasonRef = _(undefined);
@@ -9027,7 +9032,20 @@
     singleSelectionParameters,
     ...normalGridNavParameters
   }) {
-    const ret2 = useCompleteGridNavigation({
+    const {
+      childrenHaveFocusReturn,
+      singleSelectionReturn,
+      contextChildren,
+      contextProcessing,
+      linearNavigationReturn,
+      managedChildrenReturn,
+      props,
+      rearrangeableChildrenReturn,
+      refElementReturn,
+      rovingTabIndexReturn,
+      typeaheadNavigationReturn,
+      ...void1
+    } = useCompleteGridNavigation({
       singleSelectionParameters: {
         initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
         onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)),
@@ -9041,9 +9059,22 @@
       }
     } = useSelectionDeclarative({
       singleSelectionDeclarativeParameters,
-      singleSelectionReturn: ret2.singleSelectionReturn
+      singleSelectionReturn
     });
-    return ret2;
+    return {
+      singleSelectionReturn,
+      childrenHaveFocusReturn,
+      contextChildren,
+      contextProcessing,
+      linearNavigationReturn,
+      managedChildrenReturn,
+      props,
+      rearrangeableChildrenReturn,
+      refElementReturn,
+      rovingTabIndexReturn,
+      typeaheadNavigationReturn,
+      ...void1
+    };
   }
 
   /**
@@ -9390,16 +9421,39 @@
   function useCompleteListNavigationDeclarative({
     singleSelectionParameters,
     singleSelectionDeclarativeParameters,
-    ...rest
+    childrenHaveFocusParameters,
+    linearNavigationParameters,
+    managedChildrenParameters,
+    multiSelectionParameters,
+    paginatedChildrenParameters,
+    refElementParameters,
+    rovingTabIndexParameters,
+    typeaheadNavigationParameters,
+    ...void1
   }) {
-    const ret = useCompleteListNavigation({
+    const ret1 = useCompleteListNavigation({
       singleSelectionParameters: {
         initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
         // Needs to be a (stable) callback because of declaration order
         onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)),
         ...singleSelectionParameters
       },
-      ...rest
+      childrenHaveFocusParameters,
+      linearNavigationParameters,
+      managedChildrenParameters,
+      multiSelectionParameters,
+      paginatedChildrenParameters,
+      refElementParameters,
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      ...void1
+    });
+    const {
+      singleSelectionReturn
+    } = ret1;
+    const ret3 = useSelectionDeclarative({
+      singleSelectionDeclarativeParameters,
+      singleSelectionReturn
     });
     const {
       singleSelectionParameters: {
@@ -9407,31 +9461,23 @@
         ...void3
       },
       ...void2
-    } = useSelectionDeclarative({
-      singleSelectionDeclarativeParameters,
-      singleSelectionReturn: ret.singleSelectionReturn
-    });
-    const {
-      singleSelectionReturn: {
-        getSingleSelectedIndex
-      },
-      ...ret2
-    } = ret;
-    return {
-      ...ret2,
-      singleSelectionReturn: {
-        getSingleSelectedIndex
-      }
-    };
+    } = ret3;
+    return ret1;
   }
   function useCompleteListNavigationChildDeclarative({
     multiSelectionChildParameters,
     multiSelectionChildDeclarativeParameters: {
       multiSelected,
-      onMultiSelectedChange
+      onMultiSelectedChange,
+      ...void1
     },
     info: i1,
-    ...rest
+    hasCurrentFocusParameters,
+    refElementParameters,
+    singleSelectionChildParameters,
+    textContentParameters,
+    context,
+    ...void4
   }) {
     const {
       multiSelectionChildParameters: {
@@ -9446,11 +9492,28 @@
       },
       multiSelectionChildReturn: {
         changeMultiSelected: useStableCallback((...args) => {
-          ret.multiSelectionChildReturn.changeMultiSelected(...args);
+          changeMultiSelected(...args);
         })
       }
     });
-    const ret = useCompleteListNavigationChild({
+    const {
+      hasCurrentFocusReturn,
+      managedChildReturn,
+      multiSelectionChildReturn: {
+        changeMultiSelected,
+        getMultiSelected,
+        multiSelected: isMultiSelected,
+        multiSelectionMode
+      },
+      pressParameters,
+      propsChild,
+      propsTabbable,
+      refElementReturn,
+      rovingTabIndexChildReturn,
+      singleSelectionChildReturn,
+      textContentReturn,
+      ...void3
+    } = useCompleteListNavigationChild({
       multiSelectionChildParameters: {
         initiallyMultiSelected: multiSelected,
         onMultiSelectChange: useStableCallback(e => {
@@ -9462,15 +9525,29 @@
         ...i1,
         ...i2
       },
-      ...rest
+      hasCurrentFocusParameters,
+      refElementParameters,
+      singleSelectionChildParameters,
+      textContentParameters,
+      context,
+      ...void4
     });
-    const {
-      multiSelectionChildReturn,
-      ...ret2
-    } = ret;
     return {
-      ...ret2,
-      multiSelectionChildReturn
+      pressParameters,
+      propsChild,
+      propsTabbable,
+      refElementReturn,
+      hasCurrentFocusReturn,
+      managedChildReturn,
+      rovingTabIndexChildReturn,
+      singleSelectionChildReturn,
+      textContentReturn,
+      multiSelectionChildReturn: {
+        changeMultiSelected,
+        getMultiSelected,
+        multiSelected: isMultiSelected,
+        multiSelectionMode
+      }
     };
   }
 

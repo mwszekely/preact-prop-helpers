@@ -5,14 +5,14 @@ import { UsePaginatedChildren } from "../component-detail/processed-children/use
 import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildren, UseProcessedChildrenContext } from "../component-detail/processed-children/use-processed-children.js";
 import { UseRearrangeableChildren } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildren } from "../component-detail/processed-children/use-staggered-children.js";
-import { MakeSelectionDeclarativeParameters, UseSelectionChildContext } from "../component-detail/selection/use-selection.js";
+import { UseSelection, UseSelectionChild, UseSelectionChildContext, UseSelectionChildDeclarative, UseSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationSelection, UseGridNavigationSelectionCell, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionRow, UseGridNavigationSelectionRowInfoKeysParameters } from "../component-detail/use-grid-navigation-selection.js";
 import { UseRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseTextContent } from "../dom-helpers/use-text-content.js";
 import { UseChildrenHaveFocus, UseChildrenHaveFocusContext } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChild, UseManagedChildContext, UseManagedChildren } from "../preact-extensions/use-managed-children.js";
-import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook, TargetedOmit } from "../util/types.js";
+import { OmitStrong, Parameter, StandardDepsContext, StandardDepsInfo, StandardDepsOmit, StandardDepsPick, StandardDepsProps, StandardHook } from "../util/types.js";
 export type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationRowInfo<any>> | UseGridNavigationSelectionRowInfoKeysParameters;
 export type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseCompleteGridNavigationCellInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationCellInfo<any>> | UseGridNavigationSelectionCellInfoKeysParameters | "focusSelf";
 export interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSelectChildRowInfo<RowElement>, ManagedChildInfo<number> {
@@ -112,9 +112,23 @@ export declare const useCompleteGridNavigationRow: <RowElement extends Element, 
  * @compositeParams
  */
 export declare const useCompleteGridNavigationCell: <CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context, textContentParameters: { getText, onTextContentChange: otcc1, ...void4 }, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }: {} & StandardDepsInfo<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>> & StandardDepsOmit<"params", UseGridNavigationSelectionCell<CellElement>, "refElementReturn"> & StandardDepsOmit<"params", UseTextContent<CellElement>, "refElementReturn"> & StandardDepsContext<CompleteGridNavigationCellContext<CellElement, CM>, keyof CompleteGridNavigationCellContext<CellElement_1, CM_1>>) => {} & StandardDepsOmit<"return", UseGridNavigationSelectionCell<CellElement>, "hasCurrentFocusParameters" | "textContentParameters"> & StandardDepsPick<"return", UseRefElement<CellElement>> & StandardDepsPick<"return", UseHasCurrentFocus<CellElement>> & StandardDepsPick<"return", UseTextContent<CellElement_1>> & StandardDepsPick<"return", UseManagedChild<CM>> & StandardDepsProps<CellElement>;
-export interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<MakeSelectionDeclarativeParameters<Parameter<UseCompleteGridNavigation<ParentOrRowElement, RowElement, RM>>>, "singleSelectionReturn"> {
-}
-export interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends TargetedOmit<ReturnType<UseCompleteGridNavigation<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn", "changeSingleSelectedIndex">, OmitStrong<ReturnType<UseCompleteGridNavigation<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn"> {
-}
-export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, RM>;
+export type UseCompleteGridNavigationDeclarative<ParentElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> = StandardHook<"gridNavigationCompleteDeclarative", never, [
+    StandardDepsOmit<"params", UseCompleteGridNavigation<ParentElement, RowElement, RM>, never, [
+        StandardDepsOmit<"params", UseSelectionDeclarative<ParentElement, RowElement>, "singleSelectionReturn">,
+        StandardDepsPick<"params", UseSelection<ParentElement, RowElement>, "singleSelectionParameters", "omit", "initiallySingleSelectedIndex" | "onSingleSelectedIndexChange">
+    ]>
+], never, [
+    OmitStrong<ReturnType<UseCompleteGridNavigation<ParentElement, RowElement, RM>>, never>,
+    StandardDepsOmit<"return", UseSelectionDeclarative<ParentElement, RowElement>, "singleSelectionParameters">,
+    StandardDepsPick<"return", UseSelection<ParentElement, RowElement>, "singleSelectionReturn", "omit", "changeSingleSelectedIndex">
+]>;
+export type UseCompleteGridNavigationRowDeclarative<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = StandardHook<"gridNavigationSelectionChildDeclarative", never, [
+    StandardDepsInfo<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>,
+    StandardDepsContext<CompleteGridNavigationRowContext<RowElement, RM>>,
+    StandardDepsOmit<"params", UseCompleteGridNavigationRow<RowElement, CellElement, RM, CM>, never, [
+        StandardDepsOmit<"params", UseSelectionChildDeclarative<RowElement, RM>, "multiSelectionChildReturn">,
+        StandardDepsPick<"params", UseSelectionChild<RowElement>, "multiSelectionChildParameters", "omit", "initiallyMultiSelected" | "onMultiSelectChange">
+    ]>
+], never, []>;
+export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }: Parameter<UseCompleteGridNavigationDeclarative<ParentOrRowElement, RowElement, RM>>): ReturnType<UseCompleteGridNavigationDeclarative<ParentOrRowElement, RowElement, RM>>;
 //# sourceMappingURL=use-grid-navigation-complete.d.ts.map
