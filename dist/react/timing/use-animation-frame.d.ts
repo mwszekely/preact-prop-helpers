@@ -12,7 +12,7 @@ export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
 }): import("preact").VNode<{
     value: ContextType | null;
-    children: import("preact").ComponentChildren;
+    children?: import("preact").ComponentChildren;
 }>;
 export interface UseAnimationFrameParameters {
     /**

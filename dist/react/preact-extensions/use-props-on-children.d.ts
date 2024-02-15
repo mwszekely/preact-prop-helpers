@@ -11,5 +11,5 @@ import { ElementProps, JSX, Ref } from "../util/lib.js";
  * @param Tag
  * @returns
  */
-export declare function usePropsOnChildren(children: ElementProps<any>["children"] | undefined | null, props: ElementProps<any>, ref: Ref<any> | null | undefined, Tag?: keyof JSX.IntrinsicElements): import("preact").VNode<(JSX.DOMAttributes<HTMLInputElement> & import("preact").ClassAttributes<HTMLInputElement>) | null>;
+export declare function usePropsOnChildren(children: ElementProps<any>["children"] | undefined | null, props: ElementProps<any>, ref: Ref<any> | null | undefined, Tag?: keyof JSX.IntrinsicElements): import("preact").VNode<JSX.DOMAttributes<HTMLInputElement> & import("preact").ClassAttributes<HTMLInputElement>>;
 //# sourceMappingURL=use-props-on-children.d.ts.map
