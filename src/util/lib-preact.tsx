@@ -1,12 +1,18 @@
 export { Fragment, cloneElement, createContext, createElement } from "preact";
 export type { JSX, Ref, RefCallback, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
-export { useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
+export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 export type { EffectCallback, Inputs, MutableRef, Reducer, StateUpdater } from "preact/hooks";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 import type { JSX } from "preact";
 import { options } from "preact";
+import { Inputs, useCallback as ucb } from "preact/hooks";
 import { EventMapping as em } from "./lib-shared.js";
+
+// Patch the type (only the type) of useCallback to allow for nullable functions
+export const useCallback = ucb as <T extends Function | null | undefined>(callback: NonNullable<T>, inputs: Inputs) => NonNullable<T>;
+
+
 
 // In React, this is useInsertionEffect
 export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";

@@ -49,16 +49,16 @@ interface Foo<T> {
 }
 
 
-const activeElementUpdaters: MapOfSets<Window | null | undefined, Foo<Node | null>> = new Map();
-const lastActiveElementUpdaters: MapOfSets<Window | null | undefined, Foo<Node>> = new Map();
-const windowFocusedUpdaters: MapOfSets<Window | null | undefined, Foo<boolean>> = new Map();
+const activeElementUpdaters: Map<Window | null | undefined, Set<Foo<Node | null>>> = new Map();
+const lastActiveElementUpdaters: Map<Window | null | undefined, Set<Foo<Node>>> = new Map();
+const windowFocusedUpdaters: Map<Window | null | undefined, Set<Foo<boolean>>> = new Map();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
 
 // The focusin and focusout events often fire synchronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
-function forEachUpdater<T>(window: Window | null | undefined, map: MapOfSets<Window | null | undefined, Foo<T>>, value: T, reason: any) {
+function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T, reason: any) {
     const updaters = map.get(window);
 
     if (updaters) {

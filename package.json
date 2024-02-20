@@ -41,20 +41,20 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.39.0",
-    "@types/lodash-es": "^4.17.10",
-    "@types/react": "^18.2.31",
-    "@types/react-dom": "^18.2.14",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
-    "eslint": "^8.52.0",
+    "@playwright/test": "^1.41.2",
+    "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18.2.57",
+    "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "eslint": "^8.56.0",
     "npm-run-all": "^4.1.5",
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   },
   "dependencies": {
     "async-to-sync": "github:mwszekely/async-to-sync",
     "blocking-elements": "^0.1.1",
-    "clsx": "^2.0.0",
+    "clsx": "^2.1.0",
     "lodash-es": "^4.17.21",
     "map-and-set-extensions": "github:mwszekely/map-and-set-extensions",
     "tabbable": "^6.2.0",
