@@ -156,10 +156,11 @@ export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, 
     info: Pick<M, "setSelectedFromParent">;
 }
 export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
-    multiSelectionChildDeclarativeParameters: {
-        multiSelected: boolean;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
-    };
+    multiSelectionChildDeclarativeParameters: UseMultiSelectionChildDeclarativeParametersSelf<E>;
+}
+export interface UseMultiSelectionChildDeclarativeParametersSelf<E extends Element> {
+    multiSelected: boolean;
+    onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
 }
 export type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<UseMultiSelectionChildParameters<any, any>, "multiSelectionChildParameters", never>;
 export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<UseMultiSelectionChildReturnType<any, any>, "multiSelectionChildReturn", "changeMultiSelected">;

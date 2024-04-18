@@ -14,6 +14,7 @@ export const EventMapping = {
     focusout: "onBlur",
     formdata: null,
     toggle: null,
+    beforetoggle: null,
     ...em,
 };
 //# sourceMappingURL=lib-react.js.map

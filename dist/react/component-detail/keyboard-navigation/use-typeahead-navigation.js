@@ -15,10 +15,15 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, managedChildrenReturn: { getChildren, ...void4 }, ...void2 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    const isValidForTypeaheadNavigation = useCallback((index) => {
+        const child = getChildren().getAt(index);
+        return child != null && !child.untabbable;
+    }, []);
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.

@@ -1,7 +1,13 @@
 import { expect } from '@playwright/test';
-import { MissingIndex, WithColSpanIndex } from './grid-nav.constants.js';
 import { test } from "./grid-nav.fixture.js";
 
+
+// TODO: Need to copy these back and forth
+export const DisabledIndex = 4;
+export const MissingIndex = 6;
+export const HiddenIndex = 8;
+export const WithColSpanIndex = 3;
+export const DefaultChildCount = 20
 
 
 

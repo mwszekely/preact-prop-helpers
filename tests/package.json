@@ -7,14 +7,14 @@
   "packageManager": "pnpm@8.6.3",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc build:sass build:js",
-    "watch": "npx npm-run-all --npm-path npm -s build watch-impl",
-    "watch-impl": "npx npm-run-all --npm-path npm -p watch:*",
+    "watch": "npx npm-run-all --npm-path npm -p watch:*",
     "build:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css",
-    "build:js": "rollup --config stage/rollup.config.js",
+    "build:js": "npx esbuild ./stage/index.tsx --bundle --sourcemap --outfile=stage/index.js",
     "watch:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css --watch",
-    "watch:js": "rollup --config stage/rollup.config.js --watch --no-watch.clearScreen",
+    "watch:js": "npx esbuild ./stage/index.tsx --bundle --sourcemap --outfile=stage/index.js --watch",
     "serve": "npx serve .. -l 51082",
-    "start": "npx npm-run-all --npm-path npm -p watch serve"
+    "serve-and-watch": "npx npm-run-all --npm-path npm -p serve watch",
+    "start": "npx npm-run-all --npm-path npm -s build serve-and-watch"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +37,7 @@
     "tslib": "^2.5.3"
   },
   "devDependencies": {
+    "esbuild": "^0.20.2",
     "npm-run-all": "^4.1.5"
   }
 }

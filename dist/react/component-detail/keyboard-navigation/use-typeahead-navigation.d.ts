@@ -1,6 +1,6 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
@@ -43,7 +43,6 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      *
      * @nonstable
      */
-    isValidForTypeaheadNavigation(index: number): boolean;
     /**
      * A collator to use when comparing.
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
@@ -68,9 +67,9 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
 export interface UseTypeaheadNavigationContext {
     typeaheadNavigationContext: UseTypeaheadNavigationContextSelf;
 }
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index" | "untabbable"> {
 }
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
@@ -93,7 +92,7 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>) => UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare const useTypeaheadNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, managedChildrenReturn: { getChildren, ...void4 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, UseTypeaheadNavigationChildInfo<ChildElement>>) => UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 /**
  *
  * @compositeParams

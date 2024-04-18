@@ -12,7 +12,7 @@ import { monitored } from "../util/use-call-count.js";
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
+export const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options = false, mode) {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", mode);
     if (mode === "grouped") {
@@ -63,6 +63,7 @@ function useGlobalHandlerGrouped(target, type, handler, options) {
     let stableHandler = useStableCallback(handler ?? (() => { }));
     if (handler == null)
         stableHandler = null;
+    options ||= false;
     useEffect(() => {
         if (stableHandler) {
             addToMapThing(target, type, stableHandler, options);
@@ -74,6 +75,7 @@ function useGlobalHandlerSingle(target, type, handler, options) {
     let stableHandler = useStableCallback(handler ?? (() => { }));
     if (handler == null)
         stableHandler = null;
+    options ||= false;
     useEffect(() => {
         if (stableHandler) {
             target.addEventListener(type, stableHandler, options);

@@ -3,7 +3,13 @@ import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, Ev
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
-import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
+
+// TODO: Need to copy these back and forth
+export const DisabledIndex = 4;
+export const MissingIndex = 6;
+export const HiddenIndex = 8;
+export const WithColSpanIndex = 3;
+export const DefaultChildCount = 20
 
 
 

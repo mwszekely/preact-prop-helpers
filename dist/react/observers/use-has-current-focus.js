@@ -35,8 +35,8 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
         [onfocusout]: onFocusOut
     });
     return {
+        propsStable: propsStable.current,
         hasCurrentFocusReturn: {
-            propsStable: propsStable.current,
             getCurrentFocused: getFocused,
             getCurrentFocusedInner: getFocusedInner,
         }

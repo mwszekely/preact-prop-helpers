@@ -22,11 +22,7 @@ type FirstOverloadParameters<T> = T extends {
     (...args: infer R): any;
     (...args: any[]): any;
 } ? R : T extends (...args: infer R) => any ? R : [];
-type TypedAddEventListener<T extends EventTarget> = (...args: FirstOverloadParameters<(T["addEventListener"])>) => void;
-type TypedEventListenerTypes<T extends EventTarget> = TypedAddEventListener<T> extends ((type: infer K2, ...args: any[]) => any) ? K2 : string;
-type TypedEventHandler<E extends EventTarget, T extends TypedEventListenerTypes<E>> = TypedAddEventListener<E> extends ((type: T, handler: infer H, ...args: any[]) => any) ? NonNullable<H> : never;
-type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> = T extends EventListenerObject ? Parameters<T["handleEvent"]> : T extends (...args: infer P) => any ? P : never;
-type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters2<TypedEventHandler<E, T>>[0];
+type GetTypedAddEventListenerParams<E extends EventTarget, _K> = FirstOverloadParameters<E["addEventListener"]>;
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  *
@@ -37,6 +33,6 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export declare const useGlobalHandler: <T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: ((e: H) => void) | null, options?: FirstOverloadParameters<T["addEventListener"]>[2] | undefined, mode?: "grouped" | "single") => void;
+export declare const useGlobalHandler: <E extends EventTarget, K, H extends (...args: any[]) => void>(target: E, type: GetTypedAddEventListenerParams<E, K>[0], handler: H | null, options?: boolean | AddEventListenerOptions, mode?: "grouped" | "single") => void;
 export {};
 //# sourceMappingURL=use-event-handler.d.ts.map

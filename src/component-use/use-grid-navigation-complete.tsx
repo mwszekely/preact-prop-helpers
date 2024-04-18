@@ -40,8 +40,8 @@ export interface UseCompleteGridNavigationRowsInfo<ChildElement extends Element>
 
 export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">,
-    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
+    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", never>,
+    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", never>,
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">,
     Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
 
@@ -70,8 +70,8 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>,
     OmitStrong<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">,
     Pick<UseTextContentParameters<RowElement>, "textContentParameters">,
-    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
+    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", never>,
+    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", never>,
     OmitStrong<UseHasCurrentFocusParameters<RowElement>, "refElementReturn"> {
 }
 
@@ -127,7 +127,7 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
     OmitStrong<UseGridNavigationSelectionCellReturnType<CellElement>, "hasCurrentFocusParameters" | "info" | "textContentParameters">,
     OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">,
     Pick<UseTextContentReturnType, "textContentReturn">,
-    UseHasCurrentFocusReturnType<CellElement>,
+    OmitStrong<UseHasCurrentFocusReturnType<CellElement>, "propsStable">,
     UseManagedChildReturnType<CM> {
     props: ElementProps<CellElement>;
 }
@@ -190,10 +190,10 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         multiSelectionParameters,
         paginatedChildrenParameters,
         refElementReturn,
-        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+        linearNavigationParameters,
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        typeaheadNavigationParameters,
         childrenHaveFocusReturn: { getAnyFocused },
         rearrangeableChildrenReturn: { indexDemangler, indexMangler }
     });
@@ -297,31 +297,22 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
 
     // Create some helper functions
+    // (Actually just one now, this section's shrunk a fair amount)
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
-    const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
-    const getLowestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
-    const isValidForNavigation = useCallback((i: number) => {
-        const child = getChildren().getAt(i);
-        if (child == null)
-            return false;
-        if (child.untabbable)
-            return false;
-        return true;
-    }, []);
+
 
     // Someone somewhere needs useRefElement, no shock there
-    const { refElementReturn, propsStable, ...void6 } = useRefElement<RowElement>({ refElementParameters: {} });
+    const { refElementReturn, propsStable: ps1, ...void6 } = useRefElement<RowElement>({ refElementParameters: {} });
 
     // Enormous bag of parameters for useGridNavigationRow
     const parameters: UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM> = {
         rovingTabIndexParameters,
-        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-        linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
+        typeaheadNavigationParameters,
+        linearNavigationParameters,
         managedChildrenReturn: { getChildren },
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info: { index, untabbable },
-        //textContentReturn: { getTextContent: useStableCallback(() => textContentReturn.getTextContent()) },
         singleSelectionChildParameters,
         multiSelectionChildParameters
     }
@@ -365,7 +356,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
         ...contextMC,
     });
 
-    const { hasCurrentFocusReturn } = useHasCurrentFocus<RowElement>({
+    const { hasCurrentFocusReturn, propsStable: ps2 } = useHasCurrentFocus<RowElement>({
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: ocfc1,
@@ -374,9 +365,9 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
     });
 
     const props = useMergedProps(
-        propsStable,
+        ps1, 
+        ps2,
         p3,
-        hasCurrentFocusReturn.propsStable,
     );
 
     assertEmptyObject(void1);
@@ -415,7 +406,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
     info: { focusSelf, index, untabbable, ...customUserInfo },
     ...void1
 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM> {
-    const { refElementReturn, propsStable } = useRefElement<CellElement>({ refElementParameters: {} });
+    const { refElementReturn, propsStable: ps1 } = useRefElement<CellElement>({ refElementParameters: {} });
     const {
         hasCurrentFocusParameters,
         rovingTabIndexChildReturn,
@@ -438,7 +429,7 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
     assertEmptyObject(void3);
     assertEmptyObject(void4);
 
-    const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({
+    const { hasCurrentFocusReturn, propsStable: ps2 } = useHasCurrentFocus<CellElement>({
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: null,
             ...hasCurrentFocusParameters
@@ -458,9 +449,9 @@ export const useCompleteGridNavigationCell = monitored(function useCompleteGridN
     const { managedChildReturn } = useManagedChild<CM>({ context, info: { ...baseInfo, ...customUserInfo } as CM })
 
     const props = useMergedProps(
-        propsStable,
+        ps1,
+        ps2,
         propsRti,
-        hasCurrentFocusReturn.propsStable
     );
 
     return {

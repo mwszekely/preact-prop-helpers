@@ -20,6 +20,10 @@ type FirstOverloadParameters<T> =
     T extends { (...args: infer R): any; (...args: any[]): any } ? R :
     T extends (...args: infer R) => any ? R : [];
 
+
+type GetTypedAddEventListenerParams<E extends EventTarget, _K> = FirstOverloadParameters<E["addEventListener"]>;// & Parameters<((type: K, ...args: any[]) => void)>;
+
+
 // Get just the typed version of addEventListener, if it exists
 type TypedAddEventListener<T extends EventTarget> = (...args: FirstOverloadParameters<(T["addEventListener"])>) => void;
 
@@ -32,15 +36,15 @@ type TypedEventListenerTypes<T extends EventTarget> = TypedAddEventListener<T> e
 // I don't know why `infer H` is doing that when the type should be narrowed by `T` though...
 // Note that the type parameter is still used, even though it doesn't narrow down the type,
 // because otherwise, instead of being a union of all types, it's just `any`
-type TypedEventHandler<E extends EventTarget, T extends TypedEventListenerTypes<E>> = TypedAddEventListener<E> extends ((type: T, handler: infer H, ...args: any[]) => any) ? NonNullable<H> : never;
+type TypedEventHandler<E extends EventTarget, T extends TypedEventListenerTypes<E>> = TypedAddEventListener<E> extends ((type: T, handler: infer H, ...args: any[]) => any) ? NonNullable<H> : (e: Event) => void;
 //((TypedAddEventListener<E> & ((type: T, handler: (e: Event) => void, ...args: any[]) => any)) extends ((type: T, handler: (e: infer H) => any, ...args: any[]) => any) ? H : Function) /*& (T extends keyof GlobalEventHandlersEventMap? GlobalEventHandlersEventMap[T] : (e: Event) => void)*/;
 
-type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> =
+/*type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> =
     T extends EventListenerObject ? Parameters<T["handleEvent"]> :
-    T extends (...args: infer P) => any ? P : never;
+    T extends (...args: infer P) => any ? P : never;*/
 
 
-type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters2<TypedEventHandler<E, T>>[0];
+type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters<TypedEventHandler<E, T> & ((type: T, handler: any, ...args: any[]) => any)>[1];
 
 
 /**
@@ -53,7 +57,7 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export const useGlobalHandler = monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
+export const useGlobalHandler = monitored(function useGlobalHandler<E extends EventTarget, K, H extends (...args: any[]) => void>(target: E, type: GetTypedAddEventListenerParams<E, K>[0], handler: H | null, options: boolean | AddEventListenerOptions = false, mode?: "grouped" | "single"): void {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", mode);
 
@@ -62,10 +66,10 @@ export const useGlobalHandler = monitored(function useGlobalHandler<T extends Ev
         // No matter what, it seems impossible to get the handler's event object typed perfectly.
         // It seems like it's guaranteed to always be a union of all available types.
         // Again, no matter what combination of sub- or sub-sub-functions used.
-        useGlobalHandlerGrouped<T, EventType, H>(target, type, handler, options);
+        useGlobalHandlerGrouped(target, type as string, handler as EventListener, options);
     }
     else {
-        useGlobalHandlerSingle<T, EventType, H>(target, type, handler, options);
+        useGlobalHandlerSingle(target, type as string, handler as EventListener, options);
     }
 })
 
@@ -74,37 +78,37 @@ type MapOfOptionsToInfo = Map<string, GlobalHandlerInfo>
 type MapOfTypeToMapOfOptionsToInfo = Map<TypedEventListenerTypes<EventTarget>, MapOfOptionsToInfo>;
 let mapThing = new Map<EventTarget, MapOfTypeToMapOfOptionsToInfo>();
 
-function doMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(op: (i: GlobalHandlerInfo, h: EventListener) => void, target: T, type: EventType, handler: null | EventListener, options: Parameters<TypedAddEventListener<T>>[2]): void {
+function doMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(op: (i: GlobalHandlerInfo, h: EventListener) => void, target: T, type: EventType, handler: null | EventListener, options: boolean | AddEventListenerOptions): void {
     if (handler) {
 
         const optionsKey = JSON.stringify(options);
         const byType = mapThing.get(target) || (new Map() as MapOfTypeToMapOfOptionsToInfo);
-        const byOptions = (byType.get(type) || (new Map() as MapOfOptionsToInfo));
+        const byOptions = (byType.get(type as string) || (new Map() as MapOfOptionsToInfo));
         const info = byOptions.get(optionsKey) || { listener: null!, listeners: new Set() };
 
         op(info, handler);
 
         byOptions.set(optionsKey, info);
-        byType.set(type, byOptions);
+        byType.set(type as string, byOptions);
         mapThing.set(target, byType);
     }
 }
 
 
-function addToMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(target: T, type: EventType, handler: null | EventListener, options: Parameters<TypedAddEventListener<T>>[2]): void {
+function addToMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(target: T, type: EventType, handler: null | EventListener, options: boolean | AddEventListenerOptions): void {
     doMapThing((info, h) => {
         info.listeners.add(h);
         if (info.listener == null)
-            target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+            target.addEventListener(type as string, info.listener = e => info.listeners.forEach(fn => fn(e)), options as AddEventListenerOptions);
     }, target, type, handler, options);
 
 }
 
-function removeFromMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(target: T, type: EventType, handler: null | EventListener, options?: Parameters<TypedAddEventListener<T>>[2]): void {
+function removeFromMapThing<T extends EventTarget, EventType extends TypedEventListenerTypes<T>>(target: T, type: EventType, handler: null | EventListener, options: boolean | AddEventListenerOptions): void {
     doMapThing((info, h) => {
         info.listeners.delete(h);
         if (info.listener == null)
-            target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+            target.removeEventListener(type as string, info.listener = e => info.listeners.forEach(fn => fn(e)), options as AddEventListenerOptions);
     }, target, type, handler, options);
 }
 
@@ -114,10 +118,12 @@ function removeFromMapThing<T extends EventTarget, EventType extends TypedEventL
  * For example, if every button listens for a global click, or something,
  * it would be nice if it was efficient at least. 
  */
-function useGlobalHandlerGrouped<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2]): void {
+function useGlobalHandlerGrouped(target: EventTarget, type: string, handler: null | EventListener, options?: boolean | AddEventListenerOptions): void {
     let stableHandler: EventListener | null = useStableCallback<EventListener>((handler as any) ?? (() => { })) as (EventListener | null);
     if (handler == null)
         stableHandler = null;
+
+    options ||= false;
 
     useEffect(() => {
         if (stableHandler) {
@@ -127,16 +133,18 @@ function useGlobalHandlerGrouped<T extends EventTarget, EventType extends TypedE
     }, [target, type, stableHandler]);
 }
 
-function useGlobalHandlerSingle<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2]): void {
+function useGlobalHandlerSingle(target: EventTarget, type: string, handler: EventListener, options?: boolean | AddEventListenerOptions): void {
     let stableHandler: EventListener | null = useStableCallback<EventListener>((handler as any) ?? (() => { })) as (EventListener | null);
     if (handler == null)
         stableHandler = null;
 
+    options ||= false;
+
     useEffect(() => {
         if (stableHandler) {
-            target.addEventListener(type, stableHandler, options);
+            target.addEventListener(type as string, stableHandler, options);
 
-            return () => target.removeEventListener(type, stableHandler, options);
+            return () => target.removeEventListener(type as string, stableHandler, options);
         }
     }, [target, type, stableHandler]);
 }

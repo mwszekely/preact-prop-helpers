@@ -52,7 +52,13 @@ export const useSingleSelection = monitored(function useSingleSelection({ manage
     return {
         singleSelectionReturn: useMemoObject({
             getSingleSelectedIndex,
-            changeSingleSelectedIndex
+            changeSingleSelectedIndex: useCallback((e, r) => {
+                // Whenever the caller asks us to change the selected index,
+                // also make sure we change uRTI's currently tabbable index to match it.
+                if (e != null)
+                    setTabbableIndex(e, r, false);
+                changeSingleSelectedIndex(e, r);
+            }, [])
         }),
         context: useMemoObject({
             singleSelectionContext: useMemoObject({
@@ -65,6 +71,8 @@ export const useSingleSelection = monitored(function useSingleSelection({ manage
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
                 if (!anyFocused) {
+                    // TODO: Is this redundant with what we do in `changeSingleSelectedIndex`?
+                    // I'm 95% sure it is.
                     const selectedIndex = getSingleSelectedIndex();
                     if (selectedIndex != null)
                         setTabbableIndex(selectedIndex, reason, false);

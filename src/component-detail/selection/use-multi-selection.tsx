@@ -500,10 +500,12 @@ export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, 
 
 export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
     TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
-    multiSelectionChildDeclarativeParameters: {
-        multiSelected: boolean;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
-    }
+    multiSelectionChildDeclarativeParameters: UseMultiSelectionChildDeclarativeParametersSelf<E>;
+}
+
+export interface UseMultiSelectionChildDeclarativeParametersSelf<E extends Element> {
+    multiSelected: boolean;
+    onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
 }
 
 

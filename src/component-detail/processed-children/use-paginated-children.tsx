@@ -22,7 +22,7 @@ export interface UsePaginatedChildrenParametersSelf {
 
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
     extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
-    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">,
+    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement, any>, "rearrangeableChildrenReturn", "indexDemangler">,
     TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
     TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;

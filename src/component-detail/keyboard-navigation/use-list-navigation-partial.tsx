@@ -2,9 +2,9 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ElementProps, OmitStrong } from "../../util/types.js";
+import { ElementProps, OmitStrong, TargetedOmit } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
-import { UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";
+import { UseLinearNavigationChildInfo, UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";
 import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
 
@@ -41,8 +41,9 @@ import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysPar
  * (Note to self: At some point, this file will probably be normalized
  * by somebody and 着 will turn back into 着.)
  * 
- * Unrelated, but hey, this is fun: try highlighting the space between the two characters in VS Code,
- * or just typing a character in between them. What's up with this?
+ * Unrelated, but hey, this is fun: 
+ * Try typing a letter (a-z, case ins.) in between the two characters below (tested in VS Code).
+ * What's up with this?
  * 着 着
  */
 const _dummy: any = null;
@@ -50,12 +51,14 @@ const _dummy: any = null;
 
 
 
-export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> { }
+export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseLinearNavigationChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> { }
 
 export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends
     UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>,
-    OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
-    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> { }
+    OmitStrong<UseTypeaheadNavigationParameters<ChildElement, M>, "rovingTabIndexReturn" | "typeaheadNavigationParameters">,
+    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn" | "linearNavigationParameters">,
+    TargetedOmit<UseTypeaheadNavigationParameters<ChildElement, M>, "typeaheadNavigationParameters", never>,
+    TargetedOmit<UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters", never> { }
 
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends
     OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">,
@@ -103,19 +106,15 @@ export const useListNavigation = monitored(function useListNavigation<ParentOrCh
     rearrangeableChildrenReturn,
     ...void1
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
+
     const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
-    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn });
+    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, managedChildrenReturn });
+    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn, managedChildrenReturn });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-
-    // Merge the props while keeping them stable
-    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
 
     return {
         managedChildrenParameters,

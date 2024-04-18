@@ -1,10 +1,122 @@
-import { expect } from '@playwright/test';
-import { LoremIpsum } from '../lorem.js';
-import { DisabledIndex, HiddenIndex, MissingIndex } from './list-nav.constants.js';
-import { test } from "./list-nav.fixture.js";
+import { expect } from "@playwright/test";
+import { test } from "./list-navigation.fixture.js";
 
 
+test.describe("Inheritance: RovingTabIndex", async () => {
 
+    test("Tabbing in focuses the first child", async ({ rovingTabIndex, page, shared }) => {
+        await rovingTabIndex.tests.basics({ rovingTabIndex, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    // Make sure that tabbing into a component doesn't allow it to focus a non-existent child.
+    test("Untabbable children are skipped when tabbed into", async ({ rovingTabIndex, page, shared }) => {
+        await rovingTabIndex.tests.untabbableChildrenAreSkipped({ rovingTabIndex, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    // Make sure that, apropos of anything else, 
+    test("The last tabbed index is remembered when focus leaves", async ({ rovingTabIndex, page, shared }) => {
+        await rovingTabIndex.tests.lastTabbedIndexIsRemembered({ rovingTabIndex, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    test("Clicking a child focuses it", async ({ rovingTabIndex, shared }) => {
+        await rovingTabIndex.tests.focusMovesViaClick({ rovingTabIndex });
+        expect(true).toBeTruthy();
+    });
+
+    // Set the first X children to be untabbable, then click on one of them.
+    // The child at X+1 should be focused as a result.
+    test("Clicking a missing child focuses a nearby neighbor", async ({ rovingTabIndex, shared }) => {
+        await rovingTabIndex.tests.unfocusableMovesToNearestNeighbor({ rovingTabIndex, shared });
+        expect(true).toBeTruthy();
+    });
+
+    // Set the first X children to be untabbable, then click on one of them.
+    // The child at X+1 should be focused as a result.
+    test("It should not focus itself on mount", async ({ rovingTabIndex, shared }) => {
+        await rovingTabIndex.tests.dontFocusOnMount({ shared, rovingTabIndex });
+        expect(true).toBeTruthy();
+    });
+})
+
+test.describe("Inheritance: LinearNavigation", async () => {
+    test("Arrow keys move focus when the component is focused", async ({ linearNavigation, page, shared }) => {
+        await linearNavigation.tests.arrowKeysMoveFocus({ linearNavigation, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    test("Arrow keys don't move focus when the component isn't focused", async ({ linearNavigation, page, shared }) => {
+        await linearNavigation.tests.arrowKeysDontMoveFocus({ linearNavigation, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    test("Arrow key direction is configurable", async ({ linearNavigation, page, shared }) => {
+        await linearNavigation.tests.arrowKeysAreConfigurable({ linearNavigation, page, shared });
+        expect(true).toBeTruthy();
+    });
+
+    test("Home/End move focus when appropriate", async ({ linearNavigation, page, shared }) => {
+        await linearNavigation.tests.homeEndMoveFocus({ linearNavigation, page, shared });
+        expect(true).toBeTruthy();
+    });
+})
+
+test.describe("Inheritance: SingleSelection", async () => {
+    test("ARIA states follow selection", async ({ shared, singleSelection }) => {
+        await singleSelection.tests.ariaStatesFollowSelection({ shared, singleSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("No ARIA states when disabled", async ({ shared, singleSelection }) => {
+        await singleSelection.tests.noAriaStatesWhenDisabled({ shared, singleSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Single selection can follow focus", async ({ shared, singleSelection }) => {
+        await singleSelection.tests.singleSelectionFollowsFocus({ shared, singleSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Single selection can follow activation", async ({ shared, singleSelection, page }) => {
+        await singleSelection.tests.singleSelectionFollowsActivation({ shared, singleSelection, page });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Tab order is remembered after selection", async ({ page, shared, singleSelection }) => {
+        await singleSelection.tests.tabOrderIsRememberedAfterSelection({ page, shared, singleSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Selecting a non-existent item focuses the closest neighbor", async ({ singleSelection, page, shared }) => {
+        await singleSelection.tests.oobSelectionsMoveFocusToClosest({ singleSelection, page, shared });
+        await expect(true).toBeTruthy();
+    });
+})
+
+test.describe("Inheritance: MultiSelection", async () => {
+    test("ARIA states follow selection", async ({ shared, multiSelection }) => {
+        await multiSelection.tests.ariaStatesFollowSelection({ shared, multiSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("No ARIA states when disabled", async ({ shared, multiSelection }) => {
+        await multiSelection.tests.noAriaStatesWhenDisabled({ shared, multiSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Multi selection can follow focus", async ({ shared, multiSelection }) => {
+        await multiSelection.tests.multiSelectionFollowsFocus({ shared, multiSelection });
+        await expect(true).toBeTruthy();
+    });
+
+    test("Multi selection can follow activation", async ({ shared, multiSelection, page }) => {
+        await multiSelection.tests.multiSelectionFollowsActivation({ shared, multiSelection, page });
+        await expect(true).toBeTruthy();
+    });
+});
+/*
 test("Navigation", async ({ page, listNav, shared: { getRenderCount } }) => {
 
     await test.step("Arrow key navigation works", async () => {
@@ -132,7 +244,7 @@ test("Untabbability works", async ({ page, listNav, shared: { run, install } }) 
     await expect(listNav.list.locator("li:nth-child(1)")).toBeFocused();
     await run("ListNav", "setUntabbable", true);
     await expect(listNav.list.locator("li:nth-child(2)")).not.toBeFocused();
-    await expect(listNav.list).toBeFocused();*/
+    await expect(listNav.list).toBeFocused();*\/
 });
 
 test("Selection", async ({ page, listNav, shared: { run, install } }) => {
@@ -182,6 +294,8 @@ test("Selection", async ({ page, listNav, shared: { run, install } }) => {
 });
 
 test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLast, install, run } }) => {
+    test.describe.configure({ retries: 3 });
+    
     let count = 200;
     let max = count - 1;  // There's always one "missing" list item that will never have any of the attributes we're looking for.
     await expect(focusableFirst).toBeFocused();
@@ -223,6 +337,8 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
 })
 
 test("Staggering", async ({ page, listNav, shared: { install, run } }) => {
+    test.describe.configure({ retries: 3 });
+
     let count = 200;
     let max = count - 1;  // There's always one "missing" list item that will never have any of the attributes we're looking for.
     await run("ListNav", "setMounted", false);

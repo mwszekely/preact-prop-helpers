@@ -1,15 +1,9 @@
 import { expect } from '@playwright/test';
-import { test } from "./base.fixture.js"
+import { test } from "./base.fixture.js";
 
-declare global {
-    interface Window {
-        increment?(): Promise<void>;
-        onRender?(id: string): Promise<void>;
-    }
-}
 
 test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => {
-    await page.goto("/tests/stage/?test-base=sanity-check");
+    await page.goto("?test-base=sanity-check");
 
     await expect(page).toHaveTitle("Unit Testing");
 
@@ -39,7 +33,7 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
         expect(page.message).toBeFalsy();
     })
 
-    const locator = page.locator(".tests-container");
+    const locator = page.locator("body");
     await expect(locator).toBeAttached();
     await expect(locator.locator(".default")).toContainText("default");
     await expect(locator.locator(".encoding")).toContainText("符号化テスト");

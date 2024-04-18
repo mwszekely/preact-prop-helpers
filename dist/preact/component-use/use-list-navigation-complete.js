@@ -13,6 +13,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+import { usePress } from "./use-press.js";
 /**
  * All the list-related hooks combined into one large hook that encapsulates everything.
  *
@@ -29,14 +30,6 @@ refElementParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = useCallback((i) => {
-        const child = getChildren().getAt(i);
-        if (!child)
-            return false;
-        if (child.untabbable)
-            return false;
-        return true;
-    }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
@@ -44,8 +37,8 @@ refElementParameters, ...void1 }) {
     const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        linearNavigationParameters,
+        typeaheadNavigationParameters: { ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
         multiSelectionParameters,
@@ -119,8 +112,8 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
  * @compositeParams
  */
 export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
-    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
+textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, pressParameters: { allowRepeatPresses, longPressThreshold, onPressingChange, ...void11 }, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
+    const { refElementReturn, propsStable: ps1, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
         info: { index, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
@@ -139,14 +132,27 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+    const { hasCurrentFocusReturn, propsStable: ps2 } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged,
             onCurrentFocusedChanged
         },
         refElementReturn
     });
-    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild);
+    const { pressReturn, props: pressProps } = usePress({
+        pressParameters: {
+            excludeSpace,
+            onPressSync,
+            allowRepeatPresses,
+            excludeEnter: null,
+            excludePointer: null,
+            focusSelf,
+            longPressThreshold,
+            onPressingChange,
+        },
+        refElementReturn
+    });
+    const props = useMergedProps(ps1, ps2, propsChild);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -157,20 +163,18 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
     assertEmptyObject(void8);
     assertEmptyObject(void9);
     assertEmptyObject(void10);
+    assertEmptyObject(void11);
     return {
         propsChild: props,
-        propsTabbable,
-        pressParameters: {
-            onPressSync,
-            excludeSpace
-        },
+        propsTabbable: useMergedProps(pressProps, propsTabbable),
         textContentReturn,
         refElementReturn,
         singleSelectionChildReturn,
         multiSelectionChildReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
-        rovingTabIndexChildReturn
+        rovingTabIndexChildReturn,
+        pressReturn
     };
 });
 export function useCompleteListNavigationDeclarative({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }) {

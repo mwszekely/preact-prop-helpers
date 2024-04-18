@@ -39,5 +39,6 @@ export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.Intrin
     focusout: "onBlur",
     formdata: null!,
     toggle: null!,
+    beforetoggle: null!,
     ...em,
 }

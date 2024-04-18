@@ -15,10 +15,10 @@ import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManage
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
+import { TargetedOmit, useCallback } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { UsePressParameters } from "./use-press.js";
+import { UsePressParameters, UsePressReturnType, usePress } from "./use-press.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends
     UseListNavigationSelectionChildInfo<ChildElement>,
@@ -32,8 +32,8 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
     Pick<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters">,
     TargetedOmit<Pick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">,
     Pick<UseRefElementParameters<ParentElement>, "refElementParameters">,
-    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
+    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", never>,
+    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", never>,
     TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "untabbableBehavior"> { }
 
 export interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
@@ -87,16 +87,18 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     OmitStrong<UseListNavigationSelectionChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn">,
     Pick<UseRefElementParameters<ChildElement>, "refElementParameters">,
     Pick<UseTextContentParameters<ChildElement>, "textContentParameters">,
+    OmitStrong<UsePressParameters<ChildElement>, "refElementReturn" | "pressParameters">,
+    TargetedOmit<UsePressParameters<ChildElement>, "pressParameters", "focusSelf" | "excludeEnter" | "excludePointer" | "excludeSpace" | "onPressSync">,
     Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     OmitStrong<UseListNavigationSelectionChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters" | "textContentParameters">,
     OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">,
+    OmitStrong<UsePressReturnType<ChildElement>, "props">,
     Pick<UseTextContentReturnType, "textContentReturn">,
-    UseHasCurrentFocusReturnType<ChildElement>,
-    UseManagedChildReturnType<M>,
-    TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
+    OmitStrong<UseHasCurrentFocusReturnType<ChildElement>, "propsStable">,
+    UseManagedChildReturnType<M> {
 
     /**
      * These props should be passed to whichever element is tabbable. 
@@ -140,14 +142,6 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
     const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
     const getHighestIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = useCallback((i: number) => {
-        const child = getChildren().getAt(i);
-        if (!child)
-            return false;
-        if (child.untabbable)
-            return false;
-        return true;
-    }, []);
 
     const { propsStable: propsRef, refElementReturn } = useRefElement<ParentElement>({ refElementParameters });
 
@@ -170,8 +164,8 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
         ...void2
     } = useListNavigationSelection<ParentElement, ChildElement>({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        linearNavigationParameters,
+        typeaheadNavigationParameters: { ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
         multiSelectionParameters,
@@ -271,10 +265,11 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 },
     singleSelectionChildParameters,
     multiSelectionChildParameters,
+    pressParameters: { allowRepeatPresses, longPressThreshold, onPressingChange, ...void11 },
     context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 },
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
-    const { refElementReturn, propsStable, ...void6 } = useRefElement<ChildElement>({ refElementParameters });
+    const { refElementReturn, propsStable: ps1, ...void6 } = useRefElement<ChildElement>({ refElementParameters });
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
         pressParameters: { excludeSpace, onPressSync, ...void2 },
@@ -307,7 +302,7 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
 
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableMergedCallback(ocfic1, ocfic2, ocfic3);
-    const { hasCurrentFocusReturn } = useHasCurrentFocus<ChildElement>({
+    const { hasCurrentFocusReturn, propsStable: ps2 } = useHasCurrentFocus<ChildElement>({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged,
             onCurrentFocusedChanged
@@ -315,10 +310,27 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
         refElementReturn
     });
 
+    const {
+        pressReturn,
+        props: pressProps
+    } = usePress({
+        pressParameters: {
+            excludeSpace, 
+            onPressSync,
+            allowRepeatPresses,
+            excludeEnter: null,
+            excludePointer: null,
+            focusSelf,
+            longPressThreshold,
+            onPressingChange,
+        },
+        refElementReturn
+    })
+
 
     const props = useMergedProps<ChildElement>(
-        propsStable,
-        hasCurrentFocusReturn.propsStable,
+        ps1,
+        ps2,
         propsChild
     );
 
@@ -332,21 +344,19 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     assertEmptyObject(void8);
     assertEmptyObject(void9);
     assertEmptyObject(void10);
+    assertEmptyObject(void11);
 
     return {
         propsChild: props,
-        propsTabbable,
-        pressParameters: {
-            onPressSync,
-            excludeSpace
-        },
+        propsTabbable: useMergedProps(pressProps, propsTabbable),
         textContentReturn,
         refElementReturn,
         singleSelectionChildReturn,
         multiSelectionChildReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
-        rovingTabIndexChildReturn
+        rovingTabIndexChildReturn,
+        pressReturn
     }
 
 });

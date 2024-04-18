@@ -38,8 +38,9 @@ import { useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typea
  * (Note to self: At some point, this file will probably be normalized
  * by somebody and 着 will turn back into 着.)
  *
- * Unrelated, but hey, this is fun: try highlighting the space between the two characters in VS Code,
- * or just typing a character in between them. What's up with this?
+ * Unrelated, but hey, this is fun:
+ * Try typing a letter (a-z, case ins.) in between the two characters below (tested in VS Code).
+ * What's up with this?
  * 着 着
  */
 const _dummy = null;
@@ -55,16 +56,12 @@ const _dummy = null;
  */
 export const useListNavigation = monitored(function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }) {
     const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
-    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn });
+    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, managedChildrenReturn });
+    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn, managedChildrenReturn });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    // Merge the props while keeping them stable
-    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
     return {
         managedChildrenParameters,
         rovingTabIndexReturn,

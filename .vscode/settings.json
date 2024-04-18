@@ -22,5 +22,8 @@
         "unstaggered",
         "untabbable",
         "vnode"
-    ]
+    ],
+    "explorer.fileNesting.patterns": {
+        "*.spec.ts": "${capture}.parameters.tsx,${capture}.stage.tsx,${capture}.fixture.ts,${capture}.tests.ts"
+    }
 }

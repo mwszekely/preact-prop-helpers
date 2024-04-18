@@ -50,10 +50,6 @@ export interface UseSelectionDeclarativeParameters<ChildElement extends Element>
 }
 export interface UseSelectionChildDeclarativeParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseMultiSelectionChildDeclarativeParameters<ChildElement, M> {
 }
-export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): {
-    singleSelectionParameters: {
-        onSingleSelectedIndexChange: import("./use-single-selection.js").SelectedIndexChangeHandler;
-    };
-};
+export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): import("./use-single-selection.js").UseSingleSelectionDeclarativeReturnType<Element, Element>;
 export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): import("./use-multi-selection.js").UseMultiSelectionChildDeclarativeReturnType<ChildElement, UseMultiSelectionChildInfo<ChildElement>>;
 //# sourceMappingURL=use-selection.d.ts.map

@@ -37,7 +37,8 @@ export interface UseSingleSelectionParametersSelf {
      * Called when a child is selected (via a press or other method).
      *
      * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`),
-     * then you should use this to `setState` somewhere that'll change your `selectedIndex`.
+     * then you should use this to `setState` somewhere that'll change your `selectedIndex`
+     * (it's called whenever the parent is notified of a child being focused or activated).
      *
      * If this component is imperatively controlled, then you should hook this up to the
      * returned `changeSelectedIndex` function to have the desired change occur.
@@ -149,14 +150,12 @@ export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSin
 export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
 }
+export interface UseSingleSelectionDeclarativeReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>, "singleSelectionParameters", "onSingleSelectedIndexChange"> {
+}
 export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<UseSingleSelectionParameters<any, any, any>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
 export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<UseSingleSelectionReturnType<any>, "singleSelectionReturn", "changeSingleSelectedIndex">;
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): {
-    singleSelectionParameters: {
-        onSingleSelectedIndexChange: SelectedIndexChangeHandler;
-    };
-};
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): UseSingleSelectionDeclarativeReturnType<ParentOrChildElement, ChildElement>;
 //# sourceMappingURL=use-single-selection.d.ts.map

@@ -31,7 +31,6 @@ export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPi
 }
 
 export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
-    propsStable: ElementProps<E>
     /**
      * Modifies the element to be able to track its own focus state
      */
@@ -44,6 +43,7 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
 }
 
 export interface UseHasCurrentFocusReturnType<E extends Element> {
+    propsStable: ElementProps<E>;
     hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
 }
 
@@ -92,8 +92,8 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extend
     });
 
     return {
-        hasCurrentFocusReturn: {
             propsStable: propsStable.current,
+        hasCurrentFocusReturn: {
             getCurrentFocused: getFocused,
             getCurrentFocusedInner: getFocusedInner,
         }

@@ -1,4 +1,5 @@
 import { identity } from "lodash-es";
+import { UseManagedChildrenReturnType } from "../../index.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -8,7 +9,7 @@ import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../uti
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
 import { UseRearrangeableChildrenReturnType } from "../processed-children/use-rearrangeable-children.js";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 
 export interface LinearNavigationResult {
@@ -27,12 +28,15 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 //export interface UseLinearNavigationChildInfo { }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
     TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">,
-    TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+    TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax">,
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
+
+export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<ChildElement>, "untabbable" | "index"> {}
 
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
 
@@ -42,13 +46,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * @stable
      */
     onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
-
-    /**
-     * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
-     * 
-     * @stable
-     */
-    isValidForLinearNavigation(i: number): boolean;
 
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
@@ -78,13 +75,16 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     navigatePastEnd: "passthrough" | "wrap" | (() => void);
 
     /**
+     * TODO: Add `"flow"` (for flex-wrapping components and such) to read the DOM layout of elements and guess where focus should move.
+     * 
      * Controls which arrow keys are used to navigate through the component.
      * 
-     * @remarks Not relative to the writing mode -- these are the literal keys that need to be pressed.
+     * @remarks Not relative to the writing mode -- these are the *literal* keys that need to be pressed.
      * 
      * Use `"either"` to allow navigation in either direction.
      * 
      * Use `"none"` to disallow navigation with the arrow keys in any direction.
+     * 
      */
     arrowKeyDirection: "horizontal" | "vertical" | "either" | "none";
 
@@ -94,41 +94,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * unaffected.
      */
     disableHomeEndKeys: boolean;
-
-    /**
-     * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.
-     * 
-     * @remarks This is provided by {@link useRearrangeableChildren}.
-     * If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this. 
-     * Otherwise, it's recommended to simply use {@link lodash-es#identity} here.
-     * 
-     * @stable
-     */
-    //indexMangler: (n: number) => number;
-
-    /**
-     * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
-     * 
-     * @stable
-     */
-    //indexDemangler: (n: number) => number;
-
-    /**
-     * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
-     * 
-     * @returns [0, n], not [0, n)
-     * 
-     * @stable
-     */
-    getHighestIndex(): number;
-    /**
-     * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
-     * 
-     * @see {@link UseLinearNavigationParametersSelf.getLowestIndex}
-     * 
-     * @stable
-     */
-    getLowestIndex(): number;
 }
 
 
@@ -143,12 +108,13 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * @compositeParams
  */
 export const useLinearNavigation = (function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
+    linearNavigationParameters: { navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },
+    managedChildrenReturn: { getChildren, ...void6 },
     ...void1
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
+}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, UseLinearNavigationChildInfo<ChildElement>>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = EventType<any, any>;
 
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
@@ -158,17 +124,22 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     assertEmptyObject(void5);
+    assertEmptyObject(void6);
 
 
-    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
+    useEnsureStability("useLinearNavigation", getChildren, onNavigateLinear, indexDemangler, indexMangler);
+    const isValid = useCallback((index: number): boolean => {
+        const child = getChildren().getAt(index);
+        return child != null && !child.untabbable;
+    }, []);
 
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
-        const highestChildIndex = getHighestIndex();
-        const lowestChildIndex = getLowestIndex();
+        const highestChildIndex = getChildren().getHighestIndex();
+        const lowestChildIndex = getChildren().getLowestIndex();
         const _original = (getTabbableIndex() ?? 0);
 
         const targetDemangled = indexDemangler(requestedIndexMangled);
-        const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+        const { status, valueDemangled } = tryNavigateToIndex({ isValid, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
@@ -224,10 +195,10 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
             return "stop";
         }
     }, []);
-    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
-    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
+    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getChildren().getLowestIndex(), -1, e, fromUserInteraction, "single"); });
+    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getChildren().getHighestIndex(), 1, e, fromUserInteraction, "single"); });
     const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
-        const _highestChildIndex = getHighestIndex();
+        const _highestChildIndex = getChildren().getHighestIndex();
         const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
         const original = (getTabbableIndex() ?? 0);
         /**
@@ -262,7 +233,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
 
 
-            let childRange = (getHighestIndex() - getLowestIndex());
+            let childRange = (getChildren().getHighestIndex() - getChildren().getLowestIndex());
             let paginatedRange = getPaginatedRange() ?? childRange;
 
             let truePageNavigationSize = pageNavigationSize;

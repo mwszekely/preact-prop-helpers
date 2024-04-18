@@ -1,6 +1,6 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseTextContentParameters, UseTextContentParametersSelf } from "../../dom-helpers/use-text-content.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -57,7 +57,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    isValidForTypeaheadNavigation(index: number): boolean;
+    //isValidForTypeaheadNavigation(index: number): boolean;
 
 
     /**
@@ -90,10 +90,12 @@ export interface UseTypeaheadNavigationContext {
 }
 
 
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index" | "untabbable"> { }
 
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
@@ -125,14 +127,21 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * @compositeParams
  */
 export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
+    managedChildrenReturn: { getChildren, ...void4 },
     ...void2
-}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+}: UseTypeaheadNavigationParameters<ChildElement, UseTypeaheadNavigationChildInfo<ChildElement>>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
+    assertEmptyObject(void4);
+
+    const isValidForTypeaheadNavigation = useCallback((index: number) => {
+        const child = getChildren().getAt(index);
+        return child != null && !child.untabbable;
+    }, [])
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.

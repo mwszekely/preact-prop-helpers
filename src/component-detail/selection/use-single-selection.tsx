@@ -53,7 +53,8 @@ export interface UseSingleSelectionParametersSelf {
      * Called when a child is selected (via a press or other method).
      * 
      * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`),
-     * then you should use this to `setState` somewhere that'll change your `selectedIndex`.
+     * then you should use this to `setState` somewhere that'll change your `selectedIndex` 
+     * (it's called whenever the parent is notified of a child being focused or activated).
      * 
      * If this component is imperatively controlled, then you should hook this up to the
      * returned `changeSelectedIndex` function to have the desired change occur.
@@ -226,7 +227,13 @@ export const useSingleSelection = monitored(function useSingleSelection<ParentOr
     return {
         singleSelectionReturn: useMemoObject({
             getSingleSelectedIndex,
-            changeSingleSelectedIndex
+            changeSingleSelectedIndex: useCallback<typeof changeSingleSelectedIndex>((e, r) => {
+                // Whenever the caller asks us to change the selected index,
+                // also make sure we change uRTI's currently tabbable index to match it.
+                if (e != null)
+                    setTabbableIndex(e, r, false);
+                changeSingleSelectedIndex(e, r);
+            }, [])
         }),
         context: useMemoObject({
             singleSelectionContext: useMemoObject<SingleSelectionContextSelf>({
@@ -239,6 +246,8 @@ export const useSingleSelection = monitored(function useSingleSelection<ParentOr
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
                 if (!anyFocused) {
+                    // TODO: Is this redundant with what we do in `changeSingleSelectedIndex`?
+                    // I'm 95% sure it is.
                     const selectedIndex = getSingleSelectedIndex();
                     if (selectedIndex != null)
                         setTabbableIndex(selectedIndex, reason, false);
@@ -325,6 +334,12 @@ export interface UseSingleSelectionDeclarativeParameters<ChildElement extends El
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
 }
 
+export interface UseSingleSelectionDeclarativeReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>, "singleSelectionParameters", "onSingleSelectedIndexChange"> {
+
+}
+
+
+
 export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<UseSingleSelectionParameters<any, any, any>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
 export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<UseSingleSelectionReturnType<any>, "singleSelectionReturn", "changeSingleSelectedIndex">;
 
@@ -334,7 +349,7 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({
     singleSelectionReturn: { changeSingleSelectedIndex },
     singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange }
-}: UseSingleSelectionDeclarativeParameters<ChildElement>) {
+}: UseSingleSelectionDeclarativeParameters<ChildElement>): UseSingleSelectionDeclarativeReturnType<ParentOrChildElement, ChildElement> {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef<SelectedIndexChangeEvent | undefined>(undefined);
     useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current!); }, [s]);
@@ -346,4 +361,6 @@ export function useSingleSelectionDeclarative<ParentOrChildElement extends Eleme
 
     return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>["singleSelectionParameters"], "onSingleSelectedIndexChange"> }
 }
+
+
 

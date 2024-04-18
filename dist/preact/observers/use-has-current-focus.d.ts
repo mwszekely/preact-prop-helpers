@@ -24,7 +24,6 @@ export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPi
     hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
 }
 export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
-    propsStable: ElementProps<E>;
     /**
      * Modifies the element to be able to track its own focus state
      */
@@ -34,6 +33,7 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     getCurrentFocusedInner(): boolean;
 }
 export interface UseHasCurrentFocusReturnType<E extends Element> {
+    propsStable: ElementProps<E>;
     hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
 }
 /**

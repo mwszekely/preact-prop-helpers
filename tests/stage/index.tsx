@@ -1,13 +1,15 @@
 import { render } from "preact";
-import { useEffect, useRef } from "preact/hooks";
-import { useSearchParamState, useState } from "preact-prop-helpers";
 import { useSearchParamStateDeclarative } from "preact-prop-helpers";
+import { useEffect, useRef } from "preact/hooks";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
-import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
-import { TestBasesListNav } from "../fixtures/list-nav.stage.js";
+import { Stage_LinearNavigation } from "../fixtures/linear-navigation.stage.js";
+import { Stage_ListNavigation } from "../fixtures/list-navigation.stage.js";
+import { Stage_MultiSelection } from "../fixtures/multi-selection.stage.js";
 import { TestBasesButton } from "../fixtures/press.stage.js";
-import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
+import { Stage_RovingTabIndex } from "../fixtures/roving-tab-index.stage.js";
+import { Stage_SingleSelection } from "../fixtures/single-selection.stage.js";
+import { TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
 
 
 declare module globalThis {
@@ -34,33 +36,20 @@ globalThis.getTestingHandler = function getTestingHandler<K extends keyof Testin
     (globalThis)._TestingConstants[key] ??= {} as any;
     return (globalThis)._TestingConstants[key][Key2] ?? undefined!; // || (noop as never);
 };
-globalThis.run = (key, key2, ...args) => ((globalThis).getTestingHandler?.(key, key2) as Function | null)?.(...(args as any[]));
+globalThis.run = async (key, key2, ...args) => {
+    let ret = await ((globalThis).getTestingHandler?.(key, key2) as Function | null)?.(...(args as any[]));
+
+    // TODO: This allows Preact updates to "settle" a little bit after a run.
+    // Mostly needed for focus-related things, apparently.
+    // But jank is jank.
+    await new Promise(resolve => { setTimeout(resolve, 10); });
+    await new Promise(resolve => { setTimeout(resolve, 10); });
+
+    return ret;
+};
 
 function noop() { }
-/*
-let old = HTMLElement.prototype.focus
-HTMLElement.prototype.focus = function (e) {
-    debugger;
-    old.bind(this)();
-}*/
 
-
-/*
-function TestBasesMenu() {
-    return (
-        <TestItem>
-            <Menu anchor={<Button onPress={null}>Open Menu</Button>}>
-                <MenuItem onPress={useCallback(async (closeMenu, ...rest) => await (getTestingHandler("Menu", "onMenuItem") ?? (async (closeMenu) => { await new Promise(resolve => setTimeout(resolve, 1000)); closeMenu(); }))(closeMenu, ...rest, 0), [])} index={0}>Item 0</MenuItem>
-                <MenuItem onPress={useCallback(async (closeMenu, ...rest) => await (getTestingHandler("Menu", "onMenuItem") ?? (async (closeMenu) => { await new Promise(resolve => setTimeout(resolve, 1000)); closeMenu(); }))(closeMenu, ...rest, 1), [])} index={1}>Another Item (1)</MenuItem>
-                <MenuItem onPress={useCallback(async (closeMenu, ...rest) => await (getTestingHandler("Menu", "onMenuItem") ?? (async (closeMenu) => { await new Promise(resolve => setTimeout(resolve, 1000)); closeMenu(); }))(closeMenu, ...rest, 2), [])} index={2} disabled>Disabled Item (2)</MenuItem>
-                <MenuItem onPress={useCallback(async (closeMenu, ...rest) => await (getTestingHandler("Menu", "onMenuItem") ?? (async (closeMenu) => { await new Promise(resolve => setTimeout(resolve, 1000)); closeMenu(); }))(closeMenu, ...rest, 3), [])} index={3}>The next item is missing (3)</MenuItem>
-                <MenuItem onPress={useCallback(async (closeMenu, ...rest) => await (getTestingHandler("Menu", "onMenuItem") ?? (async (closeMenu) => { await new Promise(resolve => setTimeout(resolve, 1000)); closeMenu(); }))(closeMenu, ...rest, 5), [])} index={5}>Final Item (5)</MenuItem>
-            </Menu>
-            <input type="text" value="I can take focus" />
-        </TestItem>
-    )
-}
-*/
 function TestBasesSanityCheck() {
 
     let which = useRef(9);
@@ -86,9 +75,13 @@ function TestBasesSanityCheck() {
 const TestBases = {
     "sanity-check": <TestBasesSanityCheck />,
     "press": <TestBasesButton />,
-    "list-navigation": <TestBasesListNav />,
+    "roving-tab-index": <Stage_RovingTabIndex />,
+    "list-navigation": <Stage_ListNavigation />,
+    "linear-navigation": <Stage_LinearNavigation />,
+    "single-selection": <Stage_SingleSelection />,
+    "multi-selection": <Stage_MultiSelection />,
     "grid-navigation": <TestBasesGridNav />,
-    "focus": <TestBasesFocus />,
+    //"focus": <TestBasesFocus />,
     /*"menu": <TestBasesMenu />,*/
 }
 
@@ -105,9 +98,10 @@ function TestsContainer() {
 
     const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", stringToValue: value => value });
 
-    useEffect(() => {
+    /*useEffect(() => {
         document.getElementById("focusable-first")?.focus?.();
-    }, [])
+    }, [])*/
+
     if (!base) {
         return (
             <>
@@ -120,14 +114,14 @@ function TestsContainer() {
     return (
         <>
             <input id="focusable-first" />
-            <TestItem>
+            <>
                 {Object.entries(TestBases).map(([name, component]) => {
                     if (name === base)
                         return component;
                     return null;
                 })}
 
-            </TestItem>
+            </>
             <input id="focusable-last" />
         </>
     )
