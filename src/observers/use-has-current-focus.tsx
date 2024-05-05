@@ -87,8 +87,8 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extend
     }, []);
 
     const propsStable = useRef<ElementProps<T>>({
-        [onfocusin]: onFocusIn,
-        [onfocusout]: onFocusOut
+        [onfocusin as never]: onFocusIn,
+        [onfocusout as never]: onFocusOut
     });
 
     return {

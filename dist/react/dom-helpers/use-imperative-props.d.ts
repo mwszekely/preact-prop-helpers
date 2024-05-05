@@ -1,4 +1,4 @@
-import { TargetedPick, createElement, type RenderableProps } from "../util/lib.js";
+import { TargetedPick, type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
@@ -64,6 +64,6 @@ export declare const ImperativeElement: typeof ImperativeElementU;
  * @compositeParams
  */
 export declare const useImperativeProps: <E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) => UseImperativePropsReturnType<E>;
-declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<import("preact").ClassAttributes<any> & createElement.JSX.HTMLAttributes<EventTarget> & createElement.JSX.SVGAttributes<SVGElement>>;
+declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<import("preact").ClassAttributes<any> & ElementProps<any>>;
 export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

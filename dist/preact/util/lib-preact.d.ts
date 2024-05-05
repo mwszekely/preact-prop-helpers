@@ -2,11 +2,12 @@ export { Fragment, cloneElement, createContext, createElement, type ComponentChi
 export type { JSX, Ref, RefCallback, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
-export type { EffectCallback, Inputs, MutableRef, Reducer, StateUpdater } from "preact/hooks";
+export type { EffectCallback, Inputs, MutableRef, Reducer } from "preact/hooks";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 import type { JSX } from "preact";
-import { Inputs } from "preact/hooks";
+import { Dispatch, Inputs, StateUpdater as SU } from "preact/hooks";
 export declare const useCallback: <T extends Function | null | undefined>(callback: NonNullable<T>, inputs: Inputs) => NonNullable<T>;
+export type StateUpdater<T> = Dispatch<SU<T>>;
 export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 export declare function debounceRendering(f: () => void): void;
 export declare const onfocusin = "onfocusin";

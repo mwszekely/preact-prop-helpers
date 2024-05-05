@@ -11,14 +11,16 @@ export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 export function debounceRendering(f) {
     (options.debounceRendering ?? queueMicrotask)(f);
 }
+// @ts-expect-error (These are correct, I don't know why the types are wrong all of a sudden...?)
 export const onfocusin = "onfocusin";
+// @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 export const onfocusout = "onfocusout";
 export const EventMapping = {
     // @ts-ignore
     beforetoggle: null,
     dblclick: "onDblClick",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
+    focusIn: "onfocusin",
+    focusOut: "onfocusout",
     formdata: "onFormData",
     toggle: "onToggle",
     ...em

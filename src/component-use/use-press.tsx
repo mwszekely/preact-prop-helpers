@@ -522,7 +522,7 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
             onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
             onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
             onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-            [onfocusout]: onFocusOut,
+            [onfocusout as never]: onFocusOut,
             onClick
         },
     };

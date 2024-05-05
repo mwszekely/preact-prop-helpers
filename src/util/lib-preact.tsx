@@ -2,17 +2,18 @@ export { Fragment, cloneElement, createContext, createElement, type ComponentChi
 export type { JSX, Ref, RefCallback, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
-export type { EffectCallback, Inputs, MutableRef, Reducer, StateUpdater } from "preact/hooks";
+export type { EffectCallback, Inputs, MutableRef, Reducer } from "preact/hooks";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 import type { JSX } from "preact";
 import { options } from "preact";
-import { Inputs, useCallback as ucb } from "preact/hooks";
+import { Dispatch, Inputs, StateUpdater as SU, useCallback as ucb } from "preact/hooks";
 import { EventMapping as em } from "./lib-shared.js";
 
 // Patch the type (only the type) of useCallback to allow for nullable functions
 export const useCallback = ucb as <T extends Function | null | undefined>(callback: NonNullable<T>, inputs: Inputs) => NonNullable<T>;
 
 
+export type StateUpdater<T> = Dispatch<SU<T>>;
 
 // In React, this is useInsertionEffect
 export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
@@ -22,8 +23,9 @@ export function debounceRendering(f: () => void) {
 }
 
 
-
+// @ts-expect-error (These are correct, I don't know why the types are wrong all of a sudden...?)
 export const onfocusin = "onfocusin" satisfies keyof ElementProps<any>;
+// @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 export const onfocusout = "onfocusout" satisfies keyof ElementProps<any>;
 
 export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
@@ -44,8 +46,8 @@ export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.Intrin
     // @ts-ignore
     beforetoggle: null! as any,
     dblclick: "onDblClick",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
+    focusIn: "onfocusin",
+    focusOut: "onfocusout",
     formdata: "onFormData",
     toggle: "onToggle",
     ...em
