@@ -11,7 +11,7 @@ function pressLog(...args) {
         console.log(...args);
 }
 function supportsPointerEvents() {
-    return ("onpointerup" in window);
+    return ("onpointerup" in globalThis);
 }
 // All our checking for pointerdown and up doesn't mean anything if it's
 // a programmatic onClick event, which could come from any non-user source.

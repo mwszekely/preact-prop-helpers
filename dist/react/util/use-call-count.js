@@ -2,7 +2,7 @@ import { useRef } from "./lib.js";
 import "./mode.js";
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
-window.requestIdleCallback ??= (callback) => {
+globalThis.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
@@ -49,15 +49,15 @@ function monitorCallCount(hook) {
     if (filterAll || filters.has(name))
         return;
     console.assert(name.length > 0);
-    window._hookCallCount ??= { callCounts: {} };
-    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
-    window._hookCallCount.callCounts[name].moment += 1;
-    window._hookCallCount.callCounts[name].total += 1;
+    globalThis._hookCallCount ??= { callCounts: {} };
+    globalThis._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    globalThis._hookCallCount.callCounts[name].moment += 1;
+    globalThis._hookCallCount.callCounts[name].total += 1;
     if (timeoutHandle == null) {
         timeoutHandle = requestIdleCallback(() => {
             //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
             //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-            const o = Object.entries(window._hookCallCount.callCounts)
+            const o = Object.entries(globalThis._hookCallCount.callCounts)
                 .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
                 .filter(({ Now }) => { return !!Now; })
                 .sort(({ Now: lhsM }, { Now: rhsM }) => {
@@ -68,7 +68,7 @@ function monitorCallCount(hook) {
                 return lhsM - rhsM;
             });
             console.table(o, ['Hook', 'Now', 'Total']);
-            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
+            Object.entries(globalThis._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
             timeoutHandle = null;
         });
     }

@@ -14,6 +14,7 @@ export function debounceRendering(f) {
 export const onfocusin = "onfocusin";
 export const onfocusout = "onfocusout";
 export const EventMapping = {
+    beforetoggle: null,
     dblclick: "onDblClick",
     focusin: "onfocusin",
     focusout: "onfocusout",

@@ -90,7 +90,7 @@ export interface UsePressReturnType<E extends Element> {
 }
 
 function supportsPointerEvents() {
-    return ("onpointerup" in window);
+    return ("onpointerup" in globalThis);
 }
 
 // All our checking for pointerdown and up doesn't mean anything if it's

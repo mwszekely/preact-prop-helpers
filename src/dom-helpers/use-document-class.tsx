@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
-export function getDocument(element?: Node) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+export function getDocument(element?: Node) { return (element?.ownerDocument ?? document ?? globalThis.document); }
 
 type P = Parameters<typeof clsx>;
 

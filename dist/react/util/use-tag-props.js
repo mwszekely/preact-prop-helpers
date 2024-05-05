@@ -13,7 +13,7 @@ let idIndex = 0;
  * @returns A modified copy of the given props
  */
 export function useTagProps(props, tag) {
-    if (process.env.NODE_ENV === 'development' && window._generate_useTagProps_tags) {
+    if (process.env.NODE_ENV === 'development' && globalThis._generate_useTagProps_tags) {
         const [id] = useState(() => ++idIndex);
         const propsIdTag = `data-props-${tag}-${id}`;
         const getStack = useStack();

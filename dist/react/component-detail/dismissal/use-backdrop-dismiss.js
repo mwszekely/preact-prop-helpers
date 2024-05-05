@@ -28,7 +28,7 @@ export const useBackdropDismiss = monitored(function useBackdropDismiss({ backdr
             onClose()?.(e);
         }
     }, []);
-    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(globalThis, "mousedown", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(globalThis, "touchstart", open ? onBackdropClick : null, { capture: true });
 });
 //# sourceMappingURL=use-backdrop-dismiss.js.map

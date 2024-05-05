@@ -82,7 +82,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
     }, [key, storage])
 
     // Listen for changes to this storage in other browser tabs
-    useGlobalHandler(window, "storage", useStableCallback((e: StorageEvent) => {
+    useGlobalHandler(globalThis, "storage", useStableCallback((e: StorageEvent) => {
 
         if (key && e.key === key && e.storageArea == storage) {
             const newValue = e.newValue;

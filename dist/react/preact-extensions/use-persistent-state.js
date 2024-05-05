@@ -58,7 +58,7 @@ export function usePersistentState(key, initialValue, fromString = JSON.parse, t
         }
     }, [key, storage]);
     // Listen for changes to this storage in other browser tabs
-    useGlobalHandler(window, "storage", useStableCallback((e) => {
+    useGlobalHandler(globalThis, "storage", useStableCallback((e) => {
         if (key && e.key === key && e.storageArea == storage) {
             const newValue = e.newValue;
             if (newValue != null)

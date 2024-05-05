@@ -58,6 +58,6 @@ export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupEle
         }
     }, []);
 
-    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(globalThis, "mousedown", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(globalThis, "touchstart", open ? onBackdropClick : null, { capture: true });
 })

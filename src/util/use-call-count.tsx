@@ -3,7 +3,7 @@ import "./mode.js";
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
-window.requestIdleCallback ??= (callback) => {
+globalThis.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 
@@ -66,17 +66,17 @@ function monitorCallCount(hook: Function) {
 
     console.assert(name.length > 0);
 
-    (window as WindowWithHookCallCount)._hookCallCount ??= { callCounts: {} };
-    (window as WindowWithHookCallCount)._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
-    (window as WindowWithHookCallCount)._hookCallCount.callCounts[name]!.moment += 1;
-    (window as WindowWithHookCallCount)._hookCallCount.callCounts[name]!.total += 1;
+    (globalThis as WindowWithHookCallCount)._hookCallCount ??= { callCounts: {} };
+    (globalThis as WindowWithHookCallCount)._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    (globalThis as WindowWithHookCallCount)._hookCallCount.callCounts[name]!.moment += 1;
+    (globalThis as WindowWithHookCallCount)._hookCallCount.callCounts[name]!.total += 1;
 
     if (timeoutHandle == null) {
         timeoutHandle = requestIdleCallback(() => {
             //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
             //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
             const o: Array<{ readonly Hook: string; readonly Now: number; readonly Total: number; }> =
-                Object.entries((window as WindowWithHookCallCount)._hookCallCount.callCounts)
+                Object.entries((globalThis as WindowWithHookCallCount)._hookCallCount.callCounts)
                     .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 } as const })
                     .filter(({ Now }) => { return !!Now })
                     .sort(({ Now: lhsM }, { Now: rhsM }) => {
@@ -87,7 +87,7 @@ function monitorCallCount(hook: Function) {
                         return lhsM - rhsM;
                     });
             console.table(o, ['Hook', 'Now', 'Total']);
-            Object.entries((window as WindowWithHookCallCount)._hookCallCount.callCounts).forEach(([, counts]) => { counts!.moment = 0; });
+            Object.entries((globalThis as WindowWithHookCallCount)._hookCallCount.callCounts).forEach(([, counts]) => { counts!.moment = 0; });
             timeoutHandle = null;
         });
     }

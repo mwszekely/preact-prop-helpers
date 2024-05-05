@@ -41,6 +41,8 @@ export type VNode = JSX.Element;
 
 
 export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } = {
+    // @ts-ignore
+    beforetoggle: null! as any,
     dblclick: "onDblClick",
     focusin: "onfocusin",
     focusout: "onfocusout",

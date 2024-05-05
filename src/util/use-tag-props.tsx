@@ -39,7 +39,7 @@ export type TagPropPrefices =
  * @returns A modified copy of the given props
  */
 export function useTagProps<P>(props: P, tag: `data-${TagPropPrefices}`): P {
-    if (process.env.NODE_ENV === 'development' && (window as any)._generate_useTagProps_tags) {
+    if (process.env.NODE_ENV === 'development' && (globalThis as any)._generate_useTagProps_tags) {
         const [id] = useState(() => ++idIndex);
 
         const propsIdTag = `data-props-${tag}-${id}`;

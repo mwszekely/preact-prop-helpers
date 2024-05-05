@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
-export function getDocument(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+export function getDocument(element) { return (element?.ownerDocument ?? document ?? globalThis.document); }
 /**
  * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
  *

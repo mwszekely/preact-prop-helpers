@@ -23,15 +23,15 @@ export const useUrl = monitored(function useUrl(onUrlChange: (url: string) => vo
 
     const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
 
-    useGlobalHandler(window, "hashchange", (e) => {
-        setUrl(window.location.toString(), e);
+    useGlobalHandler(globalThis, "hashchange", (e) => {
+        setUrl(globalThis.location.toString(), e);
     });
 
-    useGlobalHandler(window, "popstate", (e: PopStateEvent) => {
+    useGlobalHandler(globalThis, "popstate", (e: PopStateEvent) => {
         // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
         // TODO: If this assert never fires, it's *probably* fine??
-        console.assert(window.location.toString() === document.location.toString());
-        setUrl(window.location.toString(), e);
+        console.assert(globalThis.location.toString() === document.location.toString());
+        setUrl(globalThis.location.toString(), e);
     });
 
     return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => {

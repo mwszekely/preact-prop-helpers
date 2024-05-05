@@ -4,5 +4,5 @@
     "outDir": "./dist/react",
   },
   "include": ["./src"],
-  "exclude": ["./node_modules"]
+  "exclude": ["./node_modules", "./src/util/lib-preact.tsx"]
 }

@@ -21,10 +21,10 @@ type FirstOverloadParameters<T> =
     T extends (...args: infer R) => any ? R : [];
 
 // Get just the typed version of addEventListener, if it exists
-type TypedAddEventListener<T extends EventTarget> = (...args: FirstOverloadParameters<(T["addEventListener"])>) => void;
+type TypedAddEventListener<T extends EventTarget> = T["addEventListener"]; //(...args: FirstOverloadParameters<(T["addEventListener"])>) => void;
 
 // Returns the first argument of "addEventListener" (the event type as a string)
-type TypedEventListenerTypes<T extends EventTarget> = TypedAddEventListener<T> extends ((type: infer K2, ...args: any[]) => any) ? K2 : string;
+type TypedEventListenerTypes<T extends EventTarget> = (TypedAddEventListener<T> extends ((type: infer K2, ...args: any[]) => any) ? K2 : string) & string;
 
 
 // TODO: This isn't quite able to narrow down the exact event type for unknown reasons.
@@ -40,7 +40,8 @@ type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> =
     T extends (...args: infer P) => any ? P : never;
 
 
-type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters2<TypedEventHandler<E, T>>[0];
+//    type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters2<TypedEventHandler<E, T>>[0];
+type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Event;
 
 
 /**
