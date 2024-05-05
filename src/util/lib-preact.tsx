@@ -1,4 +1,4 @@
-export { Fragment, cloneElement, createContext, createElement, type ComponentType, type Context } from "preact";
+export { Fragment, cloneElement, createContext, createElement, type ComponentChildren, type ComponentType, type Context } from "preact";
 export type { JSX, Ref, RefCallback, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
