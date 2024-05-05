@@ -51,7 +51,11 @@ export default {
             delimiters: ['', ''],
             preventAssignment: false
         }),
-        ts({ module: "NodeNext", tsconfig: "tsconfig.react.json" }),
+        ts({
+            noEmitOnError: false,
+            tsconfig: "tsconfig.react.json",
+            module: "NodeNext"
+        }),
         commonjs({ extensions, sourceMap: true }),
         resolve({ extensions, dedupe: ['react', "react-dom"], }),
         sourcemaps()
