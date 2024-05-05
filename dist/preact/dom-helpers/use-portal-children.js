@@ -1,5 +1,6 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { getDocument } from "../util/get-window.js";
 import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { monitored } from "../util/use-call-count.js";
@@ -25,14 +26,14 @@ export const usePortalChildren = monitored(function usePortalChildren({ target }
     const removeChildStable = useStableCallback((index) => {
         return removeChild?.(index);
     });
-    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? document.getElementById(target) : target; }, [target]);
+    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
     const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
     return {
         children: children,
         pushChild: pushChildStable,
         updateChild: updateChildStable,
         removeChild: removeChildStable,
-        portalElement: element
+        portalElement: element ?? null
     };
 });
 /**

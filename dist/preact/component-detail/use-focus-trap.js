@@ -1,6 +1,7 @@
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { getDocument } from "../util/get-window.js";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
@@ -16,6 +17,7 @@ export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameter
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
+        const document = getDocument();
         if (trapActive) {
             let top = getTop();
             const lastFocusedInThisComponent = getLastActiveWhenOpen();
@@ -31,12 +33,12 @@ export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameter
         }
         else {
             const lastActive = getLastActiveWhenClosed();
-            let currentFocus = document.activeElement;
+            let currentFocus = document?.activeElement;
             // Restore focus to whatever caused this trap to trigger,
             // but only if it wasn't caused by explicitly focusing something else 
             // (generally if `onlyMoveFocus` is true)
             let top = refElementReturn.getElement();
-            if (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus)) {
+            if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
                 if (lastActive)
                     focusOpener(lastActive);
             }
@@ -67,11 +69,14 @@ export function findFirstTabbable(element) {
     return findFirstCondition(element, node => node instanceof Element && isTabbable(node));
 }
 function findFirstCondition(element, filter) {
+    const document = getDocument(element);
+    if (!document)
+        return null;
     if (element && filter(element))
         return element;
     console.assert(!!element);
-    element ??= document.body;
-    const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (filter(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+    element ??= document?.body;
+    const treeWalker = document?.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (filter(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
     const firstFocusable = treeWalker.firstChild();
     return firstFocusable;
 }

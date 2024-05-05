@@ -1,4 +1,5 @@
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
+import { getWindow } from "../util/get-window.js";
 import { StateUpdater, useLayoutEffect } from "../util/lib.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
@@ -82,7 +83,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
     }, [key, storage])
 
     // Listen for changes to this storage in other browser tabs
-    useGlobalHandler(globalThis, "storage", useStableCallback((e: StorageEvent) => {
+    useGlobalHandler(getWindow(), "storage", useStableCallback((e: StorageEvent) => {
 
         if (key && e.key === key && e.storageArea == storage) {
             const newValue = e.newValue;

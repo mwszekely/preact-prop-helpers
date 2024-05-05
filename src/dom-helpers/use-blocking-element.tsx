@@ -6,9 +6,9 @@ import { UseActiveElementParameters, useActiveElement } from "../observers/use-a
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { getDocument } from "../util/get-window.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
-import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 

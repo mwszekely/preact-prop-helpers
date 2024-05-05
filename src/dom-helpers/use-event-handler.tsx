@@ -14,11 +14,11 @@ import { monitored } from "../util/use-call-count.js";
  * 
  * See https://stackoverflow.com/a/52761156 for how selecting the correct overload works.
  */
-type FirstOverloadParameters<T> =
+/*type FirstOverloadParameters<T> =
     T extends { (...args: infer R): any; (...args: any[]): any; (...args: any[]): any; (...args: any[]): infer R } ? R :
     T extends { (...args: infer R): any; (...args: any[]): any; (...args: any[]): any } ? R :
     T extends { (...args: infer R): any; (...args: any[]): any } ? R :
-    T extends (...args: infer R) => any ? R : [];
+    T extends (...args: infer R) => any ? R : [];*/
 
 // Get just the typed version of addEventListener, if it exists
 type TypedAddEventListener<T extends EventTarget> = T["addEventListener"]; //(...args: FirstOverloadParameters<(T["addEventListener"])>) => void;
@@ -32,16 +32,16 @@ type TypedEventListenerTypes<T extends EventTarget> = (TypedAddEventListener<T> 
 // I don't know why `infer H` is doing that when the type should be narrowed by `T` though...
 // Note that the type parameter is still used, even though it doesn't narrow down the type,
 // because otherwise, instead of being a union of all types, it's just `any`
-type TypedEventHandler<E extends EventTarget, T extends TypedEventListenerTypes<E>> = TypedAddEventListener<E> extends ((type: T, handler: infer H, ...args: any[]) => any) ? NonNullable<H> : never;
+//type TypedEventHandler<E extends EventTarget, T extends TypedEventListenerTypes<E>> = TypedAddEventListener<E> extends ((type: T, handler: infer H, ...args: any[]) => any) ? NonNullable<H> : never;
 //((TypedAddEventListener<E> & ((type: T, handler: (e: Event) => void, ...args: any[]) => any)) extends ((type: T, handler: (e: infer H) => any, ...args: any[]) => any) ? H : Function) /*& (T extends keyof GlobalEventHandlersEventMap? GlobalEventHandlersEventMap[T] : (e: Event) => void)*/;
 
-type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> =
+/*type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> =
     T extends EventListenerObject ? Parameters<T["handleEvent"]> :
-    T extends (...args: infer P) => any ? P : never;
+    T extends (...args: infer P) => any ? P : never;*/
 
 
 //    type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Parameters2<TypedEventHandler<E, T>>[0];
-type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerTypes<E>> = Event;
+type TypedEventHandlerEvent<E extends EventTarget, _T extends TypedEventListenerTypes<E>> = Event;
 
 
 /**
@@ -54,9 +54,12 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export const useGlobalHandler = monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
+export const useGlobalHandler = monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T | null | undefined, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
     mode ||= "grouped";
-    useEnsureStability("useGlobalHandler", mode);
+    useEnsureStability("useGlobalHandler", target, mode);
+
+    if (!target)
+            return;
 
     if (mode === "grouped") {
         // Note to self: The typing doesn't improve even if this is split up into a sub-function.

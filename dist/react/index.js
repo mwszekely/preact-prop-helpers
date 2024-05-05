@@ -452,7 +452,9 @@ function hideCallCount(hook) {
  */
 const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
     mode ||= "grouped";
-    useEnsureStability("useGlobalHandler", mode);
+    useEnsureStability("useGlobalHandler", target, mode);
+    if (!target)
+        return;
     if (mode === "grouped") {
         // Note to self: The typing doesn't improve even if this is split up into a sub-function.
         // No matter what, it seems impossible to get the handler's event object typed perfectly.
@@ -531,6 +533,11 @@ function useGlobalHandlerSingle(target, type, handler, options) {
  */
 function assertEmptyObject(_a) { }
 
+// eslint-disable-next-line no-restricted-globals
+function getWindow(element) { return (typeof window != "undefined") ? undefined : (element?.ownerDocument?.defaultView ?? globalThis ?? {}); }
+// eslint-disable-next-line no-restricted-globals
+function getDocument(element) { return (typeof window != "undefined") ? undefined : (element?.ownerDocument ?? getWindow()?.document) ?? undefined; }
+
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
@@ -553,8 +560,8 @@ const useBackdropDismiss = monitored(function useBackdropDismiss({ backdropDismi
             onClose()?.(e);
         }
     }, []);
-    useGlobalHandler(globalThis, "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(globalThis, "touchstart", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(getWindow(), "mousedown", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(getWindow(), "touchstart", open ? onBackdropClick : null, { capture: true });
 });
 
 /**
@@ -930,7 +937,7 @@ const mergeFunctions = (function mergeFunctions(lhs, rhs) {
 });
 
 function generateStack() {
-    if (process.env.NODE_ENV === 'development' && window._generate_setState_stacks) {
+    if (process.env.NODE_ENV === 'development' && globalThis._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -962,7 +969,7 @@ function returnEmptyString() { return ""; }
  * here:
  */
 function focus(e) {
-    if (process.env.NODE_ENV === 'development' && window.LOG_FOCUS_CHANGES === true) {
+    if (process.env.NODE_ENV === 'development' && globalThis.LOG_FOCUS_CHANGES === true) {
         console.log(`Focus changed to ${(e?.tagName || "").toLowerCase().padStart(6)}:`, e);
         console.log(generateStack());
     }
@@ -1074,12 +1081,15 @@ function useTagProps(props, tag) {
         console.assert(!(props && typeof props == "object" && tag in props));
         useTimeout({
             callback: () => {
-                let element = document.querySelectorAll(`[${propsIdTag}]`);
-                if (element.length != 1) {
-                    console.error("A hook returned props that were not properly spread to any HTMLElement:");
-                    console.log(getStack());
-                    /* eslint-disable no-debugger */
-                    debugger;
+                const document = getDocument();
+                if (document) {
+                    let element = document.querySelectorAll(`[${propsIdTag}]`);
+                    if (element.length != 1) {
+                        console.error("A hook returned props that were not properly spread to any HTMLElement:");
+                        console.log(getStack());
+                        /* eslint-disable no-debugger */
+                        debugger;
+                    }
                 }
             },
             timeout: 250,
@@ -1608,7 +1618,7 @@ const useState = (function useState(initialState) {
     // to also set our ref to the new value
     const setState = useRef(value => {
         if (process.env.NODE_ENV === 'development') {
-            window._setState_stack = getStack();
+            globalThis._setState_stack = getStack();
         }
         if (typeof value === "function") {
             const callback = value;
@@ -1667,6 +1677,7 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
         // Notify the relevant children that they should become tabbable/untabbable,
         // but also handle focus management when we changed due to user interaction
         return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
+            const document = getDocument();
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
             let parentElement = getElement();
@@ -1683,7 +1694,7 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
                 //
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
-                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
+                if (document && !parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(parentElement);
                 return null;
             }
@@ -1693,13 +1704,13 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
                 // TODO: Find the next/prev element and focus that instead,
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
-                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
+                if (document && !parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(parentElement);
                 return null;
             }
             // If we've made a change, and it was because the user clicked on it or something,
             // then focus that element too
-            if (prevIndex != nextIndex) {
+            if (document && prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
@@ -1722,7 +1733,8 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
     const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
-        let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement));
+        const document = getDocument();
+        let shouldFocusParentAfterwards = !!document && (getElement()?.contains(document.activeElement));
         if (untabbable)
             changeTabbableIndex(null, undefined);
         else {
@@ -1749,13 +1761,14 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
         isValid: isTabbableValid,
         setAt: setTabbableAt,
         onClosestFit: (index) => {
+            const document = getDocument();
             // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body
             // TODO: This is slightly janky -- we want to only mess with the user's focus when this list (or whatever) is the current focus,
             // but by the time we know something like "all the children have unmounted",
             // we've lot the ability to know if any of them were focused, at least easily.
             // So we just check to see if focus was lost to the body and, if so, send it somewhere useful.
             // This is liable to break, probably with blockingElements or something.
-            if (document.activeElement == null || document.activeElement == document.body) {
+            if (document && (document.activeElement == null || document.activeElement == document.body)) {
                 let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
                 if (index == null || childElement == null)
                     findBackupFocus(getElement()).focus();
@@ -1765,6 +1778,7 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
         }
     });
     const focusSelf = useCallback((force, reason) => {
+        const document = getDocument();
         const children = getChildren();
         let index = getTabbableIndex();
         const untabbable = getUntabbable();
@@ -1773,7 +1787,7 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
             index ??= getInitiallyTabbedIndex() ?? children.getLowestIndex();
         }
         if (untabbable) {
-            if (document.activeElement != getElement() && (force || untabbableBehavior != 'leave-child-focused')) {
+            if (document && document.activeElement != getElement() && (force || untabbableBehavior != 'leave-child-focused')) {
                 focusSelfParent(getElement());
             }
         }
@@ -3079,7 +3093,7 @@ function useMultiSelection({ multiSelectionParameters: { onSelectionChange, mult
         }
     });
     let nextCtrlAIsUndo = useRef(false);
-    useGlobalHandler(document, "keydown", useStableCallback((e) => {
+    useGlobalHandler(getDocument(), "keydown", useStableCallback((e) => {
         shiftKeyHeld.current = (e.shiftKey || e.key == 'Shift');
         ctrlKeyHeld.current = (e.ctrlKey || e.key == 'Control');
         // Only do CTRL+A handling if the control is focused
@@ -3097,7 +3111,7 @@ function useMultiSelection({ multiSelectionParameters: { onSelectionChange, mult
             }
         }
     }), { capture: true });
-    useGlobalHandler(document, "keyup", (e) => {
+    useGlobalHandler(getDocument(), "keyup", (e) => {
         if (e.key == 'Shift')
             shiftKeyHeld.current = false;
         if (e.key == 'Control')
@@ -3681,27 +3695,6 @@ const useDismiss = monitored(function useDismiss({ dismissParameters: { dismissA
     };
 });
 
-function getDocument(element) { return (element?.ownerDocument ?? document ?? globalThis.document); }
-/**
- * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
- *
- * @param className - The class (as a string) to be adding/removing
- * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
- * @param element - The element to affect. By default, it's the root `<html>` element
- */
-const useDocumentClass = monitored(function useDocumentClass(className, active, element) {
-    element ??= getDocument().documentElement;
-    className = clsx(className);
-    useEffect(() => {
-        if (element) {
-            if (active !== false) {
-                element.classList.add(className);
-                return () => element.classList.remove(className);
-            }
-        }
-    }, [className, active, element]);
-});
-
 function blockingElements() { return getDocument().$blockingElements; }
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -3775,6 +3768,7 @@ const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameters: { on
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
+        const document = getDocument();
         if (trapActive) {
             let top = getTop();
             getLastActiveWhenOpen();
@@ -3787,12 +3781,12 @@ const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameters: { on
         }
         else {
             const lastActive = getLastActiveWhenClosed();
-            let currentFocus = document.activeElement;
+            let currentFocus = document?.activeElement;
             // Restore focus to whatever caused this trap to trigger,
             // but only if it wasn't caused by explicitly focusing something else 
             // (generally if `onlyMoveFocus` is true)
             let top = refElementReturn.getElement();
-            if (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus)) {
+            if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
                 if (lastActive)
                     focusOpener(lastActive);
             }
@@ -3823,11 +3817,14 @@ function findFirstTabbable(element) {
     return findFirstCondition(element, node => node instanceof Element && isTabbable(node));
 }
 function findFirstCondition(element, filter) {
+    const document = getDocument(element);
+    if (!document)
+        return null;
     if (element && filter(element))
         return element;
     console.assert(!!element);
-    element ??= document.body;
-    const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (filter(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+    element ??= document?.body;
+    const treeWalker = document?.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (filter(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
     const firstFocusable = treeWalker.firstChild();
     return firstFocusable;
 }
@@ -4842,7 +4839,7 @@ const useAsyncHandler = monitored(function useAsyncHandler({ asyncHandler, captu
 });
 
 function pressLog(...args) {
-    if (window.__log_press_events)
+    if (globalThis.__log_press_events)
         console.log(...args);
 }
 function supportsPointerEvents() {
@@ -4884,7 +4881,7 @@ function onHandledManualClickEvent() {
         }, 50);
     }, 200);
 }
-document.addEventListener("click", (e) => {
+getDocument()?.addEventListener("click", (e) => {
     if (justHandledManualClickEvent) {
         justHandledManualClickEvent = false;
         manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
@@ -4984,8 +4981,8 @@ const usePress = monitored(function usePress(args) {
         ];
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
-            const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-            hoveringAtAnyPoint ||= (element?.contains(elementAtTouch) ?? false);
+            const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
+            hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false);
         }
         setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
@@ -5036,8 +5033,8 @@ const usePress = monitored(function usePress(args) {
             const element = getElement();
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
-            const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-            const hovering = element == elementAtPointer || element?.contains(elementAtPointer) || false;
+            const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
+            const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
             setHovering(hovering);
             setIsPressing(hovering && getPointerDownStartedHere(), e);
         }
@@ -5287,6 +5284,26 @@ const useRandomDualIds = monitored(function useRandomDualIds({ randomIdInputPara
 });
 
 /**
+ * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
+ *
+ * @param className - The class (as a string) to be adding/removing
+ * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
+ * @param element - The element to affect. By default, it's the root `<html>` element
+ */
+const useDocumentClass = monitored(function useDocumentClass(className, active, element) {
+    element ??= getDocument()?.documentElement;
+    className = clsx(className);
+    useEffect(() => {
+        if (element) {
+            if (active !== false) {
+                element.classList.add(className);
+                return () => element.classList.remove(className);
+            }
+        }
+    }, [className, active, element]);
+});
+
+/**
  * Allows an element to start a drag operation.
  *
  * @remarks
@@ -5502,7 +5519,8 @@ const useHideScroll = monitored(function useHideScroll(hideScroll) {
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
     useEffect(() => {
-        if (hideScroll) {
+        const document = getDocument();
+        if (hideScroll && document) {
             // When scrolling is resumed, we'll need to restore the original scroll positions
             // so we need to keep this information around
             const originalScrollTop = document.documentElement.scrollTop;
@@ -5735,14 +5753,14 @@ const usePortalChildren = monitored(function usePortalChildren({ target }) {
     const removeChildStable = useStableCallback((index) => {
         return removeChild?.(index);
     });
-    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? document.getElementById(target) : target; }, [target]);
+    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
     const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
     return {
         children: children,
         pushChild: pushChildStable,
         updateChild: updateChildStable,
         removeChild: removeChildStable,
-        portalElement: element
+        portalElement: element ?? null
     };
 });
 /**
@@ -5799,7 +5817,7 @@ const useElementSize = monitored(function useElementSize({ elementSizeParameters
     const needANewObserver = useCallback((element, observeBox) => {
         if (element) {
             const document = getDocument(element);
-            const window = document.defaultView;
+            const window = getWindow(element);
             const handleUpdate = (entries) => {
                 if (element.isConnected) {
                     const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
@@ -5812,8 +5830,8 @@ const useElementSize = monitored(function useElementSize({ elementSizeParameters
                 return () => observer.disconnect();
             }
             else {
-                document.addEventListener("resize", handleUpdate, { passive: true });
-                return () => document.removeEventListener("resize", handleUpdate);
+                document?.addEventListener("resize", handleUpdate, { passive: true });
+                return () => document?.removeEventListener("resize", handleUpdate);
             }
         }
     }, []);
@@ -6249,27 +6267,30 @@ const useMutationObserver = monitored(function useMutationObserver({ refElementP
  * entire URL.
  */
 const useUrl = monitored(function useUrl(onUrlChange) {
-    const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
-    useGlobalHandler(globalThis, "hashchange", (e) => {
+    const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
+    useGlobalHandler(getWindow(), "hashchange", (e) => {
         setUrl(globalThis.location.toString(), e);
     });
-    useGlobalHandler(globalThis, "popstate", (e) => {
+    useGlobalHandler(getWindow(), "popstate", (e) => {
         // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
         // TODO: If this assert never fires, it's *probably* fine??
-        console.assert(globalThis.location.toString() === document.location.toString());
+        console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
         setUrl(globalThis.location.toString(), e);
     });
     return [getUrl, useCallback((newUrlOrSetter, action) => {
-            if (typeof newUrlOrSetter == "function") {
-                setUrl(prev => {
-                    let newUrl = newUrlOrSetter(prev);
-                    history[`${action ?? "replace"}State`]({}, document.title, newUrl);
-                    return newUrl;
-                }, undefined);
-            }
-            else {
-                history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
-                setUrl(newUrlOrSetter, undefined);
+            const document = getDocument();
+            if (document) {
+                if (typeof newUrlOrSetter == "function") {
+                    setUrl(prev => {
+                        let newUrl = newUrlOrSetter(prev);
+                        history[`${action ?? "replace"}State`]({}, document.title, newUrl);
+                        return newUrl;
+                    }, undefined);
+                }
+                else {
+                    history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+                    setUrl(newUrlOrSetter, undefined);
+                }
             }
         }, [])];
 });
@@ -6384,7 +6405,7 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
         }
     }, [key, storage]);
     // Listen for changes to this storage in other browser tabs
-    useGlobalHandler(globalThis, "storage", useStableCallback((e) => {
+    useGlobalHandler(getWindow(), "storage", useStableCallback((e) => {
         if (key && e.key === key && e.storageArea == storage) {
             const newValue = e.newValue;
             if (newValue != null)
@@ -6440,9 +6461,10 @@ function usePropsOnChildren(children, props, ref, Tag = 'span') {
 
 const SearchParamStates = undefined; // Needed for the isolatedModules flag?
 function parseParam(url, paramKey, fromString) {
+    const window = getWindow();
     if (paramKey == undefined)
         return paramKey ?? undefined;
-    url ??= new URL(window.location.toString());
+    url ??= new URL(window?.location?.toString() ?? "");
     let value = url.searchParams.get(paramKey);
     let ret = fromString(value) ?? undefined;
     return ret;
@@ -6486,7 +6508,7 @@ function useSearchParamState({ key: paramKey, defaultReason, stringToValue, init
     //toString ??= JSON.stringify;
     valueToString ??= (value) => `${value}`;
     defaultReason ??= "replace";
-    const getInitialValue = useStableCallback(() => (parseParam(new URL(window.location.toString()), paramKey, stringToValue) ?? initialValue));
+    const getInitialValue = useStableCallback(() => (parseParam(new URL(getWindow()?.location?.toString() || ""), paramKey, stringToValue) ?? initialValue));
     useEffect(() => {
         setParamWithHistory(getInitialValue(), "replace");
     }, []);
@@ -6499,16 +6521,20 @@ function useSearchParamState({ key: paramKey, defaultReason, stringToValue, init
         return savedParamValue.current = (parseParam(null, paramKey, stringToValue) ?? getInitialValue());
     }), runImmediately);
     const setParamWithHistory = useStableCallback((newValueOrUpdater, reason) => {
-        let prevValue = parseParam(null, paramKey, stringToValue) ?? getInitialValue();
-        let nextValue = (typeof newValueOrUpdater == "function" ? newValueOrUpdater(prevValue) : newValueOrUpdater);
-        let newParams = new URLSearchParams((new URL(window.location.toString()).searchParams));
-        unparseParam(newParams, paramKey, nextValue, valueToString);
-        let nextUrl = new URL(window.location.toString());
-        nextUrl.search = prettyPrintParams(newParams);
-        reason ??= defaultReason ?? "replace";
-        history[`${reason}State`]({}, document.title, nextUrl);
-        setUrl(nextUrl.toString(), reason);
-        setSavedParamValue(nextValue);
+        const document = getDocument();
+        const window = getWindow();
+        if (document && window) {
+            let prevValue = parseParam(null, paramKey, stringToValue) ?? getInitialValue();
+            let nextValue = (typeof newValueOrUpdater == "function" ? newValueOrUpdater(prevValue) : newValueOrUpdater);
+            let newParams = new URLSearchParams((new URL(window.location.toString()).searchParams));
+            unparseParam(newParams, paramKey, nextValue, valueToString);
+            let nextUrl = new URL(window.location.toString());
+            nextUrl.search = prettyPrintParams(newParams);
+            reason ??= defaultReason ?? "replace";
+            history[`${reason}State`]({}, document.title, nextUrl);
+            setUrl(nextUrl.toString(), reason);
+            setSavedParamValue(nextValue);
+        }
     });
     // Any time the URL changes, it means the Search Param we care about might have changed.
     // Parse it out and save it.
@@ -6685,5 +6711,5 @@ const useInterval = monitored(function useInterval({ interval, callback }) {
     }, []);
 });
 
-export { EventDetail, EventMapping, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, debounceRendering, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useCreateProcessedChildrenContext, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { EventDetail, EventMapping, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, debounceRendering, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, getWindow, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useCreateProcessedChildrenContext, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.js.map

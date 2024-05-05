@@ -1,6 +1,7 @@
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { getWindow } from "../../util/get-window.js";
 import { useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 /**
@@ -28,7 +29,7 @@ export const useBackdropDismiss = monitored(function useBackdropDismiss({ backdr
             onClose()?.(e);
         }
     }, []);
-    useGlobalHandler(globalThis, "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(globalThis, "touchstart", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(getWindow(), "mousedown", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(getWindow(), "touchstart", open ? onBackdropClick : null, { capture: true });
 });
 //# sourceMappingURL=use-backdrop-dismiss.js.map

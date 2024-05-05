@@ -1,6 +1,6 @@
-import { getDocument } from "../dom-helpers/use-document-class.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 /**
@@ -16,7 +16,7 @@ export const useElementSize = monitored(function useElementSize({ elementSizePar
     const needANewObserver = useCallback((element, observeBox) => {
         if (element) {
             const document = getDocument(element);
-            const window = document.defaultView;
+            const window = getWindow(element);
             const handleUpdate = (entries) => {
                 if (element.isConnected) {
                     const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
@@ -29,8 +29,8 @@ export const useElementSize = monitored(function useElementSize({ elementSizePar
                 return () => observer.disconnect();
             }
             else {
-                document.addEventListener("resize", handleUpdate, { passive: true });
-                return () => document.removeEventListener("resize", handleUpdate);
+                document?.addEventListener("resize", handleUpdate, { passive: true });
+                return () => document?.removeEventListener("resize", handleUpdate);
             }
         }
     }, []);

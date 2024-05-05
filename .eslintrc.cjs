@@ -19,6 +19,15 @@ module.exports = {
                 "allowSingleExtends": true
             }
         ],
+        "no-restricted-globals": [
+            "warn",
+            {
+                "name": "window"
+            },
+            {
+                "name": "document"
+            }
+        ],
         "@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/no-empty-function": 0,

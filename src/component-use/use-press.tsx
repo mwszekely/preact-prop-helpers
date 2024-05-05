@@ -5,6 +5,7 @@ import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-ex
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
@@ -17,7 +18,7 @@ export interface UsePressParameters<E extends EventTarget> extends TargetedPick<
 }
 
 function pressLog(...args: any[]) {
-    if ((window as any).__log_press_events)
+    if ((globalThis as any).__log_press_events)
         console.log(...args)
 }
 
@@ -130,7 +131,7 @@ function onHandledManualClickEvent() {
     }, 200)
 }
 
-document.addEventListener("click", (e) => {
+getDocument()?.addEventListener("click", (e) => {
     if (justHandledManualClickEvent) {
         justHandledManualClickEvent = false;
         manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
@@ -241,8 +242,8 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
         ] as const;
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
-            const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-            hoveringAtAnyPoint ||= (element?.contains(elementAtTouch) ?? false)
+            const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
+            hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false)
         }
         setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
@@ -298,8 +299,8 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
             const element = getElement();
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
-            const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-            const hovering = element == elementAtPointer || element?.contains(elementAtPointer) || false;
+            const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
+            const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
             setHovering(hovering);
             setIsPressing(hovering && getPointerDownStartedHere(), e);
         }
@@ -564,8 +565,9 @@ export function usePressAsync<E extends Element>({
  * @param element 
  * @returns 
  */
-function _nodeSelectedTextLength(element: EventTarget | null | undefined) {
-    if (element && element instanceof Node) {
+function _nodeSelectedTextLength(element: Node | null | undefined) {
+    const window = getWindow(element);
+    if (window && element && element instanceof Node) {
         const selection = window.getSelection();
 
         for (let i = 0; i < (selection?.rangeCount ?? 0); ++i) {

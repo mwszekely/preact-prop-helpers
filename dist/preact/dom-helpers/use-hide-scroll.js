@@ -1,4 +1,5 @@
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { getDocument } from "../util/get-window.js";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 /**
@@ -12,7 +13,8 @@ export const useHideScroll = monitored(function useHideScroll(hideScroll) {
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
     useEffect(() => {
-        if (hideScroll) {
+        const document = getDocument();
+        if (hideScroll && document) {
             // When scrolling is resumed, we'll need to restore the original scroll positions
             // so we need to keep this information around
             const originalScrollTop = document.documentElement.scrollTop;

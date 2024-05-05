@@ -14,7 +14,9 @@ import { monitored } from "../util/use-call-count.js";
  */
 export const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
     mode ||= "grouped";
-    useEnsureStability("useGlobalHandler", mode);
+    useEnsureStability("useGlobalHandler", target, mode);
+    if (!target)
+        return;
     if (mode === "grouped") {
         // Note to self: The typing doesn't improve even if this is split up into a sub-function.
         // No matter what, it seems impossible to get the handler's event object typed perfectly.

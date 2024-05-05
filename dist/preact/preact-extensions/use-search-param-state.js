@@ -1,13 +1,15 @@
 import { useUrl } from "../observers/use-url.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { runImmediately, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 export const SearchParamStates = undefined; // Needed for the isolatedModules flag?
 function parseParam(url, paramKey, fromString) {
+    const window = getWindow();
     if (paramKey == undefined)
         return paramKey ?? undefined;
-    url ??= new URL(window.location.toString());
+    url ??= new URL(window?.location?.toString() ?? "");
     let value = url.searchParams.get(paramKey);
     let ret = fromString(value) ?? undefined;
     return ret;
@@ -51,7 +53,7 @@ export function useSearchParamState({ key: paramKey, defaultReason, stringToValu
     //toString ??= JSON.stringify;
     valueToString ??= (value) => `${value}`;
     defaultReason ??= "replace";
-    const getInitialValue = useStableCallback(() => (parseParam(new URL(window.location.toString()), paramKey, stringToValue) ?? initialValue));
+    const getInitialValue = useStableCallback(() => (parseParam(new URL(getWindow()?.location?.toString() || ""), paramKey, stringToValue) ?? initialValue));
     useEffect(() => {
         setParamWithHistory(getInitialValue(), "replace");
     }, []);
@@ -64,16 +66,20 @@ export function useSearchParamState({ key: paramKey, defaultReason, stringToValu
         return savedParamValue.current = (parseParam(null, paramKey, stringToValue) ?? getInitialValue());
     }), runImmediately);
     const setParamWithHistory = useStableCallback((newValueOrUpdater, reason) => {
-        let prevValue = parseParam(null, paramKey, stringToValue) ?? getInitialValue();
-        let nextValue = (typeof newValueOrUpdater == "function" ? newValueOrUpdater(prevValue) : newValueOrUpdater);
-        let newParams = new URLSearchParams((new URL(window.location.toString()).searchParams));
-        unparseParam(newParams, paramKey, nextValue, valueToString);
-        let nextUrl = new URL(window.location.toString());
-        nextUrl.search = prettyPrintParams(newParams);
-        reason ??= defaultReason ?? "replace";
-        history[`${reason}State`]({}, document.title, nextUrl);
-        setUrl(nextUrl.toString(), reason);
-        setSavedParamValue(nextValue);
+        const document = getDocument();
+        const window = getWindow();
+        if (document && window) {
+            let prevValue = parseParam(null, paramKey, stringToValue) ?? getInitialValue();
+            let nextValue = (typeof newValueOrUpdater == "function" ? newValueOrUpdater(prevValue) : newValueOrUpdater);
+            let newParams = new URLSearchParams((new URL(window.location.toString()).searchParams));
+            unparseParam(newParams, paramKey, nextValue, valueToString);
+            let nextUrl = new URL(window.location.toString());
+            nextUrl.search = prettyPrintParams(newParams);
+            reason ??= defaultReason ?? "replace";
+            history[`${reason}State`]({}, document.title, nextUrl);
+            setUrl(nextUrl.toString(), reason);
+            setSavedParamValue(nextValue);
+        }
     });
     // Any time the URL changes, it means the Search Param we care about might have changed.
     // Parse it out and save it.

@@ -5,6 +5,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
+import { getDocument } from "../../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -41,6 +42,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
         // Notify the relevant children that they should become tabbable/untabbable,
         // but also handle focus management when we changed due to user interaction
         return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
+            const document = getDocument();
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
             let parentElement = getElement();
@@ -57,7 +59,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
                 //
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
-                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
+                if (document && !parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(parentElement);
                 return null;
             }
@@ -67,13 +69,13 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
                 // TODO: Find the next/prev element and focus that instead,
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
-                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
+                if (document && !parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(parentElement);
                 return null;
             }
             // If we've made a change, and it was because the user clicked on it or something,
             // then focus that element too
-            if (prevIndex != nextIndex) {
+            if (document && prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
@@ -96,7 +98,8 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
     const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
-        let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement));
+        const document = getDocument();
+        let shouldFocusParentAfterwards = !!document && (getElement()?.contains(document.activeElement));
         if (untabbable)
             changeTabbableIndex(null, undefined);
         else {
@@ -123,13 +126,14 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
         isValid: isTabbableValid,
         setAt: setTabbableAt,
         onClosestFit: (index) => {
+            const document = getDocument();
             // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body
             // TODO: This is slightly janky -- we want to only mess with the user's focus when this list (or whatever) is the current focus,
             // but by the time we know something like "all the children have unmounted",
             // we've lot the ability to know if any of them were focused, at least easily.
             // So we just check to see if focus was lost to the body and, if so, send it somewhere useful.
             // This is liable to break, probably with blockingElements or something.
-            if (document.activeElement == null || document.activeElement == document.body) {
+            if (document && (document.activeElement == null || document.activeElement == document.body)) {
                 let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
                 if (index == null || childElement == null)
                     findBackupFocus(getElement()).focus();
@@ -139,6 +143,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
         }
     });
     const focusSelf = useCallback((force, reason) => {
+        const document = getDocument();
         const children = getChildren();
         let index = getTabbableIndex();
         const untabbable = getUntabbable();
@@ -147,7 +152,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
             index ??= getInitiallyTabbedIndex() ?? children.getLowestIndex();
         }
         if (untabbable) {
-            if (document.activeElement != getElement() && (force || untabbableBehavior != 'leave-child-focused')) {
+            if (document && document.activeElement != getElement() && (force || untabbableBehavior != 'leave-child-focused')) {
                 focusSelfParent(getElement());
             }
         }

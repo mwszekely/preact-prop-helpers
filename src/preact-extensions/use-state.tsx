@@ -24,7 +24,7 @@ export const useState = (function useState<T>(initialState: T | (() => T)): read
     // to also set our ref to the new value
     const setState = useRef<StateUpdater<T>>(value => {
         if (process.env.NODE_ENV === 'development') {
-            (window as any)._setState_stack = getStack();
+            (globalThis as any)._setState_stack = getStack();
         }
         if (typeof value === "function") {
             const callback = value as ((_prevValue: T) => T);

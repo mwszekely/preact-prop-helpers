@@ -1,8 +1,7 @@
 import { clsx } from "clsx";
+import { getDocument } from "../util/get-window.js";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
-
-export function getDocument(element?: Node) { return (element?.ownerDocument ?? document ?? globalThis.document); }
 
 type P = Parameters<typeof clsx>;
 
@@ -14,7 +13,7 @@ type P = Parameters<typeof clsx>;
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
 export const useDocumentClass = monitored(function useDocumentClass(className: P[0], active?: boolean, element?: HTMLElement) {
-    element ??= getDocument().documentElement;
+    element ??= getDocument()?.documentElement;
     className = clsx(className);
 
     useEffect(() => {

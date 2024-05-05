@@ -6,6 +6,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
+import { getDocument } from "../../util/get-window.js";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
 /**
  * Allows a parent to track the changes made to multi-selection children.
@@ -115,7 +116,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
         }
     });
     let nextCtrlAIsUndo = useRef(false);
-    useGlobalHandler(document, "keydown", useStableCallback((e) => {
+    useGlobalHandler(getDocument(), "keydown", useStableCallback((e) => {
         shiftKeyHeld.current = (e.shiftKey || e.key == 'Shift');
         ctrlKeyHeld.current = (e.ctrlKey || e.key == 'Control');
         // Only do CTRL+A handling if the control is focused
@@ -133,7 +134,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
             }
         }
     }), { capture: true });
-    useGlobalHandler(document, "keyup", (e) => {
+    useGlobalHandler(getDocument(), "keyup", (e) => {
         if (e.key == 'Shift')
             shiftKeyHeld.current = false;
         if (e.key == 'Control')

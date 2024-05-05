@@ -2,6 +2,7 @@ import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
@@ -21,30 +22,33 @@ import { monitored } from "../util/use-call-count.js";
  */
 export const useUrl = monitored(function useUrl(onUrlChange: (url: string) => void) {
 
-    const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
+    const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
 
-    useGlobalHandler(globalThis, "hashchange", (e) => {
+    useGlobalHandler(getWindow(), "hashchange", (e) => {
         setUrl(globalThis.location.toString(), e);
     });
 
-    useGlobalHandler(globalThis, "popstate", (e: PopStateEvent) => {
+    useGlobalHandler(getWindow(), "popstate", (e: PopStateEvent) => {
         // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
         // TODO: If this assert never fires, it's *probably* fine??
-        console.assert(globalThis.location.toString() === document.location.toString());
+        console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
         setUrl(globalThis.location.toString(), e);
     });
 
     return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => {
-        if (typeof newUrlOrSetter == "function") {
-            setUrl(prev => {
-                let newUrl = newUrlOrSetter(prev);
-                history[`${action ?? "replace"}State`]({}, document.title, newUrl);
-                return newUrl;
-            }, undefined)
-        }
-        else {
-            history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
-            setUrl(newUrlOrSetter, undefined);
+        const document = getDocument();
+        if (document) {
+            if (typeof newUrlOrSetter == "function") {
+                setUrl(prev => {
+                    let newUrl = newUrlOrSetter(prev);
+                    history[`${action ?? "replace"}State`]({}, document.title, newUrl);
+                    return newUrl;
+                }, undefined)
+            }
+            else {
+                history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+                setUrl(newUrlOrSetter, undefined);
+            }
         }
     }, [])] as const;
 })

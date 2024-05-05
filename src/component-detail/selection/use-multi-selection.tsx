@@ -11,6 +11,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
+import { getDocument } from "../../util/get-window.js";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
 import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -300,7 +301,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
 
     let nextCtrlAIsUndo = useRef(false);
 
-    useGlobalHandler(document, "keydown", useStableCallback((e: KeyboardEvent) => {
+    useGlobalHandler(getDocument(), "keydown", useStableCallback((e: KeyboardEvent) => {
         shiftKeyHeld.current = (e.shiftKey || e.key == 'Shift');
         ctrlKeyHeld.current = (e.ctrlKey || e.key == 'Control');
         // Only do CTRL+A handling if the control is focused
@@ -320,7 +321,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         }
     }), { capture: true });
 
-    useGlobalHandler(document, "keyup", (e: KeyboardEvent) => {
+    useGlobalHandler(getDocument(), "keyup", (e: KeyboardEvent) => {
         if (e.key == 'Shift')
             shiftKeyHeld.current = false;
         if (e.key == 'Control')

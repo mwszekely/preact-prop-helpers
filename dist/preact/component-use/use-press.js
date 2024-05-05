@@ -4,10 +4,11 @@ import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-s
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { onfocusout, useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 function pressLog(...args) {
-    if (window.__log_press_events)
+    if (globalThis.__log_press_events)
         console.log(...args);
 }
 function supportsPointerEvents() {
@@ -49,7 +50,7 @@ function onHandledManualClickEvent() {
         }, 50);
     }, 200);
 }
-document.addEventListener("click", (e) => {
+getDocument()?.addEventListener("click", (e) => {
     if (justHandledManualClickEvent) {
         justHandledManualClickEvent = false;
         manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
@@ -149,8 +150,8 @@ export const usePress = monitored(function usePress(args) {
         ];
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
-            const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-            hoveringAtAnyPoint ||= (element?.contains(elementAtTouch) ?? false);
+            const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
+            hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false);
         }
         setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
@@ -201,8 +202,8 @@ export const usePress = monitored(function usePress(args) {
             const element = getElement();
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
-            const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-            const hovering = element == elementAtPointer || element?.contains(elementAtPointer) || false;
+            const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
+            const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
             setHovering(hovering);
             setIsPressing(hovering && getPointerDownStartedHere(), e);
         }
@@ -420,7 +421,8 @@ export function usePressAsync({ asyncHandlerParameters: { debounce, throttle, as
  * @returns
  */
 function _nodeSelectedTextLength(element) {
-    if (element && element instanceof Node) {
+    const window = getWindow(element);
+    if (window && element && element instanceof Node) {
         const selection = window.getSelection();
         for (let i = 0; i < (selection?.rangeCount ?? 0); ++i) {
             const range = selection.getRangeAt(i);

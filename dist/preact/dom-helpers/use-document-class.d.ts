@@ -1,5 +1,4 @@
 import { clsx } from "clsx";
-export declare function getDocument(element?: Node): Document;
 type P = Parameters<typeof clsx>;
 /**
  * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.

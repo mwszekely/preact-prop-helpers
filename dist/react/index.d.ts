@@ -344,7 +344,7 @@ export { useRandomDualIds, type UseRandomDualIdsParameters, type UseRandomDualId
 export { useRandomId, type UseRandomIdParameters, type UseRandomIdParametersSelf, type UseRandomIdReturnType, type UseRandomIdReturnTypeSelf } from "./component-use/use-random-id.js";
 export { useAsyncHandler, type AsyncHandler, type UseAsyncHandlerParameters, type UseAsyncHandlerReturnType } from "./dom-helpers/use-async-handler.js";
 export { getTopElement, useBlockingElement, type UseBlockingElementParameters, type UseBlockingElementParametersSelf } from "./dom-helpers/use-blocking-element.js";
-export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
+export { useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable, type UseDraggableParameters, type UseDraggableReturnType } from "./dom-helpers/use-draggable.js";
 export { useDroppable, type DropFile, type DropFileMetadata, type DroppableFileError, type UseDroppableParameters, type UseDroppableReturnType } from "./dom-helpers/use-droppable.js";
 export { useGlobalHandler } from "./dom-helpers/use-event-handler.js";
@@ -387,6 +387,7 @@ export { useTimeout, type UseTimeoutParameters } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
 export { EventDetail, enhanceEvent, getEventDetail, type EnhancedEventHandler, type TargetedEnhancedEvent } from "./util/event.js";
 export { findBackupFocus, focus } from "./util/focus.js";
+export { getDocument, getWindow } from "./util/get-window.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitored } from "./util/use-call-count.js";

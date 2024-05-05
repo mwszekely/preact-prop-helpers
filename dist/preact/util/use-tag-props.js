@@ -1,4 +1,5 @@
 import { useTimeout } from "../timing/use-timeout.js";
+import { getDocument } from "./get-window.js";
 import { useMemo, useState } from "./lib.js";
 import "./mode.js";
 import { useStack } from "./stack.js";
@@ -21,12 +22,15 @@ export function useTagProps(props, tag) {
         console.assert(!(props && typeof props == "object" && tag in props));
         useTimeout({
             callback: () => {
-                let element = document.querySelectorAll(`[${propsIdTag}]`);
-                if (element.length != 1) {
-                    console.error("A hook returned props that were not properly spread to any HTMLElement:");
-                    console.log(getStack());
-                    /* eslint-disable no-debugger */
-                    debugger;
+                const document = getDocument();
+                if (document) {
+                    let element = document.querySelectorAll(`[${propsIdTag}]`);
+                    if (element.length != 1) {
+                        console.error("A hook returned props that were not properly spread to any HTMLElement:");
+                        console.log(getStack());
+                        /* eslint-disable no-debugger */
+                        debugger;
+                    }
                 }
             },
             timeout: 250,

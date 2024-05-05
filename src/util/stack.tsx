@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "./lib.js";
 import "./mode.js";
 
 export function generateStack() {
-    if (process.env.NODE_ENV === 'development' && (window as any)._generate_setState_stacks) {
+    if (process.env.NODE_ENV === 'development' && (globalThis as any)._generate_setState_stacks) {
         try {
             throw new Error();
         }

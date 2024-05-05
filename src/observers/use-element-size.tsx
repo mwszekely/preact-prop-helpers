@@ -1,6 +1,6 @@
-import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
@@ -72,7 +72,7 @@ export const useElementSize = monitored(function useElementSize<E extends Elemen
     const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
             const document = getDocument(element);
-            const window = document.defaultView;
+            const window = getWindow(element);
 
             const handleUpdate = (entries: ResizeObserverEntry[] | UIEvent) => {
                 if (element.isConnected) {
@@ -90,8 +90,8 @@ export const useElementSize = monitored(function useElementSize<E extends Elemen
                 return () => observer.disconnect();
             }
             else {
-                document.addEventListener("resize", handleUpdate, { passive: true });
-                return () => document.removeEventListener("resize", handleUpdate);
+                document?.addEventListener("resize", handleUpdate, { passive: true });
+                return () => document?.removeEventListener("resize", handleUpdate);
             }
         }
     }, [])
