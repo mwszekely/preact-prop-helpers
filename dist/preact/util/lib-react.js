@@ -9,6 +9,7 @@ export function debounceRendering(f) {
 export const onfocusin = "onFocus";
 export const onfocusout = "onBlur";
 export const EventMapping = {
+    // @ts-ignore
     beforetoggle: null,
     dblclick: "onDoubleClick",
     focusin: "onFocus",

@@ -10,6 +10,6 @@ export declare function isStableGetter<T extends Function>(obj: T): obj is Stabl
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-export declare const useStableCallback: <T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined) => Stable<NonNullable<T>>;
+export declare const useStableCallback: <T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined) => NonNullable<T>;
 export declare const useStableMergedCallback: <T extends (Function | null | undefined)[]>(...fns: T) => NonNullable<T[number]>;
 //# sourceMappingURL=use-stable-callback.d.ts.map
