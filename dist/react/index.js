@@ -4889,7 +4889,7 @@ function onHandledManualClickEvent() {
         }, 50);
     }, 200);
 }
-getDocument()?.addEventListener("click", (e) => {
+getDocument()?.addEventListener?.("click", (e) => {
     if (justHandledManualClickEvent) {
         justHandledManualClickEvent = false;
         manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
