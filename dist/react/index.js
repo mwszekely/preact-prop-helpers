@@ -5,7 +5,6 @@ export { createPortal } from 'react-dom';
 import { identity, noop, shuffle, debounce } from 'lodash-es';
 export { identity } from 'lodash-es';
 import { isTabbable, isFocusable } from 'tabbable';
-import 'blocking-elements';
 import 'wicg-inert';
 import { clsx } from 'clsx';
 
@@ -3695,7 +3694,16 @@ const useDismiss = monitored(function useDismiss({ dismissParameters: { dismissA
     };
 });
 
-function blockingElements() { return getDocument().$blockingElements; }
+let be;
+(async () => {
+    let d = !!globalThis.document;
+    globalThis.document ??= {};
+    await import('blocking-elements');
+    if (!d)
+        delete globalThis.document;
+})();
+function blockingElements() { return be; }
+
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  *

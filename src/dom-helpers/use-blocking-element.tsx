@@ -1,16 +1,13 @@
-import "blocking-elements";
-import { DocumentWithBlockingElements } from "blocking-elements";
-import "wicg-inert";
+
 
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { getDocument } from "../util/get-window.js";
+import { blockingElements } from "../util/blocking-elements.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
-function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 
 export interface UseBlockingElementParametersSelf<E extends Element> {
     enabled: boolean;

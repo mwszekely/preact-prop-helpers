@@ -1,5 +1,3 @@
-import "blocking-elements";
-import "wicg-inert";
 import { UseActiveElementParameters } from "../observers/use-active-element.js";
 export interface UseBlockingElementParametersSelf<E extends Element> {
     enabled: boolean;
