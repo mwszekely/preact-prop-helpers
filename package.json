@@ -19,6 +19,11 @@
       "browser": "./dist/react/index.js",
       "import": "./dist/react/index.js"
     },
+    "./preact": {
+      "types": "./dist/preact/index.d.ts",
+      "browser": "./dist/preact/index.js",
+      "import": "./dist/preact/index.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
