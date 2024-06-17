@@ -6170,29 +6170,31 @@ const WritingModes = {
  * @returns `UseMediaQueryReturnType`
  */
 const useMediaQuery = monitored(function useMediaQuery(query, defaultGuess) {
-    const queryList = useRef();
-    // queryList.current ??= (query == null ? null : matchMedia(query))
-    // This ^^^ is not done because it seems to cause reflows at inopportune moments.
-    // Specifically on iOS Safari (tested on 12).
-    // It's always iOS Safari.
-    // At any rate it botches transitions that happen on a just-mounted component, somehow.
-    const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
-    console.assert(!query || query.startsWith("("));
-    useLayoutEffect(() => {
-        if (!query)
-            return;
-        queryList.current = matchMedia(query);
-        setMatches(queryList.current.matches || false);
-        const handler = (e) => {
-            setMatches(e.matches);
+    {
+        const queryList = useRef();
+        // queryList.current ??= (query == null ? null : matchMedia(query))
+        // This ^^^ is not done because it seems to cause reflows at inopportune moments.
+        // Specifically on iOS Safari (tested on 12).
+        // It's always iOS Safari.
+        // At any rate it botches transitions that happen on a just-mounted component, somehow.
+        const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
+        console.assert(!query || query.startsWith("("));
+        useLayoutEffect(() => {
+            if (!query)
+                return;
+            queryList.current = matchMedia(query);
+            setMatches(queryList.current.matches || false);
+            const handler = (e) => {
+                setMatches(e.matches);
+            };
+            queryList.current.addEventListener("change", handler, { passive: true });
+            return () => queryList.current?.removeEventListener("change", handler);
+        }, [query]);
+        return {
+            matches,
+            getMatches
         };
-        queryList.current.addEventListener("change", handler, { passive: true });
-        return () => queryList.current?.removeEventListener("change", handler);
-    }, [query]);
-    return {
-        matches,
-        getMatches
-    };
+    }
 });
 
 /**
