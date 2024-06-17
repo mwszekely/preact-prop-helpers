@@ -1,5 +1,5 @@
 import { useState } from "../preact-extensions/use-state.js";
-import { useLayoutEffect, useRef } from "../util/lib.js";
+import { useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
 /**
@@ -16,6 +16,14 @@ import { monitored } from "../util/use-call-count.js";
  * @returns `UseMediaQueryReturnType`
  */
 export const useMediaQuery = monitored(function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
+
+    if (typeof "window" === undefined) {
+        const matches = defaultGuess || false;
+        return {
+            matches,
+            getMatches: useCallback(() => matches, [matches])
+        };
+    }
 
     const queryList = useRef<MediaQueryList | null>();
 

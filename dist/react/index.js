@@ -5,7 +5,6 @@ export { createPortal } from 'react-dom';
 import { identity, noop, shuffle, debounce } from 'lodash-es';
 export { identity } from 'lodash-es';
 import { isTabbable, isFocusable } from 'tabbable';
-import 'wicg-inert';
 import { clsx } from 'clsx';
 
 /** These are all the event mappings that are shared between Preact/React */
@@ -3696,11 +3695,15 @@ const useDismiss = monitored(function useDismiss({ dismissParameters: { dismissA
 
 let be;
 (async () => {
-    let d = !!globalThis.document;
-    globalThis.document ??= {};
-    await import('blocking-elements');
-    if (!d)
-        delete globalThis.document;
+    if (typeof window !== undefined) {
+        let d = !!globalThis.document;
+        globalThis.document ??= {};
+        /// @ts-expect-error
+        await import('wicg-inert');
+        await import('blocking-elements');
+        if (!d)
+            delete globalThis.document;
+    }
 })();
 function blockingElements() { return be; }
 
