@@ -17,7 +17,7 @@ import { monitored } from "../util/use-call-count.js";
  */
 export const useMediaQuery = monitored(function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
 
-    if (typeof "window" === "undefined") {
+    if (typeof window === "undefined") {
         const matches = defaultGuess || false;
         return {
             matches,

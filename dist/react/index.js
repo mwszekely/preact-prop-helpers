@@ -6170,7 +6170,14 @@ const WritingModes = {
  * @returns `UseMediaQueryReturnType`
  */
 const useMediaQuery = monitored(function useMediaQuery(query, defaultGuess) {
-    {
+    if (typeof window === "undefined") {
+        const matches = defaultGuess || false;
+        return {
+            matches,
+            getMatches: useCallback(() => matches, [matches])
+        };
+    }
+    else {
         const queryList = useRef();
         // queryList.current ??= (query == null ? null : matchMedia(query))
         // This ^^^ is not done because it seems to cause reflows at inopportune moments.
