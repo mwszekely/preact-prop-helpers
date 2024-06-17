@@ -1,6 +1,6 @@
 let be;
 (async () => {
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
         let d = !!globalThis.document;
         globalThis.document ??= {};
         /// @ts-expect-error
