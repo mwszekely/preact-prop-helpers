@@ -23,30 +23,37 @@ import { useState } from "./use-state.js";
 export interface PersistentStates { }
 export const PersistentStates: PersistentStates = undefined!; // Needed for the isolatedModules flag?
 
-export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage: Storage = localStorage): PersistentStates[Key] | null {
-    try {
-        const item = storage.getItem(key);
-        if (item == null)
+const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage) as Storage;
+
+export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage: Storage = defaultStorage): PersistentStates[Key] | null {
+    if (storage != null) {
+        try {
+            const item = storage.getItem(key);
+            if (item == null)
+                return null;
+            return converter(item);
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
             return null;
-        return converter(item);
+        }
     }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
-        return null;
-    }
+    return null;
 }
 
-export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage: Storage = localStorage): void {
-    try {
-        if (value == null)
-            storage.removeItem(key);
-        else
-            storage.setItem(key, converter(value));
-    }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
+export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage: Storage = defaultStorage): void {
+    if (storage != null) {
+        try {
+            if (value == null)
+                storage.removeItem(key);
+            else
+                storage.setItem(key, converter(value));
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
+        }
     }
 }
 

@@ -5,29 +5,35 @@ import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
 export const PersistentStates = undefined; // Needed for the isolatedModules flag?
-export function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
-    try {
-        const item = storage.getItem(key);
-        if (item == null)
+const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage);
+export function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStorage) {
+    if (storage != null) {
+        try {
+            const item = storage.getItem(key);
+            if (item == null)
+                return null;
+            return converter(item);
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
             return null;
-        return converter(item);
+        }
     }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
-        return null;
-    }
+    return null;
 }
-export function storeToLocalStorage(key, value, converter = JSON.stringify, storage = localStorage) {
-    try {
-        if (value == null)
-            storage.removeItem(key);
-        else
-            storage.setItem(key, converter(value));
-    }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
+export function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
+    if (storage != null) {
+        try {
+            if (value == null)
+                storage.removeItem(key);
+            else
+                storage.setItem(key, converter(value));
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
+        }
     }
 }
 //function dummy<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] { return null!; }

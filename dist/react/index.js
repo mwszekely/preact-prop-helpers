@@ -532,9 +532,9 @@ function useGlobalHandlerSingle(target, type, handler, options) {
 function assertEmptyObject(_a) { }
 
 // eslint-disable-next-line no-restricted-globals
-function getWindow(element) { return (typeof window != "undefined") ? undefined : (element?.ownerDocument?.defaultView ?? globalThis ?? {}); }
+function getWindow(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument?.defaultView ?? globalThis ?? {}); }
 // eslint-disable-next-line no-restricted-globals
-function getDocument(element) { return (typeof window != "undefined") ? undefined : (element?.ownerDocument ?? getWindow()?.document) ?? undefined; }
+function getDocument(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument ?? getWindow()?.document) ?? undefined; }
 
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
@@ -6371,29 +6371,35 @@ const useLayoutEffectDebug = monitored(function useLayoutEffectDebug(effect, inp
 });
 
 const PersistentStates = undefined; // Needed for the isolatedModules flag?
-function getFromLocalStorage(key, converter = JSON.parse, storage = localStorage) {
-    try {
-        const item = storage.getItem(key);
-        if (item == null)
+const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage);
+function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStorage) {
+    if (storage != null) {
+        try {
+            const item = storage.getItem(key);
+            if (item == null)
+                return null;
+            return converter(item);
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
             return null;
-        return converter(item);
+        }
     }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
-        return null;
-    }
+    return null;
 }
-function storeToLocalStorage(key, value, converter = JSON.stringify, storage = localStorage) {
-    try {
-        if (value == null)
-            storage.removeItem(key);
-        else
-            storage.setItem(key, converter(value));
-    }
-    catch (e) {
-        /* eslint-disable no-debugger */
-        debugger;
+function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
+    if (storage != null) {
+        try {
+            if (value == null)
+                storage.removeItem(key);
+            else
+                storage.setItem(key, converter(value));
+        }
+        catch (e) {
+            /* eslint-disable no-debugger */
+            debugger;
+        }
     }
 }
 //function dummy<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] { return null!; }
