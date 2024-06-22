@@ -1,11 +1,15 @@
+import { $pressParameters, $onPressSync } from "../../component-use/use-press.js";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { $onCompositeFocusChange, $childrenHaveFocusParameters, $childrenHaveFocusReturn } from "../../observers/use-children-have-focus.js";
+import { $hasCurrentFocusParameters, $onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
+import { $index, UseGenericChildParameters, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong } from "../../util/types.js";
-import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
-import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
+import { $untabbable, $rovingTabIndexReturn } from "../keyboard-navigation/use-roving-tabindex.js";
+import { $getMultiSelected, $getMultiSelectionDisabled, $setSelectedFromParent, MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType, $multiSelectionChildParameters, $multiSelectionChildReturn, $multiSelectionParameters, $multiSelectionReturn, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
+import { $getSingleSelected, $setLocalSingleSelected, $singleSelected, MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType, $singleSelectionChildParameters, $singleSelectionChildReturn, $singleSelectionParameters, $singleSelectionReturn, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
 
 
 export interface UseSelectionChildInfo<E extends Element> extends UseSingleSelectionChildInfo<E>, UseMultiSelectionChildInfo<E> { }
@@ -55,9 +59,9 @@ export interface UseSelectionChildReturnType<ChildElement extends Element, M ext
  * 
  * @hasChild {@link useSelectionChild}
  */
-export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
-    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...void3 }, context: contextSS, singleSelectionReturn, ...void1 } = useSingleSelection<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexReturn, singleSelectionParameters });
-    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc2, ...void4 }, context: contextMS, multiSelectionReturn, propsStable, ...void2 } = useMultiSelection<ParentOrChildElement, ChildElement>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn });
+export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ [$managedChildrenReturn]: managedChildrenReturn, [$multiSelectionParameters]: multiSelectionParameters, [$childrenHaveFocusReturn]: childrenHaveFocusReturn, [$rovingTabIndexReturn]: rovingTabIndexReturn, [$singleSelectionParameters]: singleSelectionParameters }: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
+    const { [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: ocfc1, ...void3 }, context: contextSS, [$singleSelectionReturn]: singleSelectionReturn, ...void1 } = useSingleSelection<ParentOrChildElement, ChildElement>({ [$managedChildrenReturn]: managedChildrenReturn, [$rovingTabIndexReturn]: rovingTabIndexReturn, [$singleSelectionParameters]: singleSelectionParameters });
+    const { [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: ocfc2, ...void4 }, context: contextMS, [$multiSelectionReturn]: multiSelectionReturn, propsStable, ...void2 } = useMultiSelection<ParentOrChildElement, ChildElement>({ [$managedChildrenReturn]: managedChildrenReturn, [$multiSelectionParameters]: multiSelectionParameters, [$childrenHaveFocusReturn]: childrenHaveFocusReturn });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -65,10 +69,10 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
 
     return {
         propsStable,
-        childrenHaveFocusParameters: { onCompositeFocusChange: useStableMergedCallback(ocfc1, ocfc2) },
+        [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: useStableMergedCallback(ocfc1, ocfc2) },
         context: useMemoObject({ ...contextSS, ...contextMS }),
-        multiSelectionReturn,
-        singleSelectionReturn
+        [$multiSelectionReturn]: multiSelectionReturn,
+        [$singleSelectionReturn]: singleSelectionReturn
     }
 }
 
@@ -79,16 +83,16 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
 export function useSelectionChild<ChildElement extends Element>({
     context,
     info: {
-        index,
-        untabbable,
+        [$index]: index,
+        [$untabbable]: untabbable,
         ...void2
     },
-    singleSelectionChildParameters,
-    multiSelectionChildParameters,
+    [$singleSelectionChildParameters]: singleSelectionChildParameters,
+    [$multiSelectionChildParameters]: multiSelectionChildParameters,
     ...void3
 }: UseSelectionChildParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionChildReturnType<ChildElement, UseSelectionChildInfo<ChildElement>> {
-    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: opc1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild<ChildElement>({ context, info: { index, untabbable }, singleSelectionChildParameters });
-    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, pressParameters: { onPressSync: opc2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElement>({ context, info: { index }, multiSelectionChildParameters });
+    const { props: p1, [$hasCurrentFocusParameters]: { [$onCurrentFocusedInnerChanged]: ocfic1 }, [$pressParameters]: { [$onPressSync]: opc1 }, info: { [$getSingleSelected]: getSingleSelected, [$setLocalSingleSelected]: setLocalSingleSelected, [$singleSelected]: singleSelected, ...void1 }, [$singleSelectionChildReturn]: singleSelectionChildReturn, } = useSingleSelectionChild<ChildElement>({ context, info: { [$index]: index, [$untabbable]: untabbable }, [$singleSelectionChildParameters]: singleSelectionChildParameters });
+    const { props: p2, [$hasCurrentFocusParameters]: { [$onCurrentFocusedInnerChanged]: ocfic2 }, [$pressParameters]: { [$onPressSync]: opc2 }, [$multiSelectionChildReturn]: multiSelectionChildReturn, info: { [$getMultiSelected]: getMultiSelected, [$setSelectedFromParent]: setSelectedFromParent, [$getMultiSelectionDisabled]: getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElement>({ context, info: { [$index]: index }, [$multiSelectionChildParameters]: multiSelectionChildParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -96,19 +100,19 @@ export function useSelectionChild<ChildElement extends Element>({
     assertEmptyObject(void5);
 
     return {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
+        [$hasCurrentFocusParameters]: { [$onCurrentFocusedInnerChanged]: useStableMergedCallback(ocfic1, ocfic2) },
         info: {
-            getMultiSelected,
-            setSelectedFromParent,
-            getSingleSelected,
-            setLocalSingleSelected,
-            singleSelected,
-            getMultiSelectionDisabled,
+            [$getMultiSelected]: getMultiSelected,
+            [$setSelectedFromParent]: setSelectedFromParent,
+            [$getSingleSelected]: getSingleSelected,
+            [$setLocalSingleSelected]: setLocalSingleSelected,
+            [$singleSelected]: singleSelected,
+            [$getMultiSelectionDisabled]: getMultiSelectionDisabled,
         },
-        multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
+        [$multiSelectionChildReturn]: multiSelectionChildReturn,
+        [$pressParameters]: { [$onPressSync]: useStableMergedCallback(opc1, opc2) },
         props: useMergedProps(p1, p2),
-        singleSelectionChildReturn
+        [$singleSelectionChildReturn]: singleSelectionChildReturn
     }
 }
 

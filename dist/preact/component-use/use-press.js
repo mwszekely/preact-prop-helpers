@@ -1,5 +1,6 @@
 import { noop } from "lodash-es";
-import { useAsyncHandler } from "../dom-helpers/use-async-handler.js";
+import { $asyncHandler, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
+import { $getElement, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
@@ -7,6 +8,21 @@ import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument, getWindow } from "../util/get-window.js";
 import { onfocusout, useCallback } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+import { $capture, $debounce, $throttle, $syncHandler } from "../preact-extensions/use-async.js";
+export const $pressParameters = Symbol();
+export const $onPressingChange = Symbol();
+export const $onPressSync = Symbol();
+export const $excludeSpace = Symbol();
+export const $excludeEnter = Symbol();
+export const $excludePointer = Symbol();
+export const $focusSelf = Symbol();
+export const $allowRepeatPresses = Symbol();
+export const $longPressThreshold = Symbol();
+export const $pressing = Symbol();
+export const $getIsPressing = Symbol();
+export const $longPress = Symbol();
+export const $asyncHandlerParameters = Symbol();
+export const $asyncHandlerReturn = Symbol();
 function pressLog(...args) {
     if (globalThis.__log_press_events)
         console.log(...args);
@@ -85,7 +101,7 @@ getDocument()?.addEventListener?.("click", (e) => {
  *
  */
 export const usePress = monitored(function usePress(args) {
-    const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
+    const { [$refElementReturn]: { [$getElement]: getElement }, [$pressParameters]: { [$focusSelf]: focusSelf, [$onPressSync]: onPressSync, [$allowRepeatPresses]: allowRepeatPresses, [$longPressThreshold]: longPressThreshold, [$excludeEnter]: ee, [$excludePointer]: ep, [$excludeSpace]: es, [$onPressingChange]: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
     const excludePointer = useStableCallback(ep ?? returnFalse);
@@ -379,9 +395,9 @@ export const usePress = monitored(function usePress(args) {
     const p = supportsPointerEvents();
     return {
         pressReturn: {
-            pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-            getIsPressing,
-            longPress
+            [$pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+            [$getIsPressing]: getIsPressing,
+            [$longPress]: longPress
         },
         props: {
             onKeyDown,
@@ -401,11 +417,11 @@ export const usePress = monitored(function usePress(args) {
         },
     };
 });
-export function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
-    const asyncHandlerReturn = useAsyncHandler({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+export function usePressAsync({ [$asyncHandlerParameters]: { [$debounce]: debounce, [$throttle]: throttle, [$asyncHandler]: asyncHandler }, [$pressParameters]: pressParameters, [$refElementReturn]: refElementReturn }) {
+    const asyncHandlerReturn = useAsyncHandler({ [$asyncHandler]: asyncHandler, [$capture]: noop, [$debounce]: debounce, [$throttle]: throttle });
+    const { pressReturn, props } = usePress({ [$pressParameters]: { [$onPressSync]: asyncHandlerReturn[$syncHandler], ...pressParameters }, [$refElementReturn]: refElementReturn });
     return {
-        asyncHandlerReturn,
+        [$asyncHandlerReturn]: asyncHandlerReturn,
         pressReturn,
         props
     };

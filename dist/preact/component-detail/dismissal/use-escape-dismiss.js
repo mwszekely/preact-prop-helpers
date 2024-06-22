@@ -1,9 +1,16 @@
+import { $getElement } from "../../dom-helpers/use-ref-element.js";
+import { $getDocument } from "../../observers/use-active-element.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useEffect } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
+import { $refElementPopupReturn } from "./use-backdrop-dismiss.js";
+export const $onDismissEscape = Symbol();
+export const $dismissEscapeActive = Symbol();
+export const $parentDepth = Symbol();
+export const $escapeDismissParameters = Symbol();
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
 function getElementDepth(element) {
     let depth = 0;
@@ -23,12 +30,12 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export const useEscapeDismiss = monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+export const useEscapeDismiss = monitored(function useEscapeDismiss({ [$escapeDismissParameters]: { [$onDismissEscape]: onClose, [$dismissEscapeActive]: open, [$getDocument]: unstableGetDocument, [$parentDepth]: parentDepth2, ...void1 }, [$refElementPopupReturn]: { [$getElement]: getElement, ...void2 } }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
-    const getDepth = useStableGetter(parentDepth + 1);
+    const getDepth = useStableGetter(parentDepth2 + 1);
     // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
     // Only opened components will add event handlers, and will remove them once closed.
     // The reason this is so complicated is because:

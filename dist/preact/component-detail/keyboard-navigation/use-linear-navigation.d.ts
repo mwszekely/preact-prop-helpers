@@ -1,9 +1,9 @@
 import { identity } from "lodash-es";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
-import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseRearrangeableChildrenReturnType } from "../processed-children/use-rearrangeable-children.js";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { $paginationMax, $paginationMin, UsePaginatedChildrenParameters, $paginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
+import { $indexDemangler, $indexMangler, UseRearrangeableChildrenReturnType, $rearrangeableChildrenReturn } from "../processed-children/use-rearrangeable-children.js";
+import { $getTabbableIndex, $setTabbableIndex, UseRovingTabIndexReturnType, $rovingTabIndexReturn } from "./use-roving-tabindex.js";
 export { identity };
 export interface LinearNavigationResult {
     valueDemangled: number | null;
@@ -12,26 +12,37 @@ export interface LinearNavigationResult {
 export interface UseLinearNavigationReturnTypeSelf {
 }
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
-    linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
+    [$linearNavigationReturn]: UseLinearNavigationReturnTypeSelf;
     propsStable: ElementProps<ParentOrChildElement>;
 }
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">, TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
-    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, typeof $rovingTabIndexReturn, (typeof $getTabbableIndex) | (typeof $setTabbableIndex)>, TargetedPick<UseRearrangeableChildrenReturnType<any>, typeof $rearrangeableChildrenReturn, typeof $indexMangler | typeof $indexDemangler>, TargetedPick<UsePaginatedChildrenParameters<ChildElement>, typeof $paginatedChildrenParameters, typeof $paginationMin | typeof $paginationMax> {
+    [$linearNavigationParameters]: UseLinearNavigationParametersSelf<ChildElement>;
 }
+export declare const $onNavigateLinear: unique symbol;
+export declare const $isValidForLinearNavigation: unique symbol;
+export declare const $pageNavigationSize: unique symbol;
+export declare const $navigatePastStart: unique symbol;
+export declare const $navigatePastEnd: unique symbol;
+export declare const $arrowKeyDirection: unique symbol;
+export declare const $disableHomeEndKeys: unique symbol;
+export declare const $getHighestIndex: unique symbol;
+export declare const $getLowestIndex: unique symbol;
+export declare const $linearNavigationParameters: unique symbol;
+export declare const $linearNavigationReturn: unique symbol;
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
     /**
      * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.
      *
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
+    [$onNavigateLinear]: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      *
      * @stable
      */
-    isValidForLinearNavigation(i: number): boolean;
+    [$isValidForLinearNavigation](i: number): boolean;
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
      *
@@ -41,7 +52,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
      * ```
      */
-    pageNavigationSize: Nullable<number>;
+    [$pageNavigationSize]: Nullable<number>;
     /**
      * What happens when `up` is pressed on the first valid child?
      *
@@ -49,13 +60,13 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * If it's a function, it's is called, and the event does not propagate.
      * If it's `"passthrough"`, nothing happens, **and the event is allowed to propagate**.
      */
-    navigatePastStart: "passthrough" | "wrap" | (() => void);
+    [$navigatePastStart]: "passthrough" | "wrap" | (() => void);
     /**
      * What happens when `down` is pressed on the last valid child?
      *
      * @see {@link UseLinearNavigationParametersSelf.navigatePastStart}
      */
-    navigatePastEnd: "passthrough" | "wrap" | (() => void);
+    [$navigatePastEnd]: "passthrough" | "wrap" | (() => void);
     /**
      * Controls which arrow keys are used to navigate through the component.
      *
@@ -65,13 +76,13 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * Use `"none"` to disallow navigation with the arrow keys in any direction.
      */
-    arrowKeyDirection: "horizontal" | "vertical" | "either" | "none";
+    [$arrowKeyDirection]: "horizontal" | "vertical" | "either" | "none";
     /**
      * If set to true, navigation with the home & end keys will
      * be disabled, but navigation with the arrow keys will be
      * unaffected.
      */
-    disableHomeEndKeys: boolean;
+    [$disableHomeEndKeys]: boolean;
     /**
      * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.
      *
@@ -93,7 +104,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    getHighestIndex(): number;
+    [$getHighestIndex](): number;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      *
@@ -101,7 +112,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    getLowestIndex(): number;
+    [$getLowestIndex](): number;
 }
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -113,7 +124,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  *
  * @compositeParams
  */
-export declare const useLinearNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>) => UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare const useLinearNavigation: <ParentOrChildElement extends Element, ChildElement extends Element>({ [$linearNavigationParameters]: { [$getLowestIndex]: getLowestIndex, [$getHighestIndex]: getHighestIndex, [$isValidForLinearNavigation]: isValidForLinearNavigation, [$navigatePastEnd]: navigatePastEnd, [$navigatePastStart]: navigatePastStart, [$onNavigateLinear]: onNavigateLinear, [$arrowKeyDirection]: arrowKeyDirection, [$disableHomeEndKeys]: disableHomeEndKeys, [$pageNavigationSize]: pageNavigationSize, ...void4 }, [$rovingTabIndexReturn]: { [$getTabbableIndex]: getTabbableIndex, [$setTabbableIndex]: setTabbableIndex, ...void5 }, [$paginatedChildrenParameters]: { [$paginationMax]: paginationMax, [$paginationMin]: paginationMin, ...void2 }, [$rearrangeableChildrenReturn]: { [$indexDemangler]: indexDemangler, [$indexMangler]: indexMangler, ...void3 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>) => UseLinearNavigationReturnType<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;

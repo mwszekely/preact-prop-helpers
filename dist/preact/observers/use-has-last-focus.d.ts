@@ -1,8 +1,14 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
+export declare const $hasLastFocusParameters: unique symbol;
+export declare const $hasLastFocusReturn: unique symbol;
+export declare const $onLastFocusedChanged: unique symbol;
+export declare const $onLastFocusedInnerChanged: unique symbol;
+export declare const $getLastFocused: unique symbol;
+export declare const $getLastFocusedInner: unique symbol;
 export interface UseHasLastFocusParametersSelf {
     /**
      * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
@@ -11,25 +17,25 @@ export interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
+    [$onLastFocusedChanged]: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
+    [$onLastFocusedInnerChanged]: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
-export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasLastFocusParameters: UseHasLastFocusParametersSelf;
+export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, typeof $refElementReturn, typeof $getElement> {
+    [$hasLastFocusParameters]: UseHasLastFocusParametersSelf;
 }
 export interface HasLastFocusReturnTypeSelf {
     /** @stable */
-    getLastFocused(): boolean;
+    [$getLastFocused](): boolean;
     /** @stable */
-    getLastFocusedInner(): boolean;
+    [$getLastFocusedInner](): boolean;
 }
 export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
-    hasLastFocusReturn: HasLastFocusReturnTypeSelf;
+    [$hasLastFocusReturn]: HasLastFocusReturnTypeSelf;
 }
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.

@@ -6,6 +6,9 @@ import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassi
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
 
+
+export const $index = Symbol();
+
 /**
  * Reminder of order of execution:
  * 
@@ -29,15 +32,26 @@ import { useMemoObject } from "./use-stable-getter.js";
  */
 const _comments = void (0);
 
+export const $getChildren = Symbol();
+export const $managedChildrenArray = Symbol();
+export const $remoteULEChildMounted = Symbol();
+export const $onAfterChildLayoutEffect = Symbol();
+export const $onChildrenMountChange = Symbol();
+export const $onChildrenCountChange = Symbol();
+export const $managedChildContext = Symbol();
+export const $managedChildrenParameters = Symbol();
+export const $managedChildrenReturn = Symbol();
+export const $managedChildReturn = Symbol();
+
 export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
-    getChildren(): ManagedChildren<M>;
-    managedChildrenArray: InternalChildInfo<M>;
-    remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-    //remoteULEChildChanged: (index: M["index"]) => (() => void);
+    [$getChildren](): ManagedChildren<M>;
+    [$managedChildrenArray]: InternalChildInfo<M>;
+    [$remoteULEChildMounted]: (index: M[typeof $index], mounted: boolean) => void;
+    //remoteULEChildChanged: (index: M[typeof Iindex]) => (() => void);
 }
 
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    managedChildContext: UseManagedChildrenContextSelf<M>
+    [$managedChildContext]: UseManagedChildrenContextSelf<M>
 }
 
 
@@ -55,7 +69,7 @@ export interface ManagedChildInfo<T extends string | number> {
      * 
      * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
      */
-    index: T;
+    [$index]: T;
 }
 
 
@@ -74,24 +88,24 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
      * 
      * @stable
      */
-    onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
+    [$onAfterChildLayoutEffect]?: Nullable<OnAfterChildLayoutEffect<M[typeof $index]>>;
 
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      * 
      * @stable
      */
-    onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+    [$onChildrenMountChange]?: Nullable<OnChildrenMountChange<M[typeof $index]>>;
 
     /**
      * 
      * @stable
      */
-    onChildrenCountChange?: Nullable<((count: number) => void)>;
+    [$onChildrenCountChange]?: Nullable<((count: number) => void)>;
 }
 
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
+    [$managedChildrenParameters]: UseManagedChildrenParametersSelf<M>;
 }
 
 /**
@@ -124,6 +138,7 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> exte
     info: M;
 }
 
+
 export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
     /** 
      * @stable
@@ -132,7 +147,7 @@ export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any
      * 
      * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere 
      */
-    getChildren(): ManagedChildren<M>;
+    [$getChildren](): ManagedChildren<M>;
 
 }
 
@@ -145,7 +160,7 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
      * 
      * @stable
      */
-    managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
+    [$managedChildrenReturn]: UseManagedChildrenReturnTypeSelf<M>;
 
     context: UseManagedChildrenContext<M>;
 }
@@ -156,12 +171,12 @@ export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> 
      * 
      * @stable
      */
-    getChildren(): ManagedChildren<M>;
+    [$getChildren](): ManagedChildren<M>;
 }
 
 
 export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
-    managedChildReturn: UseManagedChildReturnTypeSelf<M>;
+    [$managedChildReturn]: UseManagedChildReturnTypeSelf<M>;
 }
 
 
@@ -176,7 +191,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
      * 
      * @stable
      */
-    getAt(index: M["index"]): M | undefined;
+    getAt(index: M[typeof $index]): M | undefined;
     /** 
      * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      * 
@@ -218,7 +233,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
 
 interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
     arr: Array<M>;
-    rec: Partial<Record<M["index"], M>>;
+    rec: Partial<Record<M[typeof $index], M>>;
     highestIndex: number;
     lowestIndex: number;
 }
@@ -238,10 +253,10 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * @compositeParams
  */
 export const useManagedChildren = monitored(function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
-    type IndexType = M["index"];
+    type IndexType = M[typeof $index];
     type Info = M;
 
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
+    const { [$managedChildrenParameters]: { [$onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [$onChildrenMountChange]: onChildrenMountChange, [$onChildrenCountChange]: onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
@@ -356,7 +371,7 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
             const max = getHighestIndex();
             for (let i = 0; i <= max; ++i) {
                 if (ret[i] == null)
-                    ret[i] = { index: i } as M;
+                    ret[i] = { [$index]: i } as M;
             }
             return ret;
         }, [])
@@ -366,14 +381,13 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
 
     return {
         context: useMemoObject({
-            managedChildContext: useMemoObject({
-                managedChildrenArray: managedChildrenArray.current,
-                remoteULEChildMounted,
-                //remoteULEChildChanged,
-                getChildren
+            [$managedChildContext]: useMemoObject({
+                [$managedChildrenArray]: managedChildrenArray.current,
+                [$remoteULEChildMounted]: remoteULEChildMounted,
+                [$getChildren]: getChildren
             })
         }),
-        managedChildrenReturn: { getChildren }
+        [$managedChildrenReturn]: { [$getChildren]: getChildren }
     }
 })
 
@@ -383,10 +397,10 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
  * @compositeParams
  */
 export const useManagedChild = monitored(function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
-    type IndexType = M["index"];
+    type IndexType = M[typeof $index];
 
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
-    const index = info.index;
+    const { [$managedChildContext]: { [$getChildren]: getChildren, [$managedChildrenArray]: managedChildrenArray, [$remoteULEChildMounted]: remoteULEChildMounted } } = (context ?? { managedChildContext: {} }) as UseManagedChildrenContext<M>;
+    const index = info[$index];
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -415,7 +429,7 @@ export const useManagedChild = monitored(function useManagedChild<M extends Mana
     }, [index]);
 
     return {
-        managedChildReturn: { getChildren: getChildren! }
+        [$managedChildReturn]: { [$getChildren]: getChildren! }
     }
 })
 
@@ -427,7 +441,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      * 
      * After mount, change the current active child with `changeIndex`.
      */
-    initialIndex: M["index"] | null | undefined;
+    initialIndex: M[typeof $index] | null | undefined;
 
     /**
      * When provided, if the given activatedIndex doesn't map onto any
@@ -453,10 +467,10 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      * 
      * @stable
      */
-    onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
+    onIndexChange: null | OnPassiveStateChange<M[typeof $index] | null, R>;
 
     /** @stable */
-    setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
+    setAt(index: M, value: boolean, newSelectedIndex: M[typeof $index] | null, prevSelectedIndex: M[typeof $index] | null): void;
     /** @stable */
     getAt(index: M): boolean;
 
@@ -474,7 +488,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      * 
      * The returned value will be the new index that will be used. If `closestFit` is false, it will always be the same as what you passed in.
      */
-    changeIndex: PassiveStateUpdater<M["index"] | null, R>;
+    changeIndex: PassiveStateUpdater<M[typeof $index] | null, R>;
     /** 
      * @stable
      * 
@@ -482,7 +496,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      */
     reevaluateClosestFit: (reason: R) => void;
     /** @stable */
-    getCurrentIndex: () => M["index"] | null;
+    getCurrentIndex: () => M[typeof $index] | null;
 }
 
 /**
@@ -503,9 +517,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange);
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M[typeof $index], R>(onIndexChange);
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M[typeof $index], R>(null);
 
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
@@ -516,11 +530,11 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
         children.forEach(child => {
 
             if (child != null && isValid(child)) {
-                console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-                const newDistance = Math.abs((child.index as number) - requestedIndex);
-                if (newDistance < closestDistance || (newDistance == closestDistance && (child.index as number) < requestedIndex)) {
+                console.assert(typeof child[$index] == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+                const newDistance = Math.abs((child[$index] as number) - requestedIndex);
+                if (newDistance < closestDistance || (newDistance == closestDistance && (child[$index] as number) < requestedIndex)) {
                     closestDistance = newDistance;
-                    closestIndex = (child.index as number);
+                    closestIndex = (child[$index] as number);
                 }
             }
         });
@@ -564,9 +578,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
 
     const reasonRef = useRef<R | undefined>(undefined);
 
-    const changeIndex = useCallback<PassiveStateUpdater<M["index"] | null, R>>((arg: Parameters<PassiveStateUpdater<M["index"] | null, R>>[0], reason: Parameters<PassiveStateUpdater<M["index"] | null, R>>[1]) => {
+    const changeIndex = useCallback<PassiveStateUpdater<M[typeof $index] | null, R>>((arg: Parameters<PassiveStateUpdater<M[typeof $index] | null, R>>[0], reason: Parameters<PassiveStateUpdater<M[typeof $index] | null, R>>[1]) => {
         const children = getChildren();
-        const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M["index"];
+        const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M[typeof $index];
         reasonRef.current = reason;
         setRequestedIndex(requestedIndex, reason as never);
         const currentIndex = getCurrentIndex();

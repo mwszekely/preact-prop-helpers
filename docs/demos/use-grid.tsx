@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/preact/index.js";
+import { $adjust, $childUseEffect, $children, $childrenHaveFocusReturn, $colSpan, $collator, $compare, $disableHomeEndKeys, $focusSelfChild, $focusSelfParent2, $getAnyFocused, $getChildren, $getCurrentTypeahead, $getIndex, $getSingleSelectedIndex, $getTabbableIndex, $getText, $gridNavigationCellParameters, $gridNavigationParameters, $hasCurrentFocusParameters, $hideBecausePaginated, $hideBecauseStaggered, $index, $initiallyMultiSelected, $initiallyTabbableColumn, $initiallyTabbedIndex, $linearNavigationParameters, $linearNavigationReturn, $managedChildContext, $managedChildReturn, $managedChildrenParameters, $managedChildrenReturn, $multiSelectionAriaPropName, $multiSelectionChildParameters, $multiSelectionDisabled, $multiSelectionMode, $multiSelectionParameters, $multiSelectionReturn, $navigatePastEnd, $navigatePastStart, $noTypeahead, $onCurrentFocusedChanged, $onCurrentFocusedInnerChanged, $onMultiSelectChange, $onNavigateLinear, $onNavigateTypeahead, $onRearranged, $onSelectionChange, $onSingleSelectedIndexChange, $onTabbableColumnChange, $onTabbableIndexChange, $onTextContentChange, $onUntabbableFocus, $pageNavigationSize, $paginatedChildContext, $paginatedChildReturn, $paginatedChildrenParameters, $paginatedChildrenReturn, $paginationMax, $paginationMin, $rearrange, $rearrangeableChildrenParameters, $rearrangeableChildrenReturn, $refElementParameters, $refElementReturn, $reverse, $rovingTabIndexChildReturn, $rovingTabIndexParameters, $rovingTabIndexReturn, $setTabbableIndex, $shuffle, $singleSelectedIndex, $singleSelectionAriaPropName, $singleSelectionChildParameters, $singleSelectionDeclarativeParameters, $singleSelectionDisabled, $singleSelectionMode, $singleSelectionParameters, $singleSelectionReturn, $sort, $staggered, $staggeredChildContext, $staggeredChildReturn, $staggeredChildrenParameters, $staggeredChildrenReturn, $tabbable, $textContentParameters, $typeaheadNavigationParameters, $typeaheadNavigationReturn, $typeaheadStatus, $typeaheadTimeout, $untabbable, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/preact/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -22,64 +22,64 @@ export const DemoUseGrid = memo(() => {
     // Entirely complete, fully spelt-out version:
     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
         // `useRovingTabIndex` is a separate hook that you could call with these same parameters:
-        rovingTabIndexParameters: {
+        [$rovingTabIndexParameters]: {
             // If true, the entire grid is removed from the tab order
-            untabbable: false,
+            [$untabbable]: false,
             // A function provided by you that is only called when no children are tabbable
-            focusSelfParent: focus,
+            [$onUntabbableFocus]: focus,
             // This can be used to track when the user navigates between rows for any reason
-            onTabbableIndexChange: setTabbableRow,
+            [$onTabbableIndexChange]: setTabbableRow,
         },
         // `useSingleSelection` is a separate hook that you could call with these parameters:
-        typeaheadNavigationParameters: {
+        [$typeaheadNavigationParameters]: {
             // Determines how children are searched for (`Intl.Collator`)
-            collator: null,
+            [$collator]: null,
             // Whether typeahead behavior is disabled
-            noTypeahead: false,
+            [$noTypeahead]: false,
             // How long a period of no input is required before typeahead clears itself
-            typeaheadTimeout: 1000,
+            [$typeaheadTimeout]: 1000,
             // This can be used to track when the user navigates between rows via typeahead
-            onNavigateTypeahead: null
+            [$onNavigateTypeahead]: null
         },
         // (etc. etc.)
-        linearNavigationParameters: {
+        [$linearNavigationParameters]: {
             // Is navigating to the first/last row with Home/End disabled?
-            disableHomeEndKeys: false,
+            [$disableHomeEndKeys]: false,
             // What happens when you press Up on the first row?
-            navigatePastStart: "wrap",
+            [$navigatePastStart]: "wrap",
             // What happens when you press Down on the last row?
-            navigatePastEnd: "wrap",
+            [$navigatePastEnd]: "wrap",
             // How far do Page Up/Down jump?
-            pageNavigationSize: 0.1,
+            [$pageNavigationSize]: 0.1,
             // This can be used to track when the user navigates between rows with the arrow keys
-            onNavigateLinear: null
+            [$onNavigateLinear]: null
         },
-        singleSelectionParameters: {
+        [$singleSelectionParameters]: {
             // When a child is selected, it is indicated with this ARIA attribute:
-            singleSelectionAriaPropName: "aria-checked",
+            [$singleSelectionAriaPropName]: "aria-checked",
             // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
-            singleSelectionMode: "focus"
+            [$singleSelectionMode]: "focus"
         },
-        multiSelectionParameters: {
+        [$multiSelectionParameters]: {
             // Single- and multi- selection are not exclusive, and when so should be indicated via different attributes.
-            multiSelectionAriaPropName: "aria-selected",
+            [$multiSelectionAriaPropName]: "aria-selected",
             // singleSelectionMode but for multi-selection
-            multiSelectionMode: "activation",
+            [$multiSelectionMode]: "activation",
             // Callback when any child changes with information about % of children checked, etc.
-            onSelectionChange: null
+            [$onSelectionChange]: null
         },
-        singleSelectionDeclarativeParameters: {
+        [$singleSelectionDeclarativeParameters]: {
             // Which child is currently selected?
-            singleSelectedIndex: selectedRow,
+            [$singleSelectedIndex]: selectedRow,
             // What happens when the user selects a child?
-            onSingleSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+            [$onSingleSelectedIndexChange]: (e) => setSelectedRow(e[EventDetail].selectedIndex)
         },
-        gridNavigationParameters: {
+        [$gridNavigationParameters]: {
             // This can be used by you to track which 0-indexed column is currently the one with focus.
-            onTabbableColumnChange: setTabbableColumn,
+            [$onTabbableColumnChange]: setTabbableColumn,
 
             // Which column is tabbable (initially upon mount before the user interacts with it)
-            initiallyTabbableColumn: 0
+            [$initiallyTabbableColumn]: 0
         },
         // paginatedChildrenParameters: {
         // This must return a VNode's 0-based index from its props
@@ -89,16 +89,16 @@ export const DemoUseGrid = memo(() => {
         // Controls how rows compare against each other
         //    compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
         //},
-        paginatedChildrenParameters: {
+        [$paginatedChildrenParameters]: {
             // Controls the current pagination range
-            paginationMin: null,
-            paginationMax: null
+            [$paginationMin]: null,
+            [$paginationMax]: null
         },
         // staggeredChildrenParameters: {
         // Controls whether children appear staggered as CPU time permits
         //      staggered: false
         //  },
-        refElementParameters: {}
+        [$refElementParameters]: {}
     });
 
     // Those were the parameters, these are the return types:
@@ -110,31 +110,31 @@ export const DemoUseGrid = memo(() => {
         // Optionally, if you paginate or stagger your children, each child can `useContext` this as well.
         contextProcessing,
         // This is what `useRovingTabIndex` returned; use it for whatever you need:
-        rovingTabIndexReturn: {
+        [$rovingTabIndexReturn]: {
             // Call to focus the grid, which focuses the current row, which focuses its current cell.
-            focusSelf,
+            [$focusSelfParent2]: focusSelfParent,
             // Returns the index of the row that is tabbable to
-            getTabbableIndex,
+            [$getTabbableIndex]: getTabbableIndex,
             // Changes which row is currently tabbable
-            setTabbableIndex
+            [$setTabbableIndex]: setTabbableIndex
         },
         // This is what `useTypeaheadNavigation` returned; use it for whatever you need:
-        typeaheadNavigationReturn: {
+        [$typeaheadNavigationReturn]: {
             // Returns the current value the user has typed for typeahead (cannot be used during render)
-            getCurrentTypeahead,
+            [$getCurrentTypeahead]: getCurrentTypeahead,
             // Whether the user's typeahead is invalid/valid/nonexistent.
-            typeaheadStatus
+            [$typeaheadStatus]: typeaheadStatus
         },
         // (etc. etc.)
-        singleSelectionReturn: {
+        [$singleSelectionReturn]: {
             // Largely convenience only (since the caller likely already knows the selected index, but just in case)
-            getSingleSelectedIndex,
+            [$getSingleSelectedIndex]: getSingleSelectedIndex,
         },
-        multiSelectionReturn: {
+        [$multiSelectionReturn]: {
             // Nothing, actually
         },
-        refElementReturn: { },
-        rearrangeableChildrenReturn: {
+        [$refElementReturn]: { },
+        [$rearrangeableChildrenReturn]: {
             // You must call this hook on your array of children to implement the sorting behavior
             //     useRearrangedChildren,
             // Largely internal use only
@@ -142,18 +142,18 @@ export const DemoUseGrid = memo(() => {
             // Largely internal use only
             //    indexMangler,
             // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
-            rearrange,
+            [$rearrange]: rearrange,
             // Reverses all children 
-            reverse,
+            [$reverse]: reverse,
             // Shuffles all children
-            shuffle,
+            [$shuffle]: shuffle,
             // A table header button would probably call this function to sort all the table rows.
-            sort
+            [$sort]: sort
         },
-        linearNavigationReturn: { },
-        managedChildrenReturn: {
+        [$linearNavigationReturn]: { },
+        [$managedChildrenReturn]: {
             // Returns metadata about each row
-            getChildren
+            [$getChildren]: getChildren
         },
         //paginatedChildrenReturn: {
         // Largely internal use only
@@ -163,9 +163,9 @@ export const DemoUseGrid = memo(() => {
         // When the staggering behavior is currently hiding one or more children, this is true.
         //     stillStaggering
         // },
-        childrenHaveFocusReturn: {
+        [$childrenHaveFocusReturn]: {
             // Returns true if any row in this grid is focused
-            getAnyFocused
+            [$getAnyFocused]: getAnyFocused
         },
 
     } = allReturnInfo;
@@ -209,29 +209,29 @@ export const DemoUseGrid = memo(() => {
 const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered }: { count: number, min: number | null, max: number | null, staggered: boolean }) {
     const {
         context,
-        paginatedChildrenReturn,
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn,
+        [$paginatedChildrenReturn]: paginatedChildrenReturn,
+        [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn,
+        [$staggeredChildrenReturn]: staggeredChildrenReturn,
     } = useCompleteGridNavigationRows({
-        paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
-        rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null,
-            compare: null,
-            adjust: null,
-            children: useMemo(() => Array.from((function* () {
+        [$paginatedChildrenParameters]: { [$paginationMax]: max, [$paginationMin]: min },
+        [$rearrangeableChildrenParameters]: {
+            [$getIndex]: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+            [$onRearranged]: null,
+            [$compare]: null,
+            [$adjust]: null,
+            [$children]: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     yield <DemoUseGridRowOuter index={i} key={i} />
                 }
             })()), [count]),
         },
-        managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        [$managedChildrenParameters]: {},
+        [$staggeredChildrenParameters]: { [$staggered]: staggered },
         context: useContext(ListChildrenContext)
     })
 
     return (
-        <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
+        <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn[$children]}</ListChildContext.Provider>
     )
 }));
 
@@ -245,14 +245,14 @@ const GridCellContext = createContext<CompleteGridNavigationCellContext<HTMLTabl
 
 
 const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLTableRowElement, any>;
-    const { props, managedChildReturn, refElementParameters, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLTableRowElement>({
-        context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-        info: { index },
+    const { [$managedChildContext]: managedChildContext, [$paginatedChildContext]: paginatedChildContext, [$staggeredChildContext]: staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLTableRowElement, any>;
+    const { props, [$managedChildReturn]: managedChildReturn, [$refElementParameters]: refElementParameters, [$paginatedChildReturn]: paginatedChildReturn, [$staggeredChildReturn]: staggeredChildReturn } = useProcessedChild<HTMLTableRowElement>({
+        context: { [$managedChildContext]: managedChildContext, [$paginatedChildContext]: paginatedChildContext, [$staggeredChildContext]: staggeredChildContext },
+        info: { [$index]: index },
 
     })
-    const { childUseEffect } = staggeredChildReturn;
-    if (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered) {
+    const { [$childUseEffect]: childUseEffect } = staggeredChildReturn;
+    if (paginatedChildReturn[$hideBecausePaginated] || staggeredChildReturn[$hideBecauseStaggered]) {
         return <tr {...props}><td colSpan={99}>&nbsp;</td></tr>
     }
     else {
@@ -279,27 +279,27 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
 
         context: contextFromParent,
-        info: { index, foo: "bar", untabbable: hidden },
-        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
+        info: { [$index]: index, foo: "bar", [$untabbable]: hidden },
+        [$textContentParameters]: { [$getText]: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), [$onTextContentChange]: null },
 
-        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-        rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+        [$linearNavigationParameters]: { [$navigatePastEnd]: "wrap", [$navigatePastStart]: "wrap" },
+        [$rovingTabIndexParameters]: { [$onTabbableIndexChange]: useStableCallback((i: number | null) => { setTabbableColumn(i) }), [$untabbable]: false, [$initiallyTabbedIndex]: 0 },
+        [$typeaheadNavigationParameters]: { [$collator]: null, [$noTypeahead]: false, [$typeaheadTimeout]: 1000, [$onNavigateTypeahead]: null },
+        [$hasCurrentFocusParameters]: { [$onCurrentFocusedChanged]: null, [$onCurrentFocusedInnerChanged]: null },
         //gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex },
-        singleSelectionChildParameters: { singleSelectionDisabled: false },
-        multiSelectionChildParameters: { initiallyMultiSelected: false, onMultiSelectChange: null, multiSelectionDisabled: false }
+        [$singleSelectionChildParameters]: { [$singleSelectionDisabled]: false },
+        [$multiSelectionChildParameters]: { [$initiallyMultiSelected]: false, [$onMultiSelectChange]: null, [$multiSelectionDisabled]: false }
     });
 
     const {
         props,
         context: contextToChild,
-        rovingTabIndexChildReturn: { tabbable }
+        [$rovingTabIndexChildReturn]: { [$tabbable]: tabbable }
 
     } = ret;
 
     return (
-        <tr {...useMergedProps(props, props2)} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
+        <tr {...useMergedProps(props, props2)} data-tabbable={ret[$rovingTabIndexChildReturn][$tabbable]}>
             <GridCellContext.Provider value={contextToChild}>
                 <td>{_tabbableColumn}, {tabbable.toString()}</td>
                 {Array.from((function* () {
@@ -324,13 +324,13 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     const {
         props,
-        rovingTabIndexChildReturn: { tabbable },
+        [$rovingTabIndexChildReturn]: { [$tabbable]: tabbable },
 
     } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
-        gridNavigationCellParameters: { colSpan: 1 },
-        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), untabbable: false },
+        [$gridNavigationCellParameters]: { [$colSpan]: 1 },
+        info: { [$index]: index, bar: "baz", [$focusSelfChild]: useStableCallback((e: HTMLElement) => e.focus()), [$untabbable]: false },
         context,
-        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
+        [$textContentParameters]: { [$getText]: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), [$onTextContentChange]: null },
     });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")

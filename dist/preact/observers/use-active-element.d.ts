@@ -1,24 +1,33 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { Nullable } from "../util/lib.js";
+export declare const $onActiveElementChange: unique symbol;
+export declare const $onLastActiveElementChange: unique symbol;
+export declare const $onWindowFocusedChange: unique symbol;
+export declare const $getDocument: unique symbol;
+export declare const $activeElementReturn: unique symbol;
+export declare const $activeElementParameters: unique symbol;
+export declare const $getActiveElement: unique symbol;
+export declare const $getLastActiveElement: unique symbol;
+export declare const $getWindowFocused: unique symbol;
 export interface UseActiveElementParametersSelf {
     /**
      * Called any time the active element changes.
      *
      * @stable
      */
-    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    [$onActiveElementChange]: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
     /**
      * Called any time the active element changes and is not null.
      *
      * @stable
      */
-    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    [$onLastActiveElementChange]: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
     /**
      * Called any time the window gains/loses focus.
      *
      * @stable
      */
-    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    [$onWindowFocusedChange]: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
      *
@@ -26,30 +35,30 @@ export interface UseActiveElementParametersSelf {
      *
      * @stable
      */
-    getDocument(): Document;
+    [$getDocument](): Document;
 }
 export interface UseActiveElementParameters {
-    activeElementParameters: UseActiveElementParametersSelf;
+    [$activeElementParameters]: UseActiveElementParametersSelf;
 }
 export interface UseActiveElementReturnTypeSelf {
     /**
      * Returns whatever element is currently focused, or `null` if there's no focused element
      * @stable
      */
-    getActiveElement: () => Element | null;
+    [$getActiveElement]: () => Element | null;
     /**
      * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
      * @stable
      */
-    getLastActiveElement: () => Element;
+    [$getLastActiveElement]: () => Element;
     /**
      * Returns if the window itself has focus or not
      * @stable
      */
-    getWindowFocused: () => boolean;
+    [$getWindowFocused]: () => boolean;
 }
 export interface UseActiveElementReturnType {
-    activeElementReturn: UseActiveElementReturnTypeSelf;
+    [$activeElementReturn]: UseActiveElementReturnTypeSelf;
 }
 /**
  * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
@@ -62,5 +71,5 @@ export interface UseActiveElementReturnType {
  *
  * @compositeParams
  */
-export declare const useActiveElement: ({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters) => UseActiveElementReturnType;
+export declare const useActiveElement: ({ [$activeElementParameters]: { [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange, [$getDocument]: getDocument } }: UseActiveElementParameters) => UseActiveElementReturnType;
 //# sourceMappingURL=use-active-element.d.ts.map

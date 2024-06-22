@@ -1,6 +1,6 @@
 
 
-import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
+import { $getDocument, $onActiveElementChange, $onLastActiveElementChange, $onWindowFocusedChange, UseActiveElementParameters, $activeElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
@@ -8,14 +8,17 @@ import { blockingElements } from "../util/blocking-elements.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
+export const $enabled = Symbol();
+export const $getTarget = Symbol();
+export const $blockingElementParameters = Symbol();
 
 export interface UseBlockingElementParametersSelf<E extends Element> {
-    enabled: boolean;
-    getTarget(): (E | null)
+    [$enabled]: boolean;
+    [$getTarget](): (E | null)
 }
 
 export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
-    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+    [$blockingElementParameters]: UseBlockingElementParametersSelf<E>;
 }
 
 /**
@@ -28,16 +31,16 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * @param target 
  */
 export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
-    activeElementParameters: {
-        getDocument,
-        onActiveElementChange,
-        onLastActiveElementChange,
-        onWindowFocusedChange,
+    [$activeElementParameters]: {
+        [$getDocument]: getDocument,
+        [$onActiveElementChange]: onActiveElementChange,
+        [$onLastActiveElementChange]: onLastActiveElementChange,
+        [$onWindowFocusedChange]: onWindowFocusedChange,
         ...void3
     },
-    blockingElementParameters: {
-        enabled,
-        getTarget,
+    [$blockingElementParameters]: {
+        [$enabled]: enabled,
+        [$getTarget]: getTarget,
         ...void1
     },
     ...void2
@@ -51,11 +54,11 @@ export const useBlockingElement = monitored(function useBlockingElement<E extend
 
     //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
-        activeElementParameters: {
-            getDocument,
-            onActiveElementChange,
-            onWindowFocusedChange,
-            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+        [$activeElementParameters]: {
+            [$getDocument]: getDocument,
+            [$onActiveElementChange]: onActiveElementChange,
+            [$onWindowFocusedChange]: onWindowFocusedChange,
+            [$onLastActiveElementChange]: useStableCallback((e, prev, reason) => {
                 onLastActiveElementChange?.(e, prev, reason);
 
                 if (e) {

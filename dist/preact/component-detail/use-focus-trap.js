@@ -1,10 +1,17 @@
 import { isFocusable, isTabbable } from "tabbable";
-import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { $enabled, $getTarget, $blockingElementParameters, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { $getElement, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "../util/get-window.js";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
+import { $activeElementParameters } from "../observers/use-active-element.js";
+export const $trapActive = Symbol();
+export const $onlyMoveFocus = Symbol();
+export const $focusPopup = Symbol();
+export const $focusOpener = Symbol();
+export const $focusTrapParameters = Symbol();
 /**
  * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.
  *
@@ -13,7 +20,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
+export const useFocusTrap = monitored(function useFocusTrap({ [$focusTrapParameters]: { [$onlyMoveFocus]: onlyMoveFocus, [$trapActive]: trapActive, [$focusPopup]: focusSelfUnstable, [$focusOpener]: focusOpenerUnstable }, [$activeElementParameters]: activeElementParameters, [$refElementReturn]: refElementReturn }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
@@ -25,7 +32,7 @@ export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameter
                 focusSelf(lastFocusedInThisComponent, () => lastFocusedInThisComponent);
             }
             else {
-                top ??= refElementReturn.getElement();
+                top ??= refElementReturn[$getElement]();
                 console.assert(!!top);
                 if (top)
                     focusSelf(top, () => findFirstFocusable(top));
@@ -37,19 +44,19 @@ export const useFocusTrap = monitored(function useFocusTrap({ focusTrapParameter
             // Restore focus to whatever caused this trap to trigger,
             // but only if it wasn't caused by explicitly focusing something else 
             // (generally if `onlyMoveFocus` is true)
-            let top = refElementReturn.getElement();
+            let top = refElementReturn[$getElement]();
             if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
                 if (lastActive)
                     focusOpener(lastActive);
             }
         }
     }, [trapActive]);
-    const { getElement } = refElementReturn;
+    const { [$getElement]: getElement } = refElementReturn;
     const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
-        activeElementParameters,
-        blockingElementParameters: {
-            enabled: trapActive && !onlyMoveFocus,
-            getTarget: getElement
+        [$activeElementParameters]: activeElementParameters,
+        [$blockingElementParameters]: {
+            [$enabled]: trapActive && !onlyMoveFocus,
+            [$getTarget]: getElement
         }
     });
     return {

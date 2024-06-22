@@ -4,6 +4,7 @@ import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
+export const $index = Symbol();
 /**
  * Reminder of order of execution:
  *
@@ -26,6 +27,16 @@ import { useMemoObject } from "./use-stable-getter.js";
  * * refs are *usually* called before effects, but only when that HTMLElement renders. Basically just a reminder that a component can be mounted without it existing in the DOM.
  */
 const _comments = void (0);
+export const $getChildren = Symbol();
+export const $managedChildrenArray = Symbol();
+export const $remoteULEChildMounted = Symbol();
+export const $onAfterChildLayoutEffect = Symbol();
+export const $onChildrenMountChange = Symbol();
+export const $onChildrenCountChange = Symbol();
+export const $managedChildContext = Symbol();
+export const $managedChildrenParameters = Symbol();
+export const $managedChildrenReturn = Symbol();
+export const $managedChildReturn = Symbol();
 /**
  * Allows a parent component to access information about certain
  * child components once they have rendered.
@@ -41,7 +52,7 @@ const _comments = void (0);
  * @compositeParams
  */
 export const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
+    const { [$managedChildrenParameters]: { [$onAfterChildLayoutEffect]: onAfterChildLayoutEffect, [$onChildrenMountChange]: onChildrenMountChange, [$onChildrenCountChange]: onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
@@ -144,7 +155,7 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
             const max = getHighestIndex();
             for (let i = 0; i <= max; ++i) {
                 if (ret[i] == null)
-                    ret[i] = { index: i };
+                    ret[i] = { [$index]: i };
             }
             return ret;
         }, [])
@@ -152,22 +163,21 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
     const getChildren = useCallback(() => managedChildren, []);
     return {
         context: useMemoObject({
-            managedChildContext: useMemoObject({
-                managedChildrenArray: managedChildrenArray.current,
-                remoteULEChildMounted,
-                //remoteULEChildChanged,
-                getChildren
+            [$managedChildContext]: useMemoObject({
+                [$managedChildrenArray]: managedChildrenArray.current,
+                [$remoteULEChildMounted]: remoteULEChildMounted,
+                [$getChildren]: getChildren
             })
         }),
-        managedChildrenReturn: { getChildren }
+        [$managedChildrenReturn]: { [$getChildren]: getChildren }
     };
 });
 /**
  * @compositeParams
  */
 export const useManagedChild = monitored(function useManagedChild({ context, info }) {
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
-    const index = info.index;
+    const { [$managedChildContext]: { [$getChildren]: getChildren, [$managedChildrenArray]: managedChildrenArray, [$remoteULEChildMounted]: remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
+    const index = info[$index];
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -194,7 +204,7 @@ export const useManagedChild = monitored(function useManagedChild({ context, inf
         return () => remoteULEChildMounted?.(index, false);
     }, [index]);
     return {
-        managedChildReturn: { getChildren: getChildren }
+        [$managedChildReturn]: { [$getChildren]: getChildren }
     };
 });
 /**
@@ -224,11 +234,11 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
         let closestIndex = null;
         children.forEach(child => {
             if (child != null && isValid(child)) {
-                console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-                const newDistance = Math.abs(child.index - requestedIndex);
-                if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
+                console.assert(typeof child[$index] == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+                const newDistance = Math.abs(child[$index] - requestedIndex);
+                if (newDistance < closestDistance || (newDistance == closestDistance && child[$index] < requestedIndex)) {
                     closestDistance = newDistance;
-                    closestIndex = child.index;
+                    closestIndex = child[$index];
                 }
             }
         });

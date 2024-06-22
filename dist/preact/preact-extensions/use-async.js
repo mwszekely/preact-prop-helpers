@@ -4,6 +4,23 @@ import { useCallback, useEffect, useMemo } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
+export const $debounce = Symbol();
+export const $throttle = Symbol();
+export const $capture = Symbol();
+export const $pending = Symbol();
+export const $debouncingSync = Symbol();
+export const $debouncingAsync = Symbol();
+export const $callCount = Symbol();
+export const $settleCount = Symbol();
+export const $resolveCount = Symbol();
+export const $rejectCount = Symbol();
+export const $result = Symbol();
+export const $hasResult = Symbol();
+export const $error = Symbol();
+export const $hasError = Symbol();
+export const $invocationResult = Symbol();
+export const $flushDebouncedPromise = Symbol();
+export const $syncHandler = Symbol();
 function identityCapture(...t) { return t; }
 const AsyncFunction = ((async function () { }).constructor);
 /**
@@ -60,7 +77,7 @@ export const useAsync = monitored(function useAsync(asyncHandler, options) {
     const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
     const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
     /* eslint-disable prefer-const */
-    let { throttle, debounce, capture: captureUnstable } = (options ?? {});
+    let { [$throttle]: throttle, [$debounce]: debounce, [$capture]: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
     const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
@@ -79,28 +96,28 @@ export const useAsync = monitored(function useAsync(asyncHandler, options) {
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
             onResolve: incrementResolveCount,
-            throttle: options?.throttle ?? undefined,
-            wait: options?.debounce ?? undefined
+            throttle: options?.[$throttle] ?? undefined,
+            wait: options?.[$debounce] ?? undefined
         });
     }, [throttle, debounce]);
     useEffect(() => {
         return () => cancelSyncDebounce();
     }, [cancelSyncDebounce]);
     return {
-        syncHandler: syncOutput,
-        pending,
-        result,
-        error,
-        hasError: hasError || false,
-        hasResult: hasResult || false,
-        resolveCount,
-        rejectCount,
-        settleCount,
-        debouncingAsync: asyncDebouncing,
-        debouncingSync: syncDebouncing,
-        invocationResult,
-        callCount: runCount,
-        flushDebouncedPromise: flushSyncDebounce
+        [$syncHandler]: syncOutput,
+        [$pending]: pending,
+        [$result]: result,
+        [$error]: error,
+        [$hasError]: hasError || false,
+        [$hasResult]: hasResult || false,
+        [$resolveCount]: resolveCount,
+        [$rejectCount]: rejectCount,
+        [$settleCount]: settleCount,
+        [$debouncingAsync]: asyncDebouncing,
+        [$debouncingSync]: syncDebouncing,
+        [$invocationResult]: invocationResult,
+        [$callCount]: runCount,
+        [$flushDebouncedPromise]: flushSyncDebounce
     };
 });
 //# sourceMappingURL=use-async.js.map

@@ -2,7 +2,7 @@
 import { Inputs, useEffect } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
-import { UseAsyncParameters, useAsync } from "./use-async.js";
+import { $capture, $debounce, $throttle, $syncHandler, UseAsyncParameters, UseAsyncReturnType, useAsync } from "./use-async.js";
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 
@@ -14,8 +14,8 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export const useAsyncEffect = monitored(function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
-    const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
-    useEffect(syncHandler, inputs);
-    return rest;
+export const useAsyncEffect = monitored(function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, typeof $capture>):  OmitStrong<UseAsyncReturnType<[], void | (() => void)>, typeof $syncHandler> {
+    const ret = useAsync(effect, { ...options, [$capture]: null, [$debounce]: null, [$throttle]: null });
+    useEffect(ret[$syncHandler], inputs);
+    return ret;
 })

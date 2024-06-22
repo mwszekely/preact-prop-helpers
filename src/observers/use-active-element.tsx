@@ -5,6 +5,15 @@ import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsure
 import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
+export const $onActiveElementChange = Symbol();
+export const $onLastActiveElementChange = Symbol();
+export const $onWindowFocusedChange = Symbol();
+export const $getDocument = Symbol();
+export const $activeElementReturn = Symbol();
+export const $activeElementParameters = Symbol();
+export const $getActiveElement = Symbol();
+export const $getLastActiveElement = Symbol();
+export const $getWindowFocused = Symbol();
 
 /**
  * 
@@ -110,21 +119,21 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    [$onActiveElementChange]: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
 
     /**
      * Called any time the active element changes and is not null.
      * 
      * @stable
      */
-    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    [$onLastActiveElementChange]: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
 
     /**
      * Called any time the window gains/loses focus.
      * 
      * @stable
      */
-    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    [$onWindowFocusedChange]: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
 
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -133,21 +142,13 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    getDocument(): Document;
-
-    /**
-     * By default, event handlers are attached to the document's defaultView Window.
-     * If you need something different, override it here.
-     * 
-     * @stable
-     */
-    //getWindow: Nullable<((document: Document) => Window)>;
+    [$getDocument](): Document;
 }
 
 
 export interface UseActiveElementParameters {
 
-    activeElementParameters: UseActiveElementParametersSelf;
+    [$activeElementParameters]: UseActiveElementParametersSelf;
 }
 
 export interface UseActiveElementReturnTypeSelf {
@@ -155,21 +156,21 @@ export interface UseActiveElementReturnTypeSelf {
      * Returns whatever element is currently focused, or `null` if there's no focused element
      * @stable
      */
-    getActiveElement: () => Element | null;
+    [$getActiveElement]: () => Element | null;
     /** 
      * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
      * @stable
      */
-    getLastActiveElement: () => Element;
+    [$getLastActiveElement]: () => Element;
     /** 
      * Returns if the window itself has focus or not
      * @stable
      */
-    getWindowFocused: () => boolean;
+    [$getWindowFocused]: () => boolean;
 }
 
 export interface UseActiveElementReturnType {
-    activeElementReturn: UseActiveElementReturnTypeSelf;
+    [$activeElementReturn]: UseActiveElementReturnTypeSelf;
 }
 
 /**
@@ -183,7 +184,7 @@ export interface UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
+export const useActiveElement = monitored(function useActiveElement({ [$activeElementParameters]: { [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange, [$getDocument]: getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
 
     useEffect(() => {
@@ -223,5 +224,5 @@ export const useActiveElement = monitored(function useActiveElement({ activeElem
     const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, runImmediately);
     const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
 
-    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
+    return { [$activeElementReturn]: { [$getActiveElement]: getActiveElement, [$getLastActiveElement]: getLastActiveElement, [$getWindowFocused]: getWindowFocused } };
 })

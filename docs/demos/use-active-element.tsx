@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { useActiveElement, useState } from "../../dist/preact/index.js";
+import { $activeElementParameters, $activeElementReturn, $getActiveElement, $getDocument, $getLastActiveElement, $getWindowFocused, $onActiveElementChange, $onLastActiveElementChange, $onWindowFocusedChange, useActiveElement, useState } from "../../dist/preact/index.js";
 
 export function UseActiveElementDemo() {
     
@@ -10,16 +10,16 @@ export function UseActiveElementDemo() {
     const [windowFocused, setWindowFocused] = useState<boolean | null>(null);
 
     const {
-        activeElementReturn: {
-            getActiveElement,
-            getLastActiveElement,
-            getWindowFocused
+        [$activeElementReturn]: {
+            [$getActiveElement]: getActiveElement,
+            [$getLastActiveElement]: getLastActiveElement,
+            [$getWindowFocused]: getWindowFocused
         } } = useActiveElement({
-            activeElementParameters: {
-                getDocument,
-                onActiveElementChange: setActiveElement,
-                onLastActiveElementChange: setLastActiveElement,
-                onWindowFocusedChange: setWindowFocused
+            [$activeElementParameters]: {
+                [$getDocument]: getDocument,
+                [$onActiveElementChange]: setActiveElement,
+                [$onLastActiveElementChange]: setLastActiveElement,
+                [$onWindowFocusedChange]: setWindowFocused
             }
         });
 }

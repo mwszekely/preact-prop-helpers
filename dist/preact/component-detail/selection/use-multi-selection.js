@@ -1,4 +1,8 @@
+import { $onPressSync, $pressParameters } from "../../component-use/use-press.js";
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
+import { $onCompositeFocusChange, $getAnyFocused, $childrenHaveFocusParameters, $childrenHaveFocusReturn } from "../../observers/use-children-have-focus.js";
+import { $hasCurrentFocusParameters, $onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
+import { $index, $getChildren, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { returnFalse, returnTrue } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -8,6 +12,29 @@ import { enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
+export const $onSelectionChange = Symbol();
+export const $multiSelectionMode = Symbol();
+export const $multiSelectionAriaPropName = Symbol();
+export const $onMultiSelectChange = Symbol();
+export const $initiallyMultiSelected = Symbol();
+export const $multiSelectionDisabled = Symbol();
+export const $multiSelected = Symbol();
+export const $onMultiSelectedChange = Symbol();
+export const $changeMultiSelected = Symbol();
+export const $getMultiSelected = Symbol();
+export const $multiSelectionContext = Symbol();
+export const $multiSelectionParameters = Symbol();
+export const $multiSelectionReturn = Symbol();
+export const $multiSelectionChildParameters = Symbol();
+export const $multiSelectionChildReturn = Symbol();
+export const $multiSelectionChildDeclarativeParameters = Symbol();
+export const $notifyParentOfChildSelectChange = Symbol();
+export const $doContiguousSelection = Symbol();
+export const $changeAllChildren = Symbol();
+export const $getCtrlKeyDown = Symbol();
+export const $getShiftKeyDown = Symbol();
+export const $setSelectedFromParent = Symbol();
+export const $getMultiSelectionDisabled = Symbol();
 /**
  * Allows a parent to track the changes made to multi-selection children.
  *
@@ -20,7 +47,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.
  *
  * @hasChild {@link useMultiSelectionChild}
  */
-export function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
+export function useMultiSelection({ [$multiSelectionParameters]: { [$onSelectionChange]: onSelectionChange, [$multiSelectionAriaPropName]: multiSelectionAriaPropName, [$multiSelectionMode]: multiSelectionMode, ...void3 }, [$managedChildrenReturn]: { [$getChildren]: getChildren, ...void1 }, [$childrenHaveFocusReturn]: { [$getAnyFocused]: getAnyFocused, ...void4 }, ...void2 }) {
     // By having both we get the total number of children for free, even if there are holes in the array.
     // TODO: useManagedChildren should do that by default??
     const selectedIndices = useRef(new Set());
@@ -76,8 +103,8 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
     });
     const changeAllChildren = useStableCallback((event, shouldBeSelected) => {
         getChildren().forEach(child => {
-            if (!child.getMultiSelectionDisabled()) {
-                child.setSelectedFromParent(event, shouldBeSelected(child.index));
+            if (!child[$getMultiSelectionDisabled]()) {
+                child[$setSelectedFromParent](event, shouldBeSelected(child[$index]));
             }
         });
     });
@@ -101,10 +128,10 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
             changeAllChildren(event, (childIndex) => {
                 if (childIndex >= startIndex && childIndex <= endIndex) {
                     // If this child is within the range, toggle it.
-                    return !getChildren().getAt(childIndex)?.getMultiSelected();
+                    return !getChildren().getAt(childIndex)?.[$getMultiSelected]();
                 }
                 else {
-                    return !!getChildren().getAt(childIndex)?.getMultiSelected();
+                    return !!getChildren().getAt(childIndex)?.[$getMultiSelected]();
                 }
             });
         }
@@ -142,19 +169,19 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
     }, { passive: true, capture: true });
     return {
         context: useMemoObject({
-            multiSelectionContext: useMemoObject({
-                doContiguousSelection,
-                notifyParentOfChildSelectChange,
-                multiSelectionAriaPropName,
-                multiSelectionMode,
-                changeAllChildren,
-                getCtrlKeyDown: useCallback(() => ctrlKeyHeld.current, []),
-                getShiftKeyDown: useCallback(() => shiftKeyHeld.current, []),
-                getAnyFocused
+            [$multiSelectionContext]: useMemoObject({
+                [$doContiguousSelection]: doContiguousSelection,
+                [$notifyParentOfChildSelectChange]: notifyParentOfChildSelectChange,
+                [$multiSelectionAriaPropName]: multiSelectionAriaPropName,
+                [$multiSelectionMode]: multiSelectionMode,
+                [$changeAllChildren]: changeAllChildren,
+                [$getCtrlKeyDown]: useCallback(() => ctrlKeyHeld.current, []),
+                [$getShiftKeyDown]: useCallback(() => shiftKeyHeld.current, []),
+                [$getAnyFocused]: getAnyFocused
             })
         }),
-        childrenHaveFocusParameters: { onCompositeFocusChange },
-        multiSelectionReturn: {},
+        [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: onCompositeFocusChange },
+        [$multiSelectionReturn]: {},
         propsStable: useMemoObject({})
     };
 }
@@ -162,7 +189,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
  *
  * @compositeParams
  */
-export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
+export function useMultiSelectionChild({ info: { [$index]: index, ...void4 }, [$multiSelectionChildParameters]: { [$initiallyMultiSelected]: initiallyMultiSelected, [$onMultiSelectChange]: onMultiSelectChange, [$multiSelectionDisabled]: multiSelectionDisabled, ...void1 }, context: { [$multiSelectionContext]: { [$notifyParentOfChildSelectChange]: notifyParentOfChildSelectChange, [$multiSelectionAriaPropName]: multiSelectionAriaPropName, [$multiSelectionMode]: multiSelectionMode, [$doContiguousSelection]: doContiguousSelection, [$changeAllChildren]: changeAllChildren, [$getCtrlKeyDown]: getCtrlKeyDown, [$getShiftKeyDown]: getShiftKeyDown, [$getAnyFocused]: getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
     // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
     // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
     // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
@@ -249,23 +276,23 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
         onMultiSelectChange?.(enhanceEvent(event, { multiSelected }));
     });
     return {
-        multiSelectionChildReturn: {
-            changeMultiSelected,
-            multiSelected: localSelected,
-            getMultiSelected: getLocalSelected,
-            multiSelectionMode
+        [$multiSelectionChildReturn]: {
+            [$changeMultiSelected]: changeMultiSelected,
+            [$multiSelected]: localSelected,
+            [$getMultiSelected]: getLocalSelected,
+            [$multiSelectionMode]: multiSelectionMode
         },
-        pressParameters: {
-            onPressSync
+        [$pressParameters]: {
+            [$onPressSync]: onPressSync
         },
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged
+        [$hasCurrentFocusParameters]: {
+            [$onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged
         },
         props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled" ? undefined : (localSelected ? "true" : "false") },
         info: {
-            getMultiSelected: getLocalSelected,
-            setSelectedFromParent,
-            getMultiSelectionDisabled: useStableGetter(multiSelectionDisabled)
+            [$getMultiSelected]: getLocalSelected,
+            [$setSelectedFromParent]: setSelectedFromParent,
+            [$getMultiSelectionDisabled]: useStableGetter(multiSelectionDisabled)
         }
     };
 }
@@ -273,7 +300,7 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
  *
  * @compositeParams
  */
-export function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }) {
+export function useMultiSelectionChildDeclarative({ [$multiSelectionChildDeclarativeParameters]: { [$onMultiSelectedChange]: onMultiSelectedChange, [$multiSelected]: multiSelected, ...void3 }, [$multiSelectionChildReturn]: { [$changeMultiSelected]: changeMultiSelected, ...void2 }, ...void1 }) {
     let reasonRef = useRef(undefined);
     useEffect(() => {
         if (multiSelected != null)
@@ -290,10 +317,10 @@ export function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarati
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
-        multiSelectionChildParameters: {
-            onMultiSelectChange: omsc
+        [$multiSelectionChildParameters]: {
+            [$onMultiSelectChange]: omsc
         },
-        info: { setSelectedFromParent }
+        info: { [$setSelectedFromParent]: setSelectedFromParent }
     };
 }
 //# sourceMappingURL=use-multi-selection.js.map

@@ -1,11 +1,15 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
+import { $refElementParameters } from "../../dom-helpers/use-ref-element.js";
+import { $childrenHaveFocusReturn } from "../../observers/use-children-have-focus.js";
+import { $getChildren, $index, $managedChildContext, $managedChildReturn, $managedChildrenParameters, $managedChildrenReturn, useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { monitored } from "../../util/use-call-count.js";
-import { usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
-import { useRearrangeableChildren } from "./use-rearrangeable-children.js";
-import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
+import { $rovingTabIndexReturn } from "../keyboard-navigation/use-roving-tabindex.js";
+import { $setChildCountIfPaginated, $setPaginationVisible, $childCount, $paginationMax, $paginationMin, $refreshPagination, $paginatedChildContext, $paginatedChildReturn, $paginatedChildrenParameters, $paginatedChildrenReturn, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
+import { $children, $onRearranged, $rearrangeableChildrenParameters, $rearrangeableChildrenReturn, useRearrangeableChildren } from "./use-rearrangeable-children.js";
+import { $getStaggeredVisible, $setStaggeredVisible, $staggered, $staggeredChildContext, $staggeredChildReturn, $staggeredChildrenParameters, $staggeredChildrenReturn, useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
+export const $processedChildrenContext = Symbol();
 /**
  * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
  *
@@ -52,65 +56,65 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @hasChild {@link useProcessedChild}
  */
-export const useProcessedChildren = monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
+export const useProcessedChildren = monitored(function useProcessedChildren({ [$rearrangeableChildrenParameters]: { [$onRearranged]: onRearranged, [$children]: childrenUnsorted, ...rearrangeableChildrenParameters }, [$paginatedChildrenParameters]: paginatedChildrenParameters, [$staggeredChildrenParameters]: staggeredChildrenParameters, context, [$managedChildrenParameters]: managedChildrenParameters }) {
     const childCount = childrenUnsorted.length;
-    const { paginationMax, paginationMin } = paginatedChildrenParameters;
-    const { staggered } = staggeredChildrenParameters;
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({
-        rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
-            children: childrenUnsorted,
+    const { [$paginationMax]: paginationMax, [$paginationMin]: paginationMin } = paginatedChildrenParameters;
+    const { [$staggered]: staggered } = staggeredChildrenParameters;
+    const { context: { [$managedChildContext]: managedChildContext }, [$managedChildrenReturn]: managedChildrenReturn } = useManagedChildren({ [$managedChildrenParameters]: managedChildrenParameters });
+    const { [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn } = useRearrangeableChildren({
+        [$rearrangeableChildrenParameters]: {
+            [$onRearranged]: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
+            [$children]: childrenUnsorted,
             ...rearrangeableChildrenParameters,
         },
-        managedChildrenReturn,
+        [$managedChildrenReturn]: managedChildrenReturn,
         context
     });
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
-        managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        rovingTabIndexReturn: context.processedChildrenContext,
-        childrenHaveFocusReturn: context.processedChildrenContext,
-        paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-        rearrangeableChildrenReturn,
+    const { [$paginatedChildrenReturn]: paginatedChildrenReturn, [$paginatedChildrenReturn]: { [$refreshPagination]: refreshPagination }, context: { [$paginatedChildContext]: paginatedChildContext } } = usePaginatedChildren({
+        [$managedChildrenReturn]: { [$getChildren]: useStableCallback(() => managedChildContext[$getChildren]()) },
+        [$rovingTabIndexReturn]: context[$processedChildrenContext],
+        [$childrenHaveFocusReturn]: context[$processedChildrenContext],
+        [$paginatedChildrenParameters]: { [$paginationMax]: paginationMax, [$paginationMin]: paginationMin, [$childCount]: childCount },
+        [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn,
     });
-    const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
-        managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        staggeredChildrenParameters: { staggered, childCount },
+    const { context: { [$staggeredChildContext]: staggeredChildContext }, [$staggeredChildrenReturn]: staggeredChildrenReturn } = useStaggeredChildren({
+        [$managedChildrenReturn]: { [$getChildren]: useStableCallback(() => managedChildContext[$getChildren]()) },
+        [$staggeredChildrenParameters]: { [$staggered]: staggered, [$childCount]: childCount },
         //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
     return {
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn,
-        paginatedChildrenReturn,
+        [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn,
+        [$staggeredChildrenReturn]: staggeredChildrenReturn,
+        [$paginatedChildrenReturn]: paginatedChildrenReturn,
         context: useMemoObject({
-            staggeredChildContext,
-            paginatedChildContext,
-            managedChildContext
+            [$staggeredChildContext]: staggeredChildContext,
+            [$paginatedChildContext]: paginatedChildContext,
+            [$managedChildContext]: managedChildContext
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, }) {
-    const { paginatedChildContext, staggeredChildContext } = context;
-    const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
-    const { managedChildReturn } = useManagedChild({
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { [$index]: index, ...uinfo }, }) {
+    const { [$paginatedChildContext]: paginatedChildContext, [$staggeredChildContext]: staggeredChildContext } = context;
+    const { info: { [$setChildCountIfPaginated]: setChildCountIfPaginated, [$setPaginationVisible]: setPaginationVisible }, [$paginatedChildReturn]: paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { [$paginatedChildContext]: paginatedChildContext }, info: { index } });
+    const { info: { [$setStaggeredVisible]: setStaggeredVisible, [$getStaggeredVisible]: getStaggeredVisible }, [$staggeredChildReturn]: staggeredChildReturn, props: propsStaggered, [$refElementParameters]: refElementParameters } = useStaggeredChild({ context: { [$staggeredChildContext]: staggeredChildContext }, info: { [$index]: index } });
+    const { [$managedChildReturn]: managedChildReturn } = useManagedChild({
         context,
         info: {
-            index,
-            setChildCountIfPaginated,
-            setPaginationVisible,
-            setStaggeredVisible,
-            getStaggeredVisible,
+            [$index]: index,
+            [$setChildCountIfPaginated]: setChildCountIfPaginated,
+            [$setPaginationVisible]: setPaginationVisible,
+            [$setStaggeredVisible]: setStaggeredVisible,
+            [$getStaggeredVisible]: getStaggeredVisible,
             ...uinfo
         }
     });
     const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
         props: propsRet,
-        managedChildReturn,
-        paginatedChildReturn,
-        staggeredChildReturn,
-        refElementParameters
+        [$managedChildReturn]: managedChildReturn,
+        [$paginatedChildReturn]: paginatedChildReturn,
+        [$staggeredChildReturn]: staggeredChildReturn,
+        [$refElementParameters]: refElementParameters
     };
 });
 //# sourceMappingURL=use-processed-children.js.map

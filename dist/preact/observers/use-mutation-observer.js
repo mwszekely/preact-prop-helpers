@@ -1,15 +1,23 @@
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { $onElementChange, $getElement, $refElementParameters, $refElementReturn, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+export const $onChildList = Symbol();
+export const $onAttributes = Symbol();
+export const $onCharacterData = Symbol();
+export const $subtree = Symbol();
+export const $characterDataOldValue = Symbol();
+export const $attributeOldValue = Symbol();
+export const $attributeFilter = Symbol();
+export const $mutationObserverParameters = Symbol();
 /**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
  */
-export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
-    const { onElementChange, ...rest } = (refElementParameters || {});
+export const useMutationObserver = monitored(function useMutationObserver({ [$refElementParameters]: refElementParameters, [$mutationObserverParameters]: { [$attributeFilter]: attributeFilter, [$subtree]: subtree, [$onChildList]: onChildList, [$characterDataOldValue]: characterDataOldValue, [$onCharacterData]: onCharacterData, [$onAttributes]: onAttributes, [$attributeOldValue]: attributeOldValue } }) {
+    const { [$onElementChange]: onElementChange, ...rest } = (refElementParameters || {});
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
     const attributeKey = attributeFilter?.join(";");
@@ -58,15 +66,15 @@ export const useMutationObserver = monitored(function useMutationObserver({ refE
     useEffect(() => {
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
-    const { refElementReturn, propsStable } = useRefElement({
-        refElementParameters: {
-            onElementChange: useStableCallback((e, p, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
+    const { [$refElementReturn]: refElementReturn, propsStable } = useRefElement({
+        [$refElementParameters]: {
+            [$onElementChange]: useStableCallback((e, p, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
             ...rest
         }
     });
-    const { getElement } = refElementReturn;
+    const { [$getElement]: getElement } = refElementReturn;
     return {
-        refElementReturn,
+        [$refElementReturn]: refElementReturn,
         propsStable
     };
 });

@@ -1,6 +1,6 @@
 
 import { useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
+import { $active, $activeElementParameters, $backdropDismissParameters, $dismissActive, $dismissBackdropActive, $dismissEscapeActive, $dismissLostFocusActive, $dismissParameters, $escapeDismissParameters, $focusOpener, $focusPopup, $focusTrapParameters, $getDocument, $lostFocusDismissParameters, $modalParameters, $onActiveElementChange, $onDismiss, $onDismissBackdrop, $onDismissEscape, $onDismissLostFocus, $onLastActiveElementChange, $onWindowFocusedChange, $onlyMoveFocus, $parentDepth, $refElementParameters, $trapActive, DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
 
 function getDocument(): Document { return globalThis.document; }
 
@@ -28,22 +28,22 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         propsStableSource,
         propsFocusContainer
     } = useModal<"lost-focus" | "backdrop" | "escape", HTMLDivElement, HTMLButtonElement, HTMLDivElement>({
-        focusTrapParameters: {
-            trapActive: focusTrapActive,
-            onlyMoveFocus: false,
-            focusOpener,
-            focusPopup: useStableCallback((e, f) => f()?.focus())
+        [$focusTrapParameters]: {
+            [$trapActive]: focusTrapActive,
+            [$onlyMoveFocus]: false,
+            [$focusOpener]: focusOpener,
+            [$focusPopup]: useStableCallback((e, f) => f()?.focus())
         },
-        dismissParameters: {
-            onDismiss: useStableCallback((event, reason) => { setCloseReason(reason); setOpen(false); }),
-            dismissActive: true
+        [$dismissParameters]: {
+            [$onDismiss]: useStableCallback((event, reason) => { setCloseReason(reason); setOpen(false); }),
+            [$dismissActive]: true
         },
-        escapeDismissParameters: { parentDepth, dismissEscapeActive: true, onDismissEscape: null },
-        backdropDismissParameters: { dismissBackdropActive: true, onDismissBackdrop: null },
-        lostFocusDismissParameters: { dismissLostFocusActive: true, onDismissLostFocus: null },
-        modalParameters: { active: open },
-        refElementParameters: {},
-        activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
+        [$escapeDismissParameters]: { [$parentDepth]: parentDepth, [$dismissEscapeActive]: true, [$onDismissEscape]: null },
+        [$backdropDismissParameters]: { [$dismissBackdropActive]: true, [$onDismissBackdrop]: null },
+        [$lostFocusDismissParameters]: { [$dismissLostFocusActive]: true, [$onDismissLostFocus]: null },
+        [$modalParameters]: { [$active]: open },
+        [$refElementParameters]: {},
+        [$activeElementParameters]: { [$getDocument]: getDocument, [$onActiveElementChange]: null, [$onLastActiveElementChange]: null, [$onWindowFocusedChange]: null },
     })
     
     return (

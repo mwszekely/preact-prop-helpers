@@ -2,6 +2,13 @@ import { returnFalse, returnZero, runImmediately, usePassiveState } from "../pre
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { monitored } from "../util/use-call-count.js";
+import { $hasCurrentFocusParameters, $onCurrentFocusedInnerChanged } from "./use-has-current-focus.js";
+export const $childrenHaveFocusParameters = Symbol();
+export const $childrenHaveFocusReturn = Symbol();
+export const $childrenHaveFocusChildContext = Symbol();
+export const $onCompositeFocusChange = Symbol();
+export const $getAnyFocused = Symbol();
+export const $setFocusCount = Symbol();
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -14,24 +21,24 @@ import { monitored } from "../util/use-call-count.js";
  * @hasChild {@link useChildrenHaveFocusChild}
  */
 export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
-    const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
+    const { [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: onCompositeFocusChange } } = args;
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
     }), returnZero, setTimeout); // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being runImmediately...
     return {
-        childrenHaveFocusReturn: { getAnyFocused },
-        context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
+        [$childrenHaveFocusReturn]: { [$getAnyFocused]: getAnyFocused },
+        context: useMemoObject({ [$childrenHaveFocusChildContext]: useMemoObject({ [$setFocusCount]: setFocusCount }) }),
     };
 });
 /**
  * @compositeParams
  */
-export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
+export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { [$childrenHaveFocusChildContext]: { [$setFocusCount]: setFocusCount } } }) {
     return {
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
+        [$hasCurrentFocusParameters]: {
+            [$onCurrentFocusedInnerChanged]: useStableCallback((focused, prev, e) => {
                 if (focused) {
                     setFocusCount(p => (p ?? 0) + 1, e);
                 }

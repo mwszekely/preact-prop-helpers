@@ -2,7 +2,7 @@ import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallbac
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
+import { $getElement, UseRefElementReturnType, $refElementParameters, $refElementReturn, useRefElement } from "./use-ref-element.js";
 
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
@@ -37,7 +37,7 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
-export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> { }
+export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, typeof $refElementReturn, typeof $getElement> { }
 
 interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
@@ -81,7 +81,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as 
  * 
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
+export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ [$refElementReturn]: { [$getElement]: getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 
@@ -202,8 +202,8 @@ export const useImperativeProps = monitored(function useImperativeProps<E extend
 })
 
 function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
-    const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
-    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
+    const { propsStable, [$refElementReturn]: refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ [$refElementParameters]: {} })
+    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ [$refElementReturn]: refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
     return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }

@@ -1,3 +1,6 @@
+import { $pressParameters, $excludeSpace } from "../../component-use/use-press.js";
+import { $onTextContentChange, $textContentParameters } from "../../dom-helpers/use-text-content.js";
+import { $index } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -6,6 +9,19 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { $getTabbableIndex, $setTabbableIndex, $rovingTabIndexReturn } from "./use-roving-tabindex.js";
+export const $typeaheadNavigationParameters = Symbol();
+export const $typeaheadNavigationReturn = Symbol();
+export const $typeaheadNavigationContext = Symbol();
+export const $getCurrentTypeahead = Symbol();
+export const $typeaheadStatus = Symbol();
+export const $sortedTypeaheadInfo = Symbol();
+export const $insertingComparator = Symbol();
+export const $onNavigateTypeahead = Symbol();
+export const $isValidForTypeaheadNavigation = Symbol();
+export const $collator = Symbol();
+export const $noTypeahead = Symbol();
+export const $typeaheadTimeout = Symbol();
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
@@ -15,7 +31,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({ [$typeaheadNavigationParameters]: { [$collator]: collator, [$typeaheadTimeout]: typeaheadTimeout, [$noTypeahead]: noTypeahead, [$isValidForTypeaheadNavigation]: isValidForTypeaheadNavigation, [$onNavigateTypeahead]: onNavigateTypeahead, ...void3 }, [$rovingTabIndexReturn]: { [$getTabbableIndex]: getIndex, [$setTabbableIndex]: setIndex, ...void1 }, ...void2 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -119,15 +135,15 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none"; });
     return {
         context: useMemoObject({
-            typeaheadNavigationContext: useMemoObject({
-                insertingComparator,
-                sortedTypeaheadInfo: sortedTypeaheadInfo.current,
-                excludeSpace
+            [$typeaheadNavigationContext]: useMemoObject({
+                [$insertingComparator]: insertingComparator,
+                [$sortedTypeaheadInfo]: sortedTypeaheadInfo.current,
+                [$excludeSpace]: excludeSpace
             }),
         }),
-        typeaheadNavigationReturn: {
-            getCurrentTypeahead,
-            typeaheadStatus
+        [$typeaheadNavigationReturn]: {
+            [$getCurrentTypeahead]: getCurrentTypeahead,
+            [$typeaheadStatus]: typeaheadStatus
         },
         propsStable: propsStable.current
     };
@@ -211,9 +227,9 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation(
  *
  * @compositeParams
  */
-export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { index, ...void1 }, 
+export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({ info: { [$index]: index, ...void1 }, 
 //textContentReturn: { getTextContent, ...void5 },
-context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, ...void4 }) {
+context: { [$typeaheadNavigationContext]: { [$sortedTypeaheadInfo]: sortedTypeaheadInfo, [$insertingComparator]: insertingComparator, [$excludeSpace]: excludeSpace, ...void2 } }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void4);
@@ -254,8 +270,8 @@ context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparato
         }
     }, []);
     return {
-        textContentParameters: { onTextContentChange },
-        pressParameters: { excludeSpace }
+        [$textContentParameters]: { [$onTextContentChange]: onTextContentChange },
+        [$pressParameters]: { [$excludeSpace]: excludeSpace }
     };
 });
 /**

@@ -3,7 +3,7 @@
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/preact/index.js";
+import { $activeElementParameters, $allowRepeatPresses, $asyncHandler, $callCount, $capture, $childrenHaveFocusParameters, $currentCapture, $debounce, $debouncingAsync, $debouncingSync, $elementSizeParameters, $excludeEnter, $excludePointer, $excludeSpace, $focusOpener, $focusPopup, $focusSelf, $focusTrapParameters, $getDocument, $getObserveBox, $hasCapture, $hasCurrentFocusParameters, $hasCurrentFocusReturn, $hasError, $hasLastFocusParameters, $longPress, $longPressThreshold, $onActiveElementChange, $onCompositeFocusChange, $onCurrentFocusedChanged, $onCurrentFocusedInnerChanged, $onElementChange, $onLastActiveElementChange, $onLastFocusedChanged, $onLastFocusedInnerChanged, $onPressSync, $onPressingChange, $onSizeChange, $onWindowFocusedChange, $onlyMoveFocus, $otherReferencerProp, $pending, $prefix, $pressParameters, $pressing, $randomIdInputParameters, $randomIdLabelParameters, $refElementParameters, $refElementReturn, $rejectCount, $resolveCount, $settleCount, $syncHandler, $throttle, $trapActive, ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/preact/index.js";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -68,7 +68,7 @@ const DemoUseChildrenHaveFocus = () => {
         interval: 1000
     });
     const [anyFocused, setAnyFocused] = useState(false);
-    const { context } = useChildrenHaveFocus<HTMLDivElement>({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
+    const { context } = useChildrenHaveFocus<HTMLDivElement>({ [$childrenHaveFocusParameters]: { [$onCompositeFocusChange]: setAnyFocused } });
 
 
     return (
@@ -91,9 +91,9 @@ const DemoUseChildrenHaveFocus = () => {
 }
 
 const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ context: useContext(ChildrenHaveFocusContext) });
-    const { refElementReturn, propsStable } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
+    const { [$hasCurrentFocusParameters]: { [$onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ context: useContext(ChildrenHaveFocusContext) });
+    const { [$refElementReturn]: refElementReturn, propsStable } = useRefElement<HTMLDivElement>({ [$refElementParameters]: {} })
+    const { [$hasCurrentFocusReturn]: hasCurrentFocusReturn } = useHasCurrentFocus<HTMLDivElement>({ [$hasCurrentFocusParameters]: { [$onCurrentFocusedChanged]: null, [$onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged }, [$refElementReturn]: refElementReturn });
     return (
         <div tabIndex={0} {...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable)}>
             Focusable child #{index}
@@ -117,8 +117,8 @@ const DemoUseElementSizeAnimation = () => {
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
     const { propsStable } = useElementSize<HTMLDivElement>({
-        elementSizeParameters: { onSizeChange: setElementSize, getObserveBox: null },
-        refElementParameters: { onElementChange: undefined }
+        [$elementSizeParameters]: { [$onSizeChange]: setElementSize, [$getObserveBox]: null },
+        [$refElementParameters]: { [$onElementChange]: undefined }
     });
 
     return (
@@ -135,16 +135,16 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
+    const { propsStable, [$refElementReturn]: refElementReturn } = useRefElement<HTMLDivElement>({ [$refElementParameters]: {} })
     const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
-        focusTrapParameters: {
-            trapActive: active,
-            onlyMoveFocus: false,
-            focusOpener: e => e?.focus(),
-            focusPopup: (e, f) => f()?.focus(),
+        [$focusTrapParameters]: {
+            [$trapActive]: active,
+            [$onlyMoveFocus]: false,
+            [$focusOpener]: e => e?.focus(),
+            [$focusPopup]: (e, f) => f()?.focus(),
         },
-        activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
-        refElementReturn
+        [$activeElementParameters]: { [$getDocument]: getDocument, [$onActiveElementChange]: null, [$onLastActiveElementChange]: null, [$onWindowFocusedChange]: null },
+        [$refElementReturn]: refElementReturn
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
@@ -186,19 +186,19 @@ const DemoUseAsyncHandler1 = memo(() => {
 
     const asyncOnClick = ((_v: void, _e: MouseEventType<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
-        callCount,
-        settleCount,
-        hasCapture,
-        syncHandler,
-        pending,
-        hasError,
-        rejectCount,
-        resolveCount
+        [$callCount]: callCount,
+        [$settleCount]: settleCount,
+        [$hasCapture]: hasCapture,
+        [$syncHandler]: syncHandler,
+        [$pending]: pending,
+        [$hasError]: hasError,
+        [$rejectCount]: rejectCount,
+        [$resolveCount]: resolveCount
     } = useAsyncHandler<MouseEventType<HTMLButtonElement>, void>({
-        asyncHandler: asyncOnClick,
-        capture: () => { },
-        debounce: debounce == 0 ? undefined : debounce,
-        throttle: null
+        [$asyncHandler]: asyncOnClick,
+        [$capture]: () => { },
+        [$debounce]: debounce == 0 ? undefined : debounce,
+        [$throttle]: null
     });
 
     const onClick = pending ? undefined : syncHandler;
@@ -251,22 +251,22 @@ const DemoUseAsyncHandler2 = memo(() => {
     }, timeout));
 
     const {
-        callCount,
-        settleCount,
-        hasCapture,
-        syncHandler,
-        currentCapture,
-        pending,
-        hasError,
-        rejectCount,
-        resolveCount,
-        debouncingAsync,
-        debouncingSync
+        [$callCount]: callCount,
+        [$settleCount]: settleCount,
+        [$hasCapture]: hasCapture,
+        [$syncHandler]: syncHandler,
+        [$currentCapture]: currentCapture,
+        [$pending]: pending,
+        [$hasError]: hasError,
+        [$rejectCount]: rejectCount,
+        [$resolveCount]: resolveCount,
+        [$debouncingAsync]: debouncingAsync,
+        [$debouncingSync]: debouncingSync
     } = useAsyncHandler<EventType<HTMLInputElement, Event>, string>({
-        asyncHandler: onInputAsync,
-        capture: (e: EventType<HTMLInputElement, Event>) => { e.preventDefault(); return e.currentTarget.value },
-        debounce: debounce == 0 ? undefined : debounce,
-        throttle: throttle == 0 ? undefined : throttle
+        [$asyncHandler]: onInputAsync,
+        [$capture]: (e: EventType<HTMLInputElement, Event>) => { e.preventDefault(); return e.currentTarget.value },
+        [$debounce]: debounce == 0 ? undefined : debounce,
+        [$throttle]: throttle == 0 ? undefined : throttle
     });
 
     let anyWaiting = (pending || debouncingAsync || debouncingSync);
@@ -320,18 +320,18 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner] = useState(false);
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
-    const { refElementReturn, propsStable: p2 } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: undefined } });
+    const { [$refElementReturn]: refElementReturn, propsStable: p2 } = useRefElement<HTMLDivElement>({ [$refElementParameters]: { [$onElementChange]: undefined } });
     const {
-        hasCurrentFocusReturn: { propsStable: p1 }
+        [$hasCurrentFocusReturn]: { propsStable: p1 }
     } = useHasCurrentFocus<HTMLDivElement>({
-        refElementReturn,
-        hasCurrentFocusParameters: {
-            onCurrentFocusedChanged: useStableCallback((focused: boolean) => {
+        [$refElementReturn]: refElementReturn,
+        [$hasCurrentFocusParameters]: {
+            [$onCurrentFocusedChanged]: useStableCallback((focused: boolean) => {
                 setFocused(focused);
                 if (focused)
                     setFocusCount((c: number) => ++c);
             }),
-            onCurrentFocusedInnerChanged: useStableCallback((focused: boolean) => {
+            [$onCurrentFocusedInnerChanged]: useStableCallback((focused: boolean) => {
                 setFocusedInner(focused);
                 if (focused)
                     setInnerFocusCount((c: number) => ++c);
@@ -339,16 +339,16 @@ const DemoFocus = memo(() => {
         }
     });
     useHasLastFocus<HTMLDivElement>({
-        refElementReturn,
-        activeElementParameters: {
-            getDocument,
-            onActiveElementChange: setActiveElement,
-            onLastActiveElementChange: setLastActiveElement,
-            onWindowFocusedChange: setWindowFocused
+        [$refElementReturn]: refElementReturn,
+        [$activeElementParameters]: {
+            [$getDocument]: getDocument,
+            [$onActiveElementChange]: setActiveElement,
+            [$onLastActiveElementChange]: setLastActiveElement,
+            [$onWindowFocusedChange]: setWindowFocused
         },
-        hasLastFocusParameters: {
-            onLastFocusedChanged: setLastFocused,
-            onLastFocusedInnerChanged: setLastFocusedInner,
+        [$hasLastFocusParameters]: {
+            [$onLastFocusedChanged]: setLastFocused,
+            [$onLastFocusedInnerChanged]: setLastFocusedInner,
         }
     });
     return (
@@ -380,7 +380,7 @@ const DemoFocus = memo(() => {
 
 
 function DemoLabel() {
-    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
+    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ [$randomIdInputParameters]: { [$prefix]: "input-", [$otherReferencerProp]: "for" }, [$randomIdLabelParameters]: { [$prefix]: "label-", [$otherReferencerProp]: "aria-labelledby" as never } })
     return (
         <div className="demo">
             <h2>Labels</h2>
@@ -393,12 +393,12 @@ function DemoLabel() {
 function DemoPress({ remaining }: { remaining: number }) {
 
     const [count, setCount] = useState<number>(0);
-    const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
-        pressParameters: {
-            focusSelf: e => { e.focus() },
-            longPressThreshold: 1000,
-            onPressSync: () => {
+    const { [$refElementReturn]: refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ [$refElementParameters]: {} })
+    const { props: p2, pressReturn: { [$pressing]: pressing, [$longPress]: longPress } } = usePress<HTMLDivElement>({
+        [$pressParameters]: {
+            [$focusSelf]: e => { e.focus() },
+            [$longPressThreshold]: 1000,
+            [$onPressSync]: () => {
                 /*setTimeout(() => {
                     let startTime = +(new Date());
                     let endTime = new Date(startTime + 2000);
@@ -407,13 +407,13 @@ function DemoPress({ remaining }: { remaining: number }) {
                  });*/
                 setCount((c: number) => ++c);
             },
-            allowRepeatPresses: false,
-            excludeEnter: null,
-            excludePointer: null,
-            excludeSpace: null,
-            onPressingChange: null
+            [$allowRepeatPresses]: false,
+            [$excludeEnter]: null,
+            [$excludePointer]: null,
+            [$excludeSpace]: null,
+            [$onPressingChange]: null
         },
-        refElementReturn
+        [$refElementReturn]: refElementReturn
     })
     return (
         <div className="demo">

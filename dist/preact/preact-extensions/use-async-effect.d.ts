@@ -1,6 +1,6 @@
 import { Inputs } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
-import { UseAsyncParameters } from "./use-async.js";
+import { $capture, $syncHandler, UseAsyncParameters, UseAsyncReturnType } from "./use-async.js";
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
  *
@@ -11,19 +11,5 @@ import { UseAsyncParameters } from "./use-async.js";
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I | undefined, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) => {
-    pending: boolean;
-    debouncingSync: boolean;
-    debouncingAsync: boolean;
-    callCount: number;
-    settleCount: number;
-    resolveCount: number;
-    rejectCount: number;
-    result: void | (() => void) | undefined;
-    hasResult: boolean;
-    error: unknown;
-    hasError: boolean;
-    invocationResult: "async" | "sync" | "throw" | null;
-    flushDebouncedPromise: () => void;
-};
+export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I | undefined, options?: OmitStrong<UseAsyncParameters<[void], [void]>, typeof $capture>) => OmitStrong<UseAsyncReturnType<[], void | (() => void)>, typeof $syncHandler>;
 //# sourceMappingURL=use-async-effect.d.ts.map

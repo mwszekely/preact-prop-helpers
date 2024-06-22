@@ -1,8 +1,25 @@
+import { $getAnyFocused, $childrenHaveFocusReturn } from "../../observers/use-children-have-focus.js";
+import { $getChildren, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { $getTabbableIndex, $setTabbableIndex, $rovingTabIndexReturn } from "../keyboard-navigation/use-roving-tabindex.js";
+import { $indexDemangler, $rearrangeableChildrenReturn } from "./use-rearrangeable-children.js";
+export const $paginatedChildrenParameters = Symbol();
+export const $paginationMin = Symbol();
+export const $paginationMax = Symbol();
+export const $childCount = Symbol();
+export const $setPaginationVisible = Symbol();
+export const $setChildCountIfPaginated = Symbol();
+export const $parentIsPaginated = Symbol();
+export const $hideBecausePaginated = Symbol();
+export const $refreshPagination = Symbol();
+export const $paginatedChildReturn = Symbol();
+export const $paginatedChildContext = Symbol();
+export const $paginatedChildrenReturn = Symbol();
+export const $getDefaultPaginationVisible = Symbol();
 /**
  * Allows children to stop themselves from rendering outside of a narrow range.
  *
@@ -12,7 +29,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused } }) {
+export const usePaginatedChildren = monitored(function usePaginatedChildren({ [$managedChildrenReturn]: { [$getChildren]: getChildren }, [$rearrangeableChildrenReturn]: { [$indexDemangler]: indexDemangler }, [$paginatedChildrenParameters]: { [$paginationMax]: paginationMax, [$paginationMin]: paginationMin, [$childCount]: childCount }, [$rovingTabIndexReturn]: { [$getTabbableIndex]: getTabbableIndex, [$setTabbableIndex]: setTabbableIndex }, [$childrenHaveFocusReturn]: { [$getAnyFocused]: getAnyFocused } }) {
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
@@ -20,9 +37,9 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
         const childMin = (getChildren().getLowestIndex());
         for (let i = childMin; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-            getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+            getChildren().getAt(indexDemangler(i))?.[$setPaginationVisible](visible);
             if (visible && (paginationMax != null || paginationMin != null))
-                getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                getChildren().getAt(indexDemangler(i))?.[$setChildCountIfPaginated](getChildren().getHighestIndex() + 1);
         }
     }, [ /* Must be empty */]);
     useEffect(() => {
@@ -56,8 +73,8 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
     pmax.current = paginationMax;
     const getDefaultPaginationVisible = useCallback((i) => { return (i >= (pmin.current ?? -Infinity) && i < (pmax.current ?? Infinity)); }, []);
     const paginatedChildContext = useMemo(() => ({
-        parentIsPaginated,
-        getDefaultPaginationVisible
+        [$parentIsPaginated]: parentIsPaginated,
+        [$getDefaultPaginationVisible]: getDefaultPaginationVisible
     }), [parentIsPaginated]);
     const getPaginationMin = useStableGetter(paginationMin);
     const getPaginationMax = useStableGetter(paginationMax);
@@ -69,13 +86,13 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
             const min = (paginationMin ?? 0);
             const max = (paginationMax ?? count);
             for (let i = min; i < max; ++i) {
-                getChildren().getAt(i)?.setChildCountIfPaginated(count);
+                getChildren().getAt(i)?.[$setChildCountIfPaginated](count);
             }
         }
     }, [childCount]);
     return {
-        context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        paginatedChildrenReturn: { refreshPagination }
+        context: useMemo(() => ({ [$paginatedChildContext]: paginatedChildContext }), [paginatedChildContext]),
+        [$paginatedChildrenReturn]: { [$refreshPagination]: refreshPagination }
     };
 });
 /**
@@ -86,15 +103,15 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren({ ma
  *
  * @compositeParams
  */
-export const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
+export const usePaginatedChild = monitored(function usePaginatedChild({ info: { index }, context: { [$paginatedChildContext]: { [$parentIsPaginated]: parentIsPaginated, [$getDefaultPaginationVisible]: getDefaultPaginationVisible } } }) {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
         props: useTagProps(!parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) }, "data-paginated-children-child"),
-        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        [$paginatedChildReturn]: { [$parentIsPaginated]: parentIsPaginated, [$hideBecausePaginated]: parentIsPaginated ? !paginatedVisible : false },
         info: {
-            setPaginationVisible: setPaginatedVisible,
-            setChildCountIfPaginated
+            [$setPaginationVisible]: setPaginatedVisible,
+            [$setChildCountIfPaginated]: setChildCountIfPaginated
         }
     };
 });

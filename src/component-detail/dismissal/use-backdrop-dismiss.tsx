@@ -1,29 +1,34 @@
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
-import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { getWindow } from "../../util/get-window.js";
 import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 
+export const $dismissBackdropActive = Symbol();
+export const $onDismissBackdrop = Symbol();
+export const $backdropDismissParameters = Symbol();
+export const $refElementPopupReturn = Symbol();
+
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    dismissBackdropActive: B | false;
+    [$dismissBackdropActive]: B | false;
 
     /**
      * Called when the component is dismissed by clicking outside of the element.
      * 
      * @nonstable
      */
-    onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
+    [$onDismissBackdrop]: Nullable<(e: MouseEventType<any>) => void>;
 }
 
 export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> {
-    backdropDismissParameters: UseBackdropDismissParametersSelf<B>;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
+    [$backdropDismissParameters]: UseBackdropDismissParametersSelf<B>;
+    [$refElementPopupReturn]: Pick<UseRefElementReturnType<PopupElement>[typeof $refElementReturn], typeof $getElement>;
 }
 
 /**
@@ -31,7 +36,7 @@ export interface UseBackdropDismissParameters<PopupElement extends Element, B ex
  * 
  * @compositeParams
  */
-export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
+export const useBackdropDismiss = monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ [$backdropDismissParameters]: { [$dismissBackdropActive]: open, [$onDismissBackdrop]: onCloseUnstable, ...void1 }, [$refElementPopupReturn]: { [$getElement]: getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

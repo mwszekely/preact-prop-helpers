@@ -1,15 +1,20 @@
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { $onElementChange, $onMount, $onUnmount, $getElement, $refElementParameters, $refElementReturn, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+export const $onSizeChange = Symbol();
+export const $getObserveBox = Symbol();
+export const $elementSizeParameters = Symbol();
+export const $getSize = Symbol();
+export const $elementSizeReturn = Symbol();
 /**
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
  */
-export const useElementSize = monitored(function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
-    const { onElementChange, onMount, onUnmount } = (refElementParameters || {});
+export const useElementSize = monitored(function useElementSize({ [$elementSizeParameters]: { [$getObserveBox]: getObserveBox, [$onSizeChange]: onSizeChange }, [$refElementParameters]: refElementParameters }) {
+    const { [$onElementChange]: onElementChange, [$onMount]: onMount, [$onUnmount]: onUnmount } = (refElementParameters || {});
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
     const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, runImmediately);
     const currentObserveBox = useRef(undefined);
@@ -34,14 +39,14 @@ export const useElementSize = monitored(function useElementSize({ elementSizePar
             }
         }
     }, []);
-    const { refElementReturn, ...rest } = useRefElement({
-        refElementParameters: {
-            onElementChange: useCallback((e, p, r) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
-            onMount,
-            onUnmount
+    const { [$refElementReturn]: refElementReturn, ...rest } = useRefElement({
+        [$refElementParameters]: {
+            [$onElementChange]: useCallback((e, p, r) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
+            [$onMount]: onMount,
+            [$onUnmount]: onUnmount
         }
     });
-    const { getElement } = refElementReturn;
+    const { [$getElement]: getElement } = refElementReturn;
     useEffect(() => {
         if (getObserveBox) {
             if (currentObserveBox.current !== getObserveBox())
@@ -49,8 +54,8 @@ export const useElementSize = monitored(function useElementSize({ elementSizePar
         }
     });
     return {
-        elementSizeReturn: { getSize },
-        refElementReturn,
+        [$elementSizeReturn]: { [$getSize]: getSize },
+        [$refElementReturn]: refElementReturn,
         ...rest
     };
 });

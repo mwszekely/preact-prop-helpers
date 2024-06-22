@@ -1,31 +1,37 @@
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
 import { FocusEventType, TargetedPick } from "../util/types.js";
-import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
+import { $hasCurrentFocusParameters, $onCurrentFocusedInnerChanged, UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
+export declare const $childrenHaveFocusParameters: unique symbol;
+export declare const $childrenHaveFocusReturn: unique symbol;
+export declare const $childrenHaveFocusChildContext: unique symbol;
+export declare const $onCompositeFocusChange: unique symbol;
+export declare const $getAnyFocused: unique symbol;
+export declare const $setFocusCount: unique symbol;
 export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
      *
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
+    [$onCompositeFocusChange]: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 export interface UseChildrenHaveFocusParameters<T extends Element> {
-    childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<T>;
+    [$childrenHaveFocusParameters]: UseChildrenHaveFocusParametersSelf<T>;
 }
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends TargetedPick<UseHasCurrentFocusParameters<E>, typeof $hasCurrentFocusParameters, typeof $onCurrentFocusedInnerChanged> {
 }
 export interface UseChildrenHaveFocusReturnTypeSelf {
     /** @stable */
-    getAnyFocused(): boolean;
+    [$getAnyFocused](): boolean;
 }
 export interface UseChildrenHaveFocusReturnType<T extends Element> {
-    childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeSelf;
+    [$childrenHaveFocusReturn]: UseChildrenHaveFocusReturnTypeSelf;
     context: UseChildrenHaveFocusContext<T>;
 }
 export interface UseChildrenHaveFocusContext<T extends Element> {
-    childrenHaveFocusChildContext: {
+    [$childrenHaveFocusChildContext]: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
+        [$setFocusCount]: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
     };
 }
 export interface UseChildrenHaveFocusChildParameters<T extends Element> {
@@ -46,5 +52,5 @@ export declare const useChildrenHaveFocus: <ChildElement extends Element>(args: 
 /**
  * @compositeParams
  */
-export declare const useChildrenHaveFocusChild: <E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
+export declare const useChildrenHaveFocusChild: <E extends Element>({ context: { [$childrenHaveFocusChildContext]: { [$setFocusCount]: setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
 //# sourceMappingURL=use-children-have-focus.d.ts.map

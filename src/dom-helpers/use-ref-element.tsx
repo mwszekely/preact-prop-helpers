@@ -3,6 +3,15 @@ import { Nullable, useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
+export const $onElementChange = Symbol();
+export const $onMount = Symbol();
+export const $onUnmount = Symbol();
+
+export const $refElementParameters = Symbol();
+export const $refElementReturn = Symbol();
+
+export const $getElement = Symbol();
+
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /** 
      * 
@@ -10,12 +19,12 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      * 
      * @stable
      */
-    getElement(): T | null;
+    [$getElement](): T | null;
 }
 export interface UseRefElementReturnType<T extends EventTarget> {
     /** @stable */
     propsStable: ElementProps<T>;
-    refElementReturn: UseRefElementReturnTypeSelf<T>;
+    [$refElementReturn]: UseRefElementReturnTypeSelf<T>;
 }
 export interface UseRefElementParametersSelf<T> {
     /**
@@ -23,23 +32,24 @@ export interface UseRefElementParametersSelf<T> {
      * 
      * @stable
      */
-    onElementChange?: Nullable<OnPassiveStateChange<T | null, never>>;
+    [$onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
     /** 
      * Called when the element mounts 
      * 
      * @stable
      */
-    onMount?: Nullable<(element: T) => void>;
+    [$onMount]?: Nullable<(element: T) => void>;
     /** 
      * Called when the element unmounts
      * 
      * @stable 
      */
-    onUnmount?: Nullable<(element: T) => void>;
+    [$onUnmount]?: Nullable<(element: T) => void>;
 }
 
+
 export interface UseRefElementParameters<T> {
-    refElementParameters: UseRefElementParametersSelf<T>;
+    [$refElementParameters]: UseRefElementParametersSelf<T>;
 }
 
 /**
@@ -86,7 +96,7 @@ export const useRefElement = (function useRefElement<T extends EventTarget>(args
         console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
     }
 
-    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
+    const { [$onElementChange]: onElementChange, [$onMount]: onMount, [$onUnmount]: onUnmount } = (args[$refElementParameters] || {});
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
     // Called (indirectly) by the ref that the element receives.
@@ -113,9 +123,8 @@ export const useRefElement = (function useRefElement<T extends EventTarget>(args
     // the props and allows us to actually find the element
     return {
         propsStable: propsStable.current,
-
-        refElementReturn: {
-            getElement,
+        [$refElementReturn]: {
+            [$getElement]: getElement,
         }
     }
 })

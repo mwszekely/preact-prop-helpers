@@ -1,7 +1,13 @@
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick } from "../util/lib.js";
 import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
+export declare const $onCurrentFocusedChanged: unique symbol;
+export declare const $onCurrentFocusedInnerChanged: unique symbol;
+export declare const $hasCurrentFocusParameters: unique symbol;
+export declare const $getCurrentFocused: unique symbol;
+export declare const $getCurrentFocusedInner: unique symbol;
+export declare const $hasCurrentFocusReturn: unique symbol;
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
     /**
      * Whether the element itself currently has focus.
@@ -10,7 +16,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    [$onCurrentFocusedChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
@@ -18,10 +24,10 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    [$onCurrentFocusedInnerChanged]: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
-export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
+export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, typeof $refElementReturn, typeof $getElement> {
+    [$hasCurrentFocusParameters]: UseHasCurrentFocusParametersSelf<T>;
 }
 export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     propsStable: ElementProps<E>;
@@ -29,12 +35,12 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
      * Modifies the element to be able to track its own focus state
      */
     /** @stable */
-    getCurrentFocused(): boolean;
+    [$getCurrentFocused](): boolean;
     /** @stable */
-    getCurrentFocusedInner(): boolean;
+    [$getCurrentFocusedInner](): boolean;
 }
 export interface UseHasCurrentFocusReturnType<E extends Element> {
-    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
+    [$hasCurrentFocusReturn]: UseHasCurrentFocusReturnTypeSelf<E>;
 }
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).

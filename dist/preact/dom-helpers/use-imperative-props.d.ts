@@ -1,6 +1,6 @@
 import { TargetedPick, type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
-import { UseRefElementReturnType } from "./use-ref-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "./use-ref-element.js";
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
 export type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"];
@@ -31,7 +31,7 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Applies the given event handler to the element and its props */
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
-export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
+export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, typeof $refElementReturn, typeof $getElement> {
 }
 interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
@@ -63,7 +63,7 @@ export declare const ImperativeElement: typeof ImperativeElementU;
  *
  * @compositeParams
  */
-export declare const useImperativeProps: <E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) => UseImperativePropsReturnType<E>;
+export declare const useImperativeProps: <E extends Element>({ [$refElementReturn]: { [$getElement]: getElement } }: UseImperativePropsParameters<E>) => UseImperativePropsReturnType<E>;
 declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<import("preact").ClassAttributes<any> & ElementProps<any>>;
 export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

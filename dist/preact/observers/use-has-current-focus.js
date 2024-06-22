@@ -1,6 +1,13 @@
+import { $getElement, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+export const $onCurrentFocusedChanged = Symbol();
+export const $onCurrentFocusedInnerChanged = Symbol();
+export const $hasCurrentFocusParameters = Symbol();
+export const $getCurrentFocused = Symbol();
+export const $getCurrentFocusedInner = Symbol();
+export const $hasCurrentFocusReturn = Symbol();
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
  *
@@ -9,7 +16,7 @@ import { monitored } from "../util/use-call-count.js";
  * @compositeParams
  */
 export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
+    const { [$hasCurrentFocusParameters]: { [$onCurrentFocusedChanged]: onCurrentFocusedChanged, [$onCurrentFocusedInnerChanged]: onCurrentFocusedInnerChanged }, [$refElementReturn]: { [$getElement]: getElement } } = args;
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
     const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
@@ -35,10 +42,10 @@ export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
         [onfocusout]: onFocusOut
     });
     return {
-        hasCurrentFocusReturn: {
+        [$hasCurrentFocusReturn]: {
             propsStable: propsStable.current,
-            getCurrentFocused: getFocused,
-            getCurrentFocusedInner: getFocusedInner,
+            [$getCurrentFocused]: getFocused,
+            [$getCurrentFocusedInner]: getFocusedInner,
         }
     };
 });

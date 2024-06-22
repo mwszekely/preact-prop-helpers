@@ -1,8 +1,17 @@
-import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
+import { $refElementReturn } from "../dom-helpers/use-ref-element.js";
+import { $childrenHaveFocusReturn } from "../observers/use-children-have-focus.js";
+import { UseGenericChildParameters, $managedChildrenReturn } from "../preact-extensions/use-managed-children.js";
 import { ExtendMerge, OmitStrong, TargetedOmit } from "../util/types.js";
-import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./keyboard-navigation/use-grid-navigation-partial.js";
+import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, $gridNavigationParameters } from "./keyboard-navigation/use-grid-navigation-partial.js";
+import { $linearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseListNavigationChildInfoKeysParameters } from "./keyboard-navigation/use-list-navigation-partial.js";
+import { $initiallyTabbedIndex, $rovingTabIndexParameters, $rovingTabIndexReturn } from "./keyboard-navigation/use-roving-tabindex.js";
+import { $typeaheadNavigationParameters } from "./keyboard-navigation/use-typeahead-navigation.js";
+import { $paginatedChildrenParameters } from "./processed-children/use-paginated-children.js";
+import { $rearrangeableChildrenReturn } from "./processed-children/use-rearrangeable-children.js";
+import { $multiSelectionChildParameters, $multiSelectionParameters } from "./selection/use-multi-selection.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType } from "./selection/use-selection.js";
+import { $singleSelectionChildParameters, $singleSelectionParameters } from "./selection/use-single-selection.js";
 import { UseListNavigationSelectionChildInfoKeysParameters } from "./use-list-navigation-selection.js";
 export type UseGridNavigationSelectionRowInfoKeysParameters = UseListNavigationSelectionChildInfoKeysParameters;
 export type UseGridNavigationSelectionRowInfoKeysReturnType = UseGridNavigationRowInfoKeysReturnType | UseSelectionChildInfoKeysReturnType;
@@ -12,7 +21,7 @@ export interface GridSelectChildRowInfo<RowElement extends Element> extends Grid
 }
 export interface GridSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> {
 }
-export interface UseGridNavigationSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters">, TargetedOmit<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters", "initiallyTabbedIndex">, OmitStrong<UseSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn"> {
+export interface UseGridNavigationSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, typeof $rovingTabIndexParameters>, TargetedOmit<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, typeof $rovingTabIndexParameters, typeof $initiallyTabbedIndex>, OmitStrong<UseSelectionParameters<ParentOrRowElement, RowElement, RM>, typeof $rovingTabIndexReturn> {
 }
 export interface UseGridNavigationSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement>, OmitStrong<UseSelectionReturnType<ParentOrRowElement, RowElement>, "propsStable"> {
     context: UseGridNavigationRowSelectionContext;
@@ -44,11 +53,11 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  *
  * @compositeParams
  */
-export declare const useGridNavigationSelection: <ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>) => UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>;
+export declare const useGridNavigationSelection: <ParentOrRowElement extends Element, RowElement extends Element>({ [$gridNavigationParameters]: gridNavigationParameters, [$linearNavigationParameters]: linearNavigationParameters, [$rovingTabIndexParameters]: rovingTabIndexParameters, [$managedChildrenReturn]: managedChildrenReturn, [$typeaheadNavigationParameters]: typeaheadNavigationParameters, [$singleSelectionParameters]: singleSelectionParameters, [$multiSelectionParameters]: multiSelectionParameters, [$refElementReturn]: refElementReturn, [$paginatedChildrenParameters]: paginatedChildrenParameters, [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn, [$childrenHaveFocusReturn]: childrenHaveFocusReturn, ...void2 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>) => UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>;
 /**
  * @compositeParams
  */
-export declare const useGridNavigationSelectionRow: <RowElement extends Element, CellElement extends Element>({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>) => UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>>;
+export declare const useGridNavigationSelectionRow: <RowElement extends Element, CellElement extends Element>({ info: mcp1, [$linearNavigationParameters]: linearNavigationParameters, [$managedChildrenReturn]: managedChildrenReturn, [$refElementReturn]: refElementReturn, [$rovingTabIndexParameters]: rovingTabIndexParameters, [$typeaheadNavigationParameters]: typeaheadNavigationParameters, context, [$singleSelectionChildParameters]: singleSelectionChildParameters, [$multiSelectionChildParameters]: multiSelectionChildParameters, ...void1 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>) => UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>>;
 /**
  * @compositeParams
  */

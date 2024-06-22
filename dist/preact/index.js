@@ -89,7 +89,7 @@
  *         paginationMax: null
  *     },
  *     staggeredChildrenParameters: {
- *         // Controls whether children appear staggered as CPU time permits
+ *         // Controls whether children appear staggered time permits
  *         staggered: false
  *     },
  *     refElementParameters: {}
@@ -184,7 +184,7 @@
  * All stability **requirements** (for parameters) and **guarantees** (for returned values) are documented.
  * Just use `useCallback`, [`useStableCallback`](#usestablecallback), or [`useStableGetter`](#usestablegetter) as appropriate.
  *
- * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107).
+ * As another aside, for the same reasons, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107).
  * This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the "wrong" value that it got mid-render.
  *
  * ## List of hooks (in rough order of usefulness)
@@ -275,12 +275,12 @@
  * ```md-literal
  * ## Conventions and goals
  *
- * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same type, is also fine.
+ * * As much, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same type, is also fine.
  *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.
  * * A parent hook never needs to be directly passed child data because the children will provide it themselves.
  *     * E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that. If a child that is focused becomes filtered, for example, the parent has enough information to be able to move focus to an adjacent child.
  *     * This means that the child data is *always* the single source of truth (even if the parent creates those children and the data they use), and maps nicely to how components are built and diffed.
- * * Re-render as few times as possible. In general this means instead of a hook returning a value to use during render, it will accept an `onChange`-ish handler that will let you explicitly do that if you want (and is no-cost otherwise).
+ * * Re-render as few times. In general this means instead of a hook returning a value to use during render, it will accept an `onChange`-ish handler that will let you explicitly do that if you want (and is no-cost otherwise).
  *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
  * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then it:
  *     * ...**will always** take a single parameter that's at least like `{ fooParameters: {...} }`.
@@ -317,33 +317,33 @@
  *
  * @packageDocumentation
  */
-export { useBackdropDismiss } from "./component-detail/dismissal/use-backdrop-dismiss.js";
-export { useEscapeDismiss } from "./component-detail/dismissal/use-escape-dismiss.js";
-export { useLostFocusDismiss } from "./component-detail/dismissal/use-lost-focus-dismiss.js";
-export { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-export { identity, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
+export { $backdropDismissParameters, $dismissBackdropActive, $onDismissBackdrop, $refElementPopupReturn, useBackdropDismiss } from "./component-detail/dismissal/use-backdrop-dismiss.js";
+export { $dismissEscapeActive, $escapeDismissParameters, $onDismissEscape, $parentDepth, useEscapeDismiss } from "./component-detail/dismissal/use-escape-dismiss.js";
+export { $dismissLostFocusActive, $lostFocusDismissParameters, $onDismissLostFocus, $refElementSourceReturn, useLostFocusDismiss } from "./component-detail/dismissal/use-lost-focus-dismiss.js";
+export { $colSpan, $getRowIndex, $getTabbableColumn, $gridNavigationCellParameters, $gridNavigationParameters, $gridNavigationRowContext, $initiallyTabbableColumn, $onTabbableColumnChange, $setTabbableCell, $setTabbableColumn, $setTabbableRow, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
+export { $arrowKeyDirection, $disableHomeEndKeys, $getHighestIndex, $getLowestIndex, $isValidForLinearNavigation, $linearNavigationParameters, $linearNavigationReturn, $navigatePastEnd, $navigatePastStart, $onNavigateLinear, $pageNavigationSize, identity, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
 export { useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
-export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
-export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
-export { usePaginatedChild, usePaginatedChildren } from "./component-detail/processed-children/use-paginated-children.js";
-export { useProcessedChild, useProcessedChildren } from "./component-detail/processed-children/use-processed-children.js";
-export { useCreateProcessedChildrenContext, useRearrangeableChildren } from "./component-detail/processed-children/use-rearrangeable-children.js";
-export { useStaggeredChild, useStaggeredChildren } from "./component-detail/processed-children/use-staggered-children.js";
-export { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./component-detail/selection/use-multi-selection.js";
+export { $focusSelfChild, $focusSelfParent2, $getInitiallyTabbedIndex, $getLocallyTabbable, $getTabbable, $getTabbableIndex, $getUntabbable, $getUntabbableBehavior, $giveParentFocusedElement, $initiallyTabbedIndex, $onTabbableIndexChange, $onUntabbableFocus, $parentFocusSelf, $reevaluateClosestFit, $rovingTabIndexChildReturn, $rovingTabIndexContext, $rovingTabIndexParameters, $rovingTabIndexReturn, $setLocallyTabbable, $setTabbableIndex, $tabbable, $untabbable, $untabbableBehavior, useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
+export { $collator, $getCurrentTypeahead, $insertingComparator, $isValidForTypeaheadNavigation, $noTypeahead, $onNavigateTypeahead, $sortedTypeaheadInfo, $typeaheadNavigationContext, $typeaheadNavigationParameters, $typeaheadNavigationReturn, $typeaheadStatus, $typeaheadTimeout, binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
+export { $childCount, $getDefaultPaginationVisible, $hideBecausePaginated, $paginatedChildContext, $paginatedChildReturn, $paginatedChildrenParameters, $paginatedChildrenReturn, $paginationMax, $paginationMin, $parentIsPaginated, $refreshPagination, $setChildCountIfPaginated, $setPaginationVisible, usePaginatedChild, usePaginatedChildren } from "./component-detail/processed-children/use-paginated-children.js";
+export { $processedChildrenContext, useProcessedChild, useProcessedChildren } from "./component-detail/processed-children/use-processed-children.js";
+export { $adjust, $children, $compare, $getIndex, $indexDemangler, $indexMangler, $onRearranged, $rearrange, $rearrangeableChildrenContext, $rearrangeableChildrenParameters, $rearrangeableChildrenReturn, $reverse, $shuffle, $sort, useCreateProcessedChildrenContext, useRearrangeableChildren } from "./component-detail/processed-children/use-rearrangeable-children.js";
+export { $childCallsThisToTellTheParentToMountTheNextOne, $childUseEffect, $getDefaultStaggeredVisible, $getIntersectionObserver, $getStaggeredVisible, $hideBecauseStaggered, $parentIsStaggered, $setElementToIndexMap, $setStaggeredVisible, $staggered, $staggeredChildContext, $staggeredChildReturn, $staggeredChildrenParameters, $staggeredChildrenReturn, $stillStaggering, useStaggeredChild, useStaggeredChildren } from "./component-detail/processed-children/use-staggered-children.js";
+export { $changeAllChildren, $changeMultiSelected, $doContiguousSelection, $getCtrlKeyDown, $getMultiSelected, $getMultiSelectionDisabled, $getShiftKeyDown, $initiallyMultiSelected, $multiSelected, $multiSelectionAriaPropName, $multiSelectionChildDeclarativeParameters, $multiSelectionChildParameters, $multiSelectionChildReturn, $multiSelectionContext, $multiSelectionDisabled, $multiSelectionMode, $multiSelectionParameters, $multiSelectionReturn, $notifyParentOfChildSelectChange, $onMultiSelectChange, $onMultiSelectedChange, $onSelectionChange, $setSelectedFromParent, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./component-detail/selection/use-multi-selection.js";
 export { useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/selection/use-selection.js";
-export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/selection/use-single-selection.js";
-export { useDismiss } from "./component-detail/use-dismiss.js";
-export { findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
+export { $changeSingleSelectedIndex, $getSingleSelected, $getSingleSelectedIndex, $getSingleSelectedOffset, $initiallySingleSelectedIndex, $onSingleSelectedIndexChange, $setLocalSingleSelected, $singleSelected, $singleSelectedIndex, $singleSelectedOffset, $singleSelectionAriaPropName, $singleSelectionChildParameters, $singleSelectionChildReturn, $singleSelectionContext, $singleSelectionDeclarativeParameters, $singleSelectionDisabled, $singleSelectionMode, $singleSelectionParameters, $singleSelectionReturn, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/selection/use-single-selection.js";
+export { $dismissActive, $dismissParameters, $onDismiss, useDismiss } from "./component-detail/use-dismiss.js";
+export { $focusOpener, $focusPopup, $focusTrapParameters, $onlyMoveFocus, $trapActive, findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "./component-detail/use-grid-navigation-selection.js";
 export { useListNavigationSelection, useListNavigationSelectionChild } from "./component-detail/use-list-navigation-selection.js";
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
-export { useModal } from "./component-use/use-modal.js";
-export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
-export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
-export { useRandomId } from "./component-use/use-random-id.js";
-export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
-export { getTopElement, useBlockingElement } from "./dom-helpers/use-blocking-element.js";
+export { $active, $modalParameters, useModal } from "./component-use/use-modal.js";
+export { $allowRepeatPresses, $asyncHandlerParameters, $asyncHandlerReturn, $excludeEnter, $excludePointer, $excludeSpace, $focusSelf, $getIsPressing, $longPress, $longPressThreshold, $onPressSync, $onPressingChange, $pressParameters, $pressing, setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
+export { $randomIdInputParameters, $randomIdLabelParameters, useRandomDualIds } from "./component-use/use-random-dual-ids.js";
+export { $id, $otherReferencerProp, $prefix, $randomIdParameters, $randomIdReturn, useRandomId } from "./component-use/use-random-id.js";
+export { $asyncHandler, $currentCapture, $getCurrentCapture, $hasCapture, useAsyncHandler } from "./dom-helpers/use-async-handler.js";
+export { $blockingElementParameters, $enabled, $getTarget, getTopElement, useBlockingElement } from "./dom-helpers/use-blocking-element.js";
 export { useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable } from "./dom-helpers/use-draggable.js";
 export { useDroppable } from "./dom-helpers/use-droppable.js";
@@ -356,23 +356,23 @@ export { enableLoggingPropConflicts, mergeFunctions, useMergedProps } from "./do
 export { useMergedRefs } from "./dom-helpers/use-merged-refs.js";
 export { useMergedStyles } from "./dom-helpers/use-merged-styles.js";
 export { usePortalChildren } from "./dom-helpers/use-portal-children.js";
-export { useRefElement } from "./dom-helpers/use-ref-element.js";
-export { useTextContent } from "./dom-helpers/use-text-content.js";
-export { useActiveElement } from "./observers/use-active-element.js";
-export { useChildrenHaveFocus, useChildrenHaveFocusChild } from "./observers/use-children-have-focus.js";
-export { useElementSize } from "./observers/use-element-size.js";
-export { useHasCurrentFocus } from "./observers/use-has-current-focus.js";
-export { useHasLastFocus } from "./observers/use-has-last-focus.js";
+export { $getElement, $onElementChange, $onMount, $onUnmount, $refElementParameters, $refElementReturn, useRefElement } from "./dom-helpers/use-ref-element.js";
+export { $getText, $getTextContent, $onTextContentChange, $textContentParameters, $textContentReturn, useTextContent } from "./dom-helpers/use-text-content.js";
+export { $activeElementParameters, $activeElementReturn, $getActiveElement, $getDocument, $getLastActiveElement, $getWindowFocused, $onActiveElementChange, $onLastActiveElementChange, $onWindowFocusedChange, useActiveElement } from "./observers/use-active-element.js";
+export { $childrenHaveFocusChildContext, $childrenHaveFocusParameters, $childrenHaveFocusReturn, $getAnyFocused, $onCompositeFocusChange, $setFocusCount, useChildrenHaveFocus, useChildrenHaveFocusChild } from "./observers/use-children-have-focus.js";
+export { $elementSizeParameters, $elementSizeReturn, $getObserveBox, $getSize, $onSizeChange, useElementSize } from "./observers/use-element-size.js";
+export { $getCurrentFocused, $getCurrentFocusedInner, $hasCurrentFocusParameters, $hasCurrentFocusReturn, $onCurrentFocusedChanged, $onCurrentFocusedInnerChanged, useHasCurrentFocus } from "./observers/use-has-current-focus.js";
+export { $getLastFocused, $getLastFocusedInner, $hasLastFocusParameters, $hasLastFocusReturn, $onLastFocusedChanged, $onLastFocusedInnerChanged, useHasLastFocus } from "./observers/use-has-last-focus.js";
 export { useLogicalDirection } from "./observers/use-logical-direction.js";
-export { useMediaQuery } from "./observers/use-media-query.js";
-export { useMutationObserver } from "./observers/use-mutation-observer.js";
+export { $getMatches, $matches, useMediaQuery } from "./observers/use-media-query.js";
+export { $attributeFilter, $attributeOldValue, $characterDataOldValue, $mutationObserverParameters, $onAttributes, $onCharacterData, $onChildList, $subtree, useMutationObserver } from "./observers/use-mutation-observer.js";
 export { useUrl } from "./observers/use-url.js";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect.js";
-export { useAsync } from "./preact-extensions/use-async.js";
+export { $callCount, $capture, $debounce, $debouncingAsync, $debouncingSync, $error, $flushDebouncedPromise, $hasError, $hasResult, $invocationResult, $pending, $rejectCount, $resolveCount, $result, $settleCount, $syncHandler, $throttle, useAsync } from "./preact-extensions/use-async.js";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
 export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
-export { useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
+export { $getChildren, $index, $managedChildContext, $managedChildReturn, $managedChildrenArray, $managedChildrenParameters, $managedChildrenReturn, $onAfterChildLayoutEffect, $onChildrenCountChange, $onChildrenMountChange, $remoteULEChildMounted, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { usePropsOnChildren } from "./preact-extensions/use-props-on-children.js";

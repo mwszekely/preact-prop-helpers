@@ -1,22 +1,31 @@
-import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { $onElementChange, $getElement, UseRefElementParameters, UseRefElementReturnType, $refElementParameters, $refElementReturn, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
+export const $onChildList = Symbol();
+export const $onAttributes = Symbol();
+export const $onCharacterData = Symbol();
+export const $subtree = Symbol();
+export const $characterDataOldValue = Symbol();
+export const $attributeOldValue = Symbol();
+export const $attributeFilter = Symbol();
+export const $mutationObserverParameters = Symbol();
+
 export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
-    onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
-    onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
-    onCharacterData: null | ((info: MutationRecord) => void);
-    subtree: boolean;
-    characterDataOldValue: boolean;
-    attributeOldValue: boolean;
-    attributeFilter: string | string[];
+    [$onChildList]: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
+    [$onAttributes]: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
+    [$onCharacterData]: null | ((info: MutationRecord) => void);
+    [$subtree]: boolean;
+    [$characterDataOldValue]: boolean;
+    [$attributeOldValue]: boolean;
+    [$attributeFilter]: string | string[];
 }
 
 
 export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
-    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
+    [$mutationObserverParameters]: UseMutationObserverParametersSelf<E>;
 }
 
 export interface UseMutationObserverReturnType<E extends Element> extends UseRefElementReturnType<E> {
@@ -29,11 +38,11 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * @compositeParams
  */
 export const useMutationObserver = monitored(function useMutationObserver<E extends Element>({
-    refElementParameters,
-    mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
+    [$refElementParameters]: refElementParameters,
+    [$mutationObserverParameters]: { [$attributeFilter]: attributeFilter, [$subtree]: subtree, [$onChildList]: onChildList, [$characterDataOldValue]: characterDataOldValue, [$onCharacterData]: onCharacterData, [$onAttributes]: onAttributes, [$attributeOldValue]: attributeOldValue }
 }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
 
-    const { onElementChange, ...rest } = (refElementParameters || {})
+    const { [$onElementChange]: onElementChange, ...rest } = (refElementParameters || {})
 
 
     if (typeof attributeFilter === "string")
@@ -93,16 +102,16 @@ export const useMutationObserver = monitored(function useMutationObserver<E exte
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-    const { refElementReturn, propsStable } = useRefElement<E>({
-        refElementParameters: {
-            onElementChange: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
+    const { [$refElementReturn]: refElementReturn, propsStable } = useRefElement<E>({
+        [$refElementParameters]: {
+            [$onElementChange]: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
             ...rest
         }
     });
-    const { getElement } = refElementReturn;
+    const { [$getElement]: getElement } = refElementReturn;
 
     return {
-        refElementReturn,
+        [$refElementReturn]: refElementReturn,
         propsStable
     };
 })

@@ -1,6 +1,12 @@
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useRef } from "../util/lib.js";
 import { useTagProps } from "../util/use-tag-props.js";
+export const $onElementChange = Symbol();
+export const $onMount = Symbol();
+export const $onUnmount = Symbol();
+export const $refElementParameters = Symbol();
+export const $refElementReturn = Symbol();
+export const $getElement = Symbol();
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -44,7 +50,7 @@ export const useRefElement = (function useRefElement(args) {
         // when it initially happens, and also in the component stack.
         console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
     }
-    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
+    const { [$onElementChange]: onElementChange, [$onMount]: onMount, [$onUnmount]: onUnmount } = (args[$refElementParameters] || {});
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback((e, prevValue) => {
@@ -66,8 +72,8 @@ export const useRefElement = (function useRefElement(args) {
     // the props and allows us to actually find the element
     return {
         propsStable: propsStable.current,
-        refElementReturn: {
-            getElement,
+        [$refElementReturn]: {
+            [$getElement]: getElement,
         }
     };
 });

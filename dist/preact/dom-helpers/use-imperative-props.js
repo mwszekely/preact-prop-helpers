@@ -1,7 +1,7 @@
 import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement } from "./use-ref-element.js";
+import { $getElement, $refElementParameters, $refElementReturn, useRefElement } from "./use-ref-element.js";
 let templateElement = null;
 function htmlToElement(parent, html) {
     const document = parent.ownerDocument;
@@ -26,7 +26,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  *
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
+export const useImperativeProps = monitored(function useImperativeProps({ [$refElementReturn]: { [$getElement]: getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
@@ -130,8 +130,8 @@ export const useImperativeProps = monitored(function useImperativeProps({ refEle
     };
 });
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });
+    const { propsStable, [$refElementReturn]: refElementReturn } = useRefElement({ [$refElementParameters]: {} });
+    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ [$refElementReturn]: refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
     return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }

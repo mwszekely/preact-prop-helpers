@@ -1,7 +1,14 @@
+import { $getElement } from "../../dom-helpers/use-ref-element.js";
+import { $onLastActiveElementChange, $activeElementParameters } from "../../observers/use-active-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
+import { $refElementPopupReturn } from "./use-backdrop-dismiss.js";
+export const $onDismissLostFocus = Symbol();
+export const $dismissLostFocusActive = Symbol();
+export const $lostFocusDismissParameters = Symbol();
+export const $refElementSourceReturn = Symbol();
 /**
  * Invokes a callback when focus travels outside of the component's element.
  *
@@ -9,8 +16,8 @@ import { monitored } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
-    const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
+export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ [$refElementPopupReturn]: { [$getElement]: getPopupElement, ...void3 }, [$refElementSourceReturn]: refElementSourceReturn, [$lostFocusDismissParameters]: { [$dismissLostFocusActive]: open, [$onDismissLostFocus]: onClose, ...void4 }, ...void1 }) {
+    const { [$getElement]: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -28,6 +35,6 @@ export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refE
             }
         }
     }, [getSourceElement]);
-    return { activeElementParameters: { onLastActiveElementChange } };
+    return { [$activeElementParameters]: { [$onLastActiveElementChange]: onLastActiveElementChange } };
 });
 //# sourceMappingURL=use-lost-focus-dismiss.js.map

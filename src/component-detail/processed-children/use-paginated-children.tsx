@@ -1,5 +1,5 @@
-import { UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
-import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { $getAnyFocused, UseChildrenHaveFocusReturnType, $childrenHaveFocusReturn } from "../../observers/use-children-have-focus.js";
+import { $index, $getChildren, UseManagedChildrenReturnType, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { TargetedPick, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
@@ -7,35 +7,55 @@ import { ElementProps, Nullable } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseLinearNavigationParameters } from "../keyboard-navigation/use-linear-navigation.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+import { $getTabbableIndex, $setTabbableIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType, $rovingTabIndexReturn } from "../keyboard-navigation/use-roving-tabindex.js";
+import { $indexDemangler, $rearrangeableChildrenReturn } from "./use-rearrangeable-children.js";
 
-export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
-    setPaginationVisible(visible: boolean): void;
-    setChildCountIfPaginated(count: number): void;
+export const $paginatedChildrenParameters = Symbol();
+
+export const $paginationMin = Symbol();
+export const $paginationMax = Symbol();
+export const $childCount = Symbol();
+
+export const $setPaginationVisible = Symbol();
+export const $setChildCountIfPaginated = Symbol();
+
+export const $parentIsPaginated = Symbol();
+export const $hideBecausePaginated = Symbol();
+export const $refreshPagination = Symbol();
+
+export const $paginatedChildReturn = Symbol();
+export const $paginatedChildContext = Symbol();
+export const $paginatedChildrenReturn = Symbol();
+
+export const $getDefaultPaginationVisible = Symbol();
+
+export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, typeof $index> {
+    [$setPaginationVisible](visible: boolean): void;
+    [$setChildCountIfPaginated](count: number): void;
 }
 
 export interface UsePaginatedChildrenParametersSelf {
-    paginationMin: Nullable<number>;
-    paginationMax: Nullable<number>;
-    childCount: Nullable<number>;
+    [$paginationMin]: Nullable<number>;
+    [$paginationMax]: Nullable<number>;
+    [$childCount]: Nullable<number>;
 }
 
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
-    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
-    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">,
-    TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
-    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
-    paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
+    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, typeof $managedChildrenReturn>,
+    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, typeof $rearrangeableChildrenReturn, typeof $indexDemangler>,
+    TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, typeof $childrenHaveFocusReturn, typeof $getAnyFocused>,
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, typeof $rovingTabIndexReturn, typeof $getTabbableIndex | typeof $setTabbableIndex> {
+    [$paginatedChildrenParameters]: UsePaginatedChildrenParametersSelf;
 }
 
 export interface UsePaginatedChildContextSelf {
     // UNSTABLE, changes in this will cause the context to re-create itself.
-    parentIsPaginated: boolean;
-    getDefaultPaginationVisible(i: number): boolean;
+    [$parentIsPaginated]: boolean;
+    [$getDefaultPaginationVisible](i: number): boolean;
 }
 
 export interface UsePaginatedChildContext {
-    paginatedChildContext: UsePaginatedChildContextSelf;
+    [$paginatedChildContext]: UsePaginatedChildContextSelf;
 }
 
 export interface UsePaginatedChildrenReturnTypeSelf {
@@ -45,7 +65,7 @@ export interface UsePaginatedChildrenReturnTypeSelf {
      * 
      * @stable
      */
-    refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
+    [$refreshPagination]: (min: Nullable<number>, max: Nullable<number>) => void;
 
     /**
      * **IMPORTANT**: This is only tracked when pagination is enabled.
@@ -56,7 +76,7 @@ export interface UsePaginatedChildrenReturnTypeSelf {
 }
 
 export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters", "onChildrenCountChange">*/ {
-    paginatedChildrenReturn: UsePaginatedChildrenReturnTypeSelf;
+    [$paginatedChildrenReturn]: UsePaginatedChildrenReturnTypeSelf;
 
     context: UsePaginatedChildContext;
 }
@@ -71,11 +91,11 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * @hasChild {@link usePaginatedChild}
  */
 export const usePaginatedChildren = monitored(function usePaginatedChildren<TabbableChildElement extends Element>({
-    managedChildrenReturn: { getChildren },
-    rearrangeableChildrenReturn: { indexDemangler },
-    paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-    rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
-    childrenHaveFocusReturn: { getAnyFocused }
+    [$managedChildrenReturn]: { [$getChildren]: getChildren },
+    [$rearrangeableChildrenReturn]: { [$indexDemangler]: indexDemangler },
+    [$paginatedChildrenParameters]: { [$paginationMax]: paginationMax, [$paginationMin]: paginationMin, [$childCount]: childCount },
+    [$rovingTabIndexReturn]: { [$getTabbableIndex]: getTabbableIndex, [$setTabbableIndex]: setTabbableIndex },
+    [$childrenHaveFocusReturn]: { [$getAnyFocused]: getAnyFocused }
 }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
 
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -86,9 +106,9 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Tabb
         const childMin = (getChildren().getLowestIndex());
         for (let i = childMin; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-            getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+            getChildren().getAt(indexDemangler(i))?.[$setPaginationVisible](visible);
             if (visible && (paginationMax != null || paginationMin != null))
-                getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                getChildren().getAt(indexDemangler(i))?.[$setChildCountIfPaginated](getChildren().getHighestIndex() + 1);
         }
 
     }, [/* Must be empty */])
@@ -127,9 +147,9 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Tabb
     pmin.current = paginationMin;
     pmax.current = paginationMax;
     const getDefaultPaginationVisible = useCallback((i: number) => { return (i >= (pmin.current ?? -Infinity) && i < (pmax.current ?? Infinity)) }, []);
-    const paginatedChildContext = useMemo<UsePaginatedChildContext["paginatedChildContext"]>(() => ({
-        parentIsPaginated,
-        getDefaultPaginationVisible
+    const paginatedChildContext = useMemo<UsePaginatedChildContext[typeof $paginatedChildContext]>(() => ({
+        [$parentIsPaginated]: parentIsPaginated,
+        [$getDefaultPaginationVisible]: getDefaultPaginationVisible
     }), [parentIsPaginated]);
 
     const getPaginationMin = useStableGetter(paginationMin);
@@ -143,14 +163,14 @@ export const usePaginatedChildren = monitored(function usePaginatedChildren<Tabb
             const min = (paginationMin ?? 0);
             const max = (paginationMax ?? count);
             for (let i = min; i < max; ++i) {
-                getChildren().getAt(i)?.setChildCountIfPaginated(count);
+                getChildren().getAt(i)?.[$setChildCountIfPaginated](count);
             }
         }
     }, [childCount]);
 
     return {
-        context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
-        paginatedChildrenReturn: { refreshPagination }
+        context: useMemo(() => ({ [$paginatedChildContext]: paginatedChildContext }), [paginatedChildContext]),
+        [$paginatedChildrenReturn]: { [$refreshPagination]: refreshPagination }
     }
 })
 
@@ -163,8 +183,8 @@ export interface UsePaginatedChildParameters {
 
 export interface UsePaginatedChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
-    paginatedChildReturn: UsePaginatedChildReturnTypeSelf;
-    info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">
+    [$paginatedChildReturn]: UsePaginatedChildReturnTypeSelf;
+    info: Pick<UsePaginatedChildrenInfo<ChildElement>, typeof $setPaginationVisible | typeof $setChildCountIfPaginated>
 }
 
 export interface UsePaginatedChildReturnTypeSelf {
@@ -172,12 +192,12 @@ export interface UsePaginatedChildReturnTypeSelf {
     /**
      * Whether this child is part of a paginated parent component.
      */
-    parentIsPaginated: boolean;
+    [$parentIsPaginated]: boolean;
 
     /**
      * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.
      */
-    hideBecausePaginated: boolean;
+    [$hideBecausePaginated]: boolean;
 }
 
 /**
@@ -188,16 +208,16 @@ export interface UsePaginatedChildReturnTypeSelf {
  * 
  * @compositeParams
  */
-export const usePaginatedChild = monitored(function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
+export const usePaginatedChild = monitored(function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { [$paginatedChildContext]: { [$parentIsPaginated]: parentIsPaginated, [$getDefaultPaginationVisible]: getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
 
     return {
         props: useTagProps(!parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)), "data-paginated-children-child"),
-        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        [$paginatedChildReturn]: { [$parentIsPaginated]: parentIsPaginated, [$hideBecausePaginated]: parentIsPaginated ? !paginatedVisible : false },
         info: {
-            setPaginationVisible: setPaginatedVisible,
-            setChildCountIfPaginated
+            [$setPaginationVisible]: setPaginatedVisible,
+            [$setChildCountIfPaginated]: setChildCountIfPaginated
         }
     }
 })

@@ -1,23 +1,30 @@
 import { isFocusable, isTabbable } from "tabbable";
-import { UseBlockingElementParameters, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { $enabled, $getTarget, UseBlockingElementParameters, $blockingElementParameters, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "../util/get-window.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
+import { $activeElementParameters } from "../observers/use-active-element.js";
+
+export const $trapActive = Symbol();
+export const $onlyMoveFocus = Symbol();
+export const $focusPopup = Symbol();
+export const $focusOpener = Symbol();
+export const $focusTrapParameters = Symbol();
 
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
-    trapActive: boolean;
+    [$trapActive]: boolean;
 
     /**
      * If true, focus is not trapped but only moved to the new element. 
      */
-    onlyMoveFocus: boolean;
+    [$onlyMoveFocus]: boolean;
 
 
     /**
@@ -37,7 +44,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    [$focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
 
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
@@ -49,13 +56,13 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    focusOpener(lastFocused: SourceElement | null): void;
+    [$focusOpener](lastFocused: SourceElement | null): void;
 }
 
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends
-    TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">,
-    OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
-    focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
+    TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, typeof $refElementReturn, typeof $getElement>,
+    OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, typeof $blockingElementParameters> {
+    [$focusTrapParameters]: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
 }
 
 export interface UseFocusTrapReturnType<E extends Element> {
@@ -71,9 +78,9 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * @compositeParams
  */
 export const useFocusTrap = monitored(function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
-    focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
-    activeElementParameters,
-    refElementReturn
+    [$focusTrapParameters]: { [$onlyMoveFocus]: onlyMoveFocus, [$trapActive]: trapActive, [$focusPopup]: focusSelfUnstable, [$focusOpener]: focusOpenerUnstable },
+    [$activeElementParameters]: activeElementParameters,
+    [$refElementReturn]: refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
@@ -88,7 +95,7 @@ export const useFocusTrap = monitored(function useFocusTrap<SourceElement extend
                 focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
             }
             else {
-                top ??= refElementReturn.getElement() as unknown as HTMLElement;
+                top ??= refElementReturn[$getElement]() as unknown as HTMLElement;
                 console.assert(!!top);
                 if (top)
                     focusSelf(top as any as PopupElement, () => findFirstFocusable(top!));
@@ -101,7 +108,7 @@ export const useFocusTrap = monitored(function useFocusTrap<SourceElement extend
             // Restore focus to whatever caused this trap to trigger,
             // but only if it wasn't caused by explicitly focusing something else 
             // (generally if `onlyMoveFocus` is true)
-            let top = refElementReturn.getElement();
+            let top = refElementReturn[$getElement]();
             if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
                 if (lastActive)
                     focusOpener(lastActive as any as SourceElement);
@@ -109,13 +116,13 @@ export const useFocusTrap = monitored(function useFocusTrap<SourceElement extend
         }
     }, [trapActive]);
 
-    const { getElement } = refElementReturn;
+    const { [$getElement]: getElement } = refElementReturn;
 
     const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
-        activeElementParameters,
-        blockingElementParameters: {
-            enabled: trapActive && !onlyMoveFocus,
-            getTarget: getElement
+        [$activeElementParameters]: activeElementParameters,
+        [$blockingElementParameters]: {
+            [$enabled]: trapActive && !onlyMoveFocus,
+            [$getTarget]: getElement
         }
     });
 

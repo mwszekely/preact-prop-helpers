@@ -2,6 +2,14 @@ import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 
+export const $matches = Symbol();
+export const $getMatches = Symbol();
+
+export interface UseMediaQueryReturnType {
+    [$matches]: boolean | null;
+    [$getMatches](): boolean | null;
+}
+
 /**
  * 
  * Allows a component to use the boolean result of a media query as part of its render.
@@ -20,8 +28,8 @@ export const useMediaQuery = monitored(function useMediaQuery(query: string | nu
     if (typeof window === "undefined") {
         const matches = defaultGuess || false;
         return {
-            matches,
-            getMatches: useCallback(() => matches, [matches])
+            [$matches]: matches,
+            [$getMatches]: useCallback(() => matches, [matches])
         };
     }
     else {
@@ -54,14 +62,10 @@ export const useMediaQuery = monitored(function useMediaQuery(query: string | nu
         }, [query]);
 
         return {
-            matches,
-            getMatches
+            [$matches]: matches,
+            [$getMatches]: getMatches
         };
     }
 })
 
-export interface UseMediaQueryReturnType {
-    matches: boolean | null;
-    getMatches(): boolean | null;
-}
 

@@ -1,12 +1,15 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { $refElementReturn } from "../../dom-helpers/use-ref-element.js";
+import { $index, UseGenericChildParameters, $managedChildrenParameters, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ElementProps, OmitStrong } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
-import { UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";
-import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
-import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
+import { $paginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
+import { $rearrangeableChildrenReturn } from "../processed-children/use-rearrangeable-children.js";
+import { UseLinearNavigationParameters, UseLinearNavigationReturnType, $linearNavigationParameters, $linearNavigationReturn, useLinearNavigation } from "./use-linear-navigation.js";
+import { $untabbable, RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, $rovingTabIndexParameters, $rovingTabIndexReturn, useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
+import { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType, $typeaheadNavigationParameters, $typeaheadNavigationReturn, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
 
 /**
  * 
@@ -54,8 +57,8 @@ export interface UseListNavigationChildInfo<TabbableChildElement extends Element
 
 export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends
     UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>,
-    OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
-    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> { }
+    OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, typeof $rovingTabIndexReturn>,
+    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, typeof $rovingTabIndexReturn> { }
 
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends
     OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">,
@@ -94,18 +97,18 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  * @hasChild {@link useListNavigationChild}
  */
 export const useListNavigation = monitored(function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    linearNavigationParameters,
-    typeaheadNavigationParameters,
-    rovingTabIndexParameters,
-    managedChildrenReturn,
-    refElementReturn,
-    paginatedChildrenParameters,
-    rearrangeableChildrenReturn,
+    [$linearNavigationParameters]: linearNavigationParameters,
+    [$typeaheadNavigationParameters]: typeaheadNavigationParameters,
+    [$rovingTabIndexParameters]: rovingTabIndexParameters,
+    [$managedChildrenReturn]: managedChildrenReturn,
+    [$refElementReturn]: refElementReturn,
+    [$paginatedChildrenParameters]: paginatedChildrenParameters,
+    [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn,
     ...void1
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
-    const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
-    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenReturn });
+    const { props: propsRTI, [$rovingTabIndexReturn]: rovingTabIndexReturn, [$managedChildrenParameters]: managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ [$managedChildrenReturn]: managedChildrenReturn, [$rovingTabIndexParameters]: rovingTabIndexParameters, [$refElementReturn]: refElementReturn });
+    const { propsStable: propsStableTN, [$typeaheadNavigationReturn]: typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ [$rovingTabIndexReturn]: rovingTabIndexReturn, [$typeaheadNavigationParameters]: typeaheadNavigationParameters, });
+    const { propsStable: propsStableLN, [$linearNavigationReturn]: linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ [$rovingTabIndexReturn]: rovingTabIndexReturn, [$linearNavigationParameters]: linearNavigationParameters, [$paginatedChildrenParameters]: paginatedChildrenParameters, [$rearrangeableChildrenReturn]: rearrangeableChildrenReturn });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -118,14 +121,14 @@ export const useListNavigation = monitored(function useListNavigation<ParentOrCh
     //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
 
     return {
-        managedChildrenParameters,
-        rovingTabIndexReturn,
-        typeaheadNavigationReturn,
+        [$managedChildrenParameters]: managedChildrenParameters,
+        [$rovingTabIndexReturn]: rovingTabIndexReturn,
+        [$typeaheadNavigationReturn]: typeaheadNavigationReturn,
         context: useMemoObject({
             ...contextRovingTabIndex,
             ...contextTypeahead
         }),
-        linearNavigationReturn,
+        [$linearNavigationReturn]: linearNavigationReturn,
         props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
     }
 })
@@ -134,13 +137,13 @@ export const useListNavigation = monitored(function useListNavigation<ParentOrCh
  * @compositeParams
  */
 export const useListNavigationChild = monitored(function useListNavigationChild<ChildElement extends Element>({
-    info: { index, untabbable, ...void1 },
+    info: { [$index]: index, [$untabbable]: untabbable, ...void1 },
     context,
-    refElementReturn,
+    [$refElementReturn]: refElementReturn,
     ...void2
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
-    const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ context, info: { index, untabbable }, refElementReturn });
-    const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ context, info: { index } });
+    const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ context, info: { [$index]: index, [$untabbable]: untabbable }, [$refElementReturn]: refElementReturn });
+    const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ context, info: { [$index]: index } });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);

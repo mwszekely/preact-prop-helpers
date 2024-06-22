@@ -7,6 +7,24 @@ import { monitored } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 
+export const $debounce = Symbol();
+export const $throttle = Symbol();
+export const $capture = Symbol();
+export const $pending = Symbol();
+export const $debouncingSync = Symbol();
+export const $debouncingAsync = Symbol();
+export const $callCount = Symbol();
+export const $settleCount = Symbol();
+export const $resolveCount = Symbol();
+export const $rejectCount = Symbol();
+export const $result = Symbol();
+export const $hasResult = Symbol();
+export const $error = Symbol();
+export const $hasError = Symbol();
+export const $invocationResult = Symbol();
+export const $flushDebouncedPromise = Symbol();
+export const $syncHandler = Symbol();
+
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 
@@ -15,7 +33,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * If provided, adds a debounce behavior *in addition* to
      * the default "wait until resolved" throttling behavior.
      */
-    debounce: Nullable<number>;
+    [$debounce]: Nullable<number>;
 
     /**
      * By default, `useAsync` will auto-throttle based on how long it takes
@@ -28,7 +46,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * another one will be run immediately. If it took 100ms, then we'd wait
      * for the remaining 400ms until allowing a second run.
      */
-    throttle: Nullable<number>;
+    [$throttle]: Nullable<number>;
 
     /**
      * When an async function is debounced due to one already running,
@@ -50,7 +68,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * 
      * @nonstable
      */
-    capture: Nullable<CaptureFunctionType<AP, SP>>;
+    [$capture]: Nullable<CaptureFunctionType<AP, SP>>;
 }
 
 export interface UseAsyncReturnType<SP extends unknown[], R> {
@@ -59,17 +77,17 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * When the async handler is currently executing, this is true.
      * When it finishes, this becomes false.
      */
-    pending: boolean;
+    [$pending]: boolean;
 
     /** 
      * True when we're waiting for a debounce or throttle to end (that's not due waiting for the async function to complete)
      */
-    debouncingSync: boolean;
+    [$debouncingSync]: boolean;
 
     /**
      * True when a second invocation of the handler has been called, and it's waiting until the first before it runs.
      */
-    debouncingAsync: boolean;
+    [$debouncingAsync]: boolean;
 
     /**
      * The number of times the handler has run.
@@ -78,7 +96,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * Useful for knowing if the handler has been called yet, or for
      * setting a new timeout to show a spinner.
      */
-    callCount: number;
+    [$callCount]: number;
 
     /**
      * The number of times the handler has settled
@@ -87,20 +105,20 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * Useful for knowing if the handler has completed even once yet,
      * or just for when the handler has finished
      */
-    settleCount: number;
+    [$settleCount]: number;
 
     /**
      * The number of times the handler has completed successfully, 
      * similarly to `settleCount`.
      */
-    resolveCount: number;
+    [$resolveCount]: number;
 
 
     /**
      * The number of times the handler has failed to complete, 
      * similarly to `resolveCount`.
      */
-    rejectCount: number;
+    [$rejectCount]: number;
 
     /**
      * Represents the value most recently returned from a successful handler invocation,
@@ -112,7 +130,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * 
      * @see hasResult for if `result` being `undefined` means it's unfinished or the function itself returned `undefined`.
      */
-    result: R | undefined;
+    [$result]: R | undefined;
 
     /**
      * True when the most recently-run handler completed successfully,
@@ -121,7 +139,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * While `pending` is true, **`hasResult` and `hasError` may be simultaneously true**,
      * but in all other cases they're mutually exclusive.
      */
-    hasResult: boolean;
+    [$hasResult]: boolean;
 
     /**
      * The error the handler threw. `undefined` otherwise, though note
@@ -129,14 +147,14 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * 
      * @see hasError
      */
-    error: unknown;
+    [$error]: unknown;
 
     /**
      * Whether or not the most recent handler finished with an error.
      * 
      * This is necessary because, technically, `error` can be `undefined`.
      */
-    hasError: boolean;
+    [$hasError]: boolean;
 
     /**
      * What happened the last time the handler was called?
@@ -145,7 +163,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * * `"throw"`: An error was thrown, so it could have been either (more likely `"sync"`, though).
      * * `null`: Nothing's happened yet.
      */
-    invocationResult: "async" | "sync" | "throw" | null;
+    [$invocationResult]: "async" | "sync" | "throw" | null;
 
     /**
      * If you would like any currently debounced-but-eventually-pending promises to immediately be considered by cancelling their debounce timeout,
@@ -155,7 +173,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * 
      * **Quasi-stable** (don't use during render)
      */
-    flushDebouncedPromise: () => void;
+    [$flushDebouncedPromise]: () => void;
 
     /**
      * The transformed version of the async handler provided,
@@ -163,7 +181,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * 
      * **Quasi-stable** (don't use during render)
      */
-    syncHandler: SyncFunctionType<SP, void>;
+    [$syncHandler]: SyncFunctionType<SP, void>;
 }
 
 function identityCapture<AP extends unknown[], SP extends unknown[]>(...t: SP) { return t as unknown[] as AP; }
@@ -229,7 +247,7 @@ export const useAsync = monitored(function useAsync<AP extends unknown[], R, SP 
     const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1) }, []);
 
     /* eslint-disable prefer-const */
-    let { throttle, debounce, capture: captureUnstable } = (options ?? {});
+    let { [$throttle]: throttle, [$debounce]: debounce, [$capture]: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler ?? (identity as any));
     const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
@@ -248,8 +266,8 @@ export const useAsync = monitored(function useAsync<AP extends unknown[], R, SP 
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
             onResolve: incrementResolveCount,
-            throttle: options?.throttle ?? undefined,
-            wait: options?.debounce ?? undefined
+            throttle: options?.[$throttle] ?? undefined,
+            wait: options?.[$debounce] ?? undefined
         })
     }, [throttle, debounce]);
 
@@ -260,20 +278,20 @@ export const useAsync = monitored(function useAsync<AP extends unknown[], R, SP 
 
 
     return {
-        syncHandler: syncOutput,
-        pending,
-        result,
-        error,
-        hasError: hasError || false,
-        hasResult: hasResult || false,
-        resolveCount,
-        rejectCount,
-        settleCount,
-        debouncingAsync: asyncDebouncing,
-        debouncingSync: syncDebouncing,
-        invocationResult,
-        callCount: runCount,
-        flushDebouncedPromise: flushSyncDebounce
+        [$syncHandler]: syncOutput,
+        [$pending]: pending,
+        [$result]: result,
+        [$error]: error,
+        [$hasError]: hasError || false,
+        [$hasResult]: hasResult || false,
+        [$resolveCount]: resolveCount,
+        [$rejectCount]: rejectCount,
+        [$settleCount]: settleCount,
+        [$debouncingAsync]: asyncDebouncing,
+        [$debouncingSync]: syncDebouncing,
+        [$invocationResult]: invocationResult,
+        [$callCount]: runCount,
+        [$flushDebouncedPromise]: flushSyncDebounce
     }
 });
 

@@ -1,6 +1,6 @@
 import { noop } from "lodash-es";
-import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { $asyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
@@ -9,12 +9,28 @@ import { getDocument, getWindow } from "../util/get-window.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
+import { $capture, $debounce, $throttle, $syncHandler } from "../preact-extensions/use-async.js";
+
+export const $pressParameters = Symbol();
+export const $onPressingChange = Symbol();
+export const $onPressSync = Symbol();
+export const $excludeSpace = Symbol();
+export const $excludeEnter = Symbol();
+export const $excludePointer = Symbol();
+export const $focusSelf = Symbol();
+export const $allowRepeatPresses = Symbol();
+export const $longPressThreshold = Symbol();
+export const $pressing = Symbol();
+export const $getIsPressing = Symbol();
+export const $longPress = Symbol();
+export const $asyncHandlerParameters = Symbol();
+export const $asyncHandlerReturn = Symbol();
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 
-export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    pressParameters: UsePressParametersSelf<E>;
+export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, typeof $refElementReturn, typeof $getElement> {
+    [$pressParameters]: UsePressParametersSelf<E>;
 }
 
 function pressLog(...args: any[]) {
@@ -24,7 +40,7 @@ function pressLog(...args: any[]) {
 
 export interface UsePressParametersSelf<E extends EventTarget> {
     /**  */
-    onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
+    [$onPressingChange]: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
 
     /**
      * What should happen when this widget has been "pressed".
@@ -35,14 +51,14 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
+    [$onPressSync]: Nullable<((e: PressEventReason<E>) => void)>;
 
     /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
-    excludeSpace: Nullable<() => boolean>;
+    [$excludeSpace]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
-    excludeEnter: Nullable<() => boolean>;
+    [$excludeEnter]: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
-    excludePointer: Nullable<() => boolean>;
+    [$excludePointer]: Nullable<() => boolean>;
 
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
@@ -52,18 +68,18 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    focusSelf(element: E): void;
+    [$focusSelf](element: E): void;
 
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
      */
-    allowRepeatPresses: Nullable<boolean>;
+    [$allowRepeatPresses]: Nullable<boolean>;
 
     /**
      * After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true`
      * and the user's actions will not fire an actual press event.
      */
-    longPressThreshold: Nullable<number>;
+    [$longPressThreshold]: Nullable<number>;
 }
 
 export interface UsePressReturnTypeSelf {
@@ -72,16 +88,16 @@ export interface UsePressReturnTypeSelf {
      * but specifically for presses only, so it's a more accurate reflection
      * of what will happen for the user. Useful for styling mostly.
      */
-    pressing: boolean;
+    [$pressing]: boolean;
 
     /**
      * @stable
      */
-    getIsPressing(): boolean;
+    [$getIsPressing](): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
      */
-    longPress: boolean | null;
+    [$longPress]: boolean | null;
 }
 
 export interface UsePressReturnType<E extends Element> {
@@ -168,8 +184,8 @@ getDocument()?.addEventListener?.("click", (e) => {
  */
 export const usePress = monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
-        refElementReturn: { getElement },
-        pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
+        [$refElementReturn]: { [$getElement]: getElement },
+        [$pressParameters]: { [$focusSelf]: focusSelf, [$onPressSync]: onPressSync, [$allowRepeatPresses]: allowRepeatPresses, [$longPressThreshold]: longPressThreshold, [$excludeEnter]: ee, [$excludePointer]: ep, [$excludeSpace]: es, [$onPressingChange]: opc }
     } = args;
 
 
@@ -505,9 +521,9 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
 
     return {
         pressReturn: {
-            pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-            getIsPressing,
-            longPress
+            [$pressing]: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+            [$getIsPressing]: getIsPressing,
+            [$longPress]: longPress
         },
         props: {
             onKeyDown,
@@ -530,25 +546,25 @@ export const usePress = monitored(function usePress<E extends Element>(args: Use
 })
 
 export interface UsePressAsyncParameters<E extends Element> extends
-    OmitStrong<UsePressParameters<E>, "pressParameters">,
-    TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
-    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+    OmitStrong<UsePressParameters<E>, typeof $pressParameters>,
+    TargetedOmit<UsePressParameters<E>, typeof $pressParameters, typeof $onPressSync> {
+    [$asyncHandlerParameters]: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, typeof $capture>;
 }
 
 export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
-    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+    [$asyncHandlerReturn]: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
 }
 
 export function usePressAsync<E extends Element>({
-    asyncHandlerParameters: { debounce, throttle, asyncHandler },
-    pressParameters,
-    refElementReturn
+    [$asyncHandlerParameters]: { [$debounce]: debounce, [$throttle]: throttle, [$asyncHandler]: asyncHandler },
+    [$pressParameters]: pressParameters,
+    [$refElementReturn]: refElementReturn
 }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E> {
-    const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+    const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ [$asyncHandler]: asyncHandler, [$capture]: noop, [$debounce]: debounce, [$throttle]: throttle });
+    const { pressReturn, props } = usePress<E>({ [$pressParameters]: { [$onPressSync]: asyncHandlerReturn[$syncHandler], ...pressParameters }, [$refElementReturn]: refElementReturn });
 
     return {
-        asyncHandlerReturn,
+        [$asyncHandlerReturn]: asyncHandlerReturn,
         pressReturn,
         props
     }

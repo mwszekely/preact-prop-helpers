@@ -1,4 +1,6 @@
-import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { $getElement, $refElementReturn } from "../../dom-helpers/use-ref-element.js";
+import { $hasCurrentFocusParameters, $onCurrentFocusedInnerChanged } from "../../observers/use-has-current-focus.js";
+import { $getChildren, $index, $managedChildrenParameters, $managedChildrenReturn, $onChildrenMountChange, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -9,6 +11,29 @@ import { getDocument } from "../../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+export const $rovingTabIndexReturn = Symbol();
+export const $rovingTabIndexParameters = Symbol();
+export const $rovingTabIndexContext = Symbol();
+export const $rovingTabIndexChildReturn = Symbol();
+export const $onUntabbableFocus = Symbol();
+export const $initiallyTabbedIndex = Symbol();
+export const $untabbable = Symbol();
+export const $untabbableBehavior = Symbol();
+export const $onTabbableIndexChange = Symbol();
+export const $setTabbableIndex = Symbol();
+export const $getTabbableIndex = Symbol();
+export const $focusSelfChild = Symbol();
+export const $focusSelfParent2 = Symbol();
+export const $tabbable = Symbol();
+export const $getTabbable = Symbol();
+export const $setLocallyTabbable = Symbol();
+export const $getLocallyTabbable = Symbol();
+export const $getUntabbable = Symbol();
+export const $getUntabbableBehavior = Symbol();
+export const $parentFocusSelf = Symbol();
+export const $giveParentFocusedElement = Symbol();
+export const $getInitiallyTabbedIndex = Symbol();
+export const $reevaluateClosestFit = Symbol();
 /**
  * Implements a roving tabindex system where only one "focusable"
  * component in a set is able to receive a tab focus.
@@ -28,7 +53,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
+export const useRovingTabIndex = monitored(function useRovingTabIndex({ [$managedChildrenReturn]: { [$getChildren]: getChildren }, [$rovingTabIndexParameters]: { [$onUntabbableFocus]: focusSelfParentUnstable, [$untabbable]: untabbable, [$untabbableBehavior]: untabbableBehavior, [$initiallyTabbedIndex]: initiallyTabbedIndex, [$onTabbableIndexChange]: onTabbableIndexChange }, [$refElementReturn]: { [$getElement]: getElement }, ...void1 }) {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
     const lastFocused = useRef(null);
@@ -78,10 +103,10 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
             if (document && prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
                 if (nextChild != null && fromUserInteraction) {
-                    const element = nextChild.getElement();
+                    const element = nextChild[$getElement]();
                     if (element) {
                         if (document.activeElement == document.body || document.activeElement == null || !element.contains(document.activeElement)) {
-                            nextChild.focusSelf(element);
+                            nextChild[$focusSelfChild](element);
                         }
                     }
                 }
@@ -110,9 +135,9 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
         }
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
-    const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
-    const setTabbableAt = useCallback((child, t) => { child.setLocallyTabbable(t); }, []);
-    const isTabbableValid = useStableCallback((child) => { return !child.untabbable; });
+    const getTabbableAt = useCallback((child) => { return child[$getLocallyTabbable](); }, []);
+    const setTabbableAt = useCallback((child, t) => { child[$setLocallyTabbable](t); }, []);
+    const isTabbableValid = useStableCallback((child) => { return !child[$untabbable]; });
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
         onIndexChange: useStableCallback((n, p, r) => {
@@ -134,11 +159,11 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
             // So we just check to see if focus was lost to the body and, if so, send it somewhere useful.
             // This is liable to break, probably with blockingElements or something.
             if (document && (document.activeElement == null || document.activeElement == document.body)) {
-                let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
+                let childElement = index == null ? null : getChildren().getAt(index)?.[$getElement]();
                 if (index == null || childElement == null)
                     findBackupFocus(getElement()).focus();
                 else
-                    getChildren().getAt(index)?.focusSelf(childElement);
+                    getChildren().getAt(index)?.[$focusSelfChild](childElement);
             }
         }
     });
@@ -157,25 +182,25 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
             }
         }
         else if (!untabbable && index != null) {
-            const element = children.getAt(index)?.getElement();
-            children.getAt(index)?.focusSelf?.(element);
+            const element = children.getAt(index)?.[$getElement]();
+            children.getAt(index)?.[$focusSelfChild]?.(element);
         }
         else
             setTabbableIndex(null, reason, true);
     }, []);
     const rovingTabIndexContext = useMemoObject({
-        setTabbableIndex,
-        parentFocusSelf: focusSelf,
-        getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
-        reevaluateClosestFit,
-        getUntabbable: useStableGetter(untabbable),
-        getUntabbableBehavior: useStableGetter(untabbableBehavior),
-        giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
+        [$setTabbableIndex]: setTabbableIndex,
+        [$parentFocusSelf]: focusSelf,
+        [$getInitiallyTabbedIndex]: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
+        [$reevaluateClosestFit]: reevaluateClosestFit,
+        [$getUntabbable]: useStableGetter(untabbable),
+        [$getUntabbableBehavior]: useStableGetter(untabbableBehavior),
+        [$giveParentFocusedElement]: useCallback((e) => { lastFocused.current = e; }, [])
     });
     return {
-        managedChildrenParameters: { onChildrenMountChange: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]), },
-        rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
-        context: useMemoObject({ rovingTabIndexContext }),
+        [$managedChildrenParameters]: { [$onChildrenMountChange]: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]), },
+        [$rovingTabIndexReturn]: { [$setTabbableIndex]: setTabbableIndex, [$getTabbableIndex]: getTabbableIndex, [$focusSelfParent2]: focusSelf },
+        context: useMemoObject({ [$rovingTabIndexContext]: rovingTabIndexContext }),
         props: useTagProps({
             // Note: Making this -1 instead of null is partially intentional --
             // it gives us time during useEffect to move focus back to the last focused element
@@ -203,7 +228,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex({ managedC
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
+export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({ info: { [$index]: index, [$untabbable]: iAmUntabbable, ...void2 }, context: { [$rovingTabIndexContext]: { [$giveParentFocusedElement]: giveParentFocusedElement, [$getUntabbable]: getParentIsUntabbable, [$getUntabbableBehavior]: getUntabbableBehavior, [$reevaluateClosestFit]: reevaluateClosestFit, [$setTabbableIndex]: setTabbableIndex, [$getInitiallyTabbedIndex]: getInitiallyTabbedIndex, [$parentFocusSelf]: parentFocusSelf } }, [$refElementReturn]: { [$getElement]: getElement }, ...void3 }) {
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
         reevaluateClosestFit(undefined);
@@ -216,8 +241,8 @@ export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild(
         }
     }, [tabbable]);
     return {
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
+        [$hasCurrentFocusParameters]: {
+            [$onCurrentFocusedInnerChanged]: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
                     const parentIsUntabbable = getParentIsUntabbable();
                     const untabbableBehavior = getUntabbableBehavior();
@@ -228,11 +253,11 @@ export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild(
                 }
             })
         },
-        rovingTabIndexChildReturn: {
-            tabbable,
-            getTabbable,
+        [$rovingTabIndexChildReturn]: {
+            [$tabbable]: tabbable,
+            [$getTabbable]: getTabbable,
         },
-        info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable },
+        info: { [$setLocallyTabbable]: setTabbable, [$getLocallyTabbable]: getTabbable },
         props: useTagProps({
             tabIndex: (tabbable ? 0 : -1),
             ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself

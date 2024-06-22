@@ -1,3 +1,9 @@
+export declare const $matches: unique symbol;
+export declare const $getMatches: unique symbol;
+export interface UseMediaQueryReturnType {
+    [$matches]: boolean | null;
+    [$getMatches](): boolean | null;
+}
 /**
  *
  * Allows a component to use the boolean result of a media query as part of its render.
@@ -12,8 +18,4 @@
  * @returns `UseMediaQueryReturnType`
  */
 export declare const useMediaQuery: (query: string | null | undefined, defaultGuess?: boolean) => UseMediaQueryReturnType;
-export interface UseMediaQueryReturnType {
-    matches: boolean | null;
-    getMatches(): boolean | null;
-}
 //# sourceMappingURL=use-media-query.d.ts.map

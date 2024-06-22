@@ -1,4 +1,5 @@
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
+import { $index, $getChildren, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -6,6 +7,20 @@ import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/
 import { monitored } from "../../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { identity, shuffle as lodashShuffle, noop } from "lodash-es";
+export const $rearrangeableChildrenContext = Symbol();
+export const $rearrangeableChildrenParameters = Symbol();
+export const $rearrangeableChildrenReturn = Symbol();
+export const $compare = Symbol();
+export const $adjust = Symbol();
+export const $getIndex = Symbol();
+export const $onRearranged = Symbol();
+export const $children = Symbol();
+export const $rearrange = Symbol();
+export const $shuffle = Symbol();
+export const $reverse = Symbol();
+export const $indexMangler = Symbol();
+export const $indexDemangler = Symbol();
+export const $sort = Symbol();
 /**
  * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
  *
@@ -24,7 +39,7 @@ export function useCreateProcessedChildrenContext() {
     const shuffle = useStableCallback(() => { return (shuffleRef.current ?? identity)(); }, []);
     const reverse = useStableCallback(() => { return (reverseRef.current ?? identity)(); }, []);
     const rearrange = useStableCallback((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered); }, []);
-    const provideManglers = useStableCallback(({ indexDemangler, indexMangler, reverse, shuffle, sort }) => {
+    const provideManglers = useStableCallback(({ [$indexDemangler]: indexDemangler, [$indexMangler]: indexMangler, [$reverse]: reverse, [$shuffle]: shuffle, [$sort]: sort }) => {
         indexManglerRef.current = indexMangler;
         indexDemanglerRef.current = indexDemangler;
         reverseRef.current = reverse;
@@ -32,15 +47,15 @@ export function useCreateProcessedChildrenContext() {
         sortRef.current = sort;
     });
     const rearrangeableChildrenContext = useMemoObject({ provideManglers });
-    const context = useMemoObject({ rearrangeableChildrenContext });
+    const context = useMemoObject({ [$rearrangeableChildrenContext]: rearrangeableChildrenContext });
     return {
         context,
-        indexDemangler,
-        indexMangler,
-        rearrange,
-        reverse,
-        shuffle,
-        sort
+        [$indexDemangler]: indexDemangler,
+        [$indexMangler]: indexMangler,
+        [$rearrange]: rearrange,
+        [$reverse]: reverse,
+        [$shuffle]: shuffle,
+        [$sort]: sort
     };
 }
 /**
@@ -66,7 +81,7 @@ export function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ [$rearrangeableChildrenParameters]: { [$getIndex]: getIndex, [$onRearranged]: onRearranged, [$compare]: userCompare, [$children]: children, [$adjust]: adjust }, [$managedChildrenReturn]: { [$getChildren]: getChildren }, context: { [$rearrangeableChildrenContext]: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -99,7 +114,7 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
         // and rerender the whole table, basically
         for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
             if (sortedRows[indexAsSorted]) {
-                const indexAsUnsorted = sortedRows[indexAsSorted].index;
+                const indexAsUnsorted = sortedRows[indexAsSorted][$index];
                 mangleMap.current.set(indexAsUnsorted, indexAsSorted);
                 demangleMap.current.set(indexAsSorted, indexAsUnsorted);
             }
@@ -154,27 +169,27 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     // but we're one level deeper in the tree, so once we mount we need to give it to them.
     useLayoutEffect(() => {
         provideManglers({
-            indexDemangler,
-            indexMangler,
-            reverse,
-            shuffle,
-            sort
+            [$indexDemangler]: indexDemangler,
+            [$indexMangler]: indexMangler,
+            [$reverse]: reverse,
+            [$shuffle]: shuffle,
+            [$sort]: sort
         });
     }, []);
     return {
-        rearrangeableChildrenReturn: {
-            indexMangler,
-            indexDemangler,
-            rearrange,
-            shuffle,
-            reverse,
-            sort,
-            children: sorted
+        [$rearrangeableChildrenReturn]: {
+            [$indexMangler]: indexMangler,
+            [$indexDemangler]: indexDemangler,
+            [$rearrange]: rearrange,
+            [$shuffle]: shuffle,
+            [$reverse]: reverse,
+            [$sort]: sort,
+            [$children]: sorted
         }
     };
 });
 function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.index, rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
+    return compare1(lhs?.[$index], rhs?.[$index]); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
     function compare1(lhs, rhs) {
         if (lhs == null || rhs == null) {
             if (lhs == null)

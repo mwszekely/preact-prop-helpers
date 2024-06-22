@@ -1,16 +1,22 @@
-import { UseBlockingElementParameters } from "../dom-helpers/use-blocking-element.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseBlockingElementParameters, $blockingElementParameters } from "../dom-helpers/use-blocking-element.js";
+import { $getElement, UseRefElementReturnType, $refElementReturn } from "../dom-helpers/use-ref-element.js";
 import { TargetedPick } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
+import { $activeElementParameters } from "../observers/use-active-element.js";
+export declare const $trapActive: unique symbol;
+export declare const $onlyMoveFocus: unique symbol;
+export declare const $focusPopup: unique symbol;
+export declare const $focusOpener: unique symbol;
+export declare const $focusTrapParameters: unique symbol;
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
-    trapActive: boolean;
+    [$trapActive]: boolean;
     /**
      * If true, focus is not trapped but only moved to the new element.
      */
-    onlyMoveFocus: boolean;
+    [$onlyMoveFocus]: boolean;
     /**
      * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.
      *
@@ -28,7 +34,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    [$focusPopup](e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
      *
@@ -39,10 +45,10 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      *
      * @nonstable
      */
-    focusOpener(lastFocused: SourceElement | null): void;
+    [$focusOpener](lastFocused: SourceElement | null): void;
 }
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">, OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
-    focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, typeof $refElementReturn, typeof $getElement>, OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, typeof $blockingElementParameters> {
+    [$focusTrapParameters]: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
 }
 export interface UseFocusTrapReturnType<E extends Element> {
     props: ElementProps<E>;
@@ -55,7 +61,7 @@ export interface UseFocusTrapReturnType<E extends Element> {
  *
  * @compositeParams
  */
-export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
+export declare const useFocusTrap: <SourceElement extends Element | null, PopupElement extends Element>({ [$focusTrapParameters]: { [$onlyMoveFocus]: onlyMoveFocus, [$trapActive]: trapActive, [$focusPopup]: focusSelfUnstable, [$focusOpener]: focusOpenerUnstable }, [$activeElementParameters]: activeElementParameters, [$refElementReturn]: refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>) => UseFocusTrapReturnType<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  */

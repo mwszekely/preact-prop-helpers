@@ -1,15 +1,20 @@
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
+import { $getElement } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { getWindow } from "../../util/get-window.js";
 import { useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
+export const $dismissBackdropActive = Symbol();
+export const $onDismissBackdrop = Symbol();
+export const $backdropDismissParameters = Symbol();
+export const $refElementPopupReturn = Symbol();
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
  * @compositeParams
  */
-export const useBackdropDismiss = monitored(function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+export const useBackdropDismiss = monitored(function useBackdropDismiss({ [$backdropDismissParameters]: { [$dismissBackdropActive]: open, [$onDismissBackdrop]: onCloseUnstable, ...void1 }, [$refElementPopupReturn]: { [$getElement]: getElement, ...void3 }, ...void2 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

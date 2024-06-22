@@ -1,9 +1,15 @@
-import { useDismiss } from "../component-detail/use-dismiss.js";
-import { useFocusTrap } from "../component-detail/use-focus-trap.js";
+import { $dismissBackdropActive, $onDismissBackdrop, $backdropDismissParameters } from "../component-detail/dismissal/use-backdrop-dismiss.js";
+import { $dismissEscapeActive, $onDismissEscape, $parentDepth, $escapeDismissParameters } from "../component-detail/dismissal/use-escape-dismiss.js";
+import { $dismissLostFocusActive, $onDismissLostFocus, $lostFocusDismissParameters } from "../component-detail/dismissal/use-lost-focus-dismiss.js";
+import { $dismissActive, $onDismiss, useDismiss, $dismissParameters } from "../component-detail/use-dismiss.js";
+import { $trapActive, useFocusTrap, $focusTrapParameters } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { $onElementChange, $onMount, $onUnmount, useRefElement, $refElementParameters, $refElementReturn } from "../dom-helpers/use-ref-element.js";
+import { $activeElementParameters, $onActiveElementChange, $onLastActiveElementChange, $onWindowFocusedChange, $getDocument } from "../observers/use-active-element.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitored } from "../util/use-call-count.js";
+export const $modalParameters = Symbol();
+export const $active = Symbol();
 /**
  * Combines dismissal hooks and focus trap hooks into one.
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
@@ -14,19 +20,19 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useModal = monitored(function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
+export const useModal = monitored(function useModal({ [$dismissParameters]: { [$dismissActive]: dismissActive, [$onDismiss]: onDismiss, ...void2 }, [$escapeDismissParameters]: { [$dismissEscapeActive]: dismissEscapeActive, [$onDismissEscape]: onDismissEscape, [$parentDepth]: parentDepth, ...void3 }, [$focusTrapParameters]: { [$trapActive]: trapActive, ...focusTrapParameters }, [$activeElementParameters]: { [$getDocument]: getDocument, [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange, ...void4 }, [$backdropDismissParameters]: { [$dismissBackdropActive]: dismissBackdropActive, [$onDismissBackdrop]: onDismissBackdrop, ...void5 }, [$lostFocusDismissParameters]: { [$dismissLostFocusActive]: dismissLostFocusActive, [$onDismissLostFocus]: onDismissLostFocus, ...void6 }, [$refElementParameters]: { [$onElementChange]: onElementChange, [$onMount]: onMount, [$onUnmount]: onUnmount, ...void7 }, [$modalParameters]: { [$active]: modalActive, ...void8 }, ...void1 }) {
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
-        dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
-        escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
-        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
-        backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
-        lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
+        [$dismissParameters]: { [$dismissActive]: dismissActive && modalActive, [$onDismiss]: onDismiss },
+        [$escapeDismissParameters]: { [$dismissEscapeActive]: dismissEscapeActive, [$onDismissEscape]: onDismissEscape, [$parentDepth]: parentDepth },
+        [$activeElementParameters]: { [$getDocument]: getDocument, [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange },
+        [$backdropDismissParameters]: { [$dismissBackdropActive]: dismissBackdropActive, [$onDismissBackdrop]: onDismissBackdrop },
+        [$lostFocusDismissParameters]: { [$dismissLostFocusActive]: dismissLostFocusActive, [$onDismissLostFocus]: onDismissLostFocus },
     });
-    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: { onElementChange, onMount, onUnmount } });
+    const { propsStable, [$refElementReturn]: refElementReturn } = useRefElement({ [$refElementParameters]: { [$onElementChange]: onElementChange, [$onMount]: onMount, [$onUnmount]: onUnmount } });
     const { props } = useFocusTrap({
-        focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
-        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
-        refElementReturn
+        [$focusTrapParameters]: { [$trapActive]: trapActive && modalActive, ...focusTrapParameters },
+        [$activeElementParameters]: { [$getDocument]: getDocument, [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange },
+        [$refElementReturn]: refElementReturn
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);

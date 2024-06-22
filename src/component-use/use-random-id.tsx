@@ -4,14 +4,20 @@ import { useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
+export const $randomIdReturn = Symbol();
+export const $randomIdParameters = Symbol();
+export const $prefix = Symbol();
+export const $otherReferencerProp = Symbol();
+export const $id = Symbol();
+
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: ElementProps<S>;
     propsReferencer: ElementProps<T>;
 
-    randomIdReturn: UseRandomIdReturnTypeSelf;
+    [$randomIdReturn]: UseRandomIdReturnTypeSelf;
 }
 
-export interface UseRandomIdReturnTypeSelf { id: string; }
+export interface UseRandomIdReturnTypeSelf { [$id]: string; }
 
 export interface UseRandomIdParametersSelf {
     /**
@@ -21,14 +27,14 @@ export interface UseRandomIdParametersSelf {
      * 
      * @stable
      */
-    prefix: string;
+    [$prefix]: string;
 
     /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
-    otherReferencerProp: keyof ElementProps<any> | null;
+    [$otherReferencerProp]: keyof ElementProps<any> | null;
 }
 
 export interface UseRandomIdParameters {
-    randomIdParameters: UseRandomIdParametersSelf;
+    [$randomIdParameters]: UseRandomIdParametersSelf;
 }
 
 /**
@@ -36,7 +42,7 @@ export interface UseRandomIdParameters {
  * 
  * @compositeParams
  */
-export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ [$randomIdParameters]: { [$prefix]: prefix, [$otherReferencerProp]: otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 
@@ -44,12 +50,11 @@ export const useRandomId = monitored(function useRandomId<S extends Element, T e
     const sourceElementProps = useRef<ElementProps<S>>({ id });
     useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
 
-
     return {
         propsReferencer: referencerElementProps.current,
         propsSource: sourceElementProps.current,
-        randomIdReturn: {
-            id: id
+        [$randomIdReturn]: {
+            [$id]: id
         }
     }
 })

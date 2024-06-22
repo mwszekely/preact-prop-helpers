@@ -2,6 +2,15 @@ import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
+export const $onActiveElementChange = Symbol();
+export const $onLastActiveElementChange = Symbol();
+export const $onWindowFocusedChange = Symbol();
+export const $getDocument = Symbol();
+export const $activeElementReturn = Symbol();
+export const $activeElementParameters = Symbol();
+export const $getActiveElement = Symbol();
+export const $getLastActiveElement = Symbol();
+export const $getWindowFocused = Symbol();
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -93,7 +102,7 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-export const useActiveElement = monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
+export const useActiveElement = monitored(function useActiveElement({ [$activeElementParameters]: { [$onActiveElementChange]: onActiveElementChange, [$onLastActiveElementChange]: onLastActiveElementChange, [$onWindowFocusedChange]: onWindowFocusedChange, [$getDocument]: getDocument } }) {
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
@@ -125,6 +134,6 @@ export const useActiveElement = monitored(function useActiveElement({ activeElem
     const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, runImmediately);
     const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
     const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
-    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
+    return { [$activeElementReturn]: { [$getActiveElement]: getActiveElement, [$getLastActiveElement]: getLastActiveElement, [$getWindowFocused]: getWindowFocused } };
 });
 //# sourceMappingURL=use-active-element.js.map

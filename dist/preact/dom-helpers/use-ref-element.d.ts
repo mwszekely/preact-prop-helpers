@@ -1,6 +1,12 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { Nullable } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
+export declare const $onElementChange: unique symbol;
+export declare const $onMount: unique symbol;
+export declare const $onUnmount: unique symbol;
+export declare const $refElementParameters: unique symbol;
+export declare const $refElementReturn: unique symbol;
+export declare const $getElement: unique symbol;
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
@@ -8,12 +14,12 @@ export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
      *
      * @stable
      */
-    getElement(): T | null;
+    [$getElement](): T | null;
 }
 export interface UseRefElementReturnType<T extends EventTarget> {
     /** @stable */
     propsStable: ElementProps<T>;
-    refElementReturn: UseRefElementReturnTypeSelf<T>;
+    [$refElementReturn]: UseRefElementReturnTypeSelf<T>;
 }
 export interface UseRefElementParametersSelf<T> {
     /**
@@ -21,22 +27,22 @@ export interface UseRefElementParametersSelf<T> {
      *
      * @stable
      */
-    onElementChange?: Nullable<OnPassiveStateChange<T | null, never>>;
+    [$onElementChange]?: Nullable<OnPassiveStateChange<T | null, never>>;
     /**
      * Called when the element mounts
      *
      * @stable
      */
-    onMount?: Nullable<(element: T) => void>;
+    [$onMount]?: Nullable<(element: T) => void>;
     /**
      * Called when the element unmounts
      *
      * @stable
      */
-    onUnmount?: Nullable<(element: T) => void>;
+    [$onUnmount]?: Nullable<(element: T) => void>;
 }
 export interface UseRefElementParameters<T> {
-    refElementParameters: UseRefElementParametersSelf<T>;
+    [$refElementParameters]: UseRefElementParametersSelf<T>;
 }
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).

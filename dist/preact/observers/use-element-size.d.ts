@@ -1,4 +1,9 @@
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType, $refElementParameters } from "../dom-helpers/use-ref-element.js";
+export declare const $onSizeChange: unique symbol;
+export declare const $getObserveBox: unique symbol;
+export declare const $elementSizeParameters: unique symbol;
+export declare const $getSize: unique symbol;
+export declare const $elementSizeReturn: unique symbol;
 export interface UseElementSizeParametersSelf {
     /**
      * Called any time the browser detects a size change
@@ -8,7 +13,7 @@ export interface UseElementSizeParametersSelf {
      *
      * @stable
      */
-    onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
+    [$onSizeChange](sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
     /**
      * Passed as an argument to the created ResizeObserver.
      *
@@ -16,10 +21,10 @@ export interface UseElementSizeParametersSelf {
      *
      * @stable
      */
-    getObserveBox: null | (() => ResizeObserverOptions["box"]);
+    [$getObserveBox]: null | (() => ResizeObserverOptions["box"]);
 }
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: UseElementSizeParametersSelf;
+    [$elementSizeParameters]: UseElementSizeParametersSelf;
 }
 export interface ElementSize {
     clientWidth: number;
@@ -37,15 +42,15 @@ export interface ElementSize {
 }
 export interface UseElementSizeReturnTypeSelf {
     /** @stable */
-    getSize(): ElementSize | null;
+    [$getSize](): ElementSize | null;
 }
 export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: UseElementSizeReturnTypeSelf;
+    [$elementSizeReturn]: UseElementSizeReturnTypeSelf;
 }
 /**
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
  */
-export declare const useElementSize: <E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
+export declare const useElementSize: <E extends Element>({ [$elementSizeParameters]: { [$getObserveBox]: getObserveBox, [$onSizeChange]: onSizeChange }, [$refElementParameters]: refElementParameters }: UseElementSizeParameters<E>) => UseElementSizeReturnType<E>;
 //# sourceMappingURL=use-element-size.d.ts.map

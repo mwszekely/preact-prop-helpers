@@ -1,64 +1,80 @@
-import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
-import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { $onElementChange, UseRefElementParameters, $refElementParameters } from "../../dom-helpers/use-ref-element.js";
+import { $index, $getChildren, UseGenericChildParameters, UseManagedChildrenReturnType, $managedChildrenReturn } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
-export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
-    setStaggeredVisible(visible: boolean): void;
-    getStaggeredVisible(): boolean;
+import { $childCount } from "./use-paginated-children.js";
+export declare const $staggeredChildrenParameters: unique symbol;
+export declare const $staggeredChildReturn: unique symbol;
+export declare const $staggeredChildrenReturn: unique symbol;
+export declare const $staggeredChildContext: unique symbol;
+export declare const $setStaggeredVisible: unique symbol;
+export declare const $getStaggeredVisible: unique symbol;
+export declare const $staggered: unique symbol;
+export declare const $stillStaggering: unique symbol;
+export declare const $parentIsStaggered: unique symbol;
+export declare const $hideBecauseStaggered: unique symbol;
+export declare const $childUseEffect: unique symbol;
+export declare const $childCallsThisToTellTheParentToMountTheNextOne: unique symbol;
+export declare const $getDefaultStaggeredVisible: unique symbol;
+export declare const $getIntersectionObserver: unique symbol;
+export declare const $setElementToIndexMap: unique symbol;
+export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, typeof $index> {
+    [$setStaggeredVisible](visible: boolean): void;
+    [$getStaggeredVisible](): boolean;
 }
 export interface UseStaggeredChildrenParametersSelf {
     /**
      * If true, each child will delay rendering itself until the one before it has.
      */
-    staggered: boolean;
-    childCount: number | null;
+    [$staggered]: boolean;
+    [$childCount]: number | null;
 }
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
-    staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, typeof $managedChildrenReturn> {
+    [$staggeredChildrenParameters]: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
-    parentIsStaggered: boolean;
-    childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
-    getDefaultStaggeredVisible(i: number): boolean;
-    getIntersectionObserver(): IntersectionObserver | null;
-    setElementToIndexMap(index: number, element: any): void;
+    [$parentIsStaggered]: boolean;
+    [$childCallsThisToTellTheParentToMountTheNextOne](index: number): void;
+    [$getDefaultStaggeredVisible](i: number): boolean;
+    [$getIntersectionObserver](): IntersectionObserver | null;
+    [$setElementToIndexMap](index: number, element: any): void;
 }
 export interface UseStaggeredChildContext {
-    staggeredChildContext: UseStaggeredChildContextSelf;
+    [$staggeredChildContext]: UseStaggeredChildContextSelf;
 }
 export interface UseStaggeredChildrenReturnType {
-    staggeredChildrenReturn: UseStaggeredChildrenReturnTypeSelf;
+    [$staggeredChildrenReturn]: UseStaggeredChildrenReturnTypeSelf;
     context: UseStaggeredChildContext;
 }
 export interface UseStaggeredChildrenReturnTypeSelf {
     /**
      * Whether any children are still waiting to show themselves because of the staggering behavior
      */
-    stillStaggering: boolean;
+    [$stillStaggering]: boolean;
 }
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, typeof $index>> {
 }
 export interface UseStaggeredChildReturnTypeSelf {
     /**
      * Whether the parent has indicated that all of its children, including this one, are staggered.
      */
-    parentIsStaggered: boolean;
+    [$parentIsStaggered]: boolean;
     /**
      * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
-    hideBecauseStaggered: boolean;
+    [$hideBecauseStaggered]: boolean;
     /**
      * Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).
      *
      * This is generally passed to an inner child, if this is the outer child.
      */
-    childUseEffect(): void;
+    [$childUseEffect](): void;
 }
-export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, typeof $refElementParameters, typeof $onElementChange> {
     props: ElementProps<ChildElement>;
-    staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: OmitStrong<UseStaggeredChildrenInfo, "index">;
+    [$staggeredChildReturn]: UseStaggeredChildReturnTypeSelf;
+    info: OmitStrong<UseStaggeredChildrenInfo, typeof $index>;
 }
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering.
@@ -73,7 +89,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
+export declare const useStaggeredChildren: ({ [$managedChildrenReturn]: { [$getChildren]: getChildren }, [$staggeredChildrenParameters]: { [$staggered]: staggered, [$childCount]: childCount }, }: UseStaggeredChildrenParameters) => UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *
@@ -83,5 +99,5 @@ export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildr
  *
  * @compositeParams
  */
-export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+export declare const useStaggeredChild: <ChildElement extends Element>({ info: { [$index]: index }, context: { [$staggeredChildContext]: { [$parentIsStaggered]: parentIsStaggered, [$getDefaultStaggeredVisible]: getDefaultStaggeredVisible, [$childCallsThisToTellTheParentToMountTheNextOne]: childCallsThisToTellTheParentToMountTheNextOne, [$getIntersectionObserver]: getIntersectionObserver, [$setElementToIndexMap]: setElementToIndexMap } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map
