@@ -10,8 +10,8 @@ declare global {
 }*/
 
 export const test = base.extend<{ gridNav: GridNavFixtures }>({
-    gridNav: async ({ page, shared: { focusableFirst, locator } }, use) => {
-        await page.goto("/tests/stage/?test-base=grid-navigation");
+    gridNav: async ({ page, shared: { focusableFirst, locator, goToTest } }, use) => {
+        await goToTest("grid-navigation");
         const grid = locator.locator("[data-grid-nav]");
         function getRows() { return grid.locator("[data-grid-nav-row]") }
         function getCells(row: Locator) { return row.locator("[data-grid-nav-cell]") }

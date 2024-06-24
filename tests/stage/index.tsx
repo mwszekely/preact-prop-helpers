@@ -1,7 +1,6 @@
 import { render } from "preact";
+import { useSearchParamState, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
 import { useEffect, useRef } from "preact/hooks";
-import { useSearchParamState, useState } from "preact-prop-helpers";
-import { useSearchParamStateDeclarative } from "preact-prop-helpers";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
@@ -91,6 +90,8 @@ const TestBases = {
     "focus": <TestBasesFocus />,
     /*"menu": <TestBasesMenu />,*/
 }
+
+export type TestBases = keyof typeof TestBases;
 
 declare module "preact-prop-helpers" {
     export interface SearchParamStates {

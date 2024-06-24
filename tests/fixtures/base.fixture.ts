@@ -1,7 +1,7 @@
-import { Locator, Page, test as base, expect } from "@playwright/test";
-import { TestingConstants } from "../util.js";
+import { Locator, Response, test as base, expect } from "@playwright/test";
 import { LoremIpsum } from "../lorem.js";
-
+import type { TestBases } from "../stage/index.js";
+import { TestingConstants, TestingConstantsParameter } from "../util.js";
 
 declare module globalThis {
     let installTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) => void;
@@ -45,7 +45,13 @@ export const test = base.extend<{ shared: SharedFixtures }>({
                     return await handler(...(args as [any, any]));
                 }, [key, Key2, ...args] as const);
             },
-            locator: page.locator(".tests-container")
+            locator: page.locator(".tests-container"),
+            goToTest: async (k) => { return (await page.goto(`/tests/stage/?test-base=${k}`))! },
+            getTestSyncState: async (key, Key2) => {
+                return await page.evaluate(async ([key, Key2, ...args]: any[] | any) => {
+                    return new URL(window.location.toString()).searchParams.get(Key2) as never;
+                }, [key, Key2] as const);
+            }
         })
     }
 })
@@ -58,6 +64,9 @@ export interface SharedFixtures {
     generateText(childIndex: number): string;
 
     locator: Locator;
+ 
+    goToTest: (key: TestBases) => Promise<Response>;
+    getTestSyncState<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, key2: K2, fromString: (str: string) => TestingConstantsParameter<K, K2> | null): Promise<TestingConstantsParameter<K, K2>>;
 
     /**
      * If a testing component calls `window.onRender(id)`, you can call `getRenderCount` to return the

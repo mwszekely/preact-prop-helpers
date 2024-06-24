@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from "./base.fixture.js"
+import { test } from "./base.fixture.js";
 
 declare global {
     interface Window {
@@ -8,8 +8,8 @@ declare global {
     }
 }
 
-test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => {
-    await page.goto("/tests/stage/?test-base=sanity-check");
+test('Sanity checks', async ({ page, shared: { getCounter, resetCounter, goToTest } }) => {
+    await goToTest("sanity-check");
 
     await expect(page).toHaveTitle("Unit Testing");
 

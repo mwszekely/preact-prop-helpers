@@ -13,6 +13,7 @@ export interface TestingConstants {
 }
 
 type TCP<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]> = TestingConstants[K][K2] extends (...args: any[]) => any ? Parameters<TestingConstants[K][K2]>[0] : never;
+export type TestingConstantsParameter<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]> = TestingConstants[K][K2] extends (...args: any[]) => any ? Parameters<TestingConstants[K][K2]>[0] : never;
 
 export function fromStringBoolean(s: string | null) { return s == null? null : (s != "false") }
 export function fromStringNumber(s: string | null) { return s == null || s == "null"? null : +s; }

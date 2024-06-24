@@ -33,7 +33,7 @@
     "build:preact": "tsc",
     "build:react": "npx rollup -c",
     "watch:react": "npx rollup -c --watch",
-    "test": "playwright test --ui",
+    "test": "playwright test",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
     "rebuild": "rm \"./pnpm-lock.yaml\" && rm -R \"./node_modules\" && pnpm install && pnpm run build"
