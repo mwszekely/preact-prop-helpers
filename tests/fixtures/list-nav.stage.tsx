@@ -201,8 +201,7 @@ function Outer({ index }: { index: number }) {
             data-parent-is-paginated={parentIsPaginated}
             data-hide-because-staggered={hideBecauseStaggered}
             data-parent-is-staggered={parentIsStaggered}
-            {...(props)
-            }>{children ?? "(staggered)"}</li>}</>)
+            {...(props)}>(staggered)</li>}</>)
 }
 
 
@@ -268,6 +267,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-tabbable={tabbable}
                 data-selected={singleSelected}
                 data-selected-offset={singleSelectedOffset}
+                data-hide-because-paginated="false"
+                data-hide-because-staggered="false"
                 {...useMergedProps(propsChild, propsTabbable, propsPressStable, p1, p2)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )

@@ -1,5 +1,5 @@
-import { Page, expect } from '@playwright/test';
-import { test } from "./press.fixture.js"
+import { expect } from '@playwright/test';
+import { test } from "./press.fixture.js";
 
 
 
@@ -19,18 +19,18 @@ test.describe("Press events", () => {
             // This is our control test -- click the button normally.
             await button.hover();
             await page.mouse.down();
-            expect(getCounter()).toBe(0);
+            expect.poll(() => getCounter()).toBe(0);
             await page.mouse.up();
-            expect(getCounter()).toBe(1);
+            expect.poll(() => getCounter()).toBe(1);
 
             // If we start clicking a button but hover off it, press should not fire,
             // even if we hover back onto it.
             await page.mouse.down();
-            expect(getCounter()).toBe(1);
+            expect.poll(() => getCounter()).toBe(1);
             await page.mouse.move(500, 500, { steps: 10 });
             await button.hover();
             await page.mouse.up();
-            expect(getCounter()).toBe(1);
+            expect.poll(() => getCounter()).toBe(1);
         });
 
 
@@ -49,23 +49,23 @@ test.describe("Press events", () => {
                     case "Clicking a":
                         // We click a button and press occurs immediately
                         await button.click({ force: true });
-                        expect(getCounter()).toBe(1);
+                        expect.poll(() => getCounter()).toBe(1);
                         break;
                     case "Pressing Enter on a":
                         // We press Enter on a button and press occurs immediately
                         await button.focus();
                         await page.keyboard.down("Enter");
-                        expect(getCounter()).toBe(1);
+                        expect.poll(() => getCounter()).toBe(1);
                         await page.keyboard.up("Enter");
-                        expect(getCounter()).toBe(1);
+                        expect.poll(() => getCounter()).toBe(1);
                         break;
                     case "Releasing the spacebar on a":
                         // We press the spacebar on a button and press occurs on key up
                         await button.focus();
                         await page.keyboard.down("Space");
-                        expect(getCounter()).toBe(0);
+                        expect.poll(() => getCounter()).toBe(0);
                         await page.keyboard.up("Space");
-                        expect(getCounter()).toBe(1);
+                        expect.poll(() => getCounter()).toBe(1);
                         break;
                 }
             });

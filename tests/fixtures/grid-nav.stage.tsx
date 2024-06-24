@@ -161,8 +161,8 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
                         "data-grid-nav": true,
                         border: 1,
                         role: "grid",
-                        "data-still-staggering": stillStaggering,
-                        "data-typeahead-status": typeaheadStatus
+                        "data-still-staggering": (stillStaggering || false).toString(),
+                        "data-typeahead-status": (typeaheadStatus || false).toString()
                     } as {})}>
                         {rearrangeableChildrenReturn.children}
                     </table>

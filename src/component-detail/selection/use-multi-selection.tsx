@@ -137,7 +137,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      */
     onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
 
-    initiallyMultiSelected: boolean;
+    initiallyMultiSelected: boolean | null;
 
 
 

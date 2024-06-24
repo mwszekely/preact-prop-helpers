@@ -111,7 +111,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      * ```
      */
     onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
-    initiallyMultiSelected: boolean;
+    initiallyMultiSelected: boolean | null;
     /** When true, this child cannot be selected via multi-select, either by focusing it or by clicking it. */
     multiSelectionDisabled: boolean;
 }

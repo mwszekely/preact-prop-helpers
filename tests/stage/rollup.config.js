@@ -12,8 +12,8 @@ const extensions = [".js", ".jsx", ".ts", ".tsx"];
 export default {
     input: "stage/index.tsx",
     output: {
-        file: "stage/index.js",
-        format: "iife",
+        dir: "stage/",
+        format: "es",
         name: "bundle",
         sourcemap: true,
     },

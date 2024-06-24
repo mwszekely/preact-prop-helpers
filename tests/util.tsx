@@ -1,6 +1,6 @@
 import { RenderableProps } from "preact";
-import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useForceUpdate, useSearchParamStateDeclarative } from "preact-prop-helpers";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useForceUpdate, useSearchParamStateDeclarative, useState } from "../dist/preact/index.js";
 import { GridNavConstants } from "./fixtures/grid-nav.stage.js";
 import { ListNavConstants } from "./fixtures/list-nav.stage.js";
 import { PressConstants } from "./fixtures/press.stage.js";
@@ -34,8 +34,11 @@ export function useTestSyncState<K extends keyof TestingConstants, K2 extends ke
  * @param initialState 
  * @returns 
  */
-function useTestSyncState2<S>(initialState: S | (() => S), key: string, fromString: (str: string) => S | null): readonly [S, (...args: Parameters<StateUpdater<S>>) => Promise<ReturnType<StateUpdater<S>>>, () => S] {
+function useTestSyncState2<S>(initialState: S | (() => S), key: string, fromString: (str: string) => S | null): ReturnType<typeof useState<S>> {
 
+    type A0 = ReturnType<typeof useState<S>>[0];
+    type A1 = ReturnType<typeof useState<S>>[1];
+    type A2 = ReturnType<typeof useState<S>>[2];
 
     let resolveRef = useRef<(() => void) | null>(null);
     let promiseRef = useRef<Promise<void> | null>(null);
@@ -51,11 +54,15 @@ function useTestSyncState2<S>(initialState: S | (() => S), key: string, fromStri
         //return () => clearTimeout(handle);
     });
 
-    return [value, useCallback(async (...args: Parameters<StateUpdater<S>>) => {
+    const a0: A0 = value;
+    const a1: A1 = useCallback(async (...args: Parameters<A1>) => {
         setValue(...(args as [never]));
         forceUpdate();  // TODO: It's either this, or resolve the promise immediately (if the value hasn't changed)
         return promiseRef.current ??= new Promise<void>(resolve => { resolveRef.current = resolve; })
-    }, []), getValue] as const;
+    }, []);
+    const a2: A2 = getValue;
+
+    return [a0, a1, a2] as const;
 }
 
 export function TestItem({ children }: RenderableProps<{}>) {
