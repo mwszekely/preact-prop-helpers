@@ -20,6 +20,7 @@ export declare function useCreateProcessedChildrenContext(): OmitStrong<UseRearr
     context: UseRearrangedChildrenContext;
 };
 export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
+    getSortValue: Nullable<() => number>;
 }
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;

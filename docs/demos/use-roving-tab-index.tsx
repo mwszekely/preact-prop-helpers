@@ -195,7 +195,7 @@ const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTab
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
     const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-        info: { index }
+        info: { index, getSortValue: null }
     })
     const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
     return (

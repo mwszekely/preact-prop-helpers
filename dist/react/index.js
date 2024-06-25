@@ -2657,7 +2657,7 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
     };
 });
 function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.index, rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
+    return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
     function compare1(lhs, rhs) {
         if (lhs == null || rhs == null) {
             if (lhs == null)
@@ -2962,7 +2962,7 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
         })
     };
 });
-const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, }) {
+const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, getSortValue, ...uinfo }, }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
@@ -2970,6 +2970,7 @@ const useProcessedChild = monitored(function useProcessedChild({ context, info: 
         context,
         info: {
             index,
+            getSortValue,
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,

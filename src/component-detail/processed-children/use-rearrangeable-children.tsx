@@ -73,7 +73,9 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
 
 
 
-export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> { }
+export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
+    getSortValue: Nullable<() => number>;
+}
 
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -353,7 +355,7 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
 
 
 function defaultCompare(lhs: UseRearrangeableChildInfo | undefined, rhs: UseRearrangeableChildInfo | undefined) {
-    return compare1(lhs?.index, rhs?.index);    // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
+    return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index);    // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
 
     function compare1(lhs: unknown | undefined, rhs: unknown | undefined) {
         if (lhs == null || rhs == null) {

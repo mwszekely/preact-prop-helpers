@@ -18,7 +18,7 @@ export interface UseProcessedChildrenReturnType<TabbableChildElement extends Ele
 }
 
 // These are the info parameters required by useRovingTabIndexChild specifically
-export type UseProcessedChildInfoKeysParameters = "index";
+export type UseProcessedChildInfoKeysParameters = "index" | "getSortValue";
 // These are the info parameters provided by useRovingTabIndexChild specifically
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
@@ -167,7 +167,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
 
 export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,
-    info: { index, ...uinfo },
+    info: { index, getSortValue, ...uinfo },
 }: UseProcessedChildParameters<TabbableChildElement, M>): UseProcessedChildReturnType<TabbableChildElement, M> {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
@@ -176,6 +176,7 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
         context,
         info: {
             index,
+            getSortValue,
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,

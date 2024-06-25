@@ -189,7 +189,7 @@ function TestBasesListNavChildren({ count }: { count: number }) {
 function Outer({ index }: { index: number }) {
     const { managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
         context: useContext(Context3),
-        info: { index },
+        info: { index, getSortValue: null },
     });
 
     const children = (hideBecausePaginated || hideBecauseStaggered) ? null : <TestBasesListNavChild index={index} />

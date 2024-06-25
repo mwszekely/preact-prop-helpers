@@ -248,7 +248,7 @@ const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOu
     const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLTableRowElement, any>;
     const { props, managedChildReturn, refElementParameters, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLTableRowElement>({
         context: { managedChildContext, paginatedChildContext, staggeredChildContext },
-        info: { index },
+        info: { index, getSortValue: null },
 
     })
     const { childUseEffect } = staggeredChildReturn;

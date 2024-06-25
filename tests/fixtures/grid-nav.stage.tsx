@@ -182,7 +182,7 @@ function Outer({ index }: { index: number }) {
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
     } = useProcessedChild({
         context: useContext(ProcessingChildContext),
-        info: { index }
+        info: { index, getSortValue: null }
     });
 
     let children = hideBecausePaginated || hideBecauseStaggered ? null : <TestBaseGridNavRow index={index} />;
