@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -27,7 +27,7 @@ export interface ListNavConstants {
 }
 
 const Context1 = createContext<CompleteListNavigationContext<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
-const Context2 = createContext<UseProcessedChildrenContext>(null!);
+//const Context2 = createContext<UseProcessedChildrenContext>(null!);
 const Context3 = createContext<UseProcessedChildContext<any, any>>(null!);
 
 export function TestBasesListNav() {
@@ -100,8 +100,7 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     const { props: p1 } = useOnRender("parent");
 
     const {
-        contextChildren,
-        contextProcessing,
+        context: contextFromList,
         linearNavigationReturn: { },
         managedChildrenReturn: { getChildren },
         //paginatedChildrenReturn: { refreshPagination },
@@ -133,8 +132,8 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
     });
 
-    const { context, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useProcessedChildren({
-        context: contextProcessing,
+    const { context: contextFromProcessing, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useCompleteListNavigationChildren({
+        context: contextFromList,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             getIndex: useCallback(info => info.props.index, []),
@@ -154,18 +153,16 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     });
 
     return (
-        <Context1.Provider value={contextChildren}>
-            <Context2.Provider value={contextProcessing}>
-                <Context3.Provider value={context}>
-                    <ol {...useMergedProps(props, p1, {
-                        role: "toolbar",
-                        "data-still-staggering": stillStaggering,
-                        "data-typeahead-status": typeaheadStatus
-                    } as {})}>
-                        {rearrangeableChildrenReturn.children}
-                    </ol>
-                </Context3.Provider>
-            </Context2.Provider>
+        <Context1.Provider value={contextFromList}>
+            <Context3.Provider value={contextFromProcessing}>
+                <ol {...useMergedProps(props, p1, {
+                    role: "toolbar",
+                    "data-still-staggering": stillStaggering,
+                    "data-typeahead-status": typeaheadStatus
+                } as {})}>
+                    {rearrangeableChildrenReturn.children}
+                </ol>
+            </Context3.Provider>
         </Context1.Provider>
     )
 }

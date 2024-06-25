@@ -2,7 +2,7 @@ import { UseGridNavigationRowContext } from "../component-detail/keyboard-naviga
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildrenReturnType } from "../component-detail/processed-children/use-paginated-children.js";
-import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
+import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildParameters, UseProcessedChildReturnType, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { UseRearrangeableChildrenReturnType, useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
 import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
@@ -52,15 +52,19 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 
 
-export interface UseCompleteGridNavigationRowsParameters<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
+export interface UseCompleteGridNavigationRowsParameters<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends
+    OmitStrong<UseProcessedChildrenParameters<RowElement, RsM>, "context"> {
+    context: CompleteGridNavigationRowContext<RowElement, RM>
 }
+
+/* The context that's returned by (e.g.) the <tbody> to be consumed by the <tr>'s outer child processor */
+export interface UseCompleteGridNavigationRowsContext<RowElement extends Element, M extends UseCompleteGridNavigationRowsInfo<RowElement>> extends UseProcessedChildContext<RowElement, M> { }
 
 export interface UseCompleteGridNavigationRowsReturnType<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends
     OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
     OmitStrong<UsePaginatedChildrenReturnType, "context">,
     OmitStrong<UseStaggeredChildrenReturnType, "context"> {
-    context: UseProcessedChildContext<TabbableChildElement, M>;
+    context: UseCompleteGridNavigationRowsContext<TabbableChildElement, M>;
 }
 
 
@@ -81,7 +85,7 @@ export interface UseCompleteGridNavigationCellParameters<CellElement extends Ele
     OmitStrong<UseGridNavigationSelectionCellParameters<CellElement>, "info" | "context" | "refElementReturn"> {
 }
 
-
+/* The context that is provided by the (e.g.) <table> to each <tr>, including the outer useProcessedChild. */
 export interface CompleteGridNavigationRowContext<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     UseManagedChildrenContext<RM>,
 
@@ -89,8 +93,8 @@ export interface CompleteGridNavigationRowContext<RowElement extends Element, RM
     UseTypeaheadNavigationContext,
     UseSelectionContext,
     RovingTabIndexChildContext,
-    UseGridNavigationRowContext {
-    contextProcessing: UseProcessedChildrenContext;
+    UseGridNavigationRowContext,
+    UseProcessedChildrenContext {
 }
 
 
@@ -108,8 +112,7 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
     Pick<UseRefElementReturnType<ParentOrRowElement>, "refElementReturn">,
     TargetedOmit<UseProcessedChildrenReturnType<RowElement, any>, "rearrangeableChildrenReturn", "indexDemangler" | "indexMangler" | "children">,
     Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn"> {
-    contextChildren: CompleteGridNavigationRowContext<RowElement, RM>;
-    contextProcessing: UseProcessedChildrenContext;
+    context: CompleteGridNavigationRowContext<RowElement, RM>;
     props: ElementProps<ParentOrRowElement>;
 }
 
@@ -171,7 +174,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: { rearrangeableChildrenContext, ...void4 }, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const getAnyFocused = useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused());
     const {
         childrenHaveFocusParameters,
@@ -204,9 +207,9 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const { context: { managedChildContext }, managedChildrenReturn }: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters });
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
-    const c2 = useMemoObject({
+    const c2 = useMemoObject<UseProcessedChildrenContext>({
         processedChildrenContext,
-        ...contextProcessing
+        rearrangeableChildrenContext,
     });
     const context = useMemoObject<CompleteGridNavigationRowContext<RowElement, RM>>({
         singleSelectionContext,
@@ -216,7 +219,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
-        contextProcessing: c2
+        processedChildrenContext,
+        rearrangeableChildrenContext
     });
 
     assertEmptyObject(void1);
@@ -224,8 +228,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     assertEmptyObject(void3);
 
     return {
-        contextChildren: context,
-        contextProcessing: c2,
+        context,
         props: useMergedProps(props, propsStable),
         refElementReturn,
 
@@ -248,24 +251,23 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  */
-export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
+export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
     context,
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
     staggeredChildrenParameters,
     managedChildrenParameters
-}: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M>): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, M> {
+}: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M, RsM>): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM> {
     const {
         context: contextRPS,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
-    } = useProcessedChildren<TabbableChildElement, M>({
+    } = useProcessedChildren<TabbableChildElement, RsM>({
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
-        //refElementReturn: context.processedChildrenContext,
         context,
     });
 
@@ -274,6 +276,54 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn
+    }
+});
+
+export interface UseCompleteGridNavigationRowOuterParameters<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends
+    UseProcessedChildParameters<RowElement, RsM>,
+    UseRefElementParameters<RowElement> {
+    context: UseCompleteGridNavigationRowsContext<RowElement, RsM>;
+}
+
+export interface UseCompleteGridNavigationRowOuterReturnType<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends
+    OmitStrong<UseProcessedChildReturnType<RowElement, RsM>, "refElementParameters">,
+    OmitStrong<UseRefElementReturnType<RowElement>, "propsStable"> {
+    hide: boolean;
+}
+
+export const useCompleteGridNavigationRowOuter = monitored(function useCompleteGridNavigationRowOuter<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({
+    context,
+    info,
+    refElementParameters: { onElementChange: oec1, onMount, onUnmount }
+}: UseCompleteGridNavigationRowOuterParameters<RowElement, RsM>): UseCompleteGridNavigationRowOuterReturnType<RowElement, RsM> {
+
+    const {
+        propsStable,
+        refElementReturn
+    } = useRefElement<RowElement>({
+        refElementParameters: {
+            onElementChange: useStableCallback((...a) => { oec1?.(...a); oec2?.(...a); }),
+            onMount,
+            onUnmount
+        }
+    });
+
+    const {
+        props,
+        ...processedChildReturn
+    } = useProcessedChild<RowElement, RsM>({
+        context,
+        info
+    });
+
+    const { refElementParameters: { onElementChange: oec2 } } = processedChildReturn;
+
+    return {
+        ...processedChildReturn,
+        props: useMergedProps<RowElement>(props, propsStable),
+
+        refElementReturn,
+        hide: processedChildReturn.paginatedChildReturn.hideBecausePaginated || processedChildReturn.staggeredChildReturn.hideBecauseStaggered
     }
 })
 

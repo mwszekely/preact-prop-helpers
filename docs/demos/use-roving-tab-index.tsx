@@ -1,4 +1,5 @@
 import { createContext } from "preact";
+import { memo, useCallback, useContext, useEffect } from "preact/compat";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -7,7 +8,8 @@ import {
     UseProcessedChildContext as NormalListChildContext,
     StateUpdater,
     UseCompleteListNavigationChildInfo,
-    UseCompleteListNavigationDeclarativeReturnType, UseProcessedChildReturnType, UseProcessedChildrenContext, VNode,
+    UseCompleteListNavigationDeclarativeReturnType, UseProcessedChildReturnType,
+    VNode,
 
     focus,
     monitored,
@@ -22,7 +24,6 @@ import {
     useStableCallback,
     useState
 } from "../../dist/preact/index.js";
-import { memo, useCallback, useContext, useEffect } from "preact/compat";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -35,7 +36,6 @@ const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabl
 const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
 const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
-const WeirdContext = createContext<UseProcessedChildrenContext>(null!);
 export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
@@ -73,8 +73,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
 
     const {
         props,
-        contextChildren,
-        contextProcessing,
+        context,
         rovingTabIndexReturn: { setTabbableIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
@@ -134,12 +133,10 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
             <UntabbableContext.Provider value={untabbable}>
                 <SingleSelectionModeContext.Provider value={singleSelectionMode}>
                     <MultiSelectionModeContext.Provider value={multiSelectionMode}>
-                        <ListNavigationSingleSelectionChildContext.Provider value={contextChildren}>
-                            <WeirdContext.Provider value={contextProcessing}>
+                        <ListNavigationSingleSelectionChildContext.Provider value={context}>
                                 <ol start={0} {...props}>
                                     <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
                                 </ol>
-                            </WeirdContext.Provider>
                         </ListNavigationSingleSelectionChildContext.Provider>
                     </MultiSelectionModeContext.Provider>
                 </SingleSelectionModeContext.Provider>
@@ -169,7 +166,7 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
-        context: useContext(WeirdContext)
+        context: useContext(ListNavigationSingleSelectionChildContext)
     })
 
     useEffect(() => {
@@ -191,10 +188,9 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const { propsStable, refElementReturn: { getElement } } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: useStableCallback((e, p, r) => {
         onElementChange?.(e, p, r);
-    }) } })
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>;
+    }) } });
     const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
-        context: { managedChildContext, paginatedChildContext, staggeredChildContext },
+        context: useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>,
         info: { index, getSortValue: null }
     })
     const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);

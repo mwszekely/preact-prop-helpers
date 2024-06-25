@@ -18,8 +18,10 @@ export interface UseProcessedChildReturnType<TabbableChildElement extends Elemen
 }
 export interface UseProcessedChildInfo<TabbableChildElement extends Element> extends UseRearrangeableChildInfo, UsePaginatedChildrenInfo<TabbableChildElement>, UseStaggeredChildrenInfo {
 }
+export interface UseProcessedChildrenContextSelf extends Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex">, Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused"> {
+}
 export interface UseProcessedChildrenContext extends UseRearrangedChildrenContext {
-    processedChildrenContext: Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> & Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">;
+    processedChildrenContext: UseProcessedChildrenContextSelf;
 }
 /**
  * All of these functions **MUST** be stable across renders.

@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseProcessedChildrenContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useProcessedChild, useProcessedChildren, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -26,7 +26,7 @@ export interface GridNavConstants {
     onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
-const ProcessingChildrenContext = createContext<UseProcessedChildrenContext>(null!);
+//const ProcessingChildrenContext = createContext<UseProcessedChildrenContext>(null!);
 const ProcessingChildContext = createContext<UseProcessedChildContext<any, any>>(null!);
 const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>>(null!);
 const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
@@ -99,8 +99,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
 
     const {
         childrenHaveFocusReturn: { getAnyFocused },
-        contextChildren,
-        contextProcessing,
+        context: contextFromGrid,
         linearNavigationReturn: { },
         managedChildrenReturn: { getChildren },
         //paginatedChildrenReturn: { refreshPagination },
@@ -133,8 +132,8 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null }
     });
 
-    const { context, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useProcessedChildren({
-        context: contextProcessing,
+    const { context: contextFromProcessing, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useCompleteGridNavigationRows({
+        context: contextFromGrid,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             getIndex: useCallback(info => info.props.index, []),
@@ -154,21 +153,19 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     });
 
     return (
-        <ProcessingChildrenContext.Provider value={contextProcessing}>
-            <ProcessingChildContext.Provider value={context}>
-                <RowContext.Provider value={contextChildren}>
-                    <table {...useMergedProps(props, p1, {
-                        "data-grid-nav": true,
-                        border: 1,
-                        role: "grid",
-                        "data-still-staggering": (stillStaggering || false).toString(),
-                        "data-typeahead-status": (typeaheadStatus || false).toString()
-                    } as {})}>
-                        {rearrangeableChildrenReturn.children}
-                    </table>
-                </RowContext.Provider>
-            </ProcessingChildContext.Provider>
-        </ProcessingChildrenContext.Provider>
+        <ProcessingChildContext.Provider value={contextFromProcessing}>
+            <RowContext.Provider value={contextFromGrid}>
+                <table {...useMergedProps(props, p1, {
+                    "data-grid-nav": true,
+                    border: 1,
+                    role: "grid",
+                    "data-still-staggering": (stillStaggering || false).toString(),
+                    "data-typeahead-status": (typeaheadStatus || false).toString()
+                } as {})}>
+                    {rearrangeableChildrenReturn.children}
+                </table>
+            </RowContext.Provider>
+        </ProcessingChildContext.Provider>
     )
 }
 

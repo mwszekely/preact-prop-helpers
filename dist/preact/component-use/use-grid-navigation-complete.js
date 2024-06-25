@@ -1,4 +1,4 @@
-import { useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
+import { useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
@@ -38,7 +38,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     // Grab the information from the array of children we may or may not render.
     // (see useProcessedChildren -- it send this information to us if it's used.)
     // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: { rearrangeableChildrenContext, ...void4 }, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
     const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelection({
         gridNavigationParameters,
@@ -59,7 +59,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
     const c2 = useMemoObject({
         processedChildrenContext,
-        ...contextProcessing
+        rearrangeableChildrenContext,
     });
     const context = useMemoObject({
         singleSelectionContext,
@@ -69,14 +69,14 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         typeaheadNavigationContext,
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
-        contextProcessing: c2
+        processedChildrenContext,
+        rearrangeableChildrenContext
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
-        contextChildren: context,
-        contextProcessing: c2,
+        context,
         props: useMergedProps(props, propsStable),
         refElementReturn,
         managedChildrenReturn,
@@ -100,7 +100,6 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
-        //refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
@@ -108,6 +107,26 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn
+    };
+});
+export const useCompleteGridNavigationRowOuter = monitored(function useCompleteGridNavigationRowOuter({ context, info, refElementParameters: { onElementChange: oec1, onMount, onUnmount } }) {
+    const { propsStable, refElementReturn } = useRefElement({
+        refElementParameters: {
+            onElementChange: useStableCallback((...a) => { oec1?.(...a); oec2?.(...a); }),
+            onMount,
+            onUnmount
+        }
+    });
+    const { props, ...processedChildReturn } = useProcessedChild({
+        context,
+        info
+    });
+    const { refElementParameters: { onElementChange: oec2 } } = processedChildReturn;
+    return {
+        ...processedChildReturn,
+        props: useMergedProps(props, propsStable),
+        refElementReturn,
+        hide: processedChildReturn.paginatedChildReturn.hideBecausePaginated || processedChildReturn.staggeredChildReturn.hideBecauseStaggered
     };
 });
 /**

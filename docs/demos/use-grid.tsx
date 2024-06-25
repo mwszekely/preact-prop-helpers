@@ -1,6 +1,7 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, UseProcessedChildrenContext, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/preact/index.js";
+import { UseCompleteListNavigationChildrenContext } from "../../dist/preact/component-use/use-list-navigation-complete.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseProcessedChildContext, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/preact/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -9,8 +10,8 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const SortableColumnContext = createContext(null as number | null);
 const SetSortableColumnContext = createContext<StateUpdater<number | null>>(null!);
 const GetSortableColumnContext = createContext<() => number | null>(null!);
-const ListChildrenContext = createContext<UseProcessedChildrenContext>(null!);
-const ListChildContext = createContext<UseProcessedChildContext<any, any>>(null!);
+const ListChildrenContext = createContext<CompleteGridNavigationRowContext<any, any>>(null!);
+const ListChildContext = createContext<UseCompleteListNavigationChildrenContext<any, any>>(null!);
 
 export const DemoUseGrid = memo(() => {
 
@@ -105,10 +106,8 @@ export const DemoUseGrid = memo(() => {
     const {
         // Spread these props to the HTMLElement that will implement this grid behavior
         props,
-        // The child row will useContext this, so provide it to them.
-        contextChildren,
-        // Optionally, if you paginate or stagger your children, each child can `useContext` this as well.
-        contextProcessing,
+        // Each child row will useContext this, so provide it to them.
+        context,
         // This is what `useRovingTabIndex` returned; use it for whatever you need:
         rovingTabIndexReturn: {
             // Call to focus the grid, which focuses the current row, which focuses its current cell.
@@ -190,12 +189,10 @@ export const DemoUseGrid = memo(() => {
                 <SortableColumnContext.Provider value={sortableColumn}>
                     <GetSortableColumnContext.Provider value={getSortableColumn}>
                         <SetSortableColumnContext.Provider value={setSortableColumn}>
-                            <GridRowContext.Provider value={contextChildren}>
-                                <ListChildrenContext.Provider value={contextProcessing}>
+                            <GridRowContext.Provider value={context}>
                                     <tbody {...props}>
                                         <DemoUseRovingTabIndexChildren count={100} min={null} max={null} staggered={true} />
                                     </tbody>
-                                </ListChildrenContext.Provider>
                             </GridRowContext.Provider>
                         </SetSortableColumnContext.Provider>
                     </GetSortableColumnContext.Provider>

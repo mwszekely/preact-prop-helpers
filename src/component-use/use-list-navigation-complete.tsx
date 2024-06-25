@@ -1,7 +1,7 @@
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "../component-detail/processed-children/use-paginated-children.js";
-import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
+import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildParameters, UseProcessedChildReturnType, UseProcessedChildrenContext, UseProcessedChildrenContextSelf, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { UseRearrangeableChildrenReturnType, useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
 import { MakeSelectionDeclarativeChildParameters, MakeSelectionDeclarativeParameters, UseSelectionChildParameters, UseSelectionContext, UseSelectionParameters, useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
@@ -44,17 +44,18 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
     Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">,
     OmitStrong<UseListNavigationSelectionReturnType<ParentElement, ChildElement>, "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: ElementProps<ParentElement>;
-    contextChildren: CompleteListNavigationContext<ChildElement, M>;
-    contextProcessing: UseProcessedChildrenContext;
+    context: CompleteListNavigationContext<ChildElement, M>;
 }
 
 
+/* Contains information the parent list passes to a) each child, and b) the child processor, if used. */
 export interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     UseChildrenHaveFocusContext<ChildElement>,
     UseTypeaheadNavigationContext,
     UseSelectionContext,
     UseManagedChildrenContext<M>,
-    RovingTabIndexChildContext {
+    RovingTabIndexChildContext, 
+    UseProcessedChildrenContext {
 }
 
 
@@ -62,11 +63,13 @@ export interface UseCompleteListNavigationChildrenParameters<TabbableChildElemen
     OmitStrong<UseProcessedChildrenParameters<TabbableChildElement, M>, never> {
 }
 
+
+
 export interface UseCompleteListNavigationChildrenReturnType<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>> extends
     OmitStrong<UseRearrangeableChildrenReturnType<M>, never>,
     OmitStrong<UsePaginatedChildrenReturnType, "context">,
     OmitStrong<UseStaggeredChildrenReturnType, "context"> {
-    context: UseProcessedChildContext<TabbableChildElement, M>;
+    context: UseCompleteListNavigationChildrenContext<TabbableChildElement, M>;
 }
 
 
@@ -193,26 +196,25 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const { getAnyFocused } = childrenHaveFocusReturn;
 
-    const contextChildren = useMemoObject<CompleteListNavigationContext<ChildElement, M>>({
+    const processedChildrenContext = useMemoObject<UseProcessedChildrenContextSelf>({ getTabbableIndex, setTabbableIndex, getAnyFocused });
+
+    const context = useMemoObject<CompleteListNavigationContext<ChildElement, M>>({
         childrenHaveFocusChildContext,
         rovingTabIndexContext,
         singleSelectionContext,
         multiSelectionContext,
         typeaheadNavigationContext,
         managedChildContext: managedChildRTIContext,
+        processedChildrenContext,
+        ...contextProcessing
     });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
-    const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
 
     return {
-        contextChildren,
-        contextProcessing: useMemoObject({
-            processedChildrenContext,
-            ...contextProcessing
-        }),
+        context,
         props: useMergedProps(props, propsRef),
         managedChildrenReturn,
         linearNavigationReturn,
@@ -260,6 +262,57 @@ export const useCompleteListNavigationChildren = monitored(function useCompleteL
     }
 })
 
+/* This is the context passed from the child processor to the outer processed child component. Only used for processed children. */
+export interface UseCompleteListNavigationChildrenContext<RowElement extends Element, M extends UseCompleteListNavigationChildrenInfo<RowElement>> extends UseProcessedChildContext<RowElement, M> { }
+
+export interface UseCompleteListNavigationChildOuterParameters<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>> extends
+    UseProcessedChildParameters<RowElement, RsM>,
+    UseRefElementParameters<RowElement> {
+        context: UseCompleteListNavigationChildrenContext<RowElement, RsM>;
+}
+
+export interface UseCompleteListNavigationChildOuterReturnType<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>> extends
+    OmitStrong<UseProcessedChildReturnType<RowElement, RsM>, "refElementParameters">,
+    OmitStrong<UseRefElementReturnType<RowElement>, "propsStable"> {
+        hide: boolean;
+}
+
+export const useCompleteListNavigationChildOuter = monitored(function useCompleteListNavigationChildOuter<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>>({
+    context,
+    info,
+    refElementParameters: { onElementChange: oec1, onMount, onUnmount }
+}: UseCompleteListNavigationChildOuterParameters<RowElement, RsM>): UseCompleteListNavigationChildOuterReturnType<RowElement, RsM> {
+
+    const {
+        propsStable,
+        refElementReturn
+    } = useRefElement<RowElement>({
+        refElementParameters: {
+            onElementChange: useStableCallback((...a) => { oec1?.(...a); oec2?.(...a); }),
+            onMount,
+            onUnmount
+        }
+    });
+
+    const {
+        props,
+        ...processedChildReturn
+    } = useProcessedChild<RowElement, RsM>({
+        context,
+        info
+    });
+
+    const { refElementParameters: { onElementChange: oec2 } } = processedChildReturn;
+
+    return {
+        ...processedChildReturn,
+        props: useMergedProps<RowElement>(props, propsStable),
+
+        refElementReturn,
+        hide: processedChildReturn.paginatedChildReturn.hideBecausePaginated || processedChildReturn.staggeredChildReturn.hideBecauseStaggered
+    }
+})
+
 /**
  * 
  * @compositeParams
@@ -271,7 +324,7 @@ export const useCompleteListNavigationChild = monitored(function useCompleteList
     hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 },
     singleSelectionChildParameters,
     multiSelectionChildParameters,
-    context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 },
+    context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, rearrangeableChildrenContext, ...void5 },
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     const { refElementReturn, propsStable, ...void6 } = useRefElement<ChildElement>({ refElementParameters });

@@ -43,11 +43,11 @@ export interface UseProcessedChildInfo<TabbableChildElement extends Element> ext
 
 }
 
+export interface UseProcessedChildrenContextSelf extends Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex">,
+    Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused"> { }
+
 export interface UseProcessedChildrenContext extends UseRearrangedChildrenContext {
-    processedChildrenContext:
-    Pick<UseRovingTabIndexReturnTypeSelf, "getTabbableIndex" | "setTabbableIndex"> &
-    Pick<UseChildrenHaveFocusReturnTypeSelf, "getAnyFocused">/* & 
-    Pick<UseRefElementReturnTypeSelf<any>, "getElement">*/;
+    processedChildrenContext: UseProcessedChildrenContextSelf;
 }
 
 /**
