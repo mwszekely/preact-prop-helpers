@@ -74,6 +74,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>,
     OmitStrong<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">,
     Pick<UseTextContentParameters<RowElement>, "textContentParameters">,
+    UseRefElementParameters<RowElement>,
     TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
     TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     OmitStrong<UseHasCurrentFocusParameters<RowElement>, "refElementReturn"> {
@@ -342,6 +343,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
     hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 },
     singleSelectionChildParameters,
     multiSelectionChildParameters,
+    refElementParameters,
     ...void1
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
@@ -360,7 +362,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
     }, []);
 
     // Someone somewhere needs useRefElement, no shock there
-    const { refElementReturn, propsStable, ...void6 } = useRefElement<RowElement>({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement<RowElement>({ refElementParameters });
 
     // Enormous bag of parameters for useGridNavigationRow
     const parameters: UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM> = {

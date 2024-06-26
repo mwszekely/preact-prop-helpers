@@ -227,6 +227,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
             untabbable: hidden,
             index,
         },
+        refElementParameters: {},
         //gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: returnZero },
         multiSelectionChildParameters: { initiallyMultiSelected: false, multiSelectionDisabled: true, onMultiSelectChange: null },
         singleSelectionChildParameters: { singleSelectionDisabled: disabled },

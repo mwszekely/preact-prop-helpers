@@ -4213,7 +4213,7 @@ const useCompleteGridNavigationRowOuter = monitored(function useCompleteGridNavi
 /**
  * @compositeParams
  */
-const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
+const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, refElementParameters, ...void1 }) {
     // Create some helper functions
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4227,7 +4227,7 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
         return true;
     }, []);
     // Someone somewhere needs useRefElement, no shock there
-    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     // Enormous bag of parameters for useGridNavigationRow
     const parameters = {
         rovingTabIndexParameters,

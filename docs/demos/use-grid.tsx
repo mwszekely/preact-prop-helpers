@@ -278,7 +278,7 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
         context: contextFromParent,
         info: { index, foo: "bar", untabbable: hidden },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
-
+        refElementParameters: {},
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
