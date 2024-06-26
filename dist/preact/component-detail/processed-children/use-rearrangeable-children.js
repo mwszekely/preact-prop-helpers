@@ -173,6 +173,11 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
         }
     };
 });
+export const useRearrangeableChild = monitored(function useRearrangeableChild({ info, }) {
+    return {
+        info
+    };
+});
 function defaultCompare(lhs, rhs) {
     return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
     function compare1(lhs, rhs) {

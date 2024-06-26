@@ -58,7 +58,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
 }
 
 
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
+export interface UseStaggeredChildParameters<M extends UseStaggeredChildrenInfo> extends UseGenericChildParameters<UseStaggeredChildContext, Pick<M, "index">> {
 }
 
 export interface UseStaggeredChildReturnTypeSelf {
@@ -273,11 +273,11 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element>({
+export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({
     info: { index },
     //refElementReturn: { getElement },
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
-}: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement> {
+}: UseStaggeredChildParameters<M>): UseStaggeredChildReturnType<ChildElement> {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     // Controls whether we ask the parent to start mounting children after us.

@@ -3,14 +3,16 @@ import { UseGenericChildParameters, UseManagedChildParameters, UseManagedChildRe
 import { OmitStrong, TargetedOmit } from "../../util/lib.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "./use-paginated-children.js";
-import { UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangedChildrenContext } from "./use-rearrangeable-children.js";
-import { UseStaggeredChildContext, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType } from "./use-staggered-children.js";
+import { UseRearrangeableChildInfo, UseRearrangeableChildParameters, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangedChildrenContext } from "./use-rearrangeable-children.js";
+import { UseStaggeredChildContext, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType } from "./use-staggered-children.js";
 export interface UseProcessedChildrenReturnType<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UseStaggeredChildrenReturnType, never>, OmitStrong<UsePaginatedChildrenReturnType, never> {
     context: UseProcessedChildContext<TabbableChildElement, M>;
 }
 export type UseProcessedChildInfoKeysParameters = "index" | "getSortValue";
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
-export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<M, UseProcessedChildInfoKeysParameters>>, Pick<UsePaginatedChildParameters, never>, Pick<UseManagedChildParameters<M>, never> {
+export interface UseProcessedChildParameters<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<M, UseProcessedChildInfoKeysParameters>>, OmitStrong<UsePaginatedChildParameters, "info">, OmitStrong<UseStaggeredChildParameters<M>, "info">, OmitStrong<UseRearrangeableChildParameters<M>, "info">, Pick<UseManagedChildParameters<M>, never> {
+    context: UseProcessedChildContext<TabbableChildElement, M>;
+    info: Pick<M, UseProcessedChildInfoKeysParameters>;
 }
 export interface UseProcessedChildContext<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>> extends UsePaginatedChildContext, UseStaggeredChildContext, UseManagedChildrenContext<M> {
 }
@@ -76,5 +78,5 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * @hasChild {@link useProcessedChild}
  */
 export declare const useProcessedChildren: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }: UseProcessedChildrenParameters<TabbableChildElement, M>) => UseProcessedChildrenReturnType<TabbableChildElement, M>;
-export declare const useProcessedChild: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({ context, info: { index, getSortValue, ...uinfo }, }: UseProcessedChildParameters<TabbableChildElement, M>) => UseProcessedChildReturnType<TabbableChildElement, M>;
+export declare const useProcessedChild: <TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({ context, info: { index, getSortValue, ...uinfo }, ...void1 }: UseProcessedChildParameters<TabbableChildElement, M>) => UseProcessedChildReturnType<TabbableChildElement, M>;
 //# sourceMappingURL=use-processed-children.d.ts.map

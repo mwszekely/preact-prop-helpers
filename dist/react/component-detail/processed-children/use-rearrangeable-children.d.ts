@@ -118,6 +118,9 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      */
     sort: (direction: "ascending" | "descending") => Promise<void> | void;
 }
+export interface UseRearrangeableChildParameters<M extends UseRearrangeableChildInfo> {
+    info: Pick<M, "getSortValue">;
+}
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -142,4 +145,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
  * @compositeParams
  */
 export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
+export declare const useRearrangeableChild: <M extends UseRearrangeableChildInfo>({ info, }: UseRearrangeableChildParameters<M>) => {
+    info: Pick<M, "getSortValue">;
+};
 //# sourceMappingURL=use-rearrangeable-children.d.ts.map

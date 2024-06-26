@@ -36,7 +36,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
+export interface UseStaggeredChildParameters<M extends UseStaggeredChildrenInfo> extends UseGenericChildParameters<UseStaggeredChildContext, Pick<M, "index">> {
 }
 export interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -83,5 +83,5 @@ export declare const useStaggeredChildren: ({ managedChildrenReturn: { getChildr
  *
  * @compositeParams
  */
-export declare const useStaggeredChild: <ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters) => UseStaggeredChildReturnType<ChildElement>;
+export declare const useStaggeredChild: <ChildElement extends Element, M extends UseStaggeredChildrenInfo>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters<M>) => UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

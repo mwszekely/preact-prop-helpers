@@ -2,6 +2,7 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useManagedChild, useManagedChildren } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { monitored } from "../../util/use-call-count.js";
 import { usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
 import { useRearrangeableChildren } from "./use-rearrangeable-children.js";
@@ -89,7 +90,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren({ re
         })
     };
 });
-export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, getSortValue, ...uinfo }, }) {
+export const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, getSortValue, ...uinfo }, ...void1 }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
@@ -105,6 +106,7 @@ export const useProcessedChild = monitored(function useProcessedChild({ context,
             ...uinfo
         }
     });
+    assertEmptyObject(void1);
     const propsRet = useMergedProps(propsStaggered, propsPaginated);
     return {
         props: propsRet,

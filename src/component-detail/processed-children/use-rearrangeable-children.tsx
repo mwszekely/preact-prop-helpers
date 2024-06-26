@@ -196,6 +196,11 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
 
 
 
+export interface UseRearrangeableChildParameters<M extends UseRearrangeableChildInfo> {
+    info: Pick<M, "getSortValue">;
+}
+
+
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  * 
@@ -351,6 +356,14 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
             children: sorted
         }
     };
+})
+
+export const useRearrangeableChild = monitored(function useRearrangeableChild<M extends UseRearrangeableChildInfo>({
+    info,
+}: UseRearrangeableChildParameters<M>) {
+    return {
+        info
+    }
 })
 
 
