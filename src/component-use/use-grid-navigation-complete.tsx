@@ -559,7 +559,7 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
     return ret2;
 }
 
-export type UseCompleteGridNavigationRowDeclarativeParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = MakeMultiSelectionChildDeclarativeParameters<UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>>;
+export type UseCompleteGridNavigationRowDeclarativeParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = OmitStrong<MakeMultiSelectionChildDeclarativeParameters<UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>>, "multiSelectionChildReturn">;
 
 export function useCompleteGridNavigationRowDeclarative<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     multiSelectionChildParameters: { multiSelectionDisabled, ...multiSelectionChildParameters },
