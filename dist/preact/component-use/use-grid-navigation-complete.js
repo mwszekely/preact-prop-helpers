@@ -1,6 +1,6 @@
 import { useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
-import { useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
+import { useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -133,6 +133,8 @@ export const useCompleteGridNavigationRowOuter = monitored(function useCompleteG
  * @compositeParams
  */
 export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, refElementParameters, ...void1 }) {
+    // TODO: customUserInfo may contain setSelectedFromParent from the declarative version of this hook.
+    // This is a bit of an edge case and should probably be handled more concretely.
     // Create some helper functions
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -269,5 +271,23 @@ export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativ
         singleSelectionReturn: ret2.singleSelectionReturn
     });
     return ret2;
+}
+export function useCompleteGridNavigationRowDeclarative({ multiSelectionChildParameters: { multiSelectionDisabled, ...multiSelectionChildParameters }, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...multiSelectionChildDeclarativeParameters }, info, ...p }) {
+    const { info: { setSelectedFromParent }, multiSelectionChildParameters: { onMultiSelectChange } } = useSelectionChildDeclarative({
+        multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...multiSelectionChildDeclarativeParameters },
+        multiSelectionChildReturn: { changeMultiSelected: useStableCallback((...e) => { changeMultiSelected(...e); }) }
+    });
+    const r1 = useCompleteGridNavigationRow({
+        info: { ...info, setSelectedFromParent },
+        multiSelectionChildParameters: {
+            ...multiSelectionChildParameters,
+            initiallyMultiSelected: multiSelected,
+            multiSelectionDisabled,
+            onMultiSelectChange: useStableCallback((e) => { onMultiSelectChange?.(e); })
+        },
+        ...p
+    });
+    const { multiSelectionChildReturn: { changeMultiSelected } } = r1;
+    return r1;
 }
 //# sourceMappingURL=use-grid-navigation-complete.js.map

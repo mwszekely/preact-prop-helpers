@@ -5,7 +5,8 @@ import { UsePaginatedChildrenReturnType } from "../component-detail/processed-ch
 import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildParameters, UseProcessedChildReturnType, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
 import { UseRearrangeableChildrenReturnType, useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
-import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
+import { MakeMultiSelectionChildDeclarativeParameters, MultiSelectChildChangeEvent } from "../component-detail/selection/use-multi-selection.js";
+import { MakeSelectionDeclarativeParameters, UseSelectionContext, useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "../component-detail/use-grid-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -348,6 +349,9 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
 
+    // TODO: customUserInfo may contain setSelectedFromParent from the declarative version of this hook.
+    // This is a bit of an edge case and should probably be handled more concretely.
+
     // Create some helper functions
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
@@ -553,4 +557,42 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
     });
 
     return ret2;
+}
+
+export type UseCompleteGridNavigationRowDeclarativeParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = MakeMultiSelectionChildDeclarativeParameters<UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>>;
+
+export function useCompleteGridNavigationRowDeclarative<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
+    multiSelectionChildParameters: { multiSelectionDisabled, ...multiSelectionChildParameters },
+    multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...multiSelectionChildDeclarativeParameters },
+    info,
+    ...p
+}: UseCompleteGridNavigationRowDeclarativeParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
+
+
+    const {
+        info: { setSelectedFromParent },
+        multiSelectionChildParameters: { onMultiSelectChange }
+    } = useSelectionChildDeclarative({
+        multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...multiSelectionChildDeclarativeParameters },
+        multiSelectionChildReturn: { changeMultiSelected: useStableCallback((...e) => { changeMultiSelected(...e) }) }
+    });
+
+
+    const r1: UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> = useCompleteGridNavigationRow({
+        info: { ...info, setSelectedFromParent },
+        multiSelectionChildParameters: {
+            ...multiSelectionChildParameters,
+            initiallyMultiSelected: multiSelected,
+            multiSelectionDisabled,
+            onMultiSelectChange: useStableCallback((e: MultiSelectChildChangeEvent<RowElement>) => { onMultiSelectChange?.(e); })
+        },
+        ...p
+    });
+
+    const {
+        multiSelectionChildReturn: { changeMultiSelected}
+    } = r1;
+
+
+    return r1;
 }

@@ -336,7 +336,7 @@ export { useDismiss } from "./component-detail/use-dismiss.js";
 export { findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "./component-detail/use-grid-navigation-selection.js";
 export { useListNavigationSelection, useListNavigationSelectionChild } from "./component-detail/use-list-navigation-selection.js";
-export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
+export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { useModal } from "./component-use/use-modal.js";
 export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
