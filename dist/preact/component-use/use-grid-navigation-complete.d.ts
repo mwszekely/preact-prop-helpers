@@ -33,7 +33,7 @@ export interface UseCompleteGridNavigationParametersSelf {
      * The value returned will be passed to `getSortValueAt`.
      * If the grid you're using this for doesn't have a concept of a "sortable column", this can be entirely ignored.
      */
-    getSortColumn: Nullable<() => number>;
+    getSortColumn: Nullable<() => (number | undefined)>;
     /**
      * Should return a value that works with `rearrangeableChildrenParameters.compare` (or, by default, that works with the minus operator).
      *
