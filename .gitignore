@@ -4,10 +4,9 @@
 *.d.ts.map
 package-lock.json
 !rollup.config.js
-!docs/bundle.js
 !true.js
-!docs/bundle.js
-!docs/bundle.js.map
+!docs/index.js
+!docs/index.js.map
 !dist/**
 !temp
 !temp/preact-prop-helpers.d.ts

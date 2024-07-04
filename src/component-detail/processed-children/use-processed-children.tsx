@@ -4,7 +4,7 @@ import { ManagedChildren, UseGenericChildParameters, UseManagedChildParameters, 
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { OmitStrong, TargetedOmit } from "../../util/lib.js";
+import { OmitStrong, TargetedOmit, useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
@@ -19,7 +19,7 @@ export interface UseProcessedChildrenReturnType<TabbableChildElement extends Ele
 }
 
 // These are the info parameters required by useRovingTabIndexChild specifically
-export type UseProcessedChildInfoKeysParameters = "index" | "getSortValue";
+export type UseProcessedChildInfoKeysParameters = "index";
 // These are the info parameters provided by useRovingTabIndexChild specifically
 export type UseProcessedChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
@@ -27,7 +27,7 @@ export interface UseProcessedChildParameters<TabbableChildElement extends Elemen
     UseGenericChildParameters<UseProcessedChildContext<TabbableChildElement, M>, Pick<M, UseProcessedChildInfoKeysParameters>>,
     OmitStrong<UsePaginatedChildParameters, "info">,
     OmitStrong<UseStaggeredChildParameters<M>, "info">,
-    OmitStrong<UseRearrangeableChildParameters<M>, "info">,
+    OmitStrong<UseRearrangeableChildParameters<M>, never>,
     Pick<UseManagedChildParameters<M>, never> {
     context: UseProcessedChildContext<TabbableChildElement, M>;
     info: Pick<M, UseProcessedChildInfoKeysParameters>;
@@ -125,11 +125,26 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
 
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, })
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, });
+
+    const rp = useStableCallback(() => {
+        refreshPagination(paginationMin, paginationMax);
+    })
 
     const { rearrangeableChildrenReturn } = useRearrangeableChildren<M>({
         rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
+            onRearranged: useCallback((phase) => {
+                // This kind of weird "phase" jank is to account for this oddity:
+                // `refreshPagination` is auto-called on mount by usePaginatedChildren,
+                // but needs to be called manually during other times. Also, due to
+                // a circular dependency, it needs `useStableCallback`, so can't be
+                // called during render anyway.
+                if (phase != 'render') {
+                    rp();
+                }
+
+                onRearranged?.(phase);
+            }, []),
             children: childrenUnsorted,
             ...rearrangeableChildrenParameters,
         },
@@ -172,7 +187,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
 
 export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,
-    info: { index, getSortValue, ...uinfo },
+    info: { index, ...uinfo },
     ...void1
 }: UseProcessedChildParameters<TabbableChildElement, M>): UseProcessedChildReturnType<TabbableChildElement, M> {
     const { paginatedChildContext, staggeredChildContext } = context;
@@ -182,7 +197,6 @@ export const useProcessedChild = monitored(function useProcessedChild<TabbableCh
         context,
         info: {
             index,
-            getSortValue,
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,

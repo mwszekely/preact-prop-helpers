@@ -1,6 +1,6 @@
 
 import { useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
+import { DismissListenerTypes, focus, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
 
 function getDocument(): Document { return globalThis.document; }
 
@@ -21,7 +21,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
 
     const [open, setOpen] = useState(false);
 
-    const focusOpener = () =>buttonRef.current?.focus();
+    const focusOpener = () => focus(buttonRef.current);
 
     const {
         propsStablePopup,
@@ -32,7 +32,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             trapActive: focusTrapActive,
             onlyMoveFocus: false,
             focusOpener,
-            focusPopup: useStableCallback((e, f) => f()?.focus())
+            focusPopup: useStableCallback((e, f) => focus(f() as HTMLElement))
         },
         dismissParameters: {
             onDismiss: useStableCallback((event, reason) => { setCloseReason(reason); setOpen(false); }),
@@ -45,7 +45,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         refElementParameters: {},
         activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
     })
-    
+
     return (
         <div style={{ border: `${depth}px solid black` }}>
             <div>useModal demo:</div>

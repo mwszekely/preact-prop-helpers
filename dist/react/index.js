@@ -1216,6 +1216,8 @@ const useLinearNavigation = (function useLinearNavigation({ linearNavigationPara
                 case "ArrowUp":
                 case "ArrowDown":
                     keyPressIsValidForOrientation = (allowsVerticalNavigation);
+                    if (keyPressIsValidForOrientation)
+                        debugger;
                     break;
                 case "ArrowLeft":
                 case "ArrowRight":
@@ -1742,6 +1744,17 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
             focusSelf(true);
         }
     }, [untabbable]);
+    // TODO: This is jank, but necessary for onClosestFit.
+    // There just needs to be a better focus management strategy in general to fix this.
+    let avoidFocusingSelfOnMount = useRef(false);
+    useEffect(() => {
+        let handle = setTimeout(() => {
+            handle = setTimeout(() => {
+                avoidFocusingSelfOnMount.current = true;
+            }, 50);
+        }, 50);
+        return () => clearTimeout(handle);
+    }, []);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
     const setTabbableAt = useCallback((child, t) => { child.setLocallyTabbable(t); }, []);
@@ -1766,10 +1779,10 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({ managedChildren
             // we've lot the ability to know if any of them were focused, at least easily.
             // So we just check to see if focus was lost to the body and, if so, send it somewhere useful.
             // This is liable to break, probably with blockingElements or something.
-            if (document && (document.activeElement == null || document.activeElement == document.body)) {
+            if (avoidFocusingSelfOnMount.current && document && (document.activeElement == null || document.activeElement == document.body)) {
                 let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
                 if (index == null || childElement == null)
-                    findBackupFocus(getElement()).focus();
+                    focus(findBackupFocus(getElement()));
                 else
                     getChildren().getAt(index)?.focusSelf(childElement);
             }
@@ -2549,68 +2562,84 @@ function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
-    useEnsureStability("useRearrangeableChildren", getIndex);
+const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+    useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt, compare, onRearranged);
+    compare ??= defaultCompare;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
-    const mangleMap = useRef(new Map());
-    const demangleMap = useRef(new Map());
+    const mangleMap = useRef(null);
+    const demangleMap = useRef(null);
     const indexMangler = useCallback((n) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n) => (demangleMap.current.get(n) ?? n), []);
-    const onRearrangedGetter = useStableGetter(onRearranged);
     const shuffle$1 = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
+        const originalRows = managedRows._arraySlice().map(row => row.index);
         const shuffledRows = shuffle(originalRows);
-        return rearrange(originalRows, shuffledRows);
+        return rearrange('async', originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
-        const reversedRows = managedRows._arraySlice().reverse();
-        return rearrange(originalRows, reversedRows);
+        const originalRows = managedRows._arraySlice().map(row => row.index);
+        const reversedRows = originalRows.slice().reverse();
+        return rearrange('async', originalRows, reversedRows);
     }, [ /* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     const forceUpdateRef = useRef(null);
-    const rearrange = useCallback((originalRows, sortedRows) => {
+    const rearrange = useCallback((phase, originalRows, sortedRows) => {
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
         for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            if (sortedRows[indexAsSorted]) {
-                const indexAsUnsorted = sortedRows[indexAsSorted].index;
+            const indexAsUnsorted = sortedRows[indexAsSorted];
+            if (indexAsUnsorted != undefined) {
                 mangleMap.current.set(indexAsUnsorted, indexAsSorted);
                 demangleMap.current.set(indexAsSorted, indexAsUnsorted);
             }
         }
-        onRearrangedGetter()?.();
+        onRearranged?.(phase);
         forceUpdateRef.current?.();
     }, []);
-    // The actual sort function.
-    const getCompare = useStableGetter(userCompare ?? defaultCompare);
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
-        const compare = getCompare();
-        const originalRows = managedRows._arraySlice();
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
-            const lhsValue = lhsRow;
-            const rhsValue = rhsRow;
+        const originalRows = managedRows._arraySlice().map(child => child.index);
+        const sortedRows = originalRows.sort((lhsRow, rhsRow) => {
+            const lhsValue = getSortValueAt(lhsRow);
+            const rhsValue = getSortValueAt(rhsRow);
             const result = compare(lhsValue, rhsValue);
             if (direction[0] == "d")
                 return -result;
             return result;
-        }) : managedRows._arraySlice();
-        return rearrange(originalRows, sortedRows);
+        });
+        return rearrange('async', originalRows, sortedRows);
     }, [ /* Must remain stable */]);
     console.assert(Array.isArray(children));
     const forceUpdate = useForceUpdate();
     console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
     forceUpdateRef.current = forceUpdate; // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
-    let sorted = children
+    if (mangleMap.current == null) {
+        mangleMap.current = new Map();
+        demangleMap.current = new Map();
+        const originalRows = children.slice().map(child => {
+            if (child) {
+                return getIndex(child) ?? undefined;
+            }
+            return undefined;
+        });
+        const sortedRows = originalRows.sort((lhsIndex, rhsIndex) => {
+            const lhsValue = lhsIndex == undefined ? undefined : getSortValueAt(lhsIndex);
+            const rhsValue = rhsIndex == undefined ? undefined : getSortValueAt(rhsIndex);
+            const result = compare(lhsValue, rhsValue);
+            return result;
+        });
+        rearrange('render', originalRows, sortedRows);
+    }
+    // TODO: Right now, we rearrange the children based on the value of `mangleMap`.
+    // But `mangleMap`
+    let childrenInOrder = children
         .slice()
         .map(child => {
         if (process.env.NODE_ENV === 'development' && child) {
@@ -2627,7 +2656,6 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
     })
         .sort((lhs, rhs) => (lhs.sort - rhs.sort))
         .map(({ child, mangledIndex, demangledIndex }) => {
-        // "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex
         if (child)
             return ((adjust || identity)(createElement(child.type, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex })) ?? null;
         return null;
@@ -2652,26 +2680,21 @@ const useRearrangeableChildren = monitored(function useRearrangeableChildren({ r
             shuffle: shuffle$1,
             reverse,
             sort,
-            children: sorted
+            children: childrenInOrder
         }
     };
 });
-monitored(function useRearrangeableChild({ info, }) {
-    return {
-        info
-    };
+monitored(function useRearrangeableChild({}) {
+    return {};
 });
 function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
-    function compare1(lhs, rhs) {
-        if (lhs == null || rhs == null) {
-            if (lhs == null)
-                return -1;
-            if (rhs == null)
-                return 1;
-        }
-        return lhs - rhs;
+    if (lhs == null || rhs == null) {
+        if (lhs == null)
+            return -1;
+        if (rhs == null)
+            return 1;
     }
+    return lhs - rhs;
 }
 
 /**
@@ -2935,9 +2958,22 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
+    const rp = useStableCallback(() => {
+        refreshPagination(paginationMin, paginationMax);
+    });
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({
         rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginationMin, paginationMax); onRearranged?.(); }),
+            onRearranged: useCallback((phase) => {
+                // This kind of weird "phase" jank is to account for this oddity:
+                // `refreshPagination` is auto-called on mount by usePaginatedChildren,
+                // but needs to be called manually during other times. Also, due to
+                // a circular dependency, it needs `useStableCallback`, so can't be
+                // called during render anyway.
+                if (phase != 'render') {
+                    rp();
+                }
+                onRearranged?.(phase);
+            }, []),
             children: childrenUnsorted,
             ...rearrangeableChildrenParameters,
         },
@@ -2967,7 +3003,7 @@ const useProcessedChildren = monitored(function useProcessedChildren({ rearrange
         })
     };
 });
-const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, getSortValue, ...uinfo }, ...void1 }) {
+const useProcessedChild = monitored(function useProcessedChild({ context, info: { index, ...uinfo }, ...void1 }) {
     const { paginatedChildContext, staggeredChildContext } = context;
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
@@ -2975,7 +3011,6 @@ const useProcessedChild = monitored(function useProcessedChild({ context, info: 
         context,
         info: {
             index,
-            getSortValue,
             setChildCountIfPaginated,
             setPaginationVisible,
             setStaggeredVisible,
@@ -3707,6 +3742,7 @@ let be;
         /// @ts-expect-error
         await import('wicg-inert');
         await import('blocking-elements');
+        be = document.$blockingElements;
         if (!d)
             delete globalThis.document;
     }
@@ -4106,7 +4142,8 @@ const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, ...void1 }) {
+const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt }, ...void1 }) {
+    useEnsureStability("useCompleteGridNavigation", getSortColumn, getSortValueAt);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4154,7 +4191,8 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
         processedChildrenContext,
-        rearrangeableChildrenContext
+        rearrangeableChildrenContext,
+        completeGridNavigationContext: useMemoObject({ getSortColumn, getSortValueAt })
     });
     return {
         context,
@@ -4175,10 +4213,18 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, }) {
+    const { completeGridNavigationContext: { getSortColumn, getSortValueAt } } = context;
     const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
+        rearrangeableChildrenParameters: {
+            ...rearrangeableChildrenParameters,
+            getSortValueAt: useCallback((index) => {
+                const row = index;
+                const column = getSortColumn == undefined ? undefined : getSortColumn();
+                return getSortValueAt(row, column);
+            }, [getSortValueAt, getSortColumn])
+        },
         staggeredChildrenParameters,
         managedChildrenParameters,
         context,

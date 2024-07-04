@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteListNavigationChild, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -146,7 +146,8 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
                 }
             }()),
             compare: null,
-            onRearranged: null
+            onRearranged: null,
+            getSortValueAt: identity
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
@@ -186,7 +187,7 @@ function TestBasesListNavChildren({ count }: { count: number }) {
 function Outer({ index }: { index: number }) {
     const { managedChildReturn, paginatedChildReturn: { hideBecausePaginated, parentIsPaginated }, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useProcessedChild({
         context: useContext(Context3),
-        info: { index, getSortValue: null },
+        info: { index },
     });
 
     const children = (hideBecausePaginated || hideBecauseStaggered) ? null : <TestBasesListNavChild index={index} />

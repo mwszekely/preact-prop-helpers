@@ -131,6 +131,8 @@ export const useLinearNavigation = (function useLinearNavigation({ linearNavigat
                 case "ArrowUp":
                 case "ArrowDown":
                     keyPressIsValidForOrientation = (allowsVerticalNavigation);
+                    if (keyPressIsValidForOrientation)
+                        debugger;
                     break;
                 case "ArrowLeft":
                 case "ArrowRight":

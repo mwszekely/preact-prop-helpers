@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -125,6 +125,10 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
                 f?.(e[EventDetail].selectedIndex);
             }, [])
         },
+        gridNavigationCompleteParameters: {
+            getSortColumn: null,
+            getSortValueAt: identity
+        },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", multiSelectionMode: "disabled", onSelectionChange: null },
         //sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteGridNavigationRowInfo<HTMLDivElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         //staggeredChildrenParameters: { staggered },
@@ -179,7 +183,7 @@ function Outer({ index }: { index: number }) {
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
     } = useProcessedChild({
         context: useContext(ProcessingChildContext),
-        info: { index, getSortValue: null }
+        info: { index }
     });
 
     let children = hideBecausePaginated || hideBecauseStaggered ? null : <TestBaseGridNavRow index={index} />;

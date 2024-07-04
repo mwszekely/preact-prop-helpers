@@ -1,7 +1,7 @@
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
@@ -66,68 +66,85 @@ export function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
-    useEnsureStability("useRearrangeableChildren", getIndex);
+export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+    useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt, compare, onRearranged);
+    compare ??= defaultCompare;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
-    const mangleMap = useRef(new Map());
-    const demangleMap = useRef(new Map());
+    const mangleMap = useRef(null);
+    const demangleMap = useRef(null);
     const indexMangler = useCallback((n) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n) => (demangleMap.current.get(n) ?? n), []);
-    const onRearrangedGetter = useStableGetter(onRearranged);
     const shuffle = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
+        const originalRows = managedRows._arraySlice().map(row => row.index);
         const shuffledRows = lodashShuffle(originalRows);
-        return rearrange(originalRows, shuffledRows);
+        return rearrange('async', originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
-        const reversedRows = managedRows._arraySlice().reverse();
-        return rearrange(originalRows, reversedRows);
+        const originalRows = managedRows._arraySlice().map(row => row.index);
+        const reversedRows = originalRows.slice().reverse();
+        return rearrange('async', originalRows, reversedRows);
     }, [ /* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     const forceUpdateRef = useRef(null);
-    const rearrange = useCallback((originalRows, sortedRows) => {
+    const rearrange = useCallback((phase, originalRows, sortedRows) => {
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
         for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            if (sortedRows[indexAsSorted]) {
-                const indexAsUnsorted = sortedRows[indexAsSorted].index;
+            const indexAsUnsorted = sortedRows[indexAsSorted];
+            if (indexAsUnsorted != undefined) {
                 mangleMap.current.set(indexAsUnsorted, indexAsSorted);
                 demangleMap.current.set(indexAsSorted, indexAsUnsorted);
             }
         }
-        onRearrangedGetter()?.();
+        onRearranged?.(phase);
         forceUpdateRef.current?.();
     }, []);
-    // The actual sort function.
-    const getCompare = useStableGetter(userCompare ?? defaultCompare);
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
-        const compare = getCompare();
-        const originalRows = managedRows._arraySlice();
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
-            const lhsValue = lhsRow;
-            const rhsValue = rhsRow;
+        const originalRows = managedRows._arraySlice().map(child => child.index);
+        const sortedRows = originalRows.sort((lhsRow, rhsRow) => {
+            const lhsValue = getSortValueAt(lhsRow);
+            const rhsValue = getSortValueAt(rhsRow);
             const result = compare(lhsValue, rhsValue);
             if (direction[0] == "d")
                 return -result;
             return result;
-        }) : managedRows._arraySlice();
-        return rearrange(originalRows, sortedRows);
+        });
+        return rearrange('async', originalRows, sortedRows);
     }, [ /* Must remain stable */]);
     console.assert(Array.isArray(children));
     const forceUpdate = useForceUpdate();
     console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
     forceUpdateRef.current = forceUpdate; // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
-    let sorted = children
+    if (mangleMap.current == null) {
+        mangleMap.current = new Map();
+        demangleMap.current = new Map();
+        const unmanagedRows = children;
+        const originalRows = children.slice().map(child => {
+            if (child) {
+                return getIndex(child) ?? undefined;
+            }
+            return undefined;
+        });
+        const sortedRows = originalRows.sort((lhsIndex, rhsIndex) => {
+            const lhsValue = lhsIndex == undefined ? undefined : getSortValueAt(lhsIndex);
+            const rhsValue = rhsIndex == undefined ? undefined : getSortValueAt(rhsIndex);
+            const result = compare(lhsValue, rhsValue);
+            return result;
+        });
+        rearrange('render', originalRows, sortedRows);
+    }
+    // TODO: Right now, we rearrange the children based on the value of `mangleMap`.
+    // But `mangleMap`
+    let childrenInOrder = children
         .slice()
         .map(child => {
         if (process.env.NODE_ENV === 'development' && child) {
@@ -144,7 +161,6 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     })
         .sort((lhs, rhs) => (lhs.sort - rhs.sort))
         .map(({ child, mangledIndex, demangledIndex }) => {
-        // "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex
         if (child)
             return ((adjust || identity)(createElement(child.type, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex })) ?? null;
         return null;
@@ -169,25 +185,20 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
             shuffle,
             reverse,
             sort,
-            children: sorted
+            children: childrenInOrder
         }
     };
 });
-export const useRearrangeableChild = monitored(function useRearrangeableChild({ info, }) {
-    return {
-        info
-    };
+export const useRearrangeableChild = monitored(function useRearrangeableChild({}) {
+    return {};
 });
 function defaultCompare(lhs, rhs) {
-    return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index); // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
-    function compare1(lhs, rhs) {
-        if (lhs == null || rhs == null) {
-            if (lhs == null)
-                return -1;
-            if (rhs == null)
-                return 1;
-        }
-        return lhs - rhs;
+    if (lhs == null || rhs == null) {
+        if (lhs == null)
+            return -1;
+        if (rhs == null)
+            return 1;
     }
+    return lhs - rhs;
 }
 //# sourceMappingURL=use-rearrangeable-children.js.map

@@ -6,6 +6,7 @@ let be;
         /// @ts-expect-error
         await import("wicg-inert");
         await import("blocking-elements");
+        be = document.$blockingElements;
         if (!d)
             delete globalThis.document;
     }

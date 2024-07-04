@@ -6,7 +6,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { findBackupFocus } from "../../util/focus.js";
+import { findBackupFocus, focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
 import { EventType, FocusEventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
@@ -362,6 +362,18 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex<ParentElem
         }
     }, [untabbable]);
 
+    // TODO: This is jank, but necessary for onClosestFit.
+    // There just needs to be a better focus management strategy in general to fix this.
+    let avoidFocusingSelfOnMount = useRef(false);
+    useEffect(() => {
+        let handle = setTimeout(() => {
+            handle = setTimeout(() => {
+                avoidFocusingSelfOnMount.current = true;
+            }, 50);
+        }, 50);
+        return () => clearTimeout(handle);
+    }, []);
+
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((child: M) => { return child.getLocallyTabbable() }, []);
     const setTabbableAt = useCallback((child: M, t: boolean) => { child.setLocallyTabbable(t); }, []);
@@ -386,10 +398,10 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex<ParentElem
             // we've lot the ability to know if any of them were focused, at least easily.
             // So we just check to see if focus was lost to the body and, if so, send it somewhere useful.
             // This is liable to break, probably with blockingElements or something.
-            if (document && (document.activeElement == null || document.activeElement == document.body)) {
+            if (avoidFocusingSelfOnMount.current && document && (document.activeElement == null || document.activeElement == document.body)) {
                 let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
                 if (index == null || childElement == null)
-                    findBackupFocus(getElement()!).focus();
+                    focus(findBackupFocus(getElement()!));
                 else
                     getChildren().getAt(index)?.focusSelf(childElement);
             }

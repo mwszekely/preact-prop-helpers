@@ -3,7 +3,7 @@ import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { Nullable, TargetedPick, createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { OmitStrong, VNode } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
@@ -73,25 +73,34 @@ export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeable
 
 
 
-export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
-    getSortValue: Nullable<() => number>;
-}
+export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> { }
 
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
-export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
+export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 
-export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
+export interface UseRearrangeableChildrenParametersSelf {
     /**
-     * Controls how values compare against each other when `sort` is called.
+     * Controls how values from `getSortValueAt` compare against each other when `sort` is called. By default, simply does `lhs - rhs`.
      * 
-     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
+     * If null, the default order of children is used as given.
      * 
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    compare: Nullable<Compare<M>>;
+    compare: Nullable<Compare<unknown>>;
+
+    /** 
+     * For a given index, return a value that represents how that child should be sorted relative to other children with the `compare` function.
+     * 
+     * Anything can be returned, as long as the `compare` function you pass can also handle it. E.G. return a string, then have `compare` call `localeCompare` or something.
+     * 
+     * This is called **during** render, so it cannot be wrapped with `useStableCallback`.
+     * 
+     * @stable
+     */
+    getSortValueAt(index: number): unknown;
 
 
     /**
@@ -106,6 +115,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      * 
      * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * But if you rename `index` to something else in your component, you'll need to account for that with `getIndex`.
      * 
      * @stable
      */
@@ -115,7 +125,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
     /**
      * Called after the children have been rearranged.
      */
-    onRearranged: Nullable<(() => void)>;
+    onRearranged: Nullable<((phase: 'render' | 'async') => void)>;
 
     /**
      * The children to sort.
@@ -127,7 +137,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  * All of these functions **MUST** be stable across renders.
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
     context: UseRearrangedChildrenContext;
 }
 
@@ -146,7 +156,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      *  
      * @stable
      */
-    rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
+    rearrange: (phase: 'render' | 'async', originalRows: M["index"][], rowsInOrder: M["index"][]) => void;
 
     /** 
      * Arranges the children in a random order.
@@ -184,8 +194,10 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      * 
      * Call to rearrange the children in ascending or descending order according to `compare`.
      * 
+     * Note: `descending` simply inverts the value returned by `compare`.
+     * 
      */
-    sort: (direction: "ascending" | "descending") => Promise<void> | void;
+    sort: (direction: "ascending" | "descending") => void;
 
     /**
      * Returns an array of each cell's `getSortValue()` result.
@@ -196,9 +208,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
 
 
 
-export interface UseRearrangeableChildParameters<M extends UseRearrangeableChildInfo> {
-    info: Pick<M, "getSortValue">;
-}
+export interface UseRearrangeableChildParameters<_M extends UseRearrangeableChildInfo> { }
 
 
 /**
@@ -225,32 +235,32 @@ export interface UseRearrangeableChildParameters<M extends UseRearrangeableChild
  * @compositeParams
  */
 export const useRearrangeableChildren = monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
-    rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust },
+    rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare },
     managedChildrenReturn: { getChildren },
     context: { rearrangeableChildrenContext: { provideManglers } }
 }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M> {
-    useEnsureStability("useRearrangeableChildren", getIndex);
+    useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt, compare, onRearranged);
+    compare ??= defaultCompare;
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
-    const mangleMap = useRef(new Map<number, number>());
-    const demangleMap = useRef(new Map<number, number>());
+    const mangleMap = useRef<Map<number, number>>(null!);
+    const demangleMap = useRef<Map<number, number>>(null!);
     const indexMangler = useCallback((n: number) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n: number) => (demangleMap.current.get(n) ?? n), []);
-    const onRearrangedGetter = useStableGetter(onRearranged);
 
     const shuffle = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
+        const originalRows = managedRows._arraySlice().map(row => row.index);
         const shuffledRows = lodashShuffle(originalRows);
-        return rearrange(originalRows, shuffledRows);
+        return rearrange('async',originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
     const reverse = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
-        const originalRows = managedRows._arraySlice();
-        const reversedRows = managedRows._arraySlice().reverse();
-        return rearrange(originalRows, reversedRows);
+        const originalRows = managedRows._arraySlice().map(row => row.index);
+        const reversedRows = originalRows.slice().reverse();
+        return rearrange('async',originalRows, reversedRows);
     }, [/* Must remain stable */]);
 
 
@@ -260,45 +270,41 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     // get and set a forceUpdate function.
     const forceUpdateRef = useRef<null | (() => void)>(null);
 
-    const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
-
+    const rearrange = useCallback((phase: 'render' | 'async', originalRows: (number | undefined)[], sortedRows: (number | undefined)[]) => {
         mangleMap.current.clear();
         demangleMap.current.clear();
 
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
         for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            if (sortedRows[indexAsSorted]) {
-                const indexAsUnsorted = sortedRows[indexAsSorted].index;
+            const indexAsUnsorted = sortedRows[indexAsSorted];
+            if (indexAsUnsorted != undefined) {
 
                 mangleMap.current.set(indexAsUnsorted, indexAsSorted);
                 demangleMap.current.set(indexAsSorted, indexAsUnsorted);
             }
         }
 
-        onRearrangedGetter()?.();
+        onRearranged?.(phase);
         forceUpdateRef.current?.();
     }, []);
 
-    // The actual sort function.
-    const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
-    const sort = useCallback((direction: "ascending" | "descending"): Promise<void> | void => {
+
+    const sort = useCallback((direction: "ascending" | "descending"): void => {
         const managedRows = getChildren();
-        const compare = getCompare();
-        const originalRows = managedRows._arraySlice();
+        const originalRows = managedRows._arraySlice().map(child => child.index);
 
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+        const sortedRows = originalRows.sort((lhsRow, rhsRow) => {
 
-            const lhsValue = lhsRow;
-            const rhsValue = rhsRow;
-            const result = compare(lhsValue, rhsValue);
+            const lhsValue = getSortValueAt(lhsRow);
+            const rhsValue = getSortValueAt(rhsRow);
+            const result = compare!(lhsValue, rhsValue);
             if (direction[0] == "d")
                 return -result;
             return result;
+        });
 
-        }) : managedRows._arraySlice();
-
-        return rearrange(originalRows, sortedRows);
+        return rearrange('async', originalRows, sortedRows);
 
     }, [ /* Must remain stable */]);
 
@@ -308,7 +314,35 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
     forceUpdateRef.current = forceUpdate;    // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
 
-    let sorted = children
+
+
+    if (mangleMap.current == null) {
+
+        mangleMap.current = new Map();
+        demangleMap.current = new Map();
+
+        const unmanagedRows = children;
+        const originalRows = children.slice().map(child => {
+            if (child) {
+                return getIndex(child) ?? undefined;
+            }
+            return undefined;
+        });
+
+        const sortedRows = originalRows.sort((lhsIndex, rhsIndex) => {
+            const lhsValue = lhsIndex == undefined? undefined : getSortValueAt(lhsIndex);
+            const rhsValue = rhsIndex == undefined? undefined : getSortValueAt(rhsIndex);
+            const result = compare!(lhsValue, rhsValue);
+            return result;
+        });
+
+        rearrange('render', originalRows, sortedRows);
+    }
+
+
+    // TODO: Right now, we rearrange the children based on the value of `mangleMap`.
+    // But `mangleMap`
+    let childrenInOrder = children
         .slice()
         .map(child => {
             if (process.env.NODE_ENV === 'development' && child) {
@@ -326,7 +360,6 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
         )
         .sort((lhs, rhs) => (lhs.sort - rhs.sort))
         .map(({ child, mangledIndex, demangledIndex }) => {
-            // "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex
             if (child)
                 return ((adjust || identity)(createElement(child.type as any, { ...child.props, key: demangledIndex }), { mangledIndex, demangledIndex })) ?? null
             return null;
@@ -353,31 +386,22 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
             shuffle,
             reverse,
             sort,
-            children: sorted
+            children: childrenInOrder
         }
     };
 })
 
-export const useRearrangeableChild = monitored(function useRearrangeableChild<M extends UseRearrangeableChildInfo>({
-    info,
-}: UseRearrangeableChildParameters<M>) {
-    return {
-        info
-    }
+export const useRearrangeableChild = monitored(function useRearrangeableChild<M extends UseRearrangeableChildInfo>({ }: UseRearrangeableChildParameters<M>) {
+    return {}
 })
 
-
-function defaultCompare(lhs: UseRearrangeableChildInfo | undefined, rhs: UseRearrangeableChildInfo | undefined) {
-    return compare1(lhs?.getSortValue?.() ?? lhs?.index, rhs?.getSortValue?.() ?? rhs?.index);    // TODO: This used to have getSortValue() for a better default, but was also kind of redundant with defaultCompare being overrideable?
-
-    function compare1(lhs: unknown | undefined, rhs: unknown | undefined) {
-        if (lhs == null || rhs == null) {
-            if (lhs == null)
-                return -1;
-            if (rhs == null)
-                return 1;
-        }
-
-        return (lhs as any) - (rhs as any);
+function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined) {
+    if (lhs == null || rhs == null) {
+        if (lhs == null)
+            return -1;
+        if (rhs == null)
+            return 1;
     }
+
+    return (lhs as any) - (rhs as any);
 }

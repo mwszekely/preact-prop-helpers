@@ -3,7 +3,7 @@
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/preact/index.js";
+import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/preact/index.js";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -140,8 +140,8 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
         focusTrapParameters: {
             trapActive: active,
             onlyMoveFocus: false,
-            focusOpener: e => e?.focus(),
-            focusPopup: (e, f) => f()?.focus(),
+            focusOpener: e =>focus( e),
+            focusPopup: (e, f) => focus(f() as HTMLElement),
         },
         activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
         refElementReturn
@@ -396,7 +396,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
         pressParameters: {
-            focusSelf: e => { e.focus() },
+            focusSelf: e => { focus( e); },
             longPressThreshold: 1000,
             onPressSync: () => {
                 /*setTimeout(() => {

@@ -22,7 +22,7 @@ import {
     usePress,
     useRefElement,
     useStableCallback,
-    useState
+    useState,
 } from "../../dist/preact/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -44,8 +44,8 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     const [singleSelectionMode, setSingleSelectionMode] = useState("focus" as "focus" | "activation" | "disabled");
     const [multiSelectionMode, setMultiSelectionMode] = useState("activation" as "focus" | "activation" | "disabled");
     const [count, setCount] = useState(10);
-    let [min, setMin] = useState<number | null>(null);
-    let [max, setMax] = useState<number | null>(null);
+    let [min, setMin] = useState<number | null>(2);
+    let [max, setMax] = useState<number | null>(8);
     const [staggered, setStaggered] = useState<boolean>(false);
 
     if (!isFinite(min ?? NaN))
@@ -110,7 +110,7 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
 
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle()}>Shuffle</button>
-            <button onClick={() => { debugger; reverse() }}>Reverse</button>
+            <button onClick={() => { debugger; reverse() }}>Reversed</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {singleSelectedIndex})</label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
@@ -154,6 +154,9 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
     } = useCompleteListNavigationChildren({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
+            getSortValueAt: useCallback((index) => {
+                return RandomWords[index];
+            }, []),
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
             onRearranged: null,
             compare: null,
@@ -191,7 +194,7 @@ const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTab
     }) } });
     const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
         context: useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>,
-        info: { index, getSortValue: null }
+        info: { index }
     })
     const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
     return (
@@ -213,7 +216,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
 
     const [randomWord] = useState(() => RandomWords[index]);
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
-    const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
+    const focusSelf = useCallback((e: HTMLElement) => { focus( e) }, []);
 
     const getSortValue = useStableCallback(() => index);
 

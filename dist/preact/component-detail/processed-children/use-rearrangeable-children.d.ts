@@ -20,22 +20,31 @@ export declare function useCreateProcessedChildrenContext(): OmitStrong<UseRearr
     context: UseRearrangedChildrenContext;
 };
 export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
-    getSortValue: Nullable<() => number>;
 }
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
-export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
-export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
+export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
+export interface UseRearrangeableChildrenParametersSelf {
     /**
-     * Controls how values compare against each other when `sort` is called.
+     * Controls how values from `getSortValueAt` compare against each other when `sort` is called. By default, simply does `lhs - rhs`.
      *
-     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
+     * If null, the default order of children is used as given.
      *
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    compare: Nullable<Compare<M>>;
+    compare: Nullable<Compare<unknown>>;
+    /**
+     * For a given index, return a value that represents how that child should be sorted relative to other children with the `compare` function.
+     *
+     * Anything can be returned, as long as the `compare` function you pass can also handle it. E.G. return a string, then have `compare` call `localeCompare` or something.
+     *
+     * This is called **during** render, so it cannot be wrapped with `useStableCallback`.
+     *
+     * @stable
+     */
+    getSortValueAt(index: number): unknown;
     /**
      * Because this hook needs to re-render each child with a new `key` prop,
      * it may be useful to apply a transformation before that step completes.
@@ -50,6 +59,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      *
      * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * But if you rename `index` to something else in your component, you'll need to account for that with `getIndex`.
      *
      * @stable
      */
@@ -57,7 +67,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
     /**
      * Called after the children have been rearranged.
      */
-    onRearranged: Nullable<(() => void)>;
+    onRearranged: Nullable<((phase: 'render' | 'async') => void)>;
     /**
      * The children to sort.
      */
@@ -67,7 +77,7 @@ export interface UseRearrangeableChildrenParametersSelf<M extends UseRearrangeab
  * All of these functions **MUST** be stable across renders.
  */
 export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
-    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf<M>;
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
     context: UseRearrangedChildrenContext;
 }
 export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
@@ -82,7 +92,7 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      *
      * @stable
      */
-    rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
+    rearrange: (phase: 'render' | 'async', originalRows: M["index"][], rowsInOrder: M["index"][]) => void;
     /**
      * Arranges the children in a random order.
      *
@@ -115,11 +125,12 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      *
      * Call to rearrange the children in ascending or descending order according to `compare`.
      *
+     * Note: `descending` simply inverts the value returned by `compare`.
+     *
      */
-    sort: (direction: "ascending" | "descending") => Promise<void> | void;
+    sort: (direction: "ascending" | "descending") => void;
 }
-export interface UseRearrangeableChildParameters<M extends UseRearrangeableChildInfo> {
-    info: Pick<M, "getSortValue">;
+export interface UseRearrangeableChildParameters<_M extends UseRearrangeableChildInfo> {
 }
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -144,8 +155,6 @@ export interface UseRearrangeableChildParameters<M extends UseRearrangeableChild
  *
  * @compositeParams
  */
-export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged, compare: userCompare, children, adjust }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
-export declare const useRearrangeableChild: <M extends UseRearrangeableChildInfo>({ info, }: UseRearrangeableChildParameters<M>) => {
-    info: Pick<M, "getSortValue">;
-};
+export declare const useRearrangeableChildren: <M extends UseRearrangeableChildInfo>({ rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }: UseRearrangeableChildrenParameters<M>) => UseRearrangeableChildrenReturnType<M>;
+export declare const useRearrangeableChild: <M extends UseRearrangeableChildInfo>({}: UseRearrangeableChildParameters<M>) => {};
 //# sourceMappingURL=use-rearrangeable-children.d.ts.map

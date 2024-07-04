@@ -14,11 +14,12 @@ import { UseTextContentParameters, UseTextContentReturnType, useTextContent } fr
 import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedOmit, useCallback } from "../util/lib.js";
-import { ElementProps, OmitStrong } from "../util/types.js";
+import { ElementProps, Nullable, OmitStrong } from "../util/types.js";
 import { monitored } from "../util/use-call-count.js";
 
 
@@ -45,7 +46,33 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">,
     Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
+    gridNavigationCompleteParameters: UseCompleteGridNavigationParametersSelf;
+}
 
+// TODO: I don't love the column stuff here, since it's not *strictly* necessary to function,
+// and certain grids might not even care about the concept of a "sortable column".
+// But...otherwise the wheel just gets re-invented for each grid user, and, like,
+// there's no cost to it or anything...idk. I'm like 60% on this, but it's helped
+// by the fact that we need to pass this as **context** (not child info) from grid to gridrows, 
+// which is yet another unusual edge case conveniently handled here.
+export interface UseCompleteGridNavigationParametersSelf {
+    /**
+     * If this grid is sorted by column, then this should return the index of the column that is currently being sorted by.
+     * 
+     * The value returned will be passed to `getSortValueAt`. 
+     * If the grid you're using this for doesn't have a concept of a "sortable column", this can be entirely ignored.
+     */
+    getSortColumn: Nullable<() => number>;
+    
+    /**
+     * Should return a value that works with `rearrangeableChildrenParameters.compare` (or, by default, that works with the minus operator).
+     * 
+     * The `column` parameter will be whatever `getSortColumn` returns, or `undefined` if none was provided.
+     * 
+     * @param row: The index of the row to check
+     * @param column: The index of the column to check (as returned by `getSortColumn`) 
+     */
+    getSortValueAt(row: number, column: number | undefined): unknown;
 }
 
 
@@ -54,8 +81,9 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 
 export interface UseCompleteGridNavigationRowsParameters<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends
-    OmitStrong<UseProcessedChildrenParameters<RowElement, RsM>, "context"> {
-    context: CompleteGridNavigationRowContext<RowElement, RM>
+    OmitStrong<UseProcessedChildrenParameters<RowElement, RsM>, "context" | "rearrangeableChildrenParameters">,
+    TargetedOmit<UseProcessedChildrenParameters<RowElement, RsM>, "rearrangeableChildrenParameters", "getSortValueAt"> {
+    context: CompleteGridNavigationRowContext<RowElement, RM>;
 }
 
 /* The context that's returned by (e.g.) the <tbody> to be consumed by the <tr>'s outer child processor */
@@ -97,7 +125,10 @@ export interface CompleteGridNavigationRowContext<RowElement extends Element, RM
     RovingTabIndexChildContext,
     UseGridNavigationRowContext,
     UseProcessedChildrenContext {
+    completeGridNavigationContext: CompleteGridNavigationRowContextSelf;
 }
+
+export interface CompleteGridNavigationRowContextSelf extends UseCompleteGridNavigationParametersSelf {}
 
 
 export interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends
@@ -154,8 +185,11 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
     typeaheadNavigationParameters,
     paginatedChildrenParameters,
     refElementParameters,
+    gridNavigationCompleteParameters: { getSortColumn, getSortValueAt },
     ...void1
 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM> {
+    useEnsureStability("useCompleteGridNavigation", getSortColumn, getSortValueAt);
+
     assertEmptyObject(void1);
     const getChildren: () => ManagedChildren<RM> = useCallback<() => ManagedChildren<RM>>(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
@@ -222,7 +256,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
         processedChildrenContext,
-        rearrangeableChildrenContext
+        rearrangeableChildrenContext,
+        completeGridNavigationContext: useMemoObject({ getSortColumn, getSortValueAt })
     });
 
     assertEmptyObject(void1);
@@ -258,8 +293,9 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
     staggeredChildrenParameters,
-    managedChildrenParameters
+    managedChildrenParameters,
 }: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M, RsM>): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM> {
+    const { completeGridNavigationContext: { getSortColumn, getSortValueAt } } = context;
     const {
         context: contextRPS,
         paginatedChildrenReturn,
@@ -267,7 +303,14 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         staggeredChildrenReturn,
     } = useProcessedChildren<TabbableChildElement, RsM>({
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
+        rearrangeableChildrenParameters: {
+            ...rearrangeableChildrenParameters,
+            getSortValueAt: useCallback((index) => {
+                const row = index;
+                const column = getSortColumn == undefined? undefined : getSortColumn();
+                return getSortValueAt(row, column)
+            }, [getSortValueAt, getSortColumn])
+        },
         staggeredChildrenParameters,
         managedChildrenParameters,
         context,
@@ -590,7 +633,7 @@ export function useCompleteGridNavigationRowDeclarative<RowElement extends Eleme
     });
 
     const {
-        multiSelectionChildReturn: { changeMultiSelected}
+        multiSelectionChildReturn: { changeMultiSelected }
     } = r1;
 
 

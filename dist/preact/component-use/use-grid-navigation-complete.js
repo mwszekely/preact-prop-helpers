@@ -8,6 +8,7 @@ import { useTextContent } from "../dom-helpers/use-text-content.js";
 import { useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
@@ -21,7 +22,8 @@ import { monitored } from "../util/use-call-count.js";
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, ...void1 }) {
+export const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt }, ...void1 }) {
+    useEnsureStability("useCompleteGridNavigation", getSortColumn, getSortValueAt);
     assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -70,7 +72,8 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
         childrenHaveFocusChildContext,
         gridNavigationRowContext,
         processedChildrenContext,
-        rearrangeableChildrenContext
+        rearrangeableChildrenContext,
+        completeGridNavigationContext: useMemoObject({ getSortColumn, getSortValueAt })
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -94,10 +97,18 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, }) {
+    const { completeGridNavigationContext: { getSortColumn, getSortValueAt } } = context;
     const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
+        rearrangeableChildrenParameters: {
+            ...rearrangeableChildrenParameters,
+            getSortValueAt: useCallback((index) => {
+                const row = index;
+                const column = getSortColumn == undefined ? undefined : getSortColumn();
+                return getSortValueAt(row, column);
+            }, [getSortValueAt, getSortColumn])
+        },
         staggeredChildrenParameters,
         managedChildrenParameters,
         context,
