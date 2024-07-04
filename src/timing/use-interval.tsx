@@ -24,7 +24,7 @@ export interface UseIntervalParameters {
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-export const useInterval = monitored(function useInterval({ interval, callback }: UseIntervalParameters) {
+export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }: UseIntervalParameters) {
 
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);

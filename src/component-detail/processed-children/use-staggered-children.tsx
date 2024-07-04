@@ -102,7 +102,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * 
  * @hasChild {@link useStaggeredChild}
  */
-export const useStaggeredChildren = monitored(function useStaggeredChildren({
+export const useStaggeredChildren = /*@__PURE__*/ monitored(function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered, childCount },
     //refElementReturn: { getElement }
@@ -273,7 +273,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({
+export const useStaggeredChild = /*@__PURE__*/ monitored(function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({
     info: { index },
     //refElementReturn: { getElement },
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }

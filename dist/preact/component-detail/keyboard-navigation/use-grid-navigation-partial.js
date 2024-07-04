@@ -27,7 +27,7 @@ import { useListNavigation, useListNavigationChild } from "./use-list-navigation
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export const useGridNavigation = monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
+export const useGridNavigation = /*@__PURE__*/ monitored(function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
         let t = (initiallyTabbableColumn ?? 0);
         return { actual: t, ideal: t };
@@ -65,7 +65,7 @@ export const useGridNavigation = monitored(function useGridNavigation({ gridNavi
  *
  * @compositeParams
  */
-export const useGridNavigationRow = monitored(function useGridNavigationRow({ 
+export const useGridNavigationRow = /*@__PURE__*/ monitored(function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
 info: { index, untabbable, ...void3 }, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
@@ -182,7 +182,7 @@ refElementReturn, ...void1 }) {
  *
  * @compositeParams
  */
-export const useGridNavigationCell = monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
+export const useGridNavigationCell = /*@__PURE__*/ monitored(function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     colSpan ??= 1;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentParameters, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
         info: { index, untabbable },

@@ -9,7 +9,7 @@ import { monitored } from "../util/use-call-count.js";
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
-export const useDocumentClass = monitored(function useDocumentClass(className, active, element) {
+export const useDocumentClass = /*@__PURE__*/ monitored(function useDocumentClass(className, active, element) {
     element ??= getDocument()?.documentElement;
     className = clsx(className);
     useEffect(() => {

@@ -21,7 +21,7 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
  * 
  * @compositeParams
  */
-export const useRandomDualIds = monitored(function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
+export const useRandomDualIds = /*@__PURE__*/ monitored(function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
     randomIdInputParameters,
     randomIdLabelParameters,
 }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {

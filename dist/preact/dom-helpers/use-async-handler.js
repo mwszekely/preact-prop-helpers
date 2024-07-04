@@ -67,7 +67,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export const useAsyncHandler = monitored(function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
+export const useAsyncHandler = /*@__PURE__*/ monitored(function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);

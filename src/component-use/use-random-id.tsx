@@ -36,7 +36,7 @@ export interface UseRandomIdParameters {
  * 
  * @compositeParams
  */
-export const useRandomId = monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+export const useRandomId = /*@__PURE__*/ monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 

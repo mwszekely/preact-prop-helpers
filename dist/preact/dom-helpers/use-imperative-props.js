@@ -26,7 +26,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  *
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
+export const useImperativeProps = /*@__PURE__*/ monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {

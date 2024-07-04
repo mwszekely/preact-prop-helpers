@@ -14,7 +14,7 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export const useAsyncEffect = monitored(function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
+export const useAsyncEffect = /*@__PURE__*/ monitored(function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
     const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
     useEffect(syncHandler, inputs);
     return rest;

@@ -40,7 +40,7 @@ const _comments = void (0);
  *
  * @compositeParams
  */
-export const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
+export const useManagedChildren = /*@__PURE__*/ monitored(function useManagedChildren(parentParameters) {
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
@@ -165,7 +165,7 @@ export const useManagedChildren = monitored(function useManagedChildren(parentPa
 /**
  * @compositeParams
  */
-export const useManagedChild = monitored(function useManagedChild({ context, info }) {
+export const useManagedChild = /*@__PURE__*/ monitored(function useManagedChild({ context, info }) {
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
     const index = info.index;
     // Any time our child props change, make that information available

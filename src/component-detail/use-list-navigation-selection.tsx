@@ -43,7 +43,7 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * 
  * @compositeParams
  */
-export const useListNavigationSelection = monitored(function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useListNavigationSelection = /*@__PURE__*/ monitored(function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -95,7 +95,7 @@ export const useListNavigationSelection = monitored(function useListNavigationSe
 /**
  * @compositeParams
  */
-export const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild<ChildElement extends Element>({
+export const useListNavigationSelectionChild = /*@__PURE__*/ monitored(function useListNavigationSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, ...void2 },
     context,
     refElementReturn,

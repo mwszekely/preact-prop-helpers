@@ -23,7 +23,7 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export const useEscapeDismiss = monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+export const useEscapeDismiss = /*@__PURE__*/ monitored(function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const stableOnClose = useStableGetter(onClose);

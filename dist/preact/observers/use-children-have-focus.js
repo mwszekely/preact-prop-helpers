@@ -13,7 +13,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
+export const useChildrenHaveFocus = /*@__PURE__*/ monitored(function useChildrenHaveFocus(args) {
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
@@ -28,7 +28,7 @@ export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args
 /**
  * @compositeParams
  */
-export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
+export const useChildrenHaveFocusChild = /*@__PURE__*/ monitored(function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

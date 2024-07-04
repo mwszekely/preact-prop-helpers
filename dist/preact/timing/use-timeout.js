@@ -10,7 +10,7 @@ import { monitored } from "../util/use-call-count.js";
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-export const useTimeout = monitored(function useTimeout({ timeout, callback, triggerIndex }) {
+export const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout, callback, triggerIndex }) {
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
     // Set any time we start timeout.

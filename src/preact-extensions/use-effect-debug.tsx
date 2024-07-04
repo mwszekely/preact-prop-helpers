@@ -11,7 +11,7 @@ import { monitored } from "../util/use-call-count.js";
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export const useEffectDebug = monitored(function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
+export const useEffectDebug = /*@__PURE__*/ monitored(function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
     const prevInputs = useRef<undefined | I>(undefined);
     const effect2 = () => {
         const changes: { from: any, to: any }[] = [];

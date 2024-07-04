@@ -28,7 +28,7 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * 
  * @compositeParams
  */
-export const useMutationObserver = monitored(function useMutationObserver<E extends Element>({
+export const useMutationObserver = /*@__PURE__*/ monitored(function useMutationObserver<E extends Element>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
 }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {

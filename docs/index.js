@@ -1233,7 +1233,7 @@ function monitored(hook) {
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
+const useGlobalHandler = /*@__PURE__*/monitored(function useGlobalHandler(target, type, handler, options, mode) {
   mode ||= "grouped";
   if (!target) return;
   if (mode === "grouped") {
@@ -1315,7 +1315,7 @@ function getDocument$2(element) {
  *
  * @compositeParams
  */
-const useBackdropDismiss = monitored(function useBackdropDismiss({
+const useBackdropDismiss = /*@__PURE__*/monitored(function useBackdropDismiss({
   backdropDismissParameters: {
     dismissBackdropActive: open,
     onDismissBackdrop: onCloseUnstable,
@@ -1383,7 +1383,7 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-const useEscapeDismiss = monitored(function useEscapeDismiss({
+const useEscapeDismiss = /*@__PURE__*/monitored(function useEscapeDismiss({
   escapeDismissParameters: {
     onDismissEscape: onClose,
     dismissEscapeActive: open,
@@ -1495,7 +1495,7 @@ const useEscapeDismiss = monitored(function useEscapeDismiss({
  *
  * @compositeParams
  */
-const useLostFocusDismiss = monitored(function useLostFocusDismiss({
+const useLostFocusDismiss = /*@__PURE__*/monitored(function useLostFocusDismiss({
   refElementPopupReturn: {
     getElement: getPopupElement,
     ...void3
@@ -3289,7 +3289,7 @@ function findBackupFocus(unmountingElement) {
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-const useTimeout = monitored(function useTimeout({
+const useTimeout = /*@__PURE__*/monitored(function useTimeout({
   timeout,
   callback,
   triggerIndex
@@ -3649,7 +3649,7 @@ function tryNavigateDown({
  *
  * @compositeParams
  */
-const useManagedChildren = monitored(function useManagedChildren(parentParameters) {
+const useManagedChildren = /*@__PURE__*/monitored(function useManagedChildren(parentParameters) {
   const {
     managedChildrenParameters: {
       onAfterChildLayoutEffect,
@@ -3784,7 +3784,7 @@ const useManagedChildren = monitored(function useManagedChildren(parentParameter
 /**
  * @compositeParams
  */
-const useManagedChild = monitored(function useManagedChild({
+const useManagedChild = /*@__PURE__*/monitored(function useManagedChild({
   context,
   info
 }) {
@@ -4016,7 +4016,7 @@ const useState = function useState(initialState) {
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-const useRovingTabIndex = monitored(function useRovingTabIndex({
+const useRovingTabIndex = /*@__PURE__*/monitored(function useRovingTabIndex({
   managedChildrenReturn: {
     getChildren
   },
@@ -4227,7 +4227,7 @@ const useRovingTabIndex = monitored(function useRovingTabIndex({
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({
+const useRovingTabIndexChild = /*@__PURE__*/monitored(function useRovingTabIndexChild({
   info: {
     index,
     untabbable: iAmUntabbable,
@@ -4294,7 +4294,7 @@ const useRovingTabIndexChild = monitored(function useRovingTabIndexChild({
  *
  * @compositeParams
  */
-const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({
+const useTypeaheadNavigation = /*@__PURE__*/monitored(function useTypeaheadNavigation({
   typeaheadNavigationParameters: {
     collator,
     typeaheadTimeout,
@@ -4489,7 +4489,7 @@ const useTypeaheadNavigation = monitored(function useTypeaheadNavigation({
  *
  * @compositeParams
  */
-const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild({
+const useTypeaheadNavigationChild = /*@__PURE__*/monitored(function useTypeaheadNavigationChild({
   info: {
     index,
     ...void1
@@ -4598,7 +4598,7 @@ function binarySearch(array, wanted, comparator) {
  *
  * @hasChild {@link useListNavigationChild}
  */
-const useListNavigation = monitored(function useListNavigation({
+const useListNavigation = /*@__PURE__*/monitored(function useListNavigation({
   linearNavigationParameters,
   typeaheadNavigationParameters,
   rovingTabIndexParameters,
@@ -4657,7 +4657,7 @@ const useListNavigation = monitored(function useListNavigation({
 /**
  * @compositeParams
  */
-const useListNavigationChild = monitored(function useListNavigationChild({
+const useListNavigationChild = /*@__PURE__*/monitored(function useListNavigationChild({
   info: {
     index,
     untabbable,
@@ -4712,7 +4712,7 @@ const useListNavigationChild = monitored(function useListNavigationChild({
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-const useGridNavigation = monitored(function useGridNavigation({
+const useGridNavigation = /*@__PURE__*/monitored(function useGridNavigation({
   gridNavigationParameters: {
     onTabbableColumnChange,
     initiallyTabbableColumn,
@@ -4773,7 +4773,7 @@ const useGridNavigation = monitored(function useGridNavigation({
  *
  * @compositeParams
  */
-const useGridNavigationRow = monitored(function useGridNavigationRow({
+const useGridNavigationRow = /*@__PURE__*/monitored(function useGridNavigationRow({
   // Stuff for the row as a child of the parent grid
   info: {
     index,
@@ -4953,7 +4953,7 @@ const useGridNavigationRow = monitored(function useGridNavigationRow({
  *
  * @compositeParams
  */
-const useGridNavigationCell = monitored(function useGridNavigationCell({
+const useGridNavigationCell = /*@__PURE__*/monitored(function useGridNavigationCell({
   context: {
     gridNavigationCellContext: {
       getRowIndex,
@@ -5045,7 +5045,7 @@ const useGridNavigationCell = monitored(function useGridNavigationCell({
  *
  * @hasChild {@link usePaginatedChild}
  */
-const usePaginatedChildren = monitored(function usePaginatedChildren({
+const usePaginatedChildren = /*@__PURE__*/monitored(function usePaginatedChildren({
   managedChildrenReturn: {
     getChildren
   },
@@ -5144,7 +5144,7 @@ const usePaginatedChildren = monitored(function usePaginatedChildren({
  *
  * @compositeParams
  */
-const usePaginatedChild = monitored(function usePaginatedChild({
+const usePaginatedChild = /*@__PURE__*/monitored(function usePaginatedChild({
   info: {
     index
   },
@@ -5179,7 +5179,7 @@ const usePaginatedChild = monitored(function usePaginatedChild({
  *
  * @remarks It's a bit smelly, so best to use sparingly.
  */
-const useForceUpdate = monitored(function useForceUpdate() {
+const useForceUpdate = /*@__PURE__*/monitored(function useForceUpdate() {
   const [, set] = p(0);
   return F(() => set(i => ++i)).current;
 });
@@ -5266,7 +5266,7 @@ function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-const useRearrangeableChildren = monitored(function useRearrangeableChildren({
+const useRearrangeableChildren = /*@__PURE__*/monitored(function useRearrangeableChildren({
   rearrangeableChildrenParameters: {
     getIndex,
     getSortValueAt,
@@ -5426,7 +5426,7 @@ function defaultCompare(lhs, rhs) {
  *
  * @hasChild {@link useStaggeredChild}
  */
-const useStaggeredChildren = monitored(function useStaggeredChildren({
+const useStaggeredChildren = /*@__PURE__*/monitored(function useStaggeredChildren({
   managedChildrenReturn: {
     getChildren
   },
@@ -5574,7 +5574,7 @@ const useStaggeredChildren = monitored(function useStaggeredChildren({
  *
  * @compositeParams
  */
-const useStaggeredChild = monitored(function useStaggeredChild({
+const useStaggeredChild = /*@__PURE__*/monitored(function useStaggeredChild({
   info: {
     index
   },
@@ -5693,7 +5693,7 @@ const useStaggeredChild = monitored(function useStaggeredChild({
  *
  * @hasChild {@link useProcessedChild}
  */
-const useProcessedChildren = monitored(function useProcessedChildren({
+const useProcessedChildren = /*@__PURE__*/monitored(function useProcessedChildren({
   rearrangeableChildrenParameters: {
     onRearranged,
     children: childrenUnsorted,
@@ -5791,7 +5791,7 @@ const useProcessedChildren = monitored(function useProcessedChildren({
     })
   };
 });
-const useProcessedChild = monitored(function useProcessedChild({
+const useProcessedChild = /*@__PURE__*/monitored(function useProcessedChild({
   context,
   info: {
     index,
@@ -6206,7 +6206,7 @@ function useMultiSelectionChildDeclarative({
  *
  * @compositeParams
  */
-const useSingleSelection = monitored(function useSingleSelection({
+const useSingleSelection = /*@__PURE__*/monitored(function useSingleSelection({
   managedChildrenReturn: {
     getChildren,
     ...void1
@@ -6282,7 +6282,7 @@ const useSingleSelection = monitored(function useSingleSelection({
  *
  * @compositeParams
  */
-const useSingleSelectionChild = monitored(function useSingleSelectionChild({
+const useSingleSelectionChild = /*@__PURE__*/monitored(function useSingleSelectionChild({
   singleSelectionChildParameters: {
     singleSelectionDisabled,
     ...void5
@@ -6689,7 +6689,7 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-const useActiveElement = monitored(function useActiveElement({
+const useActiveElement = /*@__PURE__*/monitored(function useActiveElement({
   activeElementParameters: {
     onActiveElementChange,
     onLastActiveElementChange,
@@ -6758,7 +6758,7 @@ const useActiveElement = monitored(function useActiveElement({
  *
  * @compositeParams
  */
-const useDismiss = monitored(function useDismiss({
+const useDismiss = /*@__PURE__*/monitored(function useDismiss({
   dismissParameters: {
     dismissActive,
     onDismiss,
@@ -6882,7 +6882,7 @@ function blockingElements() {
  *
  * @param target
  */
-const useBlockingElement = monitored(function useBlockingElement({
+const useBlockingElement = /*@__PURE__*/monitored(function useBlockingElement({
   activeElementParameters: {
     getDocument,
     onActiveElementChange,
@@ -6952,7 +6952,7 @@ const useBlockingElement = monitored(function useBlockingElement({
  *
  * @compositeParams
  */
-const useFocusTrap = monitored(function useFocusTrap({
+const useFocusTrap = /*@__PURE__*/monitored(function useFocusTrap({
   focusTrapParameters: {
     onlyMoveFocus,
     trapActive,
@@ -7035,7 +7035,7 @@ function findFirstCondition(element, filter) {
  *
  * @compositeParams
  */
-const useGridNavigationSelection = monitored(function useGridNavigationSelection({
+const useGridNavigationSelection = /*@__PURE__*/monitored(function useGridNavigationSelection({
   gridNavigationParameters,
   linearNavigationParameters,
   rovingTabIndexParameters,
@@ -7111,7 +7111,7 @@ const useGridNavigationSelection = monitored(function useGridNavigationSelection
 /**
  * @compositeParams
  */
-const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow({
+const useGridNavigationSelectionRow = /*@__PURE__*/monitored(function useGridNavigationSelectionRow({
   info: mcp1,
   linearNavigationParameters,
   managedChildrenReturn,
@@ -7218,7 +7218,7 @@ const useGridNavigationSelectionRow = monitored(function useGridNavigationSelect
 /**
  * @compositeParams
  */
-const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell(p) {
+const useGridNavigationSelectionCell = /*@__PURE__*/monitored(function useGridNavigationSelectionCell(p) {
   return useGridNavigationCell(p);
 });
 
@@ -7231,7 +7231,7 @@ const useGridNavigationSelectionCell = monitored(function useGridNavigationSelec
  *
  * @compositeParams
  */
-const useListNavigationSelection = monitored(function useListNavigationSelection({
+const useListNavigationSelection = /*@__PURE__*/monitored(function useListNavigationSelection({
   linearNavigationParameters,
   rovingTabIndexParameters,
   typeaheadNavigationParameters,
@@ -7290,7 +7290,7 @@ const useListNavigationSelection = monitored(function useListNavigationSelection
 /**
  * @compositeParams
  */
-const useListNavigationSelectionChild = monitored(function useListNavigationSelectionChild({
+const useListNavigationSelectionChild = /*@__PURE__*/monitored(function useListNavigationSelectionChild({
   info: {
     index,
     untabbable,
@@ -7408,7 +7408,7 @@ const useTextContent = function useTextContent({
  *
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
+const useChildrenHaveFocus = /*@__PURE__*/monitored(function useChildrenHaveFocus(args) {
   const {
     childrenHaveFocusParameters: {
       onCompositeFocusChange
@@ -7433,7 +7433,7 @@ const useChildrenHaveFocus = monitored(function useChildrenHaveFocus(args) {
 /**
  * @compositeParams
  */
-const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({
+const useChildrenHaveFocusChild = /*@__PURE__*/monitored(function useChildrenHaveFocusChild({
   context: {
     childrenHaveFocusChildContext: {
       setFocusCount
@@ -7460,7 +7460,7 @@ const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild({
  *
  * @compositeParams
  */
-const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
+const useHasCurrentFocus = /*@__PURE__*/monitored(function useHasCurrentFocus(args) {
   const {
     hasCurrentFocusParameters: {
       onCurrentFocusedChanged,
@@ -7510,7 +7510,7 @@ const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
+const useCompleteGridNavigation = /*@__PURE__*/monitored(function useCompleteGridNavigation({
   gridNavigationParameters,
   linearNavigationParameters,
   rovingTabIndexParameters,
@@ -7674,7 +7674,7 @@ const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({
+const useCompleteGridNavigationRows = /*@__PURE__*/monitored(function useCompleteGridNavigationRows({
   context,
   paginatedChildrenParameters,
   rearrangeableChildrenParameters,
@@ -7716,7 +7716,7 @@ const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigati
 /**
  * @compositeParams
  */
-const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({
+const useCompleteGridNavigationRow = /*@__PURE__*/monitored(function useCompleteGridNavigationRow({
   info: {
     index,
     untabbable,
@@ -7878,7 +7878,7 @@ const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigatio
 /**
  * @compositeParams
  */
-const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({
+const useCompleteGridNavigationCell = /*@__PURE__*/monitored(function useCompleteGridNavigationCell({
   gridNavigationCellParameters,
   context,
   textContentParameters: {
@@ -8005,7 +8005,7 @@ function useCompleteGridNavigationDeclarative({
  *
  * @compositeParams
  */
-const useCompleteListNavigation = monitored(function useCompleteListNavigation({
+const useCompleteListNavigation = /*@__PURE__*/monitored(function useCompleteListNavigation({
   linearNavigationParameters,
   typeaheadNavigationParameters,
   rovingTabIndexParameters,
@@ -8158,7 +8158,7 @@ const useCompleteListNavigation = monitored(function useCompleteListNavigation({
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren({
+const useCompleteListNavigationChildren = /*@__PURE__*/monitored(function useCompleteListNavigationChildren({
   context,
   paginatedChildrenParameters,
   rearrangeableChildrenParameters,
@@ -8189,7 +8189,7 @@ const useCompleteListNavigationChildren = monitored(function useCompleteListNavi
  *
  * @compositeParams
  */
-const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild({
+const useCompleteListNavigationChild = /*@__PURE__*/monitored(function useCompleteListNavigationChild({
   info: {
     index,
     focusSelf,
@@ -8427,7 +8427,7 @@ function useCompleteListNavigationChildDeclarative({
  *
  * @compositeParams
  */
-const useModal = monitored(function useModal({
+const useModal = /*@__PURE__*/monitored(function useModal({
   dismissParameters: {
     dismissActive,
     onDismiss,
@@ -8713,7 +8713,7 @@ const AsyncFunction = async function () {}.constructor;
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-const useAsync = monitored(function useAsync(asyncHandler, options) {
+const useAsync = /*@__PURE__*/monitored(function useAsync(asyncHandler, options) {
   // Things related to current execution
   // Because we can both return and throw undefined, 
   // we need separate state to track their existence too.
@@ -8863,7 +8863,7 @@ const useAsync = monitored(function useAsync(asyncHandler, options) {
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-const useAsyncHandler = monitored(function useAsyncHandler({
+const useAsyncHandler = /*@__PURE__*/monitored(function useAsyncHandler({
   asyncHandler,
   capture: originalCapture,
   ...restAsyncOptions
@@ -8970,7 +8970,7 @@ getDocument$2()?.addEventListener?.("click", e => {
  * @compositeParams
  *
  */
-const usePress = monitored(function usePress(args) {
+const usePress = /*@__PURE__*/monitored(function usePress(args) {
   const {
     refElementReturn: {
       getElement
@@ -9288,7 +9288,7 @@ let pulse = "vibrate" in navigator && navigator.vibrate instanceof Function ? ()
  *
  * @compositeParams
  */
-const useRandomId = monitored(function useRandomId({
+const useRandomId = /*@__PURE__*/monitored(function useRandomId({
   randomIdParameters: {
     prefix,
     otherReferencerProp
@@ -9315,7 +9315,7 @@ const useRandomId = monitored(function useRandomId({
  *
  * @compositeParams
  */
-const useRandomDualIds = monitored(function useRandomDualIds({
+const useRandomDualIds = /*@__PURE__*/monitored(function useRandomDualIds({
   randomIdInputParameters,
   randomIdLabelParameters
 }) {
@@ -9348,7 +9348,7 @@ const useRandomDualIds = monitored(function useRandomDualIds({
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-const useDraggable = monitored(function useDraggable({
+const useDraggable = /*@__PURE__*/monitored(function useDraggable({
   effectAllowed,
   data,
   dragImage,
@@ -9411,7 +9411,7 @@ class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-const useDroppable = monitored(function useDroppable({
+const useDroppable = /*@__PURE__*/monitored(function useDroppable({
   effect
 }) {
   const [filesForConsideration, setFilesForConsideration] = useState(null);
@@ -9598,7 +9598,7 @@ x(k(ImperativeElementU));
  *
  * @compositeParams
  */
-const useImperativeProps = monitored(function useImperativeProps({
+const useImperativeProps = /*@__PURE__*/monitored(function useImperativeProps({
   refElementReturn: {
     getElement
   }
@@ -9770,7 +9770,7 @@ function generateRandomId(prefix) {
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-const usePortalChildren = monitored(function usePortalChildren({
+const usePortalChildren = /*@__PURE__*/monitored(function usePortalChildren({
   target
 }) {
   const [pushChild, setPushChild] = useState(null);
@@ -9865,7 +9865,7 @@ function PortalChildren({
  *
  * @compositeParams
  */
-const useHasLastFocus = monitored(function useHasLastFocus(args) {
+const useHasLastFocus = /*@__PURE__*/monitored(function useHasLastFocus(args) {
   const {
     refElementReturn: {
       getElement
@@ -9919,7 +9919,7 @@ G(null);
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-const useInterval = monitored(function useInterval({
+const useInterval = /*@__PURE__*/monitored(function useInterval({
   interval,
   callback
 }) {

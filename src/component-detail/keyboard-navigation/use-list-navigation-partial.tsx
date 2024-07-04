@@ -93,7 +93,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  * 
  * @hasChild {@link useListNavigationChild}
  */
-export const useListNavigation = monitored(function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useListNavigation = /*@__PURE__*/ monitored(function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     typeaheadNavigationParameters,
     rovingTabIndexParameters,
@@ -133,7 +133,7 @@ export const useListNavigation = monitored(function useListNavigation<ParentOrCh
 /**
  * @compositeParams
  */
-export const useListNavigationChild = monitored(function useListNavigationChild<ChildElement extends Element>({
+export const useListNavigationChild = /*@__PURE__*/ monitored(function useListNavigationChild<ChildElement extends Element>({
     info: { index, untabbable, ...void1 },
     context,
     refElementReturn,

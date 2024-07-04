@@ -11,6 +11,6 @@ import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-export const useLayoutEffectDebug = monitored(function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
+export const useLayoutEffectDebug = /*@__PURE__*/ monitored(function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
     return useEffectDebug(effect, inputs, useLayoutEffectNative);
 })

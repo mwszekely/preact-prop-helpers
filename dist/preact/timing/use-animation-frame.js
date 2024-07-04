@@ -38,7 +38,7 @@ export function ProvideBatchedAnimationFrames({ children }) {
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
-export const useAnimationFrame = monitored(function useAnimationFrame({ callback }) {
+export const useAnimationFrame = /*@__PURE__*/ monitored(function useAnimationFrame({ callback }) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);

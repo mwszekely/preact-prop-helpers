@@ -18,7 +18,7 @@ import { monitored } from "../util/use-call-count.js";
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export const useUrl = monitored(function useUrl(onUrlChange) {
+export const useUrl = /*@__PURE__*/ monitored(function useUrl(onUrlChange) {
     const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
     useGlobalHandler(getWindow(), "hashchange", (e) => {
         setUrl(globalThis.location.toString(), e);

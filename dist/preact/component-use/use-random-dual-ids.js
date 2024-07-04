@@ -6,7 +6,7 @@ import { useRandomId } from "./use-random-id.js";
  *
  * @compositeParams
  */
-export const useRandomDualIds = monitored(function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
+export const useRandomDualIds = /*@__PURE__*/ monitored(function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
     const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId({ randomIdParameters: randomIdInputParameters });
     const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId({ randomIdParameters: randomIdLabelParameters });
     return {

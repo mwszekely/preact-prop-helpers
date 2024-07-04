@@ -38,7 +38,7 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * 
  * @compositeParams 
  */
-export const useLostFocusDismiss = monitored(function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
+export const useLostFocusDismiss = /*@__PURE__*/ monitored(function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
     refElementPopupReturn: { getElement: getPopupElement, ...void3 },
     refElementSourceReturn,
     lostFocusDismissParameters: {

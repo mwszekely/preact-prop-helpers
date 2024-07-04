@@ -22,7 +22,7 @@ import { monitored } from "../util/use-call-count.js";
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export const useCompleteGridNavigation = monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt }, ...void1 }) {
+export const useCompleteGridNavigation = /*@__PURE__*/ monitored(function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt }, ...void1 }) {
     useEnsureStability("useCompleteGridNavigation", getSortColumn, getSortValueAt);
     assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -97,7 +97,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, }) {
+export const useCompleteGridNavigationRows = /*@__PURE__*/ monitored(function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, }) {
     const { completeGridNavigationContext: { getSortColumn, getSortValueAt } } = context;
     const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
         paginatedChildrenParameters,
@@ -120,7 +120,7 @@ export const useCompleteGridNavigationRows = monitored(function useCompleteGridN
         staggeredChildrenReturn
     };
 });
-export const useCompleteGridNavigationRowOuter = monitored(function useCompleteGridNavigationRowOuter({ context, info, refElementParameters: { onElementChange: oec1, onMount, onUnmount } }) {
+export const useCompleteGridNavigationRowOuter = /*@__PURE__*/ monitored(function useCompleteGridNavigationRowOuter({ context, info, refElementParameters: { onElementChange: oec1, onMount, onUnmount } }) {
     const { propsStable, refElementReturn } = useRefElement({
         refElementParameters: {
             onElementChange: useStableCallback((...a) => { oec1?.(...a); oec2?.(...a); }),
@@ -143,7 +143,7 @@ export const useCompleteGridNavigationRowOuter = monitored(function useCompleteG
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, refElementParameters, ...void1 }) {
+export const useCompleteGridNavigationRow = /*@__PURE__*/ monitored(function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, refElementParameters, ...void1 }) {
     // TODO: customUserInfo may contain setSelectedFromParent from the declarative version of this hook.
     // This is a bit of an edge case and should probably be handled more concretely.
     // Create some helper functions
@@ -227,7 +227,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters: { getText, onTextContentChange: otcc1, ...void4 }, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
+export const useCompleteGridNavigationCell = /*@__PURE__*/ monitored(function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters: { getText, onTextContentChange: otcc1, ...void4 }, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentParameters: { onTextContentChange: otcc2 }, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionCell({
         gridNavigationCellParameters,

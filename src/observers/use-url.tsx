@@ -20,7 +20,7 @@ import { monitored } from "../util/use-call-count.js";
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export const useUrl = monitored(function useUrl(onUrlChange: (url: string) => void) {
+export const useUrl = /*@__PURE__*/ monitored(function useUrl(onUrlChange: (url: string) => void) {
 
     const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
 

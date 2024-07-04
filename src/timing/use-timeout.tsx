@@ -32,7 +32,7 @@ export interface UseTimeoutParameters {
  * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
-export const useTimeout = monitored(function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
+export const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
 
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);

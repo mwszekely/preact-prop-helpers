@@ -9,7 +9,7 @@ import { monitored } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useLostFocusDismiss = monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
+export const useLostFocusDismiss = /*@__PURE__*/ monitored(function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     assertEmptyObject(void1);
     assertEmptyObject(void2);

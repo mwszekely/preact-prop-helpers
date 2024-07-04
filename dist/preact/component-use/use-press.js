@@ -84,7 +84,7 @@ getDocument()?.addEventListener?.("click", (e) => {
  * @compositeParams
  *
  */
-export const usePress = monitored(function usePress(args) {
+export const usePress = /*@__PURE__*/ monitored(function usePress(args) {
     const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);

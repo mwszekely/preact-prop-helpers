@@ -13,7 +13,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-export const usePortalChildren = monitored(function usePortalChildren({ target }) {
+export const usePortalChildren = /*@__PURE__*/ monitored(function usePortalChildren({ target }) {
     const [pushChild, setPushChild] = useState(null);
     const [updateChild, setUpdateChild] = useState(null);
     const [removeChild, setRemoveChild] = useState(null);

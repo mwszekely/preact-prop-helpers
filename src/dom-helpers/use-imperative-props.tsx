@@ -81,7 +81,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as 
  * 
  * @compositeParams
  */
-export const useImperativeProps = monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
+export const useImperativeProps = /*@__PURE__*/ monitored(function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E> {
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 

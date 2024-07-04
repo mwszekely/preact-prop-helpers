@@ -69,7 +69,7 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  * 
  * @compositeParams
  */
-export const useGridNavigationSelection = monitored(function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
+export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -142,7 +142,7 @@ export const useGridNavigationSelection = monitored(function useGridNavigationSe
 /**
  * @compositeParams
  */
-export const useGridNavigationSelectionRow = monitored(function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
+export const useGridNavigationSelectionRow = /*@__PURE__*/ monitored(function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
     info: mcp1,
     linearNavigationParameters,
     managedChildrenReturn,
@@ -197,6 +197,6 @@ export const useGridNavigationSelectionRow = monitored(function useGridNavigatio
 /**
  * @compositeParams
  */
-export const useGridNavigationSelectionCell = monitored(function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement> {
+export const useGridNavigationSelectionCell = /*@__PURE__*/ monitored(function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement> {
     return useGridNavigationCell<CellElement>(p);
 })

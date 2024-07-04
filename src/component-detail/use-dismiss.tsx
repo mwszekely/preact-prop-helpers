@@ -92,7 +92,7 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * 
  * @compositeParams
  */
-export const useDismiss = monitored(function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
+export const useDismiss = /*@__PURE__*/ monitored(function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void3 },
     backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 },
     lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 },

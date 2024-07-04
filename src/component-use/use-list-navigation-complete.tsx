@@ -129,7 +129,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * 
  * @compositeParams
  */
-export const useCompleteListNavigation = monitored(function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
+export const useCompleteListNavigation = /*@__PURE__*/ monitored(function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     linearNavigationParameters,
     typeaheadNavigationParameters,
     rovingTabIndexParameters,
@@ -233,7 +233,7 @@ export const useCompleteListNavigation = monitored(function useCompleteListNavig
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  */
-export const useCompleteListNavigationChildren = monitored(function useCompleteListNavigationChildren<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
+export const useCompleteListNavigationChildren = /*@__PURE__*/ monitored(function useCompleteListNavigationChildren<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
     context,
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
@@ -277,7 +277,7 @@ export interface UseCompleteListNavigationChildOuterReturnType<RowElement extend
         hide: boolean;
 }
 
-export const useCompleteListNavigationChildOuter = monitored(function useCompleteListNavigationChildOuter<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>>({
+export const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(function useCompleteListNavigationChildOuter<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>>({
     context,
     info,
     refElementParameters: { onElementChange: oec1, onMount, onUnmount }
@@ -317,7 +317,7 @@ export const useCompleteListNavigationChildOuter = monitored(function useComplet
  * 
  * @compositeParams
  */
-export const useCompleteListNavigationChild = monitored(function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
+export const useCompleteListNavigationChild = /*@__PURE__*/ monitored(function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, untabbable, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters: { getText, onTextContentChange: otcc1, ...void10 },
     refElementParameters,

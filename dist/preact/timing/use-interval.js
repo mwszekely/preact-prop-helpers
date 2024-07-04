@@ -8,7 +8,7 @@ import { monitored } from "../util/use-call-count.js";
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-export const useInterval = monitored(function useInterval({ interval, callback }) {
+export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);

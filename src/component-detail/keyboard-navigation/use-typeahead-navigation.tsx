@@ -124,7 +124,7 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useTypeaheadNavigation = /*@__PURE__*/ monitored(function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
@@ -376,7 +376,7 @@ export const useTypeaheadNavigation = monitored(function useTypeaheadNavigation<
  * 
  * @compositeParams
  */
-export const useTypeaheadNavigationChild = monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
+export const useTypeaheadNavigationChild = /*@__PURE__*/ monitored(function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },
     //textContentReturn: { getTextContent, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },

@@ -9,7 +9,7 @@ import { useEffectDebug } from "./use-effect-debug.js";
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-export const useLayoutEffectDebug = monitored(function useLayoutEffectDebug(effect, inputs) {
+export const useLayoutEffectDebug = /*@__PURE__*/ monitored(function useLayoutEffectDebug(effect, inputs) {
     return useEffectDebug(effect, inputs, useLayoutEffectNative);
 });
 //# sourceMappingURL=use-layout-effect-debug.js.map

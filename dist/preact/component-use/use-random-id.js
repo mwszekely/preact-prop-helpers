@@ -6,7 +6,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useRandomId = monitored(function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
+export const useRandomId = /*@__PURE__*/ monitored(function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
     const referencerElementProps = useRef(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });

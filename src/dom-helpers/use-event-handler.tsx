@@ -54,7 +54,7 @@ type TypedEventHandlerEvent<E extends EventTarget, _T extends TypedEventListener
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export const useGlobalHandler = monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T | null | undefined, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
+export const useGlobalHandler = /*@__PURE__*/ monitored(function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T | null | undefined, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", target, mode);
 

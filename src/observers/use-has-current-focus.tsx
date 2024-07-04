@@ -54,7 +54,7 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export const useHasCurrentFocus = monitored(function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+export const useHasCurrentFocus = /*@__PURE__*/ monitored(function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
         refElementReturn: { getElement }

@@ -77,7 +77,7 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-export const useDroppable = monitored(function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
+export const useDroppable = /*@__PURE__*/ monitored(function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
 
     const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
     const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);

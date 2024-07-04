@@ -201,7 +201,7 @@ const AsyncFunction = ((async function () { }).constructor)
  * @param options - @see {@link UseAsyncParameters}
  * 
  */
-export const useAsync = monitored(function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
+export const useAsync = /*@__PURE__*/ monitored(function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
 
     // Things related to current execution
     // Because we can both return and throw undefined, 

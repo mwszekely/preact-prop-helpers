@@ -12,7 +12,7 @@ type P = Parameters<typeof clsx>;
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
-export const useDocumentClass = monitored(function useDocumentClass(className: P[0], active?: boolean, element?: HTMLElement) {
+export const useDocumentClass = /*@__PURE__*/ monitored(function useDocumentClass(className: P[0], active?: boolean, element?: HTMLElement) {
     element ??= getDocument()?.documentElement;
     className = clsx(className);
 

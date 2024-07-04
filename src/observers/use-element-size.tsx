@@ -60,7 +60,7 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  * 
  * @compositeParams
  */
-export const useElementSize = monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+export const useElementSize = /*@__PURE__*/ monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);

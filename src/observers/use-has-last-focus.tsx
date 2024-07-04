@@ -49,7 +49,7 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export const useHasLastFocus = monitored(function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
+export const useHasLastFocus = /*@__PURE__*/ monitored(function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
     const {
         refElementReturn: { getElement },
         activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },

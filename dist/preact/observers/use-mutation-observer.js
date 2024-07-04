@@ -8,7 +8,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useMutationObserver = monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
+export const useMutationObserver = /*@__PURE__*/ monitored(function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     const { onElementChange, ...rest } = (refElementParameters || {});
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];

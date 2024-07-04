@@ -257,7 +257,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export const useRovingTabIndex = monitored(function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({
+export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange },
     refElementReturn: { getElement },
@@ -473,7 +473,7 @@ export const useRovingTabIndex = monitored(function useRovingTabIndex<ParentElem
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export const useRovingTabIndexChild = monitored(function useRovingTabIndexChild<ChildElement extends Element>({
+export const useRovingTabIndexChild = /*@__PURE__*/ monitored(function useRovingTabIndexChild<ChildElement extends Element>({
     info: { index, untabbable: iAmUntabbable, ...void2 },
     context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
     refElementReturn: { getElement },

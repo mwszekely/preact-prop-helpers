@@ -113,7 +113,7 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * 
  * @hasChild {@link useProcessedChild}
  */
-export const useProcessedChildren = monitored(function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
+export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
     rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters },
     paginatedChildrenParameters,
     staggeredChildrenParameters,
@@ -185,7 +185,7 @@ export const useProcessedChildren = monitored(function useProcessedChildren<Tabb
     };
 });
 
-export const useProcessedChild = monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
+export const useProcessedChild = /*@__PURE__*/ monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,
     info: { index, ...uinfo },
     ...void1

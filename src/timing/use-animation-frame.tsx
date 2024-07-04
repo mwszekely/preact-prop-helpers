@@ -67,7 +67,7 @@ export interface UseAnimationFrameParameters {
  * 
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
-export const useAnimationFrame = monitored(function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
+export const useAnimationFrame = /*@__PURE__*/ monitored(function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
 
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);

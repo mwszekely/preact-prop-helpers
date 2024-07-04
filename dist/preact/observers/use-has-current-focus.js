@@ -8,7 +8,7 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export const useHasCurrentFocus = monitored(function useHasCurrentFocus(args) {
+export const useHasCurrentFocus = /*@__PURE__*/ monitored(function useHasCurrentFocus(args) {
     const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);

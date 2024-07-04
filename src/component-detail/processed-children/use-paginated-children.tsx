@@ -70,7 +70,7 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * 
  * @hasChild {@link usePaginatedChild}
  */
-export const usePaginatedChildren = monitored(function usePaginatedChildren<TabbableChildElement extends Element>({
+export const usePaginatedChildren = /*@__PURE__*/ monitored(function usePaginatedChildren<TabbableChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rearrangeableChildrenReturn: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
@@ -188,7 +188,7 @@ export interface UsePaginatedChildReturnTypeSelf {
  * 
  * @compositeParams
  */
-export const usePaginatedChild = monitored(function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
+export const usePaginatedChild = /*@__PURE__*/ monitored(function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
 

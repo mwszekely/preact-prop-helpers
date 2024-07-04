@@ -14,7 +14,7 @@ import { monitored } from "../util/use-call-count.js";
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
-export const useMediaQuery = monitored(function useMediaQuery(query, defaultGuess) {
+export const useMediaQuery = /*@__PURE__*/ monitored(function useMediaQuery(query, defaultGuess) {
     if (typeof window === "undefined") {
         const matches = defaultGuess || false;
         return {

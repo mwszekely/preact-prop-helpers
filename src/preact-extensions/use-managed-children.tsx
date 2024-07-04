@@ -237,7 +237,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * 
  * @compositeParams
  */
-export const useManagedChildren = monitored(function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
+export const useManagedChildren = /*@__PURE__*/ monitored(function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     type IndexType = M["index"];
     type Info = M;
 
@@ -382,7 +382,7 @@ export const useManagedChildren = monitored(function useManagedChildren<M extend
 /**
  * @compositeParams
  */
-export const useManagedChild = monitored(function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
+export const useManagedChild = /*@__PURE__*/ monitored(function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });

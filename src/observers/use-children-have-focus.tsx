@@ -58,7 +58,7 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * 
  * @hasChild {@link useChildrenHaveFocusChild}
  */
-export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
+export const useChildrenHaveFocus = /*@__PURE__*/ monitored(function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
     const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, runImmediately);
@@ -76,7 +76,7 @@ export const useChildrenHaveFocus = monitored(function useChildrenHaveFocus<Chil
 /**
  * @compositeParams
  */
-export const useChildrenHaveFocusChild = monitored(function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
+export const useChildrenHaveFocusChild = /*@__PURE__*/ monitored(function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

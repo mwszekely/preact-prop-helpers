@@ -35,7 +35,7 @@ const AsyncFunction = ((async function () { }).constructor);
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-export const useAsync = monitored(function useAsync(asyncHandler, options) {
+export const useAsync = /*@__PURE__*/ monitored(function useAsync(asyncHandler, options) {
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existence too.

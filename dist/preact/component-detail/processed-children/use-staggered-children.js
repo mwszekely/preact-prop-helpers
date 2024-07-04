@@ -18,7 +18,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @hasChild {@link useStaggeredChild}
  */
-export const useStaggeredChildren = monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
+export const useStaggeredChildren = /*@__PURE__*/ monitored(function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
 //refElementReturn: { getElement }
  }) {
     // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
@@ -160,7 +160,7 @@ export const useStaggeredChildren = monitored(function useStaggeredChildren({ ma
  *
  * @compositeParams
  */
-export const useStaggeredChild = monitored(function useStaggeredChild({ info: { index }, 
+export const useStaggeredChild = /*@__PURE__*/ monitored(function useStaggeredChild({ info: { index }, 
 //refElementReturn: { getElement },
 context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }) {
     const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));

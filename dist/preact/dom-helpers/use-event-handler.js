@@ -12,7 +12,7 @@ import { monitored } from "../util/use-call-count.js";
  * @param target - A *non-Preact* node to attach the event to.
  * *
  */
-export const useGlobalHandler = monitored(function useGlobalHandler(target, type, handler, options, mode) {
+export const useGlobalHandler = /*@__PURE__*/ monitored(function useGlobalHandler(target, type, handler, options, mode) {
     mode ||= "grouped";
     useEnsureStability("useGlobalHandler", target, mode);
     if (!target)

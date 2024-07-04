@@ -66,7 +66,7 @@ export function useCreateProcessedChildrenContext() {
  *
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
+export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare }, managedChildrenReturn: { getChildren }, context: { rearrangeableChildrenContext: { provideManglers } } }) {
     useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt, compare, onRearranged);
     compare ??= defaultCompare;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
@@ -189,7 +189,7 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
         }
     };
 });
-export const useRearrangeableChild = monitored(function useRearrangeableChild({}) {
+export const useRearrangeableChild = /*@__PURE__*/ monitored(function useRearrangeableChild({}) {
     return {};
 });
 function defaultCompare(lhs, rhs) {

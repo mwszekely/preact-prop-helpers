@@ -10,7 +10,7 @@ import { useActiveElement } from "./use-active-element.js";
  *
  * @compositeParams
  */
-export const useHasLastFocus = monitored(function useHasLastFocus(args) {
+export const useHasLastFocus = /*@__PURE__*/ monitored(function useHasLastFocus(args) {
     const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 } } = args;
     assertEmptyObject(void1);
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);

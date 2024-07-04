@@ -234,7 +234,7 @@ export interface UseRearrangeableChildParameters<_M extends UseRearrangeableChil
  * 
  * @compositeParams
  */
-export const useRearrangeableChildren = monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
+export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRearrangeableChildren<M extends UseRearrangeableChildInfo>({
     rearrangeableChildrenParameters: { getIndex, getSortValueAt, onRearranged, children, adjust, compare },
     managedChildrenReturn: { getChildren },
     context: { rearrangeableChildrenContext: { provideManglers } }
@@ -391,7 +391,7 @@ export const useRearrangeableChildren = monitored(function useRearrangeableChild
     };
 })
 
-export const useRearrangeableChild = monitored(function useRearrangeableChild<M extends UseRearrangeableChildInfo>({ }: UseRearrangeableChildParameters<M>) {
+export const useRearrangeableChild = /*@__PURE__*/ monitored(function useRearrangeableChild<M extends UseRearrangeableChildInfo>({ }: UseRearrangeableChildParameters<M>) {
     return {}
 })
 

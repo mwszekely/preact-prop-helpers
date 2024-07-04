@@ -176,7 +176,7 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export const useCompleteGridNavigation = monitored(function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
+export const useCompleteGridNavigation = /*@__PURE__*/ monitored(function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -288,7 +288,7 @@ export const useCompleteGridNavigation = monitored(function useCompleteGridNavig
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  */
-export const useCompleteGridNavigationRows = monitored(function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
+export const useCompleteGridNavigationRows = /*@__PURE__*/ monitored(function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
     context,
     paginatedChildrenParameters,
     rearrangeableChildrenParameters,
@@ -336,7 +336,7 @@ export interface UseCompleteGridNavigationRowOuterReturnType<RowElement extends 
     hide: boolean;
 }
 
-export const useCompleteGridNavigationRowOuter = monitored(function useCompleteGridNavigationRowOuter<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({
+export const useCompleteGridNavigationRowOuter = /*@__PURE__*/ monitored(function useCompleteGridNavigationRowOuter<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({
     context,
     info,
     refElementParameters: { onElementChange: oec1, onMount, onUnmount }
@@ -375,7 +375,7 @@ export const useCompleteGridNavigationRowOuter = monitored(function useCompleteG
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationRow = monitored(function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
+export const useCompleteGridNavigationRow = /*@__PURE__*/ monitored(function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
 
     info: { index, untabbable, ...customUserInfo },
     context: contextIncomingForRowAsChildOfTable,
@@ -507,7 +507,7 @@ export const useCompleteGridNavigationRow = monitored(function useCompleteGridNa
 /**
  * @compositeParams
  */
-export const useCompleteGridNavigationCell = monitored(function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
+export const useCompleteGridNavigationCell = /*@__PURE__*/ monitored(function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
     context,
     textContentParameters: { getText, onTextContentChange: otcc1, ...void4 },

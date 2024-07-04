@@ -139,7 +139,7 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element> ex
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export const useGridNavigation = monitored(function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
+export const useGridNavigation = /*@__PURE__*/ monitored(function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 },
     linearNavigationParameters,
     ...listNavigationParameters
@@ -194,7 +194,7 @@ export const useGridNavigation = monitored(function useGridNavigation<ParentOrRo
  * 
  * @compositeParams
  */
-export const useGridNavigationRow = monitored(function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
+export const useGridNavigationRow = /*@__PURE__*/ monitored(function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
     info: { index, untabbable, ...void3 },
     context: contextFromParent,
@@ -351,7 +351,7 @@ export const useGridNavigationRow = monitored(function useGridNavigationRow<RowE
  * 
  * @compositeParams
  */
-export const useGridNavigationCell = monitored(function useGridNavigationCell<CellElement extends Element>({
+export const useGridNavigationCell = /*@__PURE__*/ monitored(function useGridNavigationCell<CellElement extends Element>({
     context: {
         gridNavigationCellContext: {
             getRowIndex,

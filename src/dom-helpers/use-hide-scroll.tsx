@@ -11,7 +11,7 @@ import { monitored } from "../util/use-call-count.js";
  * 
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
  */
-export const useHideScroll = monitored(function useHideScroll(hideScroll: boolean) {
+export const useHideScroll = /*@__PURE__*/ monitored(function useHideScroll(hideScroll: boolean) {
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState<number | null, never>(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState<number | null, never>(null);
 

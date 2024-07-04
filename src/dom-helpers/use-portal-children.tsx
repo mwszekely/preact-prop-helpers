@@ -42,7 +42,7 @@ export interface UsePortalChildrenReturnType {
  * 
  * {@include } {@link UsePortalChildrenParameters}
  */
-export const usePortalChildren = monitored(function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
+export const usePortalChildren = /*@__PURE__*/ monitored(function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
     const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
     const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);
     const [removeChild, setRemoveChild] = useState<RemovePortalChild | null>(null);

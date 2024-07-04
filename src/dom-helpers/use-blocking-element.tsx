@@ -27,7 +27,7 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * 
  * @param target 
  */
-export const useBlockingElement = monitored(function useBlockingElement<E extends Element>({
+export const useBlockingElement = /*@__PURE__*/ monitored(function useBlockingElement<E extends Element>({
     activeElementParameters: {
         getDocument,
         onActiveElementChange,

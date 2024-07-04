@@ -166,7 +166,7 @@ getDocument()?.addEventListener?.("click", (e) => {
  * @compositeParams
  * 
  */
-export const usePress = monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
+export const usePress = /*@__PURE__*/ monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
         pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }

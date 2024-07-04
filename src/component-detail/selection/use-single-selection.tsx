@@ -180,7 +180,7 @@ export interface UseSingleSelectionContext {
  * 
  * @compositeParams
  */
-export const useSingleSelection = monitored(function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export const useSingleSelection = /*@__PURE__*/ monitored(function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
@@ -254,7 +254,7 @@ export const useSingleSelection = monitored(function useSingleSelection<ParentOr
  * 
  * @compositeParams
  */
-export const useSingleSelectionChild = monitored(function useSingleSelectionChild<ChildElement extends Element>({
+export const useSingleSelectionChild = /*@__PURE__*/ monitored(function useSingleSelectionChild<ChildElement extends Element>({
     singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
     context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 },
     info: { index, untabbable, ...void3 },
