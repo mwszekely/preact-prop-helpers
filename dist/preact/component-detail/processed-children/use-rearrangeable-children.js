@@ -97,11 +97,14 @@ export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRear
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
-        for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            const indexAsUnsorted = sortedRows[indexAsSorted];
-            if (indexAsUnsorted != undefined) {
-                mangleMap.current.set(indexAsUnsorted, indexAsSorted);
-                demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+        // for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
+        for (const indexAsSorted of originalRows) {
+            if (indexAsSorted != undefined) {
+                const indexAsUnsorted = sortedRows[indexAsSorted];
+                if (indexAsUnsorted != undefined) {
+                    mangleMap.current.set(indexAsUnsorted, indexAsSorted);
+                    demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+                }
             }
         }
         onRearranged?.(phase);

@@ -253,14 +253,14 @@ export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRear
         const managedRows = getChildren();
         const originalRows = managedRows._arraySlice().map(row => row.index);
         const shuffledRows = lodashShuffle(originalRows);
-        return rearrange('async',originalRows, shuffledRows);
+        return rearrange('async', originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
     const reverse = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
         const originalRows = managedRows._arraySlice().map(row => row.index);
         const reversedRows = originalRows.slice().reverse();
-        return rearrange('async',originalRows, reversedRows);
+        return rearrange('async', originalRows, reversedRows);
     }, [/* Must remain stable */]);
 
 
@@ -276,12 +276,15 @@ export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRear
 
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
-        for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            const indexAsUnsorted = sortedRows[indexAsSorted];
-            if (indexAsUnsorted != undefined) {
+        // for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
+        for (const indexAsSorted of originalRows) {
+            if (indexAsSorted != undefined) {
+                const indexAsUnsorted = sortedRows[indexAsSorted];
+                if (indexAsUnsorted != undefined) {
 
-                mangleMap.current.set(indexAsUnsorted, indexAsSorted);
-                demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+                    mangleMap.current.set(indexAsUnsorted, indexAsSorted);
+                    demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+                }
             }
         }
 
@@ -331,8 +334,8 @@ export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRear
 
         const sortedRows = originalRows.slice();
         sortedRows.sort((lhsIndex, rhsIndex) => {
-            const lhsValue = lhsIndex == undefined? undefined : getSortValueAt(lhsIndex);
-            const rhsValue = rhsIndex == undefined? undefined : getSortValueAt(rhsIndex);
+            const lhsValue = lhsIndex == undefined ? undefined : getSortValueAt(lhsIndex);
+            const rhsValue = rhsIndex == undefined ? undefined : getSortValueAt(rhsIndex);
             const result = compare!(lhsValue, rhsValue);
             return result;
         });
