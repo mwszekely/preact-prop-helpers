@@ -4419,7 +4419,8 @@ function useCompleteGridNavigationRowDeclarative({ multiSelectionChildParameters
  */
 const useCompleteListNavigation = /*@__PURE__*/ monitored(function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
-refElementParameters, ...void1 }) {
+refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...void1 }) {
+    useEnsureStability("useCompleteListNavigation", getSortValueAt);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -4467,6 +4468,7 @@ refElementParameters, ...void1 }) {
         typeaheadNavigationContext,
         managedChildContext: managedChildRTIContext,
         processedChildrenContext,
+        listNavigationCompleteContext: useMemoObject({ getSortValueAt }),
         ...contextProcessing
     });
     return {
@@ -4489,12 +4491,15 @@ refElementParameters, ...void1 }) {
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
 const useCompleteListNavigationChildren = /*@__PURE__*/ monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
+    const { listNavigationCompleteContext: { getSortValueAt } } = context;
     const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
+        rearrangeableChildrenParameters: {
+            getSortValueAt,
+            ...rearrangeableChildrenParameters
+        },
         staggeredChildrenParameters,
         managedChildrenParameters,
-        //refElementReturn: context.processedChildrenContext,
         context,
     });
     return {
@@ -4529,7 +4534,7 @@ const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(function use
  * @compositeParams
  */
 const useCompleteListNavigationChild = /*@__PURE__*/ monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, rearrangeableChildrenContext, ...void5 }, ...void1 }) {
+textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, rearrangeableChildrenContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
         info: { index, untabbable },

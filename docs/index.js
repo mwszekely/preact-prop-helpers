@@ -8014,6 +8014,9 @@ const useCompleteListNavigation = /*@__PURE__*/monitored(function useCompleteLis
   paginatedChildrenParameters,
   //staggeredChildrenParameters,
   refElementParameters,
+  listNavigationCompleteParameters: {
+    getSortValueAt
+  },
   ...void1
 }) {
   const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -8132,6 +8135,9 @@ const useCompleteListNavigation = /*@__PURE__*/monitored(function useCompleteLis
     typeaheadNavigationContext,
     managedChildContext: managedChildRTIContext,
     processedChildrenContext,
+    listNavigationCompleteContext: useMemoObject({
+      getSortValueAt
+    }),
     ...contextProcessing
   });
   return {
@@ -8166,16 +8172,23 @@ const useCompleteListNavigationChildren = /*@__PURE__*/monitored(function useCom
   managedChildrenParameters
 }) {
   const {
+    listNavigationCompleteContext: {
+      getSortValueAt
+    }
+  } = context;
+  const {
     context: contextRPS,
     paginatedChildrenReturn,
     rearrangeableChildrenReturn,
     staggeredChildrenReturn
   } = useProcessedChildren({
     paginatedChildrenParameters,
-    rearrangeableChildrenParameters,
+    rearrangeableChildrenParameters: {
+      getSortValueAt,
+      ...rearrangeableChildrenParameters
+    },
     staggeredChildrenParameters,
     managedChildrenParameters,
-    //refElementReturn: context.processedChildrenContext,
     context
   });
   return {
@@ -8219,6 +8232,7 @@ const useCompleteListNavigationChild = /*@__PURE__*/monitored(function useComple
     childrenHaveFocusChildContext,
     processedChildrenContext,
     rearrangeableChildrenContext,
+    listNavigationCompleteContext,
     ...void5
   },
   ...void1
@@ -10583,6 +10597,11 @@ const DemoUseRovingTabIndex = x(monitored(function DemoUseRovingTabIndex() {
       multiSelectionAriaPropName: "aria-checked",
       onSelectionChange,
       multiSelectionMode
+    },
+    listNavigationCompleteParameters: {
+      getSortValueAt: x$1(index => {
+        return RandomWords[index];
+      }, [])
     }
   });
   const {
@@ -10835,9 +10854,6 @@ const DemoUseRovingTabIndexChildren = x(monitored(function DemoUseRovingTabIndex
       paginationMin: min
     },
     rearrangeableChildrenParameters: {
-      getSortValueAt: x$1(index => {
-        return RandomWords[index];
-      }, []),
       getIndex: x$1(a => a.props.index, []),
       onRearranged: null,
       compare: null,

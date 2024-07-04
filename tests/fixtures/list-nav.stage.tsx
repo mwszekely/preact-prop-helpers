@@ -130,6 +130,9 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null },
         refElementParameters: {},
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
+        listNavigationCompleteParameters: {
+            getSortValueAt: identity
+        }
     });
 
     const { context: contextFromProcessing, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useCompleteListNavigationChildren({
@@ -146,8 +149,7 @@ function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
                 }
             }()),
             compare: null,
-            onRearranged: null,
-            getSortValueAt: identity
+            onRearranged: null
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },

@@ -67,7 +67,12 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         refElementParameters: {},
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
-        multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode }
+        multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode },
+        listNavigationCompleteParameters: {
+            getSortValueAt: useCallback((index) => {
+                return RandomWords[index];
+            }, [])
+        }
     });
 
 
@@ -154,9 +159,6 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
     } = useCompleteListNavigationChildren({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
-            getSortValueAt: useCallback((index) => {
-                return RandomWords[index];
-            }, []),
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
             onRearranged: null,
             compare: null,
