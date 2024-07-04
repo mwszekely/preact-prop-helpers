@@ -13,6 +13,7 @@ let be: DocumentWithBlockingElements["$blockingElements"];
         /// @ts-expect-error
         await import("wicg-inert");
         await import("blocking-elements");
+        be = (document as DocumentWithBlockingElements).$blockingElements;
         if (!d)
             delete (globalThis as any).document;
     }
