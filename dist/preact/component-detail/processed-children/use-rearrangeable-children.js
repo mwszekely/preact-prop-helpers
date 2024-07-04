@@ -110,7 +110,8 @@ export const useRearrangeableChildren = /*@__PURE__*/ monitored(function useRear
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
         const originalRows = managedRows._arraySlice().map(child => child.index);
-        const sortedRows = originalRows.sort((lhsRow, rhsRow) => {
+        const sortedRows = originalRows.slice();
+        sortedRows.sort((lhsRow, rhsRow) => {
             const lhsValue = getSortValueAt(lhsRow);
             const rhsValue = getSortValueAt(rhsRow);
             const result = compare(lhsValue, rhsValue);
