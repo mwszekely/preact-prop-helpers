@@ -5349,7 +5349,8 @@ const useRearrangeableChildren = /*@__PURE__*/monitored(function useRearrangeabl
       }
       return undefined;
     });
-    const sortedRows = originalRows.sort((lhsIndex, rhsIndex) => {
+    const sortedRows = originalRows.slice();
+    sortedRows.sort((lhsIndex, rhsIndex) => {
       const lhsValue = lhsIndex == undefined ? undefined : getSortValueAt(lhsIndex);
       const rhsValue = rhsIndex == undefined ? undefined : getSortValueAt(rhsIndex);
       const result = compare(lhsValue, rhsValue);
