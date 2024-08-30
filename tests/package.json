@@ -14,7 +14,7 @@
     "watch:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css --watch",
     "watch:js": "rollup --config stage/rollup.config.js --watch --no-watch.clearScreen",
     "serve": "npx serve .. -l 51082",
-    "start": "npx npm-run-all --npm-path npm -p watch serve"
+    "start": "npx npm-run-all --npm-path npm -s build serve"
   },
   "keywords": [],
   "author": "",

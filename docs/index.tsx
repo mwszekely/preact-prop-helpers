@@ -547,12 +547,12 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 })*/
 
 
-//options.debounceRendering = (f) => f();
+// options.debounceRendering = (f) => f();
 
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
-        <DemoPress remaining={2} />
+        {/*<DemoPress remaining={2} />
         <input />
         <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
@@ -573,13 +573,13 @@ const Component = () => {
         <hr />
         <DemoUseTimeout />
         <hr />
-        {/*<DemoUseInterval />
+        <DemoUseInterval />
         <hr />*/}
         <DemoUseRovingTabIndex />
         <hr />
 
 
-        <DemoUseFocusTrap />
+       {/*  <DemoUseFocusTrap />
         <hr />
         <DemoUseAsyncHandler1 />
         <hr />
@@ -589,7 +589,7 @@ const Component = () => {
         <hr />
         <DemoUseDraggable />
         <hr />
-        {/*<DemoUseElementSizeAnimation />
+       <DemoUseElementSizeAnimation />
         <hr />
 <input />*/}
     </div>

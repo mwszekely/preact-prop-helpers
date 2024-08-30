@@ -23,7 +23,7 @@ const _dummy = 0;
  *
  * @compositeParams
  */
-export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }) {
+export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void2 }) {
     const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
         linearNavigationParameters,
@@ -31,7 +31,7 @@ export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGr
         rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
         typeaheadNavigationParameters,
         paginatedChildrenParameters,
-        rearrangeableChildrenReturn,
+        processedIndexManglerReturn,
         refElementReturn
     });
     const { childrenHaveFocusParameters, context: { singleSelectionContext, multiSelectionContext }, multiSelectionReturn, propsStable, singleSelectionReturn, ...void1 } = useSelection({

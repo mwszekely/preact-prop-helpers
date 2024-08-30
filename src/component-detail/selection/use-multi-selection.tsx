@@ -442,7 +442,6 @@ export function useMultiSelectionChild<E extends Element>({
         if (focused) {
             if (multiSelectionMode == "focus") {
                 let any = getAnyFocused();
-                console.log("any focused: ", any);
 
                 // Wow, it's the worst selection mode.
                 const subSelectionMode = (getShiftKeyDown() ? "toggle" : getCtrlKeyDown() ? "skip" : "set");

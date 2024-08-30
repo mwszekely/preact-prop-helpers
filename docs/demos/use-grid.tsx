@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, UseProcessedChildContext, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useProcessedChild, useStableCallback, useState } from "../../dist/preact/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/preact/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -93,6 +93,13 @@ export const DemoUseGrid = memo(() => {
             // Which column is tabbable (initially upon mount before the user interacts with it)
             initiallyTabbableColumn: 0
         },
+        processedIndexManglerParameters: {
+            // A custom function that can handle gridNavigationCompleteParameters.getSortValueAt
+            compare: null,
+
+            // Must return the numeric index from a `VNode`.
+            getIndex: useCallback((vnode: VNode) => vnode.props.index, [])
+        },
         // paginatedChildrenParameters: {
         // This must return a VNode's 0-based index from its props
         //     getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
@@ -145,20 +152,7 @@ export const DemoUseGrid = memo(() => {
         },
         refElementReturn: { },
         rearrangeableChildrenReturn: {
-            // You must call this hook on your array of children to implement the sorting behavior
-            //     useRearrangedChildren,
-            // Largely internal use only
-            //    indexDemangler,
-            // Largely internal use only
-            //    indexMangler,
-            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
-            rearrange,
-            // Reverses all children 
-            reverse,
-            // Shuffles all children
-            shuffle,
-            // A table header button would probably call this function to sort all the table rows.
-            sort
+            // Also nothing
         },
         linearNavigationReturn: { },
         managedChildrenReturn: {
@@ -223,10 +217,6 @@ const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIn
     } = useCompleteGridNavigationRows({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
-            compare: null,
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null,
-            adjust: null,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     yield <DemoUseGridRowOuter index={i} key={i} />
@@ -235,6 +225,7 @@ const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIn
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
+        
         context: useContext(ListChildrenContext)
     })
 
@@ -251,12 +242,20 @@ interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<HTMLTableC
 
 
 const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { managedChildContext, paginatedChildContext, staggeredChildContext } = useContext(ListChildContext) as UseProcessedChildContext<HTMLTableRowElement, any>;
-    const { props, managedChildReturn, refElementParameters, paginatedChildReturn, staggeredChildReturn } = useProcessedChild<HTMLTableRowElement>({
-        context: { managedChildContext, paginatedChildContext, staggeredChildContext },
+    const {
+        hide,
+        managedChildReturn,
+        paginatedChildReturn,
+        props,
+        refElementReturn,
+        staggeredChildReturn,
+    } = useCompleteGridNavigationRowOuter({
+        context: useContext(ListChildContext),
         info: { index },
+        refElementParameters: {},
+        rearrangeableChildParameters: { cssProperty: 'translate', duration: '666ms' }
+    });
 
-    })
     const { childUseEffect } = staggeredChildReturn;
     if (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered) {
         return <tr {...props}><td colSpan={99}>&nbsp;</td></tr>

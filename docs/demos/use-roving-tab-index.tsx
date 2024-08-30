@@ -1,5 +1,7 @@
+
+import { reverse, shuffle } from "lodash-es";
 import { createContext } from "preact";
-import { memo, useCallback, useContext, useEffect } from "preact/compat";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -8,31 +10,34 @@ import {
     UseProcessedChildContext as NormalListChildContext,
     StateUpdater,
     UseCompleteListNavigationChildInfo,
-    UseCompleteListNavigationDeclarativeReturnType, UseProcessedChildReturnType,
+    UseCompleteListNavigationChildrenInfo,
+    UseCompleteListNavigationDeclarativeReturnType,
     VNode,
-
     focus,
+    memo,
     monitored,
     useCompleteListNavigationChildDeclarative,
+    useCompleteListNavigationChildOuter,
     useCompleteListNavigationChildren,
     useCompleteListNavigationDeclarative,
-    useProcessedChild as useListChild,
     useMemo,
     useMergedProps,
     usePress,
-    useRefElement,
     useStableCallback,
-    useState,
+    useState
 } from "../../dist/preact/index.js";
 
-const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
 function _getDocument() {
     return window.document;
 }
 
-const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
-const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
+// TODO: Too lazy to set this up as context properly
+//const shuffledWords = { current: RandomWords2 };
+
+//const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
+//const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
 const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
 const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
@@ -44,8 +49,8 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
     const [singleSelectionMode, setSingleSelectionMode] = useState("focus" as "focus" | "activation" | "disabled");
     const [multiSelectionMode, setMultiSelectionMode] = useState("activation" as "focus" | "activation" | "disabled");
     const [count, setCount] = useState(10);
-    let [min, setMin] = useState<number | null>(2);
-    let [max, setMax] = useState<number | null>(8);
+    let [min, setMin] = useState<number | null>(null);
+    let [max, setMax] = useState<number | null>(null);
     const [staggered, setStaggered] = useState<boolean>(false);
 
     if (!isFinite(min ?? NaN))
@@ -59,6 +64,19 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         setMultiSelectPercent(e[EventDetail].selectedPercent)
     }
 
+
+    const shuffle2 = useCallback(() => {
+        sortValues.current = shuffle(sortValues.current);
+        refreshRows();
+    }, [])
+
+    const reverse2 = useCallback(() => {
+        sortValues.current = reverse(sortValues.current);
+        refreshRows();
+    }, [])
+
+    let sortValues = useRef<number[]>([]);
+
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
         singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
@@ -68,10 +86,13 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode },
-        listNavigationCompleteParameters: {
+        processedIndexManglerParameters: {
+
             getSortValueAt: useCallback((index) => {
-                return RandomWords[index];
-            }, [])
+                return sortValues.current[index] ??= index;
+            }, []),
+            compare: null,
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
         }
     });
 
@@ -82,8 +103,13 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
         rovingTabIndexReturn: { setTabbableIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
-        rearrangeableChildrenReturn: { shuffle, reverse, sort: _sort },
+        rearrangeableChildrenReturn: { refresh: refreshRows }
     } = r;
+
+    const secondsToHalve = 3;
+    const halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn = useCallback(() => {
+        const handle = setTimeout(() => { setCount(count => Math.floor(count / 2)) }, secondsToHalve * 1000)
+    }, [])
 
 
     const [staggering, setStaggering] = useState(false);
@@ -114,8 +140,9 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
             <p>The biggest restriction of this method is that every child needs a 0-based numeric index.</p>
 
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
-            <button onClick={() => shuffle()}>Shuffle</button>
-            <button onClick={() => { debugger; reverse() }}>Reversed</button>
+            <button onClick={() => shuffle2()}>Shuffle</button>
+            <button onClick={() => reverse2()}>Reverse</button>
+            <button onClick={() => halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn()}>Halve # of children in {secondsToHalve} seconds</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {singleSelectedIndex})</label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
@@ -132,26 +159,22 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
                 <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <div>Staggering status: {staggered? staggering? "Staggering..." : "Done staggering" : "Not staggered"}</div>
+            <div>Staggering status: {staggered ? staggering ? "Staggering..." : "Done staggering" : "Not staggered"}</div>
             {<div>Typeahead status: {typeaheadStatus}</div>}
             {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
             <UntabbableContext.Provider value={untabbable}>
-                <SingleSelectionModeContext.Provider value={singleSelectionMode}>
-                    <MultiSelectionModeContext.Provider value={multiSelectionMode}>
-                        <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                                <ol start={0} {...props}>
-                                    <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
-                                </ol>
-                        </ListNavigationSingleSelectionChildContext.Provider>
-                    </MultiSelectionModeContext.Provider>
-                </SingleSelectionModeContext.Provider>
+                <ListNavigationSingleSelectionChildContext.Provider value={context}>
+                    <ol start={0} {...props}>
+                        <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
+                    </ol>
+                </ListNavigationSingleSelectionChildContext.Provider>
             </UntabbableContext.Provider>
         </div>
     );
 }))
 
 export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
-    const { 
+    const {
         context,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
@@ -159,13 +182,12 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
     } = useCompleteListNavigationChildren({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null,
-            compare: null,
-            adjust: null,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
-                    yield <DemoUseRovingTabIndexChildOuter index={i} key={i} />
+                    if (i == 1)
+                        yield <li><span>(Item {i} is a <strong>hole in the array</strong> and does not exist)</span></li>;
+                    else
+                        yield <DemoUseRovingTabIndexChildOuter index={i} word={RandomWords2[i]} key={i} />
                 }
             })()), [count]),
         },
@@ -190,23 +212,30 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
-    const { propsStable, refElementReturn: { getElement } } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: useStableCallback((e, p, r) => {
-        onElementChange?.(e, p, r);
-    }) } });
-    const { props, managedChildReturn, paginatedChildReturn, staggeredChildReturn, refElementParameters: { onElementChange } }: UseProcessedChildReturnType<HTMLLIElement, any> = useListChild<HTMLLIElement>({
-        context: useContext(ListChildContext) as NormalListChildContext<HTMLLIElement, any>,
-        info: { index }
-    })
-    const c = useMemo(() => <DemoUseRovingTabIndexChild index={index} />, [index]);
+const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex?: number, demangledIndex?: number }) {
+    
+    const { 
+        hide, 
+        managedChildReturn, 
+        paginatedChildReturn, 
+        props, 
+        refElementReturn, 
+        staggeredChildReturn 
+    } = useCompleteListNavigationChildOuter<HTMLLIElement, UseCompleteListNavigationChildrenInfo<HTMLLIElement>>({
+        context: useContext(ListChildContext),
+        info: { index },
+        refElementParameters: {},
+        rearrangeableChildParameters: { cssProperty: 'translate', duration: '666ms' }
+    });
+
+    //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />, [mangledIndex, demangledIndex, index]);
+    const c = <DemoUseRovingTabIndexChild word={word} index={index} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />;
     return (
-        <li {...useMergedProps(props, propsStable)}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered? "\xA0" : c}</li>
+        <li {...props}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
 }));
 
-const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndexChild({ index }: { index: number }) {
-    if (index == 1)
-        return <span>(Item {index} is a <strong>hole in the array</strong> and does not exist)</span>;
+const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined }) {
 
     let disabled = (index == 6);
     let hidden = (index == 7);
@@ -216,9 +245,9 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
 
     const [multiSelected, setMultiSelected] = useState(false);
 
-    const [randomWord] = useState(() => RandomWords[index]);
+    const randomWord = word;// shuffledWords.current[index];
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
-    const focusSelf = useCallback((e: HTMLElement) => { focus( e) }, []);
+    const focusSelf = useCallback((e: HTMLElement) => { focus(e) }, []);
 
     const getSortValue = useStableCallback(() => index);
 
@@ -248,7 +277,7 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
-    const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+    const text = `${randomWord} This is item #${index} (#${demangledIndex} to #${mangledIndex}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
         <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></span>

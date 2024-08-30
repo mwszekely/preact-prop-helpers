@@ -1,9 +1,122 @@
 import { expect } from '@playwright/test';
-import { MissingIndex, WithColSpanIndex } from './grid-nav.constants.js';
+import { HiddenIndex, MissingIndex, WithColSpanIndex } from './grid-nav.constants.js';
 import { test } from "./grid-nav.fixture.js";
 
+//, async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount } }) => {})
+
+test("By default, the top-right cell is focusable", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount } }) => {
+    const rows = getRows();
+    const row0Cells = getCells(rows.nth(0))
+    const row1Cells = getCells(rows.nth(1))
+    await page.keyboard.press("Tab");
+    await expect(row0Cells.nth(0)).toBeFocused();
+});
+
+test("Pressing up/down moves focus between rows", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount, focusableLast, focusableFirst } }) => {
+    let column = 1;
+
+    const rows = await getRows().all();
+    await page.keyboard.press("Tab");
+
+    for (let i = 0; i < column; ++i) {
+        await page.keyboard.press("ArrowRight");
+    }
+
+    let rowIndex = 0;
+    while (rowIndex < rows.length) {
+        if (rowIndex != MissingIndex && rowIndex != HiddenIndex) {
+            const cells = getCells(rows[rowIndex]);
+            await expect(cells.nth(column), `Pressing down should move to the ${rowIndex}-th row`).toBeFocused();
+            await page.keyboard.press("ArrowDown");
+        }
+        ++rowIndex;
+    }
+    await expect(getCells(rows.at(-1)!).nth(column), "(Redundant, probably)").toBeFocused();
+
+    // Quickly make sure that moving focus around didn't leave any lingering tabbables behind,
+    // then move focus back to where it was.
+    await page.keyboard.press("Shift+Tab");
+    await expect(focusableFirst, "Shift+Tab should move focus out of the composite").toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(getCells(rows.at(-1)!).nth(column), "Tab should move focus back into the composite in the same position it was before").toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(focusableLast, "Tab should move focus out of the composite").toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    do {
+        --rowIndex;
+        if (rowIndex != MissingIndex && rowIndex != HiddenIndex) {
+            const cells = getCells(rows[rowIndex]);
+            await expect(cells.nth(column)).toBeFocused();
+            await page.keyboard.press("ArrowUp");
+        }
+    } while (rowIndex > 0)
+    await expect(getCells(rows.at(0)!).nth(column)).toBeFocused();
+})
+
+test("Pressing left/right moves focus between cells", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount, focusableLast, focusableFirst } }) => {
+    const cells = await getCells(getRows().nth(0)).all();
+    await page.keyboard.press("Tab");
+
+    let cellIndex = 0;
+    while (cellIndex < cells.length) {
+        if (cellIndex != MissingIndex && cellIndex != HiddenIndex) {
+            await expect(cells[cellIndex]).toBeFocused();
+            await page.keyboard.press("ArrowRight");
+        }
+        ++cellIndex;
+    }
+    await expect(cells.at(-1)!).toBeFocused();
+
+    await page.keyboard.press("Shift+Tab");
+    await expect(focusableFirst).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(cells.at(-1)!).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(focusableLast).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+
+    do {
+        --cellIndex;
+        if (cellIndex != MissingIndex && cellIndex != HiddenIndex) {
+            await expect(cells[cellIndex]).toBeFocused();
+            await page.keyboard.press("ArrowLeft");
+        }
+    } while (cellIndex > 0)
+    await expect(cells.at(0)!).toBeFocused();
+});
+
+test("Pressing up/down works with colSpan", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount, focusableLast, focusableFirst } }) => {
+    let column = 5;
+
+    const lastRow = 10;
+
+    const rows = await getRows().all();
+    await page.keyboard.press("Tab");
+
+    for (let i = 0; i < column; ++i) {
+        await page.keyboard.press("ArrowRight");
+    }
+
+    let rowIndex = 0;
+    while (rowIndex < lastRow) {
+        if (rowIndex != MissingIndex && rowIndex != HiddenIndex) {
+            await page.keyboard.press("ArrowDown");
+        }
+        ++rowIndex;
+    }
+    await expect(getCells(rows[lastRow]).nth(column), "(Redundant, probably)").toBeFocused();
+
+    do {
+        if (rowIndex != MissingIndex && rowIndex != HiddenIndex) {
+            const cells = getCells(rows[rowIndex]);
+            await page.keyboard.press("ArrowUp");
+        }
+        --rowIndex;
+    } while (rowIndex > 0)
 
 
+    await expect(getCells(rows.at(0)!).nth(column), "After moving down/up through the whole grid, the tabbable column should not have changed.").toBeFocused();
+})
 
 test("Basic arrow key navigation works", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount } }) => {
     //expect(getRenderCount("parent"), "Before anything happens, the grid should only have rendered once").toBe(1);
@@ -68,17 +181,17 @@ test("Arrow key navigation works with missing items", async ({ page, gridNav: { 
 });
 
 
-    /*await test.step("Home/end works", async () => {
-        await page.keyboard.press("Home");
-        await expect(page.locator("li").first(), "Pressing home should focus the first element").toBeFocused();
-        await page.keyboard.press("End");
-        await expect(page.locator("li").last(), "Pressing End should focus the final element").toBeFocused();
-    });
+/*await test.step("Home/end works", async () => {
+    await page.keyboard.press("Home");
+    await expect(page.locator("li").first(), "Pressing home should focus the first element").toBeFocused();
+    await page.keyboard.press("End");
+    await expect(page.locator("li").last(), "Pressing End should focus the final element").toBeFocused();
+});
 
-    await test.step("Typeahead works", async () => {
-        await page.keyboard.type(LoremIpsum[HiddenIndex - 1]);
-        await expect(page.locator("li").nth(HiddenIndex - 1), `Typeahead should work as expected`).toBeFocused();
-    });*/
+await test.step("Typeahead works", async () => {
+    await page.keyboard.type(LoremIpsum[HiddenIndex - 1]);
+    await expect(page.locator("li").nth(HiddenIndex - 1), `Typeahead should work as expected`).toBeFocused();
+});*/
 
 /*
 test("Untabbability works", async ({ page, gridNav, shared: { run, install } }) => {

@@ -63,8 +63,8 @@ export const useHasCurrentFocus = /*@__PURE__*/ monitored(function useHasCurrent
 
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, runImmediately);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
+    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
 
     const onFocusIn = useCallback((e: FocusEventType<T>) => {
         setFocusedInner(true, e);

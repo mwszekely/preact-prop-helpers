@@ -7,7 +7,7 @@ import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js"
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseRearrangeableChildrenReturnType } from "../processed-children/use-rearrangeable-children.js";
+import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 
@@ -29,7 +29,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
-    TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexMangler" | "indexDemangler">,
     TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
@@ -146,7 +146,7 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
-    rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },
+    processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 },
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = EventType<any, any>;
@@ -279,8 +279,6 @@ export const useLinearNavigation = (function useLinearNavigation<ParentOrChildEl
                 case "ArrowUp":
                 case "ArrowDown":
                     keyPressIsValidForOrientation = (allowsVerticalNavigation);
-                    if (keyPressIsValidForOrientation)
-                            debugger;
                     break;
                 case "ArrowLeft":
                 case "ArrowRight":

@@ -327,7 +327,8 @@ export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/ke
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
 export { usePaginatedChild, usePaginatedChildren } from "./component-detail/processed-children/use-paginated-children.js";
 export { useProcessedChild, useProcessedChildren } from "./component-detail/processed-children/use-processed-children.js";
-export { useCreateProcessedChildrenContext, useRearrangeableChild, useRearrangeableChildren } from "./component-detail/processed-children/use-rearrangeable-children.js";
+export { defaultCompare, useProcessedIndexMangler } from "./component-detail/processed-children/use-processed-index-mangler.js";
+export { useRearrangeableChild, useRearrangeableChildren } from "./component-detail/processed-children/use-rearrangeable-children.js";
 export { useStaggeredChild, useStaggeredChildren } from "./component-detail/processed-children/use-staggered-children.js";
 export { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./component-detail/selection/use-multi-selection.js";
 export { useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/selection/use-selection.js";

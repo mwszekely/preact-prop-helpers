@@ -52,7 +52,7 @@ export const useListNavigationSelection = /*@__PURE__*/ monitored(function useLi
     managedChildrenReturn,
     refElementReturn,
     paginatedChildrenParameters,
-    rearrangeableChildrenReturn,
+    processedIndexManglerReturn,
     childrenHaveFocusReturn,
     ...void3
 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
@@ -75,7 +75,7 @@ export const useListNavigationSelection = /*@__PURE__*/ monitored(function useLi
         typeaheadNavigationParameters,
         managedChildrenReturn,
         refElementReturn,
-        rearrangeableChildrenReturn
+        processedIndexManglerReturn
     });
 
     assertEmptyObject(void3);

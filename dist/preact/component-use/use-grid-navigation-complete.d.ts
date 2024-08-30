@@ -3,6 +3,7 @@ import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigat
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildrenReturnType } from "../component-detail/processed-children/use-paginated-children.js";
 import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildParameters, UseProcessedChildReturnType, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType } from "../component-detail/processed-children/use-processed-children.js";
+import { UseProcessedIndexManglerParameters, UseProcessedIndexManglerParametersSelf } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { UseRearrangeableChildrenReturnType } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
 import { MakeMultiSelectionChildDeclarativeParameters } from "../component-detail/selection/use-multi-selection.js";
@@ -23,7 +24,7 @@ export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> 
 }
 export interface UseCompleteGridNavigationRowsInfo<ChildElement extends Element> extends UseProcessedChildInfo<ChildElement>, ManagedChildInfo<number> {
 }
-export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">, Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
+export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "processedIndexManglerReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">, TargetedOmit<UseProcessedIndexManglerParameters, "processedIndexManglerParameters", "getSortValueAt">, Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
     gridNavigationCompleteParameters: UseCompleteGridNavigationParametersSelf;
 }
 export interface UseCompleteGridNavigationParametersSelf {
@@ -44,12 +45,15 @@ export interface UseCompleteGridNavigationParametersSelf {
      */
     getSortValueAt(row: number, column: number | undefined): unknown;
 }
-export interface UseCompleteGridNavigationRowsParameters<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends OmitStrong<UseProcessedChildrenParameters<RowElement, RsM>, "context" | "rearrangeableChildrenParameters">, TargetedOmit<UseProcessedChildrenParameters<RowElement, RsM>, "rearrangeableChildrenParameters", "getSortValueAt"> {
+export interface UseCompleteGridNavigationContextSelf extends UseProcessedIndexManglerParametersSelf {
+    provideParentWithRefreshRows(refreshRows: () => void): void;
+}
+export interface UseCompleteGridNavigationRowsParameters<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends OmitStrong<UseProcessedChildrenParameters<RowElement, RsM>, "context" | "processedIndexManglerParameters"> {
     context: CompleteGridNavigationRowContext<RowElement, RM>;
 }
 export interface UseCompleteGridNavigationRowsContext<RowElement extends Element, M extends UseCompleteGridNavigationRowsInfo<RowElement>> extends UseProcessedChildContext<RowElement, M> {
 }
-export interface UseCompleteGridNavigationRowsReturnType<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType<M>, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
+export interface UseCompleteGridNavigationRowsReturnType<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>> extends OmitStrong<UseRearrangeableChildrenReturnType, never>, OmitStrong<UsePaginatedChildrenReturnType, "context">, OmitStrong<UseStaggeredChildrenReturnType, "context"> {
     context: UseCompleteGridNavigationRowsContext<TabbableChildElement, M>;
 }
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>, OmitStrong<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">, Pick<UseTextContentParameters<RowElement>, "textContentParameters">, UseRefElementParameters<RowElement>, TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, OmitStrong<UseHasCurrentFocusParameters<RowElement>, "refElementReturn"> {
@@ -57,15 +61,19 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationCellContext<CellElement, CM>, Pick<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>>>, Pick<UseTextContentParameters<CellElement>, "textContentParameters">, OmitStrong<UseGridNavigationSelectionCellParameters<CellElement>, "info" | "context" | "refElementReturn"> {
 }
 export interface CompleteGridNavigationRowContext<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends UseManagedChildrenContext<RM>, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext, UseProcessedChildrenContext {
-    completeGridNavigationContext: CompleteGridNavigationRowContextSelf;
-}
-export interface CompleteGridNavigationRowContextSelf extends UseCompleteGridNavigationParametersSelf {
+    completeGridNavigationContext: UseCompleteGridNavigationContextSelf;
 }
 export interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellSelectionContext {
 }
-export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>, "props" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseRefElementReturnType<ParentOrRowElement>, "refElementReturn">, TargetedOmit<UseProcessedChildrenReturnType<RowElement, any>, "rearrangeableChildrenReturn", "indexDemangler" | "indexMangler" | "children">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn"> {
+export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>, "props" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseRefElementReturnType<ParentOrRowElement>, "refElementReturn">, TargetedOmit<UseProcessedChildrenReturnType<RowElement, any>, "rearrangeableChildrenReturn", "children">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn"> {
     context: CompleteGridNavigationRowContext<RowElement, RM>;
     props: ElementProps<ParentOrRowElement>;
+}
+export interface UseCompleteGridNavigationReturnTypeSelf {
+    /**
+     * Call this any time the values for the sortable children change to re-sort and re-render them.
+     */
+    refreshRows(): void;
 }
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSelectionRowReturnType<RowElement, CellElement, RM>, "hasCurrentFocusParameters" | "managedChildrenParameters" | "info" | "textContentParameters">, Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">, Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">, Pick<UseRefElementReturnType<RowElement>, "refElementReturn">, Pick<UseTextContentReturnType, "textContentReturn">, Pick<UseManagedChildReturnType<RM>, "managedChildReturn"> {
     context: CompleteGridNavigationCellContext<CellElement, CM>;
@@ -81,20 +89,21 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export declare const useCompleteGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt }, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>) => UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>;
+export declare const useCompleteGridNavigation: <ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt: gsva }, processedIndexManglerParameters: { compare, getIndex }, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>) => UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>;
 /**
  * Helper for `useCompleteGridNavigation` that handles the array of children in a way that allows for sorting, pagination, and staggering. Optional but recommended.
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-export declare const useCompleteGridNavigationRows: <TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, }: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M, RsM>) => UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM>;
-export interface UseCompleteGridNavigationRowOuterParameters<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends UseProcessedChildParameters<RowElement, RsM>, UseRefElementParameters<RowElement> {
+export declare const useCompleteGridNavigationRows: <TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M, RsM>) => UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM>;
+export interface UseCompleteGridNavigationRowOuterParameters<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends OmitStrong<UseProcessedChildParameters<RowElement, RsM>, "info">, UseRefElementParameters<RowElement> {
+    info: OmitStrong<UseProcessedChildParameters<RowElement, RsM>["info"], "getElement">;
     context: UseCompleteGridNavigationRowsContext<RowElement, RsM>;
 }
 export interface UseCompleteGridNavigationRowOuterReturnType<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>> extends OmitStrong<UseProcessedChildReturnType<RowElement, RsM>, "refElementParameters">, OmitStrong<UseRefElementReturnType<RowElement>, "propsStable"> {
     hide: boolean;
 }
-export declare const useCompleteGridNavigationRowOuter: <RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({ context, info, refElementParameters: { onElementChange: oec1, onMount, onUnmount } }: UseCompleteGridNavigationRowOuterParameters<RowElement, RsM>) => UseCompleteGridNavigationRowOuterReturnType<RowElement, RsM>;
+export declare const useCompleteGridNavigationRowOuter: <RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({ context, info: { index, ...uinfo }, refElementParameters: { onElementChange: oec1, onMount, onUnmount }, rearrangeableChildParameters }: UseCompleteGridNavigationRowOuterParameters<RowElement, RsM>) => UseCompleteGridNavigationRowOuterReturnType<RowElement, RsM>;
 /**
  * @compositeParams
  */

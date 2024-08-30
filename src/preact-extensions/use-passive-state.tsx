@@ -43,6 +43,12 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
     }
 }
 
+export interface UsePassiveStateOptions {
+    /** **Must be stable** (i.e. the value must not change as long as the component is rendered) */
+    skipMountInitialization: boolean;
+
+    debounceRendering: typeof debounceRendering;
+}
 
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
@@ -65,8 +71,10 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
  */
-export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
+export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, { debounceRendering: customDebounceRendering, skipMountInitialization }: Partial<UsePassiveStateOptions> = { debounceRendering, skipMountInitialization: false }): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
 
+    skipMountInitialization ??= false;
+    useEnsureStability("usePassiveState", skipMountInitialization);
     //let [id, ,getId] = useState(() => generateRandomId());
 
     const valueRef = useRef<T | typeof Unset>(Unset);
@@ -116,11 +124,22 @@ export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T,
         return (valueRef.current === Unset ? undefined! : valueRef.current!) as T;
     }, []);
 
-    useLayoutEffect(() => {
-        // Make sure we've run our effect at least once on mount.
-        // (If we have an initial value, of course)
-        tryEnsureValue();
-    }, []);
+    if (!skipMountInitialization) {
+        // TODO: Very, very few instances require initializing on mount.
+        // Grid navigation needs it (for reasons I haven't investigated and do not recall, but is related to a row's 0th cell sometimes erroneously entering the tab order)
+        // so it's the default until all use cases are thoroughly exhausted.
+        // But in general, we probably don't need so many invocations of `use(Layout!!)Effect`.
+        
+
+        // Also it is safe to wrap this hook in an `if` because 
+        // `skipMountInitialization` can't change throughout the lifetime of the component, 
+        // so the RoH aren't violated.
+        useLayoutEffect(() => {
+            // Make sure we've run our effect at least once on mount.
+            // (If we have an initial value, of course)
+            tryEnsureValue();
+        }, []);
+    }
 
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useCallback<PassiveStateUpdater<T, R>>((arg: Parameters<PassiveStateUpdater<T, R>>[0], reason: Parameters<PassiveStateUpdater<T, R>>[1]) => {

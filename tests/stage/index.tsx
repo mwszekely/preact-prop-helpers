@@ -1,11 +1,12 @@
 import { render } from "preact";
-import { useSearchParamState, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
+import { useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
 import { useEffect, useRef } from "preact/hooks";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
 import { TestBasesListNav } from "../fixtures/list-nav.stage.js";
 import { TestBasesButton } from "../fixtures/press.stage.js";
+import { TestBasesRefElement } from "../fixtures/ref-element.stage.js";
 import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
 
 
@@ -21,7 +22,9 @@ declare module globalThis {
 }
 
 
-
+//(globalThis as any).LOG_FOCUS_CHANGES = true;
+//(window as any)._generate_setState_stacks = true;
+//options.debounceRendering = (f) => f();
 
 globalThis.installTestingHandler = function installTestingHandler<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) {
     (globalThis)._TestingConstants ??= {} as any;
@@ -82,9 +85,11 @@ function TestBasesSanityCheck() {
     )
 }
 
+
 const TestBases = {
     "sanity-check": <TestBasesSanityCheck />,
     "press": <TestBasesButton />,
+    "ref-element": <TestBasesRefElement />,
     "list-navigation": <TestBasesListNav />,
     "grid-navigation": <TestBasesGridNav />,
     "focus": <TestBasesFocus />,
@@ -101,10 +106,49 @@ declare module "preact-prop-helpers" {
     }
 }
 
+const getCssSelectorShort = (el2: HTMLElement) => {
+    let el: Element = el2;
+    let path = [], parent;
+    while (parent = el.parentNode) {
+        let tag = el.tagName, siblings;
+        path.unshift(
+            el.id ? `#${el.id}` : (
+                siblings = parent.children,
+                [].filter.call(siblings, sibling => (sibling as Element).tagName === tag).length === 1 ? tag :
+                    `${tag}:nth-child(${[].indexOf.call(siblings, el as never)} + 1)`
+            )
+        );
+        el = parent as Element;
+    };
+    return `${path.join(' > ')}`.toLowerCase();
+};
+
 function TestsContainer() {
     const [bool, setBool, getBool] = useSearchParamStateDeclarative({ key: "test-bool", initialValue: null, stringToValue: fromStringBoolean });
-
+    const [focused, setFocused] = useState("");
     const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", stringToValue: value => value });
+
+    useGlobalHandler(document, "focusin", (e: FocusEvent) => {
+        ref.current!.innerHTML = `Focused: ${getCssSelectorShort(e.target as HTMLElement)}`;
+    }, { capture: true })
+
+
+    useGlobalHandler(document, "focusout", (e: FocusEvent) => {
+        const ae = document.activeElement;
+        const aes = ae ? getCssSelectorShort(ae as HTMLElement) : '';
+        ref.current!.innerHTML = `Focused: None!${aes ? ` (${aes})` : ``}`;
+    }, { capture: true })
+
+    useInterval({
+        interval: 100,
+        callback: () => {
+            ref2.current!.innerHTML = (new Date().toISOString());
+        }
+    })
+
+    useEffect(() => {
+        ref2.current!.innerHTML = (new Date().toISOString());
+    }, [])
 
     useEffect(() => {
         document.getElementById("focusable-first")?.focus?.();
@@ -118,8 +162,12 @@ function TestsContainer() {
             </>
         );
     }
+    const ref = useRef<HTMLDivElement>(null);
+    const ref2 = useRef<HTMLDivElement>(null);
     return (
         <>
+            <div ref={ref} />
+            <div ref={ref2} />
             <input id="focusable-first" />
             <TestItem>
                 {Object.entries(TestBases).map(([name, component]) => {

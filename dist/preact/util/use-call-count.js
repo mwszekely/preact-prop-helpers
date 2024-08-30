@@ -22,7 +22,7 @@ let i = 0;
  */
 export function monitored(hook) {
     const h = hook;
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) {
         return (function (...args) {
             const r = useRef(++i);
             monitorCallCount(h);

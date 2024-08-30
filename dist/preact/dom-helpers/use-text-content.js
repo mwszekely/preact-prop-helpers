@@ -6,7 +6,7 @@ import { useEffect } from "../util/lib.js";
  * @compositeParams
  */
 export const useTextContent = (function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
-    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
+    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
     useEffect(() => {
         const element = getElement();
         if (element) {

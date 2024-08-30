@@ -61,8 +61,8 @@ export const useHasLastFocus = /*@__PURE__*/ monitored(function useHasLastFocus<
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
 
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, runImmediately);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, runImmediately);
+    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
 
     const { activeElementReturn } = useActiveElement({
         activeElementParameters: {

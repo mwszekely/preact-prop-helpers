@@ -222,7 +222,6 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
         if (focused) {
             if (multiSelectionMode == "focus") {
                 let any = getAnyFocused();
-                console.log("any focused: ", any);
                 // Wow, it's the worst selection mode.
                 const subSelectionMode = (getShiftKeyDown() ? "toggle" : getCtrlKeyDown() ? "skip" : "set");
                 let newIndex = index;

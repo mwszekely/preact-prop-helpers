@@ -44,7 +44,7 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  *
  * @compositeParams
  */
-export declare const useGridNavigationSelection: <ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>) => UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>;
+export declare const useGridNavigationSelection: <ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void2 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>) => UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>;
 /**
  * @compositeParams
  */

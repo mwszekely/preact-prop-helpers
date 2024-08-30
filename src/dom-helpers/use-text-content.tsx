@@ -39,7 +39,7 @@ export interface UseTextContentReturnType {
  * @compositeParams
  */
 export const useTextContent = (function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
-    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
+    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
     useEffect(() => {
         const element = getElement();
         if (element) {

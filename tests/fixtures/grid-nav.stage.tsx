@@ -1,6 +1,6 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useProcessedChild, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
-import { useCallback, useContext, useEffect, useState } from "preact/hooks";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowsInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { useCallback, useContext, useEffect, useMemo, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -47,16 +47,23 @@ export function TestBasesGridNav() {
     const [typeaheadTimeout] = useTestSyncState("GridNav", "setTypeaheadTimeout", 1000, fromStringNumber);
     const [singleSelectionMode] = useTestSyncState("GridNav", "setSingleSelectionMode", "activation", fromStringString);
     const [singleSelectedIndex, setSingleSelectedIndex] = useState<number | null>(null);
+
+    const [tabbableColumnActual, setTabbableColumnActual] = useState(0 as number | null);
+    const [tabbableColumnIdeal, setTabbableColumnIdeal] = useState(0 as number | null);
     console.log(pagination);
 
     const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, singleSelectionMode }
 
-    installTestingHandler("GridNav", "setSingleSelectedIndex", setSingleSelectedIndex);
+    useEffect(() => { installTestingHandler("GridNav", "setSingleSelectedIndex", setSingleSelectedIndex); }, []);
+    
     if (!mounted)
         return <div />;
 
     return (
-        <TestBasesGridNavImpl singleSelectedIndex={singleSelectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} singleSelectionMode={singleSelectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} singleSelectionAriaPropName={singleSelectionAriaPropName} />
+        <>
+            <div>Tabbable column: {tabbableColumnActual} (wanted {tabbableColumnIdeal})</div>
+            <TestBasesGridNavImpl singleSelectedIndex={singleSelectedIndex} setTabbableColumnActual={setTabbableColumnActual} setTabbableColumnIdeal={setTabbableColumnIdeal} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} singleSelectionMode={singleSelectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} singleSelectionAriaPropName={singleSelectionAriaPropName} />
+        </>
     );
 }
 
@@ -75,10 +82,12 @@ interface TestBasesGridNavImplProps {
     typeaheadTimeout: number;
     singleSelectionMode: "focus" | "activation" | "disabled";
     singleSelectedIndex: number | null;
+    setTabbableColumnActual: (c: number | null) => void;
+    setTabbableColumnIdeal: (c: number | null) => void;
 }
 
 function useOnRender(id: string) {
-    window.onRender ??= async (id) => { console.log("RENDER:" + id); }
+    //window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
     const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { imperativePropsReturn: imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
@@ -91,7 +100,7 @@ function useOnRender(id: string) {
     return { props: useMergedProps(props, propsStable) }
 }
 
-function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, singleSelectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesGridNavImplProps) {
+function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex, setTabbableColumnActual, setTabbableColumnIdeal, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, singleSelectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesGridNavImplProps) {
 
     console.log(pagination);
 
@@ -110,14 +119,24 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         //sortableChildrenReturn: { sort },
         //staggeredChildrenReturn: { stillStaggering },
         refElementReturn,
+
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
     } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
-        gridNavigationParameters: { onTabbableColumnChange: null, initiallyTabbableColumn: 0 },
+        gridNavigationParameters: {
+            onTabbableColumnChange: useStableCallback(({ actual, ideal }) => {
+                setTabbableColumnActual(actual);
+                setTabbableColumnIdeal(ideal);
+            }, []), initiallyTabbableColumn: 0
+        },
         //rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         refElementParameters: {},
+        processedIndexManglerParameters: {
+            compare: null,
+            getIndex: useCallback(info => info.props.index, []),
+        },
         singleSelectionDeclarativeParameters: {
             singleSelectedIndex,
             onSingleSelectedIndexChange: useStableCallback((e) => {
@@ -133,24 +152,24 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         //sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteGridNavigationRowInfo<HTMLDivElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         //staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
-        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null }
+        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null },
     });
+
+    const children = useMemo(() => {
+        return Array.from(function* () {
+            for (let i = 0; i < childCount; ++i) {
+                yield (
+                    <Outer index={i} />
+                );
+            }
+        }());
+    }, [childCount]);
 
     const { context: contextFromProcessing, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn: { stillStaggering } } = useCompleteGridNavigationRows({
         context: contextFromGrid,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback(info => info.props.index, []),
-            adjust: null,
-            children: Array.from(function* () {
-                for (let i = 0; i < childCount; ++i) {
-                    yield (
-                        <Outer index={i} />
-                    );
-                }
-            }()),
-            compare: null,
-            onRearranged: null
+            children,
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered },
@@ -181,9 +200,11 @@ function Outer({ index }: { index: number }) {
         props,
         paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
-    } = useProcessedChild({
+    } = useCompleteGridNavigationRowOuter<HTMLTableRowElement, UseCompleteGridNavigationRowsInfo<HTMLTableRowElement>>({
         context: useContext(ProcessingChildContext),
-        info: { index }
+        info: { index },
+        refElementParameters: {},
+        rearrangeableChildParameters: { cssProperty: 'translate', duration: '666ms' }
     });
 
     let children = hideBecausePaginated || hideBecauseStaggered ? null : <TestBaseGridNavRow index={index} />;
@@ -301,8 +322,9 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     } = useCompleteGridNavigationCell<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(CellContext),
         gridNavigationCellParameters: { colSpan },
-        info: { index, untabbable: false, focusSelf: e => e.focus() },
-        textContentParameters: { getText: useStableCallback(() => textContent), onTextContentChange: null }
+        info: { index, untabbable: hidden, focusSelf: e => focus(e) },
+        textContentParameters: { getText: useStableCallback(() => textContent), onTextContentChange: null },
+
     })
     return (
         <>

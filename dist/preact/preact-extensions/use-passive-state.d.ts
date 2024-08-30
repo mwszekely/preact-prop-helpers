@@ -10,6 +10,11 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
+export interface UsePassiveStateOptions {
+    /** **Must be stable** (i.e. the value must not change as long as the component is rendered) */
+    skipMountInitialization: boolean;
+    debounceRendering: typeof debounceRendering;
+}
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
  *
@@ -31,7 +36,7 @@ export declare function useEnsureStability<T extends any[]>(parentHookName: stri
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
+export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, { debounceRendering: customDebounceRendering, skipMountInitialization }?: Partial<UsePassiveStateOptions>): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
 export declare function returnTrue(): boolean;
 export declare function returnFalse(): boolean;
 export declare function returnNull(): null;

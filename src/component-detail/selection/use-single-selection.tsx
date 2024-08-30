@@ -221,7 +221,8 @@ export const useSingleSelection = /*@__PURE__*/ monitored(function useSingleSele
         setAt: setSelectedAt,
         isValid: isSelectedValid,
         closestFit: false,
-        onClosestFit: null
+        onClosestFit: null,
+        indexDemangler: null
     });
     return {
         singleSelectionReturn: useMemoObject({

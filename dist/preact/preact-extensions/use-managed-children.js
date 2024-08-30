@@ -1,5 +1,6 @@
+import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
+import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -76,6 +77,27 @@ export const useManagedChildren = /*@__PURE__*/ monitored(function useManagedChi
         else
             return managedChildrenArray.current.rec[index];
     }, []);
+    const shrinkwrapHandle = useRef(null);
+    // When we unmount children, we'd like to reduce the array length accordingly.
+    // We do this a tick after useEffect to wait for all the child dust to settle, 
+    // because this is not critical work; it's just for memory optimization.
+    // Honestly, it might even be better to delete this? TODO, I guess.
+    const scheduleShrinkwrap = useCallback(() => {
+        if (shrinkwrapHandle.current != null)
+            clearTimeout(shrinkwrapHandle.current);
+        shrinkwrapHandle.current = setTimeout(() => {
+            let shave = 0;
+            while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
+                ++shave;
+            }
+            managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
+            managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+            shrinkwrapHandle.current = null;
+            // TODO: length automatically adjusts to give us the highest index,
+            // but there's no corresponding property to get the lowest index when it changes...
+            // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
+        }, 1);
+    }, []);
     // tl;dr this is a way to have run useLayoutEffect once after all N children
     // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
     // ourselves because of having a `childCount` state or anything similar.
@@ -98,8 +120,23 @@ export const useManagedChildren = /*@__PURE__*/ monitored(function useManagedChi
             hasRemoteULEChildMounted.current = {
                 mounts: new Set(),
                 unmounts: new Set(),
+                mountInfos: new Map()
             };
             debounceRendering(() => {
+                const { mounts, unmounts } = hasRemoteULEChildMounted.current;
+                const unmountsThatDidntMount = unmounts.difference(mounts);
+                for (const index of mounts) {
+                    if (typeof index == "number") {
+                        managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+                        managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index);
+                    }
+                }
+                for (const index of unmountsThatDidntMount) {
+                    if (typeof index == "number")
+                        delete managedChildrenArray.current.arr[index];
+                    else
+                        delete managedChildrenArray.current.rec[index];
+                }
                 if (onChildrenCountChange || onChildrenMountChange) {
                     onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
                     onChildrenCountChange?.(getChildren().getHighestIndex() + 1);
@@ -107,32 +144,11 @@ export const useManagedChildren = /*@__PURE__*/ monitored(function useManagedChi
                 }
             });
         }
-        if (mounted) {
-            if (typeof index == "number") {
-                managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-                managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index);
-            }
-        }
-        else {
-            if (typeof index == "number") {
-                delete managedChildrenArray.current.arr[index];
-                let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
-                    ++shave;
-                }
-                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-            }
-            else
-                delete managedChildrenArray.current.rec[index];
-            if (typeof index == "number") {
-                managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
-                // TODO: length automatically adjusts to give us the highest index,
-                // but there's no corresponding property to get the lowest index when it changes...
-                // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
-            }
-        }
         hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
     }, [ /* Must remain stable */]);
+    useEffect(() => {
+        scheduleShrinkwrap();
+    }, []);
     const managedChildren = useMemoObject({
         ...{ _: managedChildrenArray.current },
         forEach: forEachChild,
@@ -182,17 +198,25 @@ export const useManagedChild = /*@__PURE__*/ monitored(function useManagedChild(
         else {
             managedChildrenArray.rec[index] = { ...info };
         }
-        //return remoteULEChildChanged(index as IndexType);
     });
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
     // Do the same on unmount.
     // Note: It's important that this comes AFTER remoteULEChildChanged
     // so that remoteULEChildMounted has access to all the info on mount.
+    // When we unmount, ask the parent to remove our info from the list of children.
     useLayoutEffect(() => {
         remoteULEChildMounted?.(index, true);
         return () => remoteULEChildMounted?.(index, false);
     }, [index]);
+    // When we mount, and **after other children have unmounted via uLE),
+    // ask the parent to add our info to the list of children.
+    //
+    // The order is important (we need to delete all unmounts *before* adding any mounts)
+    // but TODO the use of useLayoutEffect + useEffect to achieve this isn't really semantically correct.
+    // Plus we've gone from scheduling 1 effect to 2.
+    //useEffect(() => {
+    //}, [index]);
     return {
         managedChildReturn: { getChildren: getChildren }
     };
@@ -211,11 +235,12 @@ export const useManagedChild = /*@__PURE__*/ monitored(function useManagedChild(
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  *
  */
-export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+export function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);
+    indexDemangler ??= identity;
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, undefined);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { skipMountInitialization: true });
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
     const getClosestFit = useCallback((requestedIndex) => {
@@ -243,15 +268,16 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
-        const requestedIndex = getRequestedIndex();
-        const currentIndex = getCurrentIndex();
+        const requestedIndex = indexDemangler(getRequestedIndex());
+        const currentIndex = indexDemangler(getCurrentIndex());
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
             const closestFitIndex = getClosestFit(requestedIndex);
             setCurrentIndex(closestFitIndex, reason);
-            if (currentChild)
+            if (currentChild) {
                 setAt(currentChild, false, closestFitIndex, currentIndex);
+            }
             if (closestFitIndex != null) {
                 const closestFitChild = children.getAt(closestFitIndex);
                 console.assert(closestFitChild != null, "Internal logic???");

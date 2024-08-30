@@ -48,7 +48,9 @@ export function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+export function usePassiveState(onChange, getInitialValue, { debounceRendering: customDebounceRendering, skipMountInitialization } = { debounceRendering, skipMountInitialization: false }) {
+    skipMountInitialization ??= false;
+    useEnsureStability("usePassiveState", skipMountInitialization);
     //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset);
     const reasonRef = useRef(Unset);
@@ -89,11 +91,20 @@ export function usePassiveState(onChange, getInitialValue, customDebounceRenderi
             tryEnsureValue();
         return (valueRef.current === Unset ? undefined : valueRef.current);
     }, []);
-    useLayoutEffect(() => {
-        // Make sure we've run our effect at least once on mount.
-        // (If we have an initial value, of course)
-        tryEnsureValue();
-    }, []);
+    if (!skipMountInitialization) {
+        // TODO: Very, very few instances require initializing on mount.
+        // Grid navigation needs it (for reasons I haven't investigated and do not recall, but is related to a row's 0th cell sometimes erroneously entering the tab order)
+        // so it's the default until all use cases are thoroughly exhausted.
+        // But in general, we probably don't need so many invocations of `use(Layout!!)Effect`.
+        // Also it is safe to wrap this hook in an `if` because 
+        // `skipMountInitialization` can't change throughout the lifetime of the component, 
+        // so the RoH aren't violated.
+        useLayoutEffect(() => {
+            // Make sure we've run our effect at least once on mount.
+            // (If we have an initial value, of course)
+            tryEnsureValue();
+        }, []);
+    }
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useCallback((arg, reason) => {
         // Regardless of anything else, figure out what our next value is about to be.

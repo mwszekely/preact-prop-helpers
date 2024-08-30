@@ -6,8 +6,8 @@ import { TargetedPick, useCallback, useEffect, useLayoutEffect, useMemo, useRef 
 import { ElementProps, Nullable } from "../../util/types.js";
 import { monitored } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UseLinearNavigationParameters } from "../keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+import { UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
     setPaginationVisible(visible: boolean): void;
@@ -22,8 +22,8 @@ export interface UsePaginatedChildrenParametersSelf {
 
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
     extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
-    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">,
     TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler">,
     TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
@@ -72,10 +72,10 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  */
 export const usePaginatedChildren = /*@__PURE__*/ monitored(function usePaginatedChildren<TabbableChildElement extends Element>({
     managedChildrenReturn: { getChildren },
-    rearrangeableChildrenReturn: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
-    childrenHaveFocusReturn: { getAnyFocused }
+    childrenHaveFocusReturn: { getAnyFocused },
+    processedIndexManglerReturn: { indexDemangler, indexMangler }
 }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
 
     const parentIsPaginated = (paginationMin != null || paginationMax != null);

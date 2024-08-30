@@ -16,7 +16,7 @@ export { identity };
  *
  * @compositeParams
  */
-export const useLinearNavigation = (function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
+export const useLinearNavigation = (function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -131,8 +131,6 @@ export const useLinearNavigation = (function useLinearNavigation({ linearNavigat
                 case "ArrowUp":
                 case "ArrowDown":
                     keyPressIsValidForOrientation = (allowsVerticalNavigation);
-                    if (keyPressIsValidForOrientation)
-                        debugger;
                     break;
                 case "ArrowLeft":
                 case "ArrowRight":

@@ -12,5 +12,5 @@
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export declare const useUrl: (onUrlChange: (url: string) => void) => readonly [() => string, (newUrlOrSetter: string | ((prev: string | undefined) => string), action: "push" | "replace") => void];
+export declare const useUrl: (onUrlChange: (url: string) => void) => readonly [() => string, (newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => void];
 //# sourceMappingURL=use-url.d.ts.map

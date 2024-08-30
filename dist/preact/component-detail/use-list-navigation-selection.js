@@ -14,7 +14,7 @@ import { useSelection, useSelectionChild } from "./selection/use-selection.js";
  *
  * @compositeParams
  */
-export const useListNavigationSelection = /*@__PURE__*/ monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }) {
+export const useListNavigationSelection = /*@__PURE__*/ monitored(function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void3 }) {
     const { context: contextSS, propsStable, ...retSS } = useSelection({
         childrenHaveFocusReturn,
         rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
@@ -29,7 +29,7 @@ export const useListNavigationSelection = /*@__PURE__*/ monitored(function useLi
         typeaheadNavigationParameters,
         managedChildrenReturn,
         refElementReturn,
-        rearrangeableChildrenReturn
+        processedIndexManglerReturn
     });
     assertEmptyObject(void3);
     return {

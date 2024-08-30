@@ -20,7 +20,7 @@ export default {
     treeshake: "recommended",
     plugins: [
         typescript(),
-        replace({ 'process.env.NODE_ENV': JSON.stringify('production'), preventAssignment: true }),
+        replace({ 'process.env.NODE_ENV': JSON.stringify('development'), preventAssignment: true }),
         commonjs({ extensions, sourceMap: true, transformMixedEsModules: true }),
         resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks", "preact-prop-helpers"] }),   // TODO: Why, exactly, is dedupe needed? It doesn't not make sense, but specifically. Why.
         getBabelOutputPlugin({  // Used instead of babel because babel generates incorrect source maps for our code (but not Preact's)

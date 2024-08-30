@@ -11,8 +11,8 @@ import { monitored } from "../util/use-call-count.js";
 export const useHasCurrentFocus = /*@__PURE__*/ monitored(function useHasCurrentFocus(args) {
     const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
-    const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
-    const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
+    const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
     const onFocusIn = useCallback((e) => {
         setFocusedInner(true, e);
         setFocused(e.target == getElement(), e);

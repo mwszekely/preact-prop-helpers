@@ -11,7 +11,7 @@ import { monitored } from "../util/use-call-count.js";
 export const useElementSize = /*@__PURE__*/ monitored(function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {});
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
-    const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, runImmediately);
+    const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
     const currentObserveBox = useRef(undefined);
     const needANewObserver = useCallback((element, observeBox) => {
         if (element) {

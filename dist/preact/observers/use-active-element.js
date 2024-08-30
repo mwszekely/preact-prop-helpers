@@ -122,9 +122,9 @@ export const useActiveElement = /*@__PURE__*/ monitored(function useActiveElemen
             }
         };
     }, []);
-    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, runImmediately);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
-    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
+    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
 });
 //# sourceMappingURL=use-active-element.js.map

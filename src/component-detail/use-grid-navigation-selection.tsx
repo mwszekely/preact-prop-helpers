@@ -79,7 +79,7 @@ export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGr
     multiSelectionParameters,
     refElementReturn,
     paginatedChildrenParameters,
-    rearrangeableChildrenReturn,
+    processedIndexManglerReturn,
     childrenHaveFocusReturn,
     ...void2
 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>): UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement> {
@@ -98,7 +98,7 @@ export const useGridNavigationSelection = /*@__PURE__*/ monitored(function useGr
         rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
         typeaheadNavigationParameters,
         paginatedChildrenParameters,
-        rearrangeableChildrenReturn,
+        processedIndexManglerReturn,
         refElementReturn
     });
 

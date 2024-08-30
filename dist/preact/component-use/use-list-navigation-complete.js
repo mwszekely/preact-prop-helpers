@@ -1,5 +1,5 @@
 import { useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
-import { useCreateProcessedChildrenContext } from "../component-detail/processed-children/use-rearrangeable-children.js";
+import { useProcessedIndexMangler } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/selection/use-selection.js";
 import { useListNavigationSelection, useListNavigationSelectionChild } from "../component-detail/use-list-navigation-selection.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -8,11 +8,10 @@ import { useTextContent } from "../dom-helpers/use-text-content.js";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
-import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { useCallback } from "../util/lib.js";
+import { useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { monitored } from "../util/use-call-count.js";
 /**
  * All the list-related hooks combined into one large hook that encapsulates everything.
@@ -26,8 +25,7 @@ import { monitored } from "../util/use-call-count.js";
  */
 export const useCompleteListNavigation = /*@__PURE__*/ monitored(function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
-refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...void1 }) {
-    useEnsureStability("useCompleteListNavigation", getSortValueAt);
+refElementParameters, processedIndexManglerParameters, ...void1 }) {
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -40,10 +38,7 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    // Grab the information from the array of children we may or may not render.
-    // (see useProcessedChildren -- it send this information to us if it's used.)
-    // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-    const { context: contextProcessing, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+    const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexDemangler, indexMangler, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters });
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -54,7 +49,7 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
         paginatedChildrenParameters,
         refElementReturn,
         childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-        rearrangeableChildrenReturn: { indexDemangler, indexMangler }
+        processedIndexManglerReturn: { indexDemangler, indexMangler }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const mcr = useManagedChildren({
@@ -66,7 +61,10 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
     const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const { getAnyFocused } = childrenHaveFocusReturn;
+    // => <= <=>
     const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused });
+    const refreshRows = useRef(() => { });
+    const { getSortValueAt, compare, getIndex } = processedIndexManglerParameters;
     const context = useMemoObject({
         childrenHaveFocusChildContext,
         rovingTabIndexContext,
@@ -75,8 +73,8 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
         typeaheadNavigationContext,
         managedChildContext: managedChildRTIContext,
         processedChildrenContext,
-        listNavigationCompleteContext: useMemoObject({ getSortValueAt }),
-        ...contextProcessing
+        listNavigationCompleteContext: useMemoObject({ getSortValueAt, compare, getIndex, provideParentWithRefreshRows: useCallback((e) => { refreshRows.current = e; }, []) }),
+        processedIndexManglerContext,
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -91,7 +89,7 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
         typeaheadNavigationReturn,
         childrenHaveFocusReturn,
         refElementReturn,
-        rearrangeableChildrenReturn: { reverse, shuffle, rearrange, sort },
+        rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) }
     };
 });
 /**
@@ -99,18 +97,22 @@ refElementParameters, listNavigationCompleteParameters: { getSortValueAt }, ...v
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  */
-export const useCompleteListNavigationChildren = /*@__PURE__*/ monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, rearrangeableChildrenParameters, staggeredChildrenParameters, managedChildrenParameters }) {
-    const { listNavigationCompleteContext: { getSortValueAt } } = context;
+export const useCompleteListNavigationChildren = /*@__PURE__*/ monitored(function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
+    assertEmptyObject(void1);
+    const { listNavigationCompleteContext: { getSortValueAt, compare, getIndex, provideParentWithRefreshRows } } = context;
     const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
         paginatedChildrenParameters,
-        rearrangeableChildrenParameters: {
-            getSortValueAt,
-            ...rearrangeableChildrenParameters
-        },
+        processedIndexManglerParameters: { getSortValueAt, compare, getIndex },
+        rearrangeableChildrenParameters,
         staggeredChildrenParameters,
         managedChildrenParameters,
         context,
     });
+    useLayoutEffect(() => {
+        provideParentWithRefreshRows(() => {
+            rearrangeableChildrenReturn.refresh();
+        });
+    }, []);
     return {
         context: contextRPS,
         paginatedChildrenReturn,
@@ -118,7 +120,7 @@ export const useCompleteListNavigationChildren = /*@__PURE__*/ monitored(functio
         staggeredChildrenReturn
     };
 });
-export const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(function useCompleteListNavigationChildOuter({ context, info, refElementParameters: { onElementChange: oec1, onMount, onUnmount } }) {
+export const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(function useCompleteListNavigationChildOuter({ context, info: { index, ...uinfo }, refElementParameters: { onElementChange: oec1, onMount, onUnmount }, rearrangeableChildParameters }) {
     const { propsStable, refElementReturn } = useRefElement({
         refElementParameters: {
             onElementChange: useStableCallback((...a) => { oec1?.(...a); oec2?.(...a); }),
@@ -126,9 +128,11 @@ export const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(funct
             onUnmount
         }
     });
+    const { getElement } = refElementReturn;
     const { props, ...processedChildReturn } = useProcessedChild({
         context,
-        info
+        info: { index, getElement, ...uinfo },
+        rearrangeableChildParameters
     });
     const { refElementParameters: { onElementChange: oec2 } } = processedChildReturn;
     return {
@@ -143,7 +147,7 @@ export const useCompleteListNavigationChildOuter = /*@__PURE__*/ monitored(funct
  * @compositeParams
  */
 export const useCompleteListNavigationChild = /*@__PURE__*/ monitored(function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, rearrangeableChildrenContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
+textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, processedIndexManglerContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
         info: { index, untabbable },

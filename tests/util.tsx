@@ -1,13 +1,15 @@
 import { RenderableProps } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate, useSearchParamStateDeclarative, useState } from "../dist/preact/index.js";
-import { GridNavConstants } from "./fixtures/grid-nav.stage.js";
-import { ListNavConstants } from "./fixtures/list-nav.stage.js";
-import { PressConstants } from "./fixtures/press.stage.js";
+import type { GridNavConstants } from "./fixtures/grid-nav.stage.js";
+import type { ListNavConstants } from "./fixtures/list-nav.stage.js";
+import type { PressConstants } from "./fixtures/press.stage.js";
+import type { RefElementConstants } from "./fixtures/ref-element.stage.js";
 
 
 export interface TestingConstants {
     Press: PressConstants;
+    RefElement: RefElementConstants;
     ListNav: ListNavConstants;
     GridNav: GridNavConstants;
 }

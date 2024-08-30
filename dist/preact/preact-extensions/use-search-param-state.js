@@ -64,7 +64,7 @@ export function useSearchParamState({ key: paramKey, defaultReason, stringToValu
     const savedParamValue = useRef(parseParam(null, paramKey, stringToValue) ?? initialValue);
     const [_getSavedParamValue, setSavedParamValue] = usePassiveState(onValueChange, useStableCallback(() => {
         return savedParamValue.current = (parseParam(null, paramKey, stringToValue) ?? getInitialValue());
-    }), runImmediately);
+    }), { debounceRendering: runImmediately, skipMountInitialization: true });
     const setParamWithHistory = useStableCallback((newValueOrUpdater, reason) => {
         const document = getDocument();
         const window = getWindow();

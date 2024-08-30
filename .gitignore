@@ -11,6 +11,7 @@ package-lock.json
 !temp
 !temp/preact-prop-helpers.d.ts
 temp/tsdoc-metadata.json
+test-results
 
 # Logs
 logs

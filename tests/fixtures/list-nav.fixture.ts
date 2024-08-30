@@ -15,10 +15,23 @@ export const test = base.extend<{listNav: ListNavFixtures}>({
         const list = locator.locator("[role=toolbar]");
         await focusableFirst.focus();
         await expect(list).toBeAttached();
-        await use({ list });
+        const resetChildrenButton = page.locator("#reduce-child-count");
+        const reduceChildrenButton = page.locator("#reset-child-order");
+        const shuffleChildrenButton = page.locator("#shuffle-child-order");
+        await use({ 
+            list, 
+            items: list.locator("li") ,
+            reduceChildren: async () => { await reduceChildrenButton.click(); await page.keyboard.press("Shift+Tab") },
+            resetChildCount: async () => { await resetChildrenButton.click(); await page.keyboard.press("Shift+Tab") },
+            shuffleChildren: async () => { await shuffleChildrenButton.click(); await page.keyboard.press("Shift+Tab") },
+        });
     },
 });
 
 export interface ListNavFixtures {
     list: Locator;
+    items: Locator;
+    shuffleChildren(): Promise<void>;
+    reduceChildren(): Promise<void>;
+    resetChildCount(): Promise<void>;
 }

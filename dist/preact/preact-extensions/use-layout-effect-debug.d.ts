@@ -8,5 +8,5 @@ import { EffectChange } from "./use-effect-debug.js";
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
  */
-export declare const useLayoutEffectDebug: <I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I | undefined) => void;
+export declare const useLayoutEffectDebug: <I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) => void;
 //# sourceMappingURL=use-layout-effect-debug.d.ts.map

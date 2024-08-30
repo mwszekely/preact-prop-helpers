@@ -3,10 +3,9 @@ import { useManagedChild, useManagedChildren } from "../../preact-extensions/use
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { useCallback } from "../../util/lib.js";
 import { monitored } from "../../util/use-call-count.js";
 import { usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
-import { useRearrangeableChildren } from "./use-rearrangeable-children.js";
+import { useRearrangeableChild, useRearrangeableChildren } from "./use-rearrangeable-children.js";
 import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-children.js";
 /**
  * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
@@ -54,39 +53,27 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @hasChild {@link useProcessedChild}
  */
-export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcessedChildren({ rearrangeableChildrenParameters: { onRearranged, children: childrenUnsorted, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters }) {
-    const childCount = childrenUnsorted.length;
+export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters, processedIndexManglerParameters }) {
+    const childCount = rearrangeableChildrenParameters.children.length;
     const { paginationMax, paginationMin } = paginatedChildrenParameters;
     const { staggered } = staggeredChildrenParameters;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
     const rp = useStableCallback(() => {
         refreshPagination(paginationMin, paginationMax);
     });
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren({
-        rearrangeableChildrenParameters: {
-            onRearranged: useCallback((phase) => {
-                // This kind of weird "phase" jank is to account for this oddity:
-                // `refreshPagination` is auto-called on mount by usePaginatedChildren,
-                // but needs to be called manually during other times. Also, due to
-                // a circular dependency, it needs `useStableCallback`, so can't be
-                // called during render anyway.
-                if (phase != 'render') {
-                    rp();
-                }
-                onRearranged?.(phase);
-            }, []),
-            children: childrenUnsorted,
-            ...rearrangeableChildrenParameters,
-        },
-        managedChildrenReturn,
-        context
+    const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
+    const { rearrangeableChildrenReturn, context: { rearrangeableChildrenContext }, } = useRearrangeableChildren({
+        context,
+        processedIndexManglerParameters,
+        rearrangeableChildrenParameters,
+        managedChildrenReturn
     });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
         rovingTabIndexReturn: context.processedChildrenContext,
         childrenHaveFocusReturn: context.processedChildrenContext,
         paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-        rearrangeableChildrenReturn,
+        processedIndexManglerReturn: { indexDemangler, indexMangler }
     });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
         managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
@@ -100,12 +87,18 @@ export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcesse
         context: useMemoObject({
             staggeredChildContext,
             paginatedChildContext,
-            managedChildContext
+            managedChildContext,
+            rearrangeableChildrenContext
         })
     };
 });
-export const useProcessedChild = /*@__PURE__*/ monitored(function useProcessedChild({ context, info: { index, ...uinfo }, ...void1 }) {
+export const useProcessedChild = /*@__PURE__*/ monitored(function useProcessedChild({ context, info: { index, getElement, ...uinfo }, rearrangeableChildParameters, ...void1 }) {
     const { paginatedChildContext, staggeredChildContext } = context;
+    const { info: { updateFLIPAnimation } } = useRearrangeableChild({
+        context,
+        info: { getElement, index },
+        rearrangeableChildParameters
+    });
     const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild({ context: { paginatedChildContext }, info: { index } });
     const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild({ context: { staggeredChildContext }, info: { index } });
     const { managedChildReturn } = useManagedChild({
@@ -116,6 +109,8 @@ export const useProcessedChild = /*@__PURE__*/ monitored(function useProcessedCh
             setPaginationVisible,
             setStaggeredVisible,
             getStaggeredVisible,
+            updateFLIPAnimation,
+            getElement,
             ...uinfo
         }
     });

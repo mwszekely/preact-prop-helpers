@@ -61,11 +61,11 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
 export const useChildrenHaveFocus = /*@__PURE__*/ monitored(function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
-    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, runImmediately);
+    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
     const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
-    }), returnZero, setTimeout);    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being runImmediately...
+    }), returnZero, { debounceRendering: setTimeout, skipMountInitialization: true });    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
 
     return {
         childrenHaveFocusReturn: { getAnyFocused },

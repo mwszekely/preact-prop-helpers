@@ -35,7 +35,7 @@ let i = 0;
 export function monitored<T>(hook: T): T {
     const h = (hook as (...args: any) => any);
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration) {
         return (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
             const r = useRef(++i);
             monitorCallCount(h);

@@ -28,7 +28,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
+export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexDemangler }, ...void1 }) {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
     const lastFocused = useRef(null);
@@ -49,6 +49,7 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
             console.assert(!!parentElement);
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
+            // TODO: Redundant with below?
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex, reason);
             // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
@@ -86,7 +87,7 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
                     }
                 }
             }
-            // TODO: Redundant?
+            // TODO: Redundant with above?
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex, reason);
             // Finally, return the value the user requested the index be set to.
@@ -122,13 +123,14 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
     }, []);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
-    const setTabbableAt = useCallback((child, t) => { child.setLocallyTabbable(t); }, []);
+    const setTabbableAt = useCallback((child, t) => { if (child.index == 8)
+        debugger; child.setLocallyTabbable(t); }, []);
     const isTabbableValid = useStableCallback((child) => { return !child.untabbable; });
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
         onIndexChange: useStableCallback((n, p, r) => {
             // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange
-            if ((!(n == null && untabbable)) && n != getLastNonNullIndex())
+            if ((!(n == null && untabbable)))
                 onTabbableIndexChange?.(n, p, r);
         }),
         getChildren,
@@ -136,6 +138,7 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
         getAt: getTabbableAt,
         isValid: isTabbableValid,
         setAt: setTabbableAt,
+        indexDemangler,
         onClosestFit: (index) => {
             const document = getDocument();
             // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body
@@ -151,6 +154,7 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
                 else
                     getChildren().getAt(index)?.focusSelf(childElement);
             }
+            avoidFocusingSelfOnMount.current = true;
         }
     });
     const focusSelf = useCallback((force, reason) => {
@@ -179,7 +183,7 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
         reevaluateClosestFit,
-        getUntabbable: useStableGetter(untabbable),
+        untabbable,
         getUntabbableBehavior: useStableGetter(untabbableBehavior),
         giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
     });
@@ -214,11 +218,40 @@ export const useRovingTabIndex = /*@__PURE__*/ monitored(function useRovingTabIn
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export const useRovingTabIndexChild = /*@__PURE__*/ monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
-    const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
-    useEffect(() => {
+export const useRovingTabIndexChild = /*@__PURE__*/ monitored(function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
+    const [tabbable, st, getTabbable] = useState(() => { return getInitiallyTabbedIndex() === index; });
+    const HACK = useRef(iAmUntabbable);
+    const HACK2 = useRef(index);
+    HACK.current = iAmUntabbable;
+    HACK2.current = index;
+    const setTabbable = useCallback((t) => {
+        if (typeof t === 'function') {
+            return st(prev => {
+                const ret = t(prev);
+                if (ret && HACK.current) {
+                    debugger;
+                    console.error("setTabbable(true) called on a hidden child?");
+                }
+                console.log(`setTabbable(${HACK2.current}, ${ret})`);
+                return ret;
+            });
+        }
+        else {
+            if (t && HACK.current) {
+                debugger;
+                console.error("setTabbable(true) called on a hidden child?");
+            }
+            const ret = st(t);
+            console.log(`setTabbable(${HACK2.current}, ${t})`);
+            return ret;
+        }
+    }, []);
+    /*useEffect(() => {
+        if (index == 8 && tabbable)
+            debugger;
         reevaluateClosestFit(undefined);
-    }, [!!iAmUntabbable]);
+        return () => reevaluateClosestFit(undefined);
+    }, [index, tabbable, !!iAmUntabbable]);*/
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     useEffect(() => {
@@ -230,7 +263,6 @@ export const useRovingTabIndexChild = /*@__PURE__*/ monitored(function useRoving
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
-                    const parentIsUntabbable = getParentIsUntabbable();
                     const untabbableBehavior = getUntabbableBehavior();
                     if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior != "focus-parent")
                         setTabbableIndex(index, e, false);
@@ -245,8 +277,8 @@ export const useRovingTabIndexChild = /*@__PURE__*/ monitored(function useRoving
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable },
         props: useTagProps({
-            tabIndex: (tabbable ? 0 : -1),
-            ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
+            tabIndex: ((tabbable && !parentIsUntabbable) ? 0 : -1),
+            inert: iAmUntabbable // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
         }, "data-roving-tab-index-child"),
     };
 });

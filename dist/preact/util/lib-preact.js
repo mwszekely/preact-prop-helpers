@@ -1,4 +1,4 @@
-export { Fragment, cloneElement, createContext, createElement } from "preact";
+export { cloneElement, createContext, createElement, Fragment } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 import { options } from "preact";
@@ -16,11 +16,10 @@ export const onfocusin = "onfocusin";
 // @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 export const onfocusout = "onfocusout";
 export const EventMapping = {
-    // @ts-ignore
     beforetoggle: null,
     dblclick: "onDblClick",
-    focusIn: "onfocusin",
-    focusOut: "onfocusout",
+    focusin: "onFocusIn",
+    focusout: "onFocusOut",
     formdata: "onFormData",
     toggle: "onToggle",
     ...em

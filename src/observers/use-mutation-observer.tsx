@@ -63,7 +63,7 @@ export const useMutationObserver = /*@__PURE__*/ monitored(function useMutationO
 
             return () => observer.disconnect();
         }
-    }), returnNull, runImmediately)
+    }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true })
 
     const onNeedMutationObserverReset = useCallback((element: E | null) => {
         if (element) {

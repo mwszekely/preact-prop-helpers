@@ -111,7 +111,7 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
     const savedParamValue = useRef(parseParam<Key, T>(null, paramKey, stringToValue) ?? initialValue);
     const [_getSavedParamValue, setSavedParamValue] = usePassiveState<T, never>(onValueChange, useStableCallback(() => {
         return savedParamValue.current = (parseParam<Key, T>(null, paramKey, stringToValue) ?? getInitialValue());
-    }), runImmediately);
+    }), { debounceRendering: runImmediately, skipMountInitialization: true });
     const setParamWithHistory = useStableCallback<SetParamWithHistory<T>>((newValueOrUpdater, reason?: "push" | "replace") => {
         const document = getDocument();
         const window = getWindow();

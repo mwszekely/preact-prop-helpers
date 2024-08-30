@@ -219,9 +219,9 @@ export const useActiveElement = /*@__PURE__*/ monitored(function useActiveElemen
         }
     }, [])
 
-    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, runImmediately);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, runImmediately);
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
+    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
 
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
 })

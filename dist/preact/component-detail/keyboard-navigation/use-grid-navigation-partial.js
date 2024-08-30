@@ -78,7 +78,7 @@ refElementReturn, ...void1 }) {
     // instead of focusing the row element, this function focuses the appropriate cell element.
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
-        if (contextFromParent.rovingTabIndexContext.getUntabbable()) {
+        if (contextFromParent.rovingTabIndexContext.untabbable) {
             // If the parent is untabbable, and this row was requested to focus itself (as part of parentFocusSelf),
             // then we focus the parent grid instead of the child cell.
             contextFromParent.rovingTabIndexContext.parentFocusSelf(true);
@@ -111,24 +111,25 @@ refElementReturn, ...void1 }) {
     const focusSelf = whenThisRowIsFocused;
     const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, hasCurrentFocusParameters, pressParameters, rovingTabIndexChildReturn, textContentParameters, ...void6 } = useListNavigationChild({ info: { index, untabbable }, refElementReturn, context: contextFromParent });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
+    console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`);
     const { props: propsLN, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn, ...void5 } = useListNavigation({
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,
-        rearrangeableChildrenReturn: { indexDemangler: identity, indexMangler: identity },
+        processedIndexManglerReturn: { indexDemangler: identity, indexMangler: identity },
         rovingTabIndexParameters: {
             untabbableBehavior: "leave-child-focused",
             focusSelfParent: whenThisRowIsFocused,
             untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
             initiallyTabbedIndex,
             onTabbableIndexChange: useStableCallback((v, p, r) => {
-                setTabbableColumn({ ideal: v, actual: v }, r);
+                setTabbableColumn(p => ({ ideal: p?.ideal ?? null, actual: p?.actual ?? null }), r);
                 onTabbableIndexChange?.(v, p, r);
             })
         },
         linearNavigationParameters: {
             onNavigateLinear: useStableCallback((next, event) => {
-                setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
+                setTabbableColumn(prev => ({ ideal: next, actual: next }), event);
             }),
             disableHomeEndKeys: true,
             pageNavigationSize: 0,
@@ -198,7 +199,13 @@ export const useGridNavigationCell = /*@__PURE__*/ monitored(function useGridNav
     assertEmptyObject(void7);
     return {
         info: infoLs,
-        props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
+        props: useMergedProps(props, {
+            onClick: (e) => {
+                setTabbableColumn(prev => {
+                    return ({ ideal: index, actual: index });
+                }, e);
+            }
+        }),
         rovingTabIndexChildReturn,
         textContentParameters,
         pressParameters,
@@ -207,7 +214,9 @@ export const useGridNavigationCell = /*@__PURE__*/ monitored(function useGridNav
                 ocfic1?.(focused, prev, e);
                 if (focused) {
                     setTabbableRow(getRowIndex(), e, false);
-                    setTabbableColumn(prev => { return { actual: index, ideal: prev?.ideal ?? index }; }, e);
+                    setTabbableColumn(prev => {
+                        return { actual: index ?? null, ideal: prev?.ideal ?? null };
+                    }, e);
                     setTabbableCell((prev) => {
                         if (prev != null && (prev < index || prev > index + (colSpan))) {
                             return prev;
