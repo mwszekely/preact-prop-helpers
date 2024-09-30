@@ -41,15 +41,15 @@ export const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout,
     // Unset any time the timeout completes
     const startTimeRef = useRef<number | null>(null);
 
-    const timeoutIsNull = (timeout == null);
+    const disabled = (timeout == null);
 
     // Any time the triggerIndex changes (including on mount)
     // restart the timeout.  The timeout does NOT reset
     // when the duration or callback changes, only triggerIndex.
     useEffect(() => {
-        if (!timeoutIsNull) {
+        if (!disabled) {
             const timeout = getTimeout();
-            console.assert(timeoutIsNull == (timeout == null));
+            console.assert(disabled == (timeout == null));
 
             if (timeout != null) {
                 startTimeRef.current = +(new Date());
@@ -59,7 +59,7 @@ export const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout,
             }
         }
 
-    }, [triggerIndex, timeoutIsNull])
+    }, [triggerIndex, disabled])
 
     const getElapsedTime = useCallback(() => {
         return (+(new Date())) - (+(startTimeRef.current ?? new Date()));

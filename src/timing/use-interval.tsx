@@ -25,6 +25,7 @@ export interface UseIntervalParameters {
  * {@include } {@link UseIntervalParameters}
  */
 export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }: UseIntervalParameters) {
+    const enabled = (interval != null);
 
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
@@ -34,7 +35,7 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
         const interval = getInterval();
         let lastDelayUsed = interval;
 
-        if (interval == null)
+        if (!enabled)
             return;
 
 
@@ -49,8 +50,8 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         }
-        let handle = setInterval(adjustableCallback, interval);
+        let handle = setInterval(adjustableCallback, interval!);    // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
-    }, []);
+    }, [enabled]);
 })
 

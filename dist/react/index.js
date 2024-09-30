@@ -1045,21 +1045,21 @@ const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout, callba
     // Set any time we start timeout.
     // Unset any time the timeout completes
     const startTimeRef = useRef(null);
-    const timeoutIsNull = (timeout == null);
+    const disabled = (timeout == null);
     // Any time the triggerIndex changes (including on mount)
     // restart the timeout.  The timeout does NOT reset
     // when the duration or callback changes, only triggerIndex.
     useEffect(() => {
-        if (!timeoutIsNull) {
+        if (!disabled) {
             const timeout = getTimeout();
-            console.assert(timeoutIsNull == (timeout == null));
+            console.assert(disabled == (timeout == null));
             if (timeout != null) {
                 startTimeRef.current = +(new Date());
                 const handle = setTimeout(stableCallback, timeout);
                 return () => clearTimeout(handle);
             }
         }
-    }, [triggerIndex, timeoutIsNull]);
+    }, [triggerIndex, disabled]);
     const getElapsedTime = useCallback(() => {
         return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
     }, []);
@@ -6984,13 +6984,14 @@ const useAnimationFrame = /*@__PURE__*/ monitored(function useAnimationFrame({ c
  * {@include } {@link UseIntervalParameters}
  */
 const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }) {
+    const enabled = (interval != null);
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
     useEffect(() => {
         const interval = getInterval();
         let lastDelayUsed = interval;
-        if (interval == null)
+        if (!enabled)
             return;
         // Get a wrapper around the wrapper around the callback
         // that clears and resets the interval if it changes.
@@ -7003,9 +7004,9 @@ const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, cal
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         };
-        let handle = setInterval(adjustableCallback, interval);
+        let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
-    }, []);
+    }, [enabled]);
 });
 
 export { EventDetail, EventMapping, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, getWindow, hideCallCount, mergeFunctions, monitored, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, useProcessedIndexMangler, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChild, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };

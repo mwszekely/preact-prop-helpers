@@ -50,6 +50,6 @@ export declare class ProcessedIndexMangler {
     private _demangledToMangled;
     setChildren(children: (VNode | null)[]): (createElement.JSX.Element | null)[];
 }
-export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 1 | -1 | 0;
+export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
 export {};
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

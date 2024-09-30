@@ -9,13 +9,14 @@ import { monitored } from "../util/use-call-count.js";
  * {@include } {@link UseIntervalParameters}
  */
 export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }) {
+    const enabled = (interval != null);
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
     useEffect(() => {
         const interval = getInterval();
         let lastDelayUsed = interval;
-        if (interval == null)
+        if (!enabled)
             return;
         // Get a wrapper around the wrapper around the callback
         // that clears and resets the interval if it changes.
@@ -28,8 +29,8 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         };
-        let handle = setInterval(adjustableCallback, interval);
+        let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
-    }, []);
+    }, [enabled]);
 });
 //# sourceMappingURL=use-interval.js.map
