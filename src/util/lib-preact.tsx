@@ -49,5 +49,7 @@ export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.Intrin
     focusout: "onFocusOut",
     formdata: "onFormData",
     toggle: "onToggle",
+    contextlost: null!,
+    contextrestored: null!,
     ...em
 }

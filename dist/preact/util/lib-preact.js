@@ -22,6 +22,8 @@ export const EventMapping = {
     focusout: "onFocusOut",
     formdata: "onFormData",
     toggle: "onToggle",
+    contextlost: null,
+    contextrestored: null,
     ...em
 };
 //# sourceMappingURL=lib-preact.js.map

@@ -280,6 +280,6 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
     const text = `${randomWord} This is item #${index} (#${demangledIndex} to #${mangledIndex}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></span>
+        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<HTMLInputElement>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
     )
 }));
