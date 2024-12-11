@@ -16,6 +16,13 @@ export interface UseIntervalParameters {
      * Called `timeout` ms after mount, or the last change to `triggerIndex`.
      */
     callback: () => void;
+
+    /**
+     * By default, the callback will be called as soon as interval is non-null, and then on every interval afterwards.
+     * 
+     * Set this to true to only call the callback after the first interval has passed.
+     */
+    noRisingEdge?: boolean;
 }
 
 /**
@@ -24,7 +31,7 @@ export interface UseIntervalParameters {
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }: UseIntervalParameters) {
+export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback, noRisingEdge }: UseIntervalParameters) {
     const enabled = (interval != null);
 
     // Get a wrapper around the given callback that's stable
@@ -39,6 +46,7 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
             return;
 
 
+
         // Get a wrapper around the wrapper around the callback
         // that clears and resets the interval if it changes.
         const adjustableCallback = () => {
@@ -50,6 +58,10 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         }
+
+        if (!noRisingEdge)
+            adjustableCallback();
+
         let handle = setInterval(adjustableCallback, interval!);    // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
     }, [enabled]);

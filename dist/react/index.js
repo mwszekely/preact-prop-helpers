@@ -6985,7 +6985,7 @@ const useAnimationFrame = /*@__PURE__*/ monitored(function useAnimationFrame({ c
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }) {
+const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback, noRisingEdge }) {
     const enabled = (interval != null);
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
@@ -7006,6 +7006,8 @@ const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, cal
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         };
+        if (!noRisingEdge)
+            adjustableCallback();
         let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
     }, [enabled]);

@@ -8,7 +8,7 @@ import { monitored } from "../util/use-call-count.js";
  * @remarks
  * {@include } {@link UseIntervalParameters}
  */
-export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback }) {
+export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interval, callback, noRisingEdge }) {
     const enabled = (interval != null);
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
@@ -29,6 +29,8 @@ export const useInterval = /*@__PURE__*/ monitored(function useInterval({ interv
                     handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
             }
         };
+        if (!noRisingEdge)
+            adjustableCallback();
         let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
         return () => clearInterval(handle);
     }, [enabled]);
