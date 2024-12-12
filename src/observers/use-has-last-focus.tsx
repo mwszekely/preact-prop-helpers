@@ -48,8 +48,6 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
     return useMonitoring(function useHasLastFocus(): UseHasLastFocusReturnType {

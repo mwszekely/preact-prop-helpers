@@ -12,8 +12,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * TODO: Can't push a child until after the very first `useLayoutEffect`
  *
  * {@include } {@link UsePortalChildrenParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function usePortalChildren({ target }) {
     return useMonitoring(function usePortalChildren() {

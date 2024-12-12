@@ -91,8 +91,6 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void3 },

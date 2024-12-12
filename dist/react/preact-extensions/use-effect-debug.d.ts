@@ -8,8 +8,6 @@ import { Inputs, useEffect as useEffectNative } from "../util/lib.js";
  * @param inputs - Same as the default
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl?: typeof useEffectNative): void;
 export interface EffectChange<I extends Inputs, N extends number> {

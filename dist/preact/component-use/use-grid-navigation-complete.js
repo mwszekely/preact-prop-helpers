@@ -21,8 +21,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @hasChild {@link useCompleteGridNavigationCell}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, paginatedChildrenParameters, refElementParameters, gridNavigationCompleteParameters: { getSortColumn, getSortValueAt: gsva }, processedIndexManglerParameters: { compare, getIndex }, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigation() {
@@ -116,7 +114,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigationRows() {
@@ -144,7 +142,7 @@ export function useCompleteGridNavigationRows({ context, paginatedChildrenParame
     });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRowOuter({ context, info: { index, ...uinfo }, refElementParameters: { onElementChange: oec1, onMount, onUnmount }, rearrangeableChildParameters }) {
     return useMonitoring(function useCompleteGridNavigationRowOuter() {
@@ -171,8 +169,6 @@ export function useCompleteGridNavigationRowOuter({ context, info: { index, ...u
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters: { getText, onTextContentChange: otcc1 }, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, refElementParameters, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigationRow() {
@@ -259,8 +255,6 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters: { getText, onTextContentChange: otcc1, ...void4 }, info: { focusSelf, index, untabbable, ...customUserInfo }, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigationCell() {
@@ -306,7 +300,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
     });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativeParameters, singleSelectionParameters, ...normalGridNavParameters }) {
     const ret2 = useCompleteGridNavigation({
@@ -324,7 +318,7 @@ export function useCompleteGridNavigationDeclarative({ singleSelectionDeclarativ
     return ret2;
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRowDeclarative({ multiSelectionChildParameters: { multiSelectionDisabled, ...multiSelectionChildParameters }, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange, ...multiSelectionChildDeclarativeParameters }, info, ...p }) {
     const { info: { setSelectedFromParent }, multiSelectionChildParameters: { onMultiSelectChange } } = useSelectionChildDeclarative({

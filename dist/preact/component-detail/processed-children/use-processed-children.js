@@ -52,8 +52,6 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  * @hasChild {@link useProcessedChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters, processedIndexManglerParameters }) {
     return useMonitoring(function useProcessedChildren() {
@@ -98,7 +96,7 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
 }
 ;
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useProcessedChild({ context, info: { index, getElement, ...uinfo }, rearrangeableChildParameters, ...void1 }) {
     return useMonitoring(function useProcessedChild() {

@@ -77,8 +77,6 @@ export interface UseRefElementParameters<T> {
  * ```
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     return useMonitoring(function useRefElement(): UseRefElementReturnType<T> {

@@ -260,8 +260,6 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * 
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren },
@@ -485,8 +483,6 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
  * @see {@link useRovingTabIndex}
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useRovingTabIndexChild<ChildElement extends Element>({
     info: { index, untabbable: iAmUntabbable, ...void2 },

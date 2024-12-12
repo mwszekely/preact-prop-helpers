@@ -101,8 +101,6 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * @hasChild {@link useStaggeredChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
@@ -275,8 +273,6 @@ export function useStaggeredChildren({
  * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({
     info: { index },

@@ -8,8 +8,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @param className - The class (as a string) to be adding/removing
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
  * @param element - The element to affect. By default, it's the root `<html>` element
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useDocumentClass(className, active, element) {
     return useMonitoring(function useDocumentClass() {

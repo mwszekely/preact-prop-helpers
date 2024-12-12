@@ -38,8 +38,6 @@ export interface UseEscapeDismissParameters<PopupElement extends Element, B exte
  * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void;
 //# sourceMappingURL=use-escape-dismiss.d.ts.map

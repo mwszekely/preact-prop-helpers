@@ -8,8 +8,6 @@ function styleStringToObject(style) {
  * @param style - The user-given style prop for this component
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useMergedStyles(lhs, rhs) {
     // Easy case, when there are no styles to merge return nothing.

@@ -32,8 +32,6 @@ export interface UseBlockingElementReturnType {
  * it'll take to find its way into the spec, if ever)
  * 
  * @param target 
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useBlockingElement<E extends Element>({
     activeElementParameters: {

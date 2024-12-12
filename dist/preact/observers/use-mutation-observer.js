@@ -7,8 +7,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     return useMonitoring(function useMutationObserver() {

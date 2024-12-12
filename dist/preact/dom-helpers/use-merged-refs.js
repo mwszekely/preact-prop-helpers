@@ -16,8 +16,6 @@ function processRef(instance, ref) {
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
  *
  * @remarks Or just use {@link useMergedProps}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useMergedRefs(rhs, lhs) {
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.

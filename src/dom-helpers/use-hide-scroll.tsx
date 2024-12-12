@@ -14,8 +14,6 @@ export interface UseHideScrollReturnType {
  * of padding to the root element if necessary.
  * 
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useHideScroll(hideScroll: boolean): UseHideScrollReturnType {
     return useMonitoring(function useHideScroll(): UseHideScrollReturnType {

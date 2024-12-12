@@ -199,8 +199,6 @@ const AsyncFunction = ((async function () { }).constructor)
  * 
  * @param asyncHandler - The async function to make sync
  * @param options - @see {@link UseAsyncParameters}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
 

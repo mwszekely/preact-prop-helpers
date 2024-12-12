@@ -114,15 +114,13 @@ export interface UseRearrangeableChildParametersSelf {
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ rearrangeableChildrenParameters: { children: childrenIn }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType;
 export interface UseRearrangeableChildReturnType<ChildElement extends Element> {
     info: Pick<UseRearrangeableChildInfo<ChildElement>, "updateFLIPAnimation">;
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export declare function useRearrangeableChild<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ context, info: { getElement, index }, rearrangeableChildParameters: { cssProperty, duration } }: UseRearrangeableChildParameters<ChildElement>): UseRearrangeableChildReturnType<ChildElement>;
 export {};

@@ -142,8 +142,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * @see {@link useCompleteListNavigation}, which packages everything up together.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },

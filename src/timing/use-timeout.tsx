@@ -31,8 +31,6 @@ export interface UseTimeoutParameters {
  * 
  * @remarks
  * {@include } {@link UseTimeoutParameters}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
 

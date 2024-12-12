@@ -22,8 +22,6 @@ function getElementDepth(element) {
  * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     return useMonitoring(function useEscapeDismiss() {

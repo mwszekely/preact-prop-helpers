@@ -10,8 +10,6 @@ import { useAsync } from "./use-async.js";
  * only remembering the most recent request.
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useAsyncEffect(effect, inputs, options) {
     useMonitoring(function useAsyncEffect() {

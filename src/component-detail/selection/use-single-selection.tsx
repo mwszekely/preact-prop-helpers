@@ -179,8 +179,6 @@ export interface UseSingleSelectionContext {
  * @hasChild {@link useSingleSelectionChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     managedChildrenReturn: { getChildren, ...void1 },
@@ -258,8 +256,6 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
  * 
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useSingleSelectionChild<ChildElement extends Element>({
     singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },

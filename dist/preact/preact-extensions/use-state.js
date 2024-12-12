@@ -9,8 +9,6 @@ import { useStack } from "../util/stack.js";
  * Useful if you want to trace whose state is being updated.
  *
  * @param initialState - Same as the built-in `setState`'s
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useState(initialState) {
     const getStack = useStack();

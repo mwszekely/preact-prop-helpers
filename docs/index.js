@@ -944,8 +944,6 @@ const EventMapping = {
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useEnsureStability(parentHookName, ...values) {
   return;
@@ -970,8 +968,6 @@ function useEnsureStability(parentHookName, ...values) {
  * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
- *
- * #__NO_SIDE_EFFECTS__
  */
 function usePassiveState(onChange, getInitialValue, {
   debounceRendering: customDebounceRendering,
@@ -1128,7 +1124,7 @@ globalThis.requestIdleCallback ??= callback => {
  */
 const useMonitoring = dontUseMonitoringImpl;
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 function dontUseMonitoringImpl(t) {
   return t();
@@ -1140,8 +1136,6 @@ const Unset$1 = Symbol("unset");
  *
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useStableGetter(value) {
   return useMonitoring(function useStableGetter() {
@@ -1162,8 +1156,6 @@ function useStableGetter(value) {
  *
  * @param t
  * @returns
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMemoObject(t) {
   return T$1(() => {
@@ -1185,8 +1177,6 @@ function setIsStableGetter(obj) {
  * during render, pass an empty dependency array and it'll act like `useCallback` with an
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useStableCallback(fn, noDeps) {
   return useMonitoring(function useStableCallback() {
@@ -1224,8 +1214,6 @@ function useStableMergedCallback(...fns) {
  * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
  *
  * @param target - A *non-Preact* node to attach the event to.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useGlobalHandler(target, type, handler, options, mode) {
   return useMonitoring(function useGlobalHandler() {
@@ -2503,8 +2491,6 @@ function shuffle(collection) {
  * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
  *
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMergedChildren(lhs, rhs) {
   if (lhs == null && rhs == null) {
@@ -2522,8 +2508,6 @@ function useMergedChildren(lhs, rhs) {
  * Merged the `class` and `className` properties of two sets of props into a single string.
  *
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMergedClasses(...classes) {
   // Note: For the sake of forward compatibility, this function is labelled as
@@ -2553,8 +2537,6 @@ function processRef(instance, ref) {
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
  *
  * @remarks Or just use {@link useMergedProps}
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMergedRefs(rhs, lhs) {
   // This *must* be stable in order to prevent repeated reset `null` calls after every render.
@@ -2582,8 +2564,6 @@ function styleStringToObject(style) {
  * @param style - The user-given style prop for this component
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMergedStyles(lhs, rhs) {
   // Easy case, when there are no styles to merge return nothing.
@@ -2630,8 +2610,6 @@ let log = console.warn;
  * @param allProps - A variadic number of props to merge into one
  *
  * @returns A single object with all the provided props merged into one.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMergedProps(...allProps) {
   useEnsureStability("useMergedProps", allProps.length);
@@ -3123,8 +3101,6 @@ function findBackupFocus(unmountingElement) {
  *
  * @remarks
  * {@include } {@link UseTimeoutParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useTimeout({
   timeout,
@@ -3193,8 +3169,6 @@ function useTagProps(props, tag) {
  * @see {@link useCompleteListNavigation}, which packages everything up together.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useLinearNavigation({
   linearNavigationParameters: {
@@ -3493,8 +3467,6 @@ function tryNavigateDown({
  * @hasChild {@link useManagedChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useManagedChildren(parentParameters) {
   return useMonitoring(function useManagedChildren() {
@@ -3649,8 +3621,6 @@ function useManagedChildren(parentParameters) {
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useManagedChild({
   context,
@@ -3721,8 +3691,6 @@ function useManagedChild({
  * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useChildrenFlag({
   getChildren,
@@ -3848,8 +3816,6 @@ function useChildrenFlag({
  * Useful if you want to trace whose state is being updated.
  *
  * @param initialState - Same as the built-in `setState`'s
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useState(initialState) {
   // We keep both, but override the `setState` functionality
@@ -3902,8 +3868,6 @@ function useState(initialState) {
  *
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useRovingTabIndex({
   managedChildrenReturn: {
@@ -4124,8 +4088,6 @@ function useRovingTabIndex({
  * @see {@link useRovingTabIndex}
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useRovingTabIndexChild({
   info: {
@@ -4216,8 +4178,6 @@ function useRovingTabIndexChild({
  * @hasChild {@link useTypeaheadNavigationChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useTypeaheadNavigation({
   typeaheadNavigationParameters: {
@@ -4415,8 +4375,6 @@ function useTypeaheadNavigation({
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useTypeaheadNavigationChild({
   info: {
@@ -4527,11 +4485,9 @@ function binarySearch(array, wanted, comparator) {
  * @remarks In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  *
- * @compositeParams
- *
  * @hasChild {@link useListNavigationChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useListNavigation({
   linearNavigationParameters,
@@ -4594,8 +4550,6 @@ function useListNavigation({
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useListNavigationChild({
   info: {
@@ -4640,11 +4594,9 @@ function useListNavigationChild({
  *
  * @remarks Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
  *
- * @compositeParams
- *
  * @hasChild {@link usePaginatedChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function usePaginatedChildren({
   managedChildrenReturn: {
@@ -4747,8 +4699,6 @@ function usePaginatedChildren({
  * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function usePaginatedChild({
   info: {
@@ -4803,8 +4753,6 @@ function usePaginatedChild({
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useRearrangeableChildren({
   rearrangeableChildrenParameters: {
@@ -4872,7 +4820,7 @@ function useRearrangeableChildren({
   });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useRearrangeableChild({
   context,
@@ -4952,11 +4900,9 @@ function useRearrangeableChild({
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  *
- * @compositeParams
- *
  * @hasChild {@link useStaggeredChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useStaggeredChildren({
   managedChildrenReturn: {
@@ -5107,8 +5053,6 @@ function useStaggeredChildren({
  * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useStaggeredChild({
   info: {
@@ -5131,6 +5075,15 @@ function useStaggeredChild({
     // (We don't ask when the child becomes visible due to screen-scrolling,
     // only when it becomes visible because we were next in line to do so)
     const becauseScreen = A$1(false);
+    usePassiveState(useStableCallback((next, _prev, _reason) => {
+      if (staggeredVisible) return;
+      if (next) {
+        const io = getIntersectionObserver();
+        io?.unobserve(e.current);
+        setStaggeredVisible(true);
+        becauseScreen.current = true;
+      }
+    }), returnFalse);
     // This isn't called during useEffect here, because we want to wait for the
     // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
     // So we return the effect we want to run and let the caller run it as appropriate.
@@ -5218,11 +5171,9 @@ function useStaggeredChild({
  * Finally, `useListNavigation` imposes no requirements on how your children are laid out in the DOM, but
  * this hook **requires** all children be in one contiguous array.
  *
- * @compositeParams
- *
  * @hasChild {@link useProcessedChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useProcessedChildren({
   rearrangeableChildrenParameters,
@@ -5248,6 +5199,9 @@ function useProcessedChildren({
       managedChildrenReturn
     } = useManagedChildren({
       managedChildrenParameters
+    });
+    useStableCallback(() => {
+      refreshPagination(paginationMin, paginationMax);
     });
     const {
       processedIndexManglerContext: {
@@ -5319,7 +5273,7 @@ function useProcessedChildren({
   });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useProcessedChild({
   context,
@@ -5406,7 +5360,7 @@ function useProcessedChild({
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useProcessedIndexMangler({
   processedIndexManglerParameters: {
@@ -5575,11 +5529,9 @@ function defaultCompare(lhs, rhs) {
  *
  * This is not exclusive with {@link useSingleSelection}, you can use both at once if you have a use case for it.
  *
- * @compositeParams
- *
  * @hasChild {@link useMultiSelectionChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useMultiSelection({
   multiSelectionParameters: {
@@ -5738,8 +5690,6 @@ function useMultiSelection({
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useMultiSelectionChild({
   info: {
@@ -5924,8 +5874,6 @@ function useMultiSelectionChildDeclarative({
  * @hasChild {@link useSingleSelectionChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useSingleSelection({
   managedChildrenReturn: {
@@ -6005,8 +5953,6 @@ function useSingleSelection({
  *
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useSingleSelectionChild({
   singleSelectionChildParameters: {
@@ -6123,11 +6069,9 @@ function useSingleSelectionDeclarative({
  * @see {@link useSingleSelection}
  * @see {@link useMultiSelection}
  *
- * @compositeParams
- *
  * @hasChild {@link useSelectionChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useSelection({
   managedChildrenReturn,
@@ -6179,8 +6123,6 @@ function useSelection({
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useSelectionChild({
   context,
@@ -6260,20 +6202,20 @@ function useSelectionChild({
   };
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useSelectionDeclarative(args) {
   return useSingleSelectionDeclarative(args);
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useSelectionChildDeclarative(args) {
   return useMultiSelectionChildDeclarative(args);
 }
 
 /**
- * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
  *
@@ -6306,8 +6248,6 @@ function useSelectionChildDeclarative(args) {
  * ```
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useRefElement(args) {
   return useMonitoring(function useRefElement() {
@@ -6352,6 +6292,162 @@ function useRefElement(args) {
     };
   });
 }
+function add(map, key, value) {
+  var _a;
+  let set = (_a = map.get(key)) !== null && _a !== void 0 ? _a : new Set();
+  set.add(value);
+  map.set(key, set);
+  return map;
+}
+/**
+ * Removes this `value` from the `Set` associated with `key`. Does not remove the `Set` itself, even if it becomes empty.
+ */
+function del(map, key, value) {
+  var _a;
+  let set = (_a = map.get(key)) !== null && _a !== void 0 ? _a : new Set();
+  let ret = set.delete(value);
+  map.set(key, set);
+  return ret;
+}
+function has$1(map, key, value) {
+  var _a, _b;
+  return (_b = (_a = map.get(key)) === null || _a === void 0 ? void 0 : _a.has(value)) !== null && _b !== void 0 ? _b : false;
+}
+var mapOfSets = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  add: add,
+  delete: del,
+  has: has$1
+});
+const activeElementUpdaters = new Map();
+const lastActiveElementUpdaters = new Map();
+const windowFocusedUpdaters = new Map();
+const windowsFocusedUpdaters = new Map();
+// The focusin and focusout events often fire synchronously in the middle of running code.
+// E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
+// For the purpose of improving stability, we debounce all focus events to the next microtask.
+function forEachUpdater(window, map, value, reason) {
+  const updaters = map.get(window);
+  if (updaters) {
+    for (const updater of updaters) {
+      const {
+        lastSent,
+        send
+      } = updater;
+      if (value !== lastSent) {
+        send(value, reason);
+        updater.lastSent = value;
+      }
+    }
+  }
+}
+function focusout(e) {
+  const window = e.target.ownerDocument.defaultView;
+  if (e.relatedTarget == null) {
+    forEachUpdater(window, activeElementUpdaters, null, e);
+  }
+}
+function focusin(e) {
+  const window = e.target.ownerDocument.defaultView;
+  const currentlyFocusedElement = e.target;
+  forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement, e);
+  forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement, e);
+}
+function windowFocus(e) {
+  const window = e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView;
+  windowsFocusedUpdaters.set(window, true);
+  forEachUpdater(window, windowFocusedUpdaters, true, e);
+}
+function windowBlur(e) {
+  const window = e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView;
+  windowsFocusedUpdaters.set(window, false);
+  forEachUpdater(window, windowFocusedUpdaters, false, e);
+}
+/**
+ * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
+ *
+ * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
+ *
+ * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
+ *
+ * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+ *
+ * @compositeParams
+ */
+function useActiveElement({
+  activeElementParameters: {
+    onActiveElementChange,
+    onLastActiveElementChange,
+    onWindowFocusedChange,
+    getDocument
+  }
+}) {
+  return useMonitoring(function useActiveElement() {
+    y(() => {
+      const document = getDocument();
+      const window = document?.defaultView;
+      if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+        document?.addEventListener("focusin", focusin, {
+          passive: true
+        });
+        document?.addEventListener("focusout", focusout, {
+          passive: true
+        });
+        window?.addEventListener("focus", windowFocus, {
+          passive: true
+        });
+        window?.addEventListener("blur", windowBlur, {
+          passive: true
+        });
+      }
+      const laeu = {
+        send: setActiveElement,
+        lastSent: undefined
+      };
+      const llaeu = {
+        send: setLastActiveElement,
+        lastSent: undefined
+      };
+      const lwfu = {
+        send: setWindowFocused,
+        lastSent: undefined
+      };
+      mapOfSets.add(activeElementUpdaters, window, laeu);
+      mapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+      mapOfSets.add(windowFocusedUpdaters, window, lwfu);
+      return () => {
+        mapOfSets.delete(activeElementUpdaters, window, laeu);
+        mapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+        mapOfSets.delete(windowFocusedUpdaters, window, lwfu);
+        if (activeElementUpdaters.size === 0) {
+          document?.removeEventListener("focusin", focusin);
+          document?.removeEventListener("focusout", focusout);
+          window?.removeEventListener("focus", windowFocus);
+          window?.removeEventListener("blur", windowBlur);
+        }
+      };
+    }, []);
+    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, {
+      debounceRendering: runImmediately,
+      skipMountInitialization: true
+    });
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, {
+      debounceRendering: runImmediately,
+      skipMountInitialization: true
+    });
+    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, {
+      debounceRendering: runImmediately,
+      skipMountInitialization: true
+    });
+    return {
+      activeElementReturn: {
+        getActiveElement,
+        getLastActiveElement,
+        getWindowFocused
+      }
+    };
+  });
+}
 let be;
 (async () => {
   if (typeof window !== 'undefined') {
@@ -6376,8 +6472,6 @@ function blockingElements() {
  * it'll take to find its way into the spec, if ever)
  *
  * @param target
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useBlockingElement({
   activeElementParameters: {
@@ -6396,6 +6490,20 @@ function useBlockingElement({
 }) {
   return useMonitoring(function useBlockingElement() {
     const stableGetTarget = useStableCallback(getTarget);
+    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+    useActiveElement({
+      activeElementParameters: {
+        getDocument,
+        onActiveElementChange,
+        onWindowFocusedChange,
+        onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+          onLastActiveElementChange?.(e, prev, reason);
+          if (e) {
+            if (enabled) setLastActiveWhenOpen(e, reason);else setLastActiveWhenClosed(e, reason);
+          }
+        })
+      }
+    });
     const [getTop, setTop] = usePassiveState(null, returnNull);
     const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState(null, returnNull);
     const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState(null, returnNull);
@@ -6436,8 +6544,6 @@ function useBlockingElement({
  * Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useFocusTrap({
   focusTrapParameters: {
@@ -6522,8 +6628,6 @@ function findFirstCondition(element, filter) {
  * @hasChild {@link useListNavigationSelectionChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useListNavigationSelection({
   linearNavigationParameters,
@@ -6585,8 +6689,6 @@ function useListNavigationSelection({
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useListNavigationSelectionChild({
   info: {
@@ -6670,8 +6772,6 @@ function useListNavigationSelectionChild({
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useTextContent({
   refElementReturn: {
@@ -6711,11 +6811,9 @@ function useTextContent({
  *
  * @remarks I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  *
- * @compositeParams
- *
  * @hasChild {@link useChildrenHaveFocusChild}
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useChildrenHaveFocus(args) {
   return useMonitoring(function useChildrenHaveFocus() {
@@ -6749,8 +6847,6 @@ function useChildrenHaveFocus(args) {
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useChildrenHaveFocusChild({
   context: {
@@ -6780,8 +6876,6 @@ function useChildrenHaveFocusChild({
  * @see {@link useHasLastFocus}, in which even if the `body` is clicked it's not considered a loss in focus.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useHasCurrentFocus(args) {
   return useMonitoring(function useHasCurrentFocus() {
@@ -6842,8 +6936,6 @@ function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteListNavigationChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useCompleteListNavigation({
   linearNavigationParameters,
@@ -7013,7 +7105,7 @@ function useCompleteListNavigation({
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useCompleteListNavigationChildren({
   context,
@@ -7063,7 +7155,7 @@ function useCompleteListNavigationChildren({
   });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useCompleteListNavigationChildOuter({
   context,
@@ -7123,8 +7215,6 @@ function useCompleteListNavigationChildOuter({
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useCompleteListNavigationChild({
   info: {
@@ -7271,7 +7361,7 @@ function useCompleteListNavigationChild({
   });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 function useCompleteListNavigationDeclarative({
   singleSelectionParameters,
@@ -7538,8 +7628,6 @@ const AsyncFunction = async function () {}.constructor;
  *
  * @param asyncHandler - The async function to make sync
  * @param options - @see {@link UseAsyncParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useAsync(asyncHandler, options) {
   return useMonitoring(function useAsync() {
@@ -7692,8 +7780,6 @@ function useAsync(asyncHandler, options) {
  * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useAsyncHandler({
   asyncHandler,
@@ -7802,8 +7888,6 @@ getDocument$1()?.addEventListener?.("click", e => {
  * {@include } {@link setPressVibrate}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function usePress(args) {
   return useMonitoring(function usePress() {
@@ -8142,8 +8226,6 @@ N(A(ImperativeElementU));
  * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 function useImperativeProps({
   refElementReturn: {
@@ -8286,6 +8368,68 @@ function ImperativeElementU({
   return g$1(Tag, useMergedProps(propsStable, imperativeProps, props, {
     ref
   }));
+}
+
+/**
+ * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
+ *
+ * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
+ *
+ * @compositeParams
+ */
+function useHasLastFocus(args) {
+  return useMonitoring(function useHasLastFocus() {
+    const {
+      refElementReturn: {
+        getElement
+      },
+      activeElementParameters: {
+        onLastActiveElementChange,
+        ...activeElementParameters
+      },
+      hasLastFocusParameters: {
+        onLastFocusedChanged,
+        onLastFocusedInnerChanged,
+        ...void1
+      }
+    } = args;
+    const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, {
+      debounceRendering: runImmediately,
+      skipMountInitialization: true
+    });
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, {
+      debounceRendering: runImmediately,
+      skipMountInitialization: true
+    });
+    const {
+      activeElementReturn
+    } = useActiveElement({
+      activeElementParameters: {
+        onLastActiveElementChange: useCallback((lastActiveElement, prevLastActiveElement, e) => {
+          const selfElement = getElement();
+          const focused = selfElement != null && selfElement == lastActiveElement;
+          const focusedInner = !!selfElement?.contains(lastActiveElement);
+          setLastFocused(focused, e);
+          setLastFocusedInner(focusedInner, e);
+          onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement, e);
+        }, []),
+        ...activeElementParameters
+      }
+    });
+    y(() => {
+      return () => {
+        setLastFocused(false, undefined);
+        setLastFocusedInner(false, undefined);
+      };
+    }, []);
+    return {
+      activeElementReturn,
+      hasLastFocusReturn: {
+        getLastFocused,
+        getLastFocusedInner
+      }
+    };
+  });
 }
 J$1(null);
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -8698,6 +8842,7 @@ const DemoUseRovingTabIndexChild = N(function DemoUseRovingTabIndexChild({
   const focusSelf = q$1(e => {
     focus(e);
   }, []);
+  useStableCallback(() => index);
   const {
     hasCurrentFocusReturn,
     managedChildReturn,
@@ -9161,6 +9306,19 @@ N(() => {
       })
     }
   });
+  useHasLastFocus({
+    refElementReturn,
+    activeElementParameters: {
+      getDocument,
+      onActiveElementChange: setActiveElement,
+      onLastActiveElementChange: setLastActiveElement,
+      onWindowFocusedChange: setWindowFocused
+    },
+    hasLastFocusParameters: {
+      onLastFocusedChanged: setLastFocused,
+      onLastFocusedInnerChanged: setLastFocusedInner
+    }
+  });
   return u$1("div", {
     class: "demo",
     children: [u$1("h2", {
@@ -9235,6 +9393,10 @@ const DemoGlobalHandlerChild = N(function DemoGlobalHandlerChild({
   mode,
   target
 }) {
+  useGlobalHandler(target, "click", mode == null ? null : e => {
+    if (e.target?.id != "global-handler-test2") return;
+    window._demo_event = (window._demo_event || 0) + 1;
+  }, {}, mode || "grouped");
   return u$1("div", {
     hidden: true
   });

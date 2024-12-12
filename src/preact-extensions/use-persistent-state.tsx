@@ -45,9 +45,6 @@ export function getFromLocalStorage<Key extends (keyof PersistentStates) & strin
     return null;
 }
 
-/**
- * #__NO_SIDE_EFFECTS__
- */
 export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage: Storage = defaultStorage): void {
     if (storage != null) {
         try {
@@ -62,8 +59,6 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
         }
     }
 }
-
-//function dummy<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] { return null!; }
 
 /**
  * @remarks Use module augmentation to get the correct types for this function.
@@ -81,8 +76,6 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  * @param fromString -  
  * @param toString -  
  * @returns 
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = defaultStorage): [T, StateUpdater<T>, () => T] {
 

@@ -40,8 +40,6 @@ const _comments = void (0);
  * @hasChild {@link useManagedChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useManagedChildren(parentParameters) {
     return useMonitoring(function useManagedChildren() {
@@ -184,8 +182,6 @@ export function useManagedChildren(parentParameters) {
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useManagedChild({ context, info }) {
     return useMonitoring(function useManagedChild() {
@@ -241,8 +237,6 @@ export function useManagedChild({ context, info }) {
  * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);

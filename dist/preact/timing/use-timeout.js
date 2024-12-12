@@ -9,8 +9,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  *
  * @remarks
  * {@include } {@link UseTimeoutParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useTimeout({ timeout, callback, triggerIndex }) {
     return useMonitoring(function useTimeout() {

@@ -92,8 +92,6 @@ function windowBlur(e) {
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
     return useMonitoring(function useActiveElement() {

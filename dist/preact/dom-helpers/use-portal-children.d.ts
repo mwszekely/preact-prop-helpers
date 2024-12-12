@@ -31,8 +31,6 @@ export interface UsePortalChildrenReturnType {
  * TODO: Can't push a child until after the very first `useLayoutEffect`
  *
  * {@include } {@link UsePortalChildrenParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType;
 //# sourceMappingURL=use-portal-children.d.ts.map

@@ -20,8 +20,6 @@ export interface UseBackdropDismissParameters<PopupElement extends Element, B ex
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void;
 //# sourceMappingURL=use-backdrop-dismiss.d.ts.map

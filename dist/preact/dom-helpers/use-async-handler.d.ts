@@ -105,8 +105,6 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType>;
 //# sourceMappingURL=use-async-handler.d.ts.map

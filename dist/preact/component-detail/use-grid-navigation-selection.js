@@ -22,8 +22,6 @@ const _dummy = 0;
  * @hasChild {@link useGridNavigationSelectionCell}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void2 }) {
     return useMonitoring(function useGridNavigationSelection() {
@@ -67,8 +65,6 @@ export function useGridNavigationSelection({ gridNavigationParameters, linearNav
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useMonitoring(function useGridNavigationSelectionRow() {
@@ -112,8 +108,6 @@ export function useGridNavigationSelectionRow({ info: mcp1, linearNavigationPara
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelectionCell(p) {
     return useMonitoring(function useGridNavigationSelectionCell() {

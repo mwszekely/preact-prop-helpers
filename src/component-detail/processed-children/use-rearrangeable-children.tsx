@@ -203,8 +203,6 @@ export interface UseRearrangeableChildParametersSelf {
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
     rearrangeableChildrenParameters: { children: childrenIn },
@@ -267,7 +265,7 @@ export interface UseRearrangeableChildReturnType<ChildElement extends Element> {
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useRearrangeableChild<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
     context,

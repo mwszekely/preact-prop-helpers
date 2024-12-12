@@ -17,13 +17,13 @@ let i = 0;
  */
 export const useMonitoring = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 function dontUseMonitoringImpl(t) {
     return t();
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 function useMonitoringImpl(hook) {
     const h = hook;
@@ -81,7 +81,7 @@ function monitorCallCount(hook) {
 let filterAll = false;
 const filters = new Set();
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 export function hideCallCount(hook) {
     filterAll = (hook === "all");

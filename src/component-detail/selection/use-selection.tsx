@@ -54,8 +54,6 @@ export interface UseSelectionChildReturnType<ChildElement extends Element, M ext
  * @hasChild {@link useSelectionChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
     const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...void3 }, context: contextSS, singleSelectionReturn, ...void1 } = useSingleSelection<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexReturn, singleSelectionParameters });
@@ -77,8 +75,6 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
 /**
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useSelectionChild<ChildElement extends Element>({
     context,
@@ -124,14 +120,14 @@ export interface UseSelectionDeclarativeParameters<ChildElement extends Element>
 export interface UseSelectionChildDeclarativeParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseMultiSelectionChildDeclarativeParameters<ChildElement, M> { }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>) {
     return useSingleSelectionDeclarative(args);
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>) {
     return useMultiSelectionChildDeclarative(args);

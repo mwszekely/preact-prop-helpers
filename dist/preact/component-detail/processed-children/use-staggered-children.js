@@ -17,8 +17,6 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
 //refElementReturn: { getElement }
@@ -163,8 +161,6 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
  * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useStaggeredChild({ info: { index }, 
 //refElementReturn: { getElement },

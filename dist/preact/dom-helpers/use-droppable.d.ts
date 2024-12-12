@@ -60,8 +60,6 @@ export declare class DroppableFileError extends Error {
  * @remarks
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E>;
 export {};

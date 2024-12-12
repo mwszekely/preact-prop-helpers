@@ -36,8 +36,6 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * during render, pass an empty dependency array and it'll act like `useCallback` with an
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
     return useMonitoring(function useStableCallback() {

@@ -164,8 +164,6 @@ getDocument()?.addEventListener?.("click", (e) => {
  * {@include } {@link setPressVibrate}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     return useMonitoring(function usePress(): UsePressReturnType<E> {

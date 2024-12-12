@@ -8,8 +8,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * of padding to the root element if necessary.
  *
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useHideScroll(hideScroll) {
     return useMonitoring(function useHideScroll() {

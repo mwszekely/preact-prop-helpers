@@ -11,8 +11,6 @@
  * In general, you'll want to inspect a specific directory of
  * a path, or a specific query parameter value, not the
  * entire URL.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useUrl(onUrlChange: (url: string) => void): readonly [() => string, (newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => void];
 //# sourceMappingURL=use-url.d.ts.map

@@ -152,8 +152,6 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * @hasChild {@link useCompleteListNavigationChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     linearNavigationParameters,
@@ -262,7 +260,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  * 
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationChildren<TabbableChildElement extends Element, M extends UseCompleteListNavigationChildInfo<TabbableChildElement>, RM extends UseCompleteListNavigationChildrenInfo<TabbableChildElement>>({
     context,
@@ -324,7 +322,7 @@ export interface UseCompleteListNavigationChildOuterReturnType<RowElement extend
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationChildOuter<RowElement extends Element, RsM extends UseCompleteListNavigationChildrenInfo<RowElement>>({
     context,
@@ -371,8 +369,6 @@ export function useCompleteListNavigationChildOuter<RowElement extends Element, 
 /**
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, untabbable, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
@@ -482,7 +478,7 @@ export interface UseCompleteListNavigationChildDeclarativeReturnType<ChildElemen
     OmitStrong<UseCompleteListNavigationChildReturnType<ChildElement, M>, "singleSelectionChildReturn" | "multiSelectionChildReturn"> { }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     singleSelectionParameters,

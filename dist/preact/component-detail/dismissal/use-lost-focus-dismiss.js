@@ -8,8 +8,6 @@ import { useMonitoring } from "../../util/use-call-count.js";
  * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
     return useMonitoring(function useLostFocusDismiss() {

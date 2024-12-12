@@ -183,8 +183,6 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  * @hasChild {@link useMultiSelectionChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 },
@@ -355,8 +353,6 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
 /**
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useMultiSelectionChild<E extends Element>({
     info: { index, ...void4 },

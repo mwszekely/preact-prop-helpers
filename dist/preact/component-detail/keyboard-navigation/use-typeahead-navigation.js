@@ -14,8 +14,6 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @hasChild {@link useTypeaheadNavigationChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     return useMonitoring(function useTypeaheadNavigation() {
@@ -214,8 +212,6 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useTypeaheadNavigationChild({ info: { index, ...void1 }, 
 //textContentReturn: { getTextContent, ...void5 },

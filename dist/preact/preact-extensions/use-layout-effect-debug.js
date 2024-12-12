@@ -8,8 +8,6 @@ import { useEffectDebug } from "./use-effect-debug.js";
  *
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useLayoutEffectDebug(effect, inputs) {
     return useMonitoring(function useLayoutEffectDebug() {

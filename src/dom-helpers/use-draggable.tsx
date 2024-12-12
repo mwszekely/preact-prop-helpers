@@ -62,8 +62,6 @@ export interface UseDraggableParameters {
  * @remarks
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
     return useMonitoring(function useDraggable(): UseDraggableReturnType<E> {

@@ -3,8 +3,6 @@
  * that uses this hook to re-render itself.
  *
  * @remarks It's a bit smelly, so best to use sparingly.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useForceUpdate(): () => void;
 //# sourceMappingURL=use-force-update.d.ts.map

@@ -25,8 +25,6 @@ import { useMonitoring } from "../../util/use-call-count.js";
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
     return useMonitoring(function useRearrangeableChildren() {
@@ -70,7 +68,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ch
     });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useRearrangeableChild({ context, info: { getElement, index }, rearrangeableChildParameters: { cssProperty, duration } }) {
     return useMonitoring(function useRearrangeableChild() {

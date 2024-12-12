@@ -89,8 +89,6 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
  * @param paramKey - The name of the URL search parameter to reference 
  * @param type - The type of data encode/decode (`"string"` | `"boolean"` | `"number"` | `"bigint"`)
  * @param onParamValueChanged - Will be called any time the requested Search Parameter's value changes.
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useSearchParamState<Key extends keyof SearchParamStates>({ key: paramKey, defaultReason, stringToValue, initialValue, onValueChange, valueToString }: UseSearchParamStateParameters<Key, SearchParamStates[Key]>) {
     type T = SearchParamStates[Key];
@@ -145,7 +143,7 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * 
  */
 export function useSearchParamStateDeclarative<Key extends keyof SearchParamStates>({ key, defaultReason, stringToValue, initialValue, valueToString }: OmitStrong<UseSearchParamStateParameters<Key, SearchParamStates[Key]>, "onValueChange">) {
     const [value, setLocalCopy] = useState<SearchParamStates[Key]>(parseParam<Key>(null, key, stringToValue)! ?? initialValue);

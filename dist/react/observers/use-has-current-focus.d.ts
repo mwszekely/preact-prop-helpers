@@ -42,8 +42,6 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * @see {@link useHasLastFocus}, in which even if the `body` is clicked it's not considered a loss in focus.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T>;
 //# sourceMappingURL=use-has-current-focus.d.ts.map

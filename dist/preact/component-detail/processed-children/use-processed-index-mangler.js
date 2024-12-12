@@ -3,7 +3,7 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useMemo } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }) {
     return useMonitoring(function useProcessedIndexMangler() {

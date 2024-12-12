@@ -10,8 +10,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
  *
  * @param target - A *non-Preact* node to attach the event to.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGlobalHandler(target, type, handler, options, mode) {
     return useMonitoring(function useGlobalHandler() {

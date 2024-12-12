@@ -113,8 +113,6 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * @hasChild {@link useProcessedChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
     rearrangeableChildrenParameters,
@@ -183,7 +181,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
 };
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,

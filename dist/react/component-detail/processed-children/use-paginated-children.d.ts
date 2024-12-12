@@ -43,8 +43,6 @@ export interface UsePaginatedChildrenReturnType {
  * @hasChild {@link usePaginatedChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function usePaginatedChildren<TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexDemangler, indexMangler } }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType;
 export interface UsePaginatedChildParameters {
@@ -75,8 +73,6 @@ export interface UsePaginatedChildReturnTypeSelf {
  * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement>;
 //# sourceMappingURL=use-paginated-children.d.ts.map

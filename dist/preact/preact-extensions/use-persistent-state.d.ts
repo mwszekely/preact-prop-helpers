@@ -20,9 +20,6 @@ export declare const PersistentStates: PersistentStates;
  * #__NO_SIDE_EFFECTS__
  */
 export declare function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter?: ((input: string) => PersistentStates[Key]), storage?: Storage): PersistentStates[Key] | null;
-/**
- * #__NO_SIDE_EFFECTS__
- */
 export declare function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter?: ((input: PersistentStates[Key]) => string), storage?: Storage): void;
 /**
  * @remarks Use module augmentation to get the correct types for this function.
@@ -40,8 +37,6 @@ export declare function storeToLocalStorage<Key extends (keyof PersistentStates)
  * @param fromString -
  * @param toString -
  * @returns
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString?: ((value: string) => T), toString?: ((value: T) => string), storage?: Storage): [T, StateUpdater<T>, () => T];
 //# sourceMappingURL=use-persistent-state.d.ts.map

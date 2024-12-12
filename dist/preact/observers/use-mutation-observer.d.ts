@@ -24,8 +24,6 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useMutationObserver<E extends Element>({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E>;
 //# sourceMappingURL=use-mutation-observer.d.ts.map

@@ -22,8 +22,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @hasChild {@link useCompleteListNavigationChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
 //staggeredChildrenParameters,
@@ -102,7 +100,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
  *
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize
  *
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
     return useMonitoring(function useCompleteListNavigationChildren() {
@@ -130,7 +128,7 @@ export function useCompleteListNavigationChildren({ context, paginatedChildrenPa
     });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationChildOuter({ context, info: { index, ...uinfo }, refElementParameters: { onElementChange: oec1, onMount, onUnmount }, rearrangeableChildParameters }) {
     return useMonitoring(function useCompleteListNavigationChildOuter() {
@@ -159,8 +157,6 @@ export function useCompleteListNavigationChildOuter({ context, info: { index, ..
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
 textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, processedIndexManglerContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
@@ -220,7 +216,7 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
     });
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteListNavigationDeclarative({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }) {
     const ret = useCompleteListNavigation({

@@ -11,8 +11,6 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @hasChild {@link usePaginatedChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexDemangler, indexMangler } }) {
     return useMonitoring(function usePaginatedChildren() {
@@ -89,8 +87,6 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
  * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     return useMonitoring(function usePaginatedChild() {

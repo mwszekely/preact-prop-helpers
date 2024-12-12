@@ -22,8 +22,6 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
  * @param allProps - A variadic number of props to merge into one
  *
  * @returns A single object with all the provided props merged into one.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]): ElementProps<E>;
 /**

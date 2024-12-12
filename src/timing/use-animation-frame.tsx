@@ -16,8 +16,6 @@ const SharedAnimationFrameContext = createContext<null | ContextType>(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function ProvideBatchedAnimationFrames({ children }: { children: ElementProps<EventTarget>["children"] }) {
 
@@ -68,8 +66,6 @@ export interface UseAnimationFrameParameters {
  * {@include } {@link UseAnimationFrameParameters}
  * 
  * {@include } {@link ProvideBatchedAnimationFrames}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
 

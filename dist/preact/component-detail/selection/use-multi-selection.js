@@ -20,8 +20,6 @@ import { useMonitoring } from "../../util/use-call-count.js";
  * @hasChild {@link useMultiSelectionChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
     return useMonitoring(function useMultiSelection() {
@@ -167,8 +165,6 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
 /**
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }) {
     return useMonitoring(function useMultiSelectionChild() {

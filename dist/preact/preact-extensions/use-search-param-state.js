@@ -47,8 +47,6 @@ function unparseParam(params, paramKey, value, ts2) {
  * @param paramKey - The name of the URL search parameter to reference
  * @param type - The type of data encode/decode (`"string"` | `"boolean"` | `"number"` | `"bigint"`)
  * @param onParamValueChanged - Will be called any time the requested Search Parameter's value changes.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useSearchParamState({ key: paramKey, defaultReason, stringToValue, initialValue, onValueChange, valueToString }) {
     //fromString ??= JSON.parse;
@@ -93,7 +91,7 @@ export function useSearchParamState({ key: paramKey, defaultReason, stringToValu
     return [useCallback(() => { return savedParamValue.current; }, []), setParamWithHistory];
 }
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 export function useSearchParamStateDeclarative({ key, defaultReason, stringToValue, initialValue, valueToString }) {
     const [value, setLocalCopy] = useState(parseParam(null, key, stringToValue) ?? initialValue);

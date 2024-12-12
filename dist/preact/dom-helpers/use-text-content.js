@@ -5,8 +5,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     return useMonitoring(function useTextContent() {

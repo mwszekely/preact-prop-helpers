@@ -37,8 +37,6 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
  * 
  * @compositeParams 
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
     refElementPopupReturn: { getElement: getPopupElement, ...void3 },

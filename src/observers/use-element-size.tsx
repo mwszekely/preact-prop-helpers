@@ -59,8 +59,6 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  * Measures an element, allowing you to react to its changes in size.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
     return useMonitoring(function useElementSize(): UseElementSizeReturnType<E> {

@@ -138,8 +138,6 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element> ex
  * @hasChild {@link useGridNavigationCell}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 },
@@ -197,8 +195,6 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
  * As such, this is one of the most complicated hooks here in terms of dependencies.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
@@ -358,8 +354,6 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationCell<CellElement extends Element>({
     context: {

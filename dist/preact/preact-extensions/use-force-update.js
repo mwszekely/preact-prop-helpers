@@ -5,8 +5,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * that uses this hook to re-render itself.
  *
  * @remarks It's a bit smelly, so best to use sparingly.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useForceUpdate() {
     return useMonitoring(function useForceUpdate() {

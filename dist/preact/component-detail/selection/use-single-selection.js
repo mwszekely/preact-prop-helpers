@@ -18,8 +18,6 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @hasChild {@link useSingleSelectionChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
     return useMonitoring(function useSingleSelection() {
@@ -82,8 +80,6 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
  *
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
     return useMonitoring(function useSingleSelectionChild() {

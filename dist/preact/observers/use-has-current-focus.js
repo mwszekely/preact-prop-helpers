@@ -7,8 +7,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @see {@link useHasLastFocus}, in which even if the `body` is clicked it's not considered a loss in focus.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useHasCurrentFocus(args) {
     return useMonitoring(function useHasCurrentFocus() {

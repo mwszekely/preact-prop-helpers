@@ -39,7 +39,7 @@ export interface UseRefElementParameters<T> {
     refElementParameters: UseRefElementParametersSelf<T>;
 }
 /**
- * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
  *
@@ -72,8 +72,6 @@ export interface UseRefElementParameters<T> {
  * ```
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T>;
 //# sourceMappingURL=use-ref-element.d.ts.map

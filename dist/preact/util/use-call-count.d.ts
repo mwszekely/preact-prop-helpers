@@ -9,11 +9,11 @@ import "./mode.js";
  */
 export declare const useMonitoring: typeof dontUseMonitoringImpl;
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 declare function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnType<T>;
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 export declare function hideCallCount(hook: Function | "all"): void;
 export {};

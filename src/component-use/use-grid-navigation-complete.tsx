@@ -189,8 +189,6 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
  * @hasChild {@link useCompleteGridNavigationCell}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
     gridNavigationParameters,
@@ -324,7 +322,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
  * 
  * @remarks Each child must also call `useProcessedChild`, and use its information to optimize 
  * 
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRows<TabbableChildElement extends Element, M extends UseCompleteGridNavigationRowInfo<TabbableChildElement>, RsM extends UseCompleteGridNavigationRowsInfo<TabbableChildElement>>({
     context,
@@ -380,7 +378,7 @@ export interface UseCompleteGridNavigationRowOuterReturnType<RowElement extends 
 }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRowOuter<RowElement extends Element, RsM extends UseCompleteGridNavigationRowsInfo<RowElement>>({
     context,
@@ -423,8 +421,6 @@ export function useCompleteGridNavigationRowOuter<RowElement extends Element, Rs
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
 
@@ -558,8 +554,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
@@ -639,7 +633,7 @@ export interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowEleme
 
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({
     singleSelectionDeclarativeParameters,
@@ -665,7 +659,7 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
 export type UseCompleteGridNavigationRowDeclarativeParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> = OmitStrong<MakeMultiSelectionChildDeclarativeParameters<UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>>, "multiSelectionChildReturn">;
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useCompleteGridNavigationRowDeclarative<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     multiSelectionChildParameters: { multiSelectionDisabled, ...multiSelectionChildParameters },

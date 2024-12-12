@@ -7,8 +7,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * Measures an element, allowing you to react to its changes in size.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
     return useMonitoring(function useElementSize() {

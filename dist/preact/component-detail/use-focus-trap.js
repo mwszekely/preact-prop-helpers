@@ -12,8 +12,6 @@ import { useTagProps } from "../util/use-tag-props.js";
  * Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     return useMonitoring(function useFocusTrap() {

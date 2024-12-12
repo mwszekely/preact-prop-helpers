@@ -248,9 +248,10 @@
  * {@include } {@link useSingleSelection}
  * {@include } {@link useMultiSelection}
  * {@include } {@link useRearrangeableChildren}
- * {@include } {@link useSortableChildren}
  * {@include } {@link usePaginatedChildren}
  * {@include } {@link useStaggeredChildren}
+ * {@include } {@link useProcessedChildren}
+ * {@include } {@link useProcessedIndexMangler}
  * {@include } {@link useDismiss}
  * {@include } {@link useBackdropDismiss}
  * {@include } {@link useEscapeDismiss}

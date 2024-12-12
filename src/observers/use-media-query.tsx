@@ -16,8 +16,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @param query - Must be in parens, e.g. `(max-width: 600px)`
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`.
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
     return useMonitoring(function useMediaQuery(): UseMediaQueryReturnType {

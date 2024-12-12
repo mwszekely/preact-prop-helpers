@@ -3,7 +3,7 @@ import { useCallback, useRef } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
- * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
  *
@@ -36,8 +36,6 @@ import { useTagProps } from "../util/use-tag-props.js";
  * ```
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRefElement(args) {
     return useMonitoring(function useRefElement() {

@@ -5,8 +5,6 @@ import { useRandomId } from "./use-random-id.js";
  * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
     return useMonitoring(function useRandomDualIds() {

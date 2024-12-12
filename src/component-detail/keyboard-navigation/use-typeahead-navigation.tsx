@@ -123,8 +123,6 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * @hasChild {@link useTypeaheadNavigationChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
@@ -378,8 +376,6 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 /**
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },

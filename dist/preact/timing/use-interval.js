@@ -7,8 +7,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  *
  * @remarks
  * {@include } {@link UseIntervalParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useInterval({ interval, callback, noRisingEdge }) {
     return useMonitoring(function useInterval() {

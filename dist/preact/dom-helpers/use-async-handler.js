@@ -66,8 +66,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
     return useMonitoring(function useAsyncHandler() {

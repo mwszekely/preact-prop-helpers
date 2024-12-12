@@ -41,8 +41,6 @@ export interface UsePortalChildrenReturnType {
  * TODO: Can't push a child until after the very first `useLayoutEffect`
  * 
  * {@include } {@link UsePortalChildrenParameters}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
     return useMonitoring(function usePortalChildren() {

@@ -9,8 +9,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @param inputs - Same as the default
  * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useEffectDebug(effect, inputs, impl = useEffectNative) {
     return useMonitoring(function useEffectDebug() {

@@ -53,7 +53,7 @@ export interface UseProcessedIndexManglerContextSelf {
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf { }
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * @compositeParams
  */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType {
     return useMonitoring(function useProcessedIndexMangler(): UseProcessedIndexManglerReturnType {

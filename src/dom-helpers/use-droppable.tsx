@@ -76,8 +76,6 @@ export class DroppableFileError extends Error {
  * @remarks
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
     return useMonitoring(function useDroppable(): UseDroppableReturnType<E> {

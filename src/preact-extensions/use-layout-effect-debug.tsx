@@ -10,8 +10,6 @@ import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
  * 
  * @param effect - Same as the built-in's
  * @param inputs - Same as the built-in's
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
     return useMonitoring(function useLayoutEffectDebug() {

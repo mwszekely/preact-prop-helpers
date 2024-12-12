@@ -5,8 +5,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     return useMonitoring(function useRandomId() {

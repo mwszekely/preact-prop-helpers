@@ -30,14 +30,14 @@ let i = 0;
 export const useMonitoring = ((process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration)? useMonitoringImpl : dontUseMonitoringImpl) as typeof dontUseMonitoringImpl;
 
 /**
- * #__NO_SIDE_EFFECTS__ 
+ * 
  */
 function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnType<T> {
     return t();
 }
 
 /**
- * #__NO_SIDE_EFFECTS__ 
+ * 
  */
 function useMonitoringImpl<T>(hook: T) {
     const h = (hook as (...args: any) => any);
@@ -103,7 +103,7 @@ let filterAll = false;
 const filters = new Set<string>();
 
 /**
- * #__NO_SIDE_EFFECTS__
+ * 
  */
 export function hideCallCount(hook: Function | "all") {
     filterAll = (hook === "all");

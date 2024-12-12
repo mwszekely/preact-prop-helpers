@@ -68,8 +68,6 @@ export interface UseGridNavigationSelectionCellReturnType<CellElement extends El
  * @hasChild {@link useGridNavigationSelectionCell}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters,
@@ -144,8 +142,6 @@ export function useGridNavigationSelection<ParentOrRowElement extends Element, R
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({
     info: mcp1,
@@ -203,8 +199,6 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement> {
     return useMonitoring(function useGridNavigationSelectionCell(): UseGridNavigationSelectionCellReturnType<CellElement> {

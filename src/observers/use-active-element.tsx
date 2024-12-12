@@ -182,8 +182,6 @@ export interface UseActiveElementReturnType {
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
     return useMonitoring(function useActiveElement(): UseActiveElementReturnType {

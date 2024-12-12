@@ -12,8 +12,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @hasChild {@link useChildrenHaveFocusChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useChildrenHaveFocus(args) {
     return useMonitoring(function useChildrenHaveFocus() {
@@ -31,8 +29,6 @@ export function useChildrenHaveFocus(args) {
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return useMonitoring(function useChildrenHaveFocusChild() {

@@ -53,8 +53,6 @@ export interface LogicalElementSize {
  * * `convertElementSize`: When used in conjunction with `useElementSize`, allows you to retrieve the logical size of an element instead of the physical size. 
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
     return useMonitoring(function useLogicalDirection(): UseLogicalDirectionReturnType {

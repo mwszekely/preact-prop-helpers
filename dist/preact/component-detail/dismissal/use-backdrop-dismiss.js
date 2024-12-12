@@ -8,8 +8,6 @@ import { useMonitoring } from "../../util/use-call-count.js";
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     return useMonitoring(function useBackdropDismiss() {

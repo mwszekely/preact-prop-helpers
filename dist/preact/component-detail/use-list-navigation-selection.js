@@ -13,8 +13,6 @@ import { useSelection, useSelectionChild } from "./selection/use-selection.js";
  * @hasChild {@link useListNavigationSelectionChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigationSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void3 }) {
     return useMonitoring(function useListNavigationSelection() {
@@ -49,8 +47,6 @@ export function useListNavigationSelection({ linearNavigationParameters, rovingT
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useMonitoring(function useListNavigationSelectionChild() {

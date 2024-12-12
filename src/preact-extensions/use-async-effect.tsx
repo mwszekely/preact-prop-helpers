@@ -13,8 +13,6 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
  * only remembering the most recent request.
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
     useMonitoring(function useAsyncEffect() {

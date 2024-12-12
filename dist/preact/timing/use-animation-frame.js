@@ -6,8 +6,6 @@ const SharedAnimationFrameContext = createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function ProvideBatchedAnimationFrames({ children }) {
     const addCallback = useCallback((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
@@ -39,8 +37,6 @@ export function ProvideBatchedAnimationFrames({ children }) {
  * {@include } {@link UseAnimationFrameParameters}
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useAnimationFrame({ callback }) {
     return useMonitoring(function useAnimationFrame() {

@@ -25,8 +25,6 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     return useMonitoring(function useImperativeProps() {

@@ -42,8 +42,6 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * @hasChild {@link useListNavigationSelectionChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
@@ -98,8 +96,6 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigationSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, ...void2 },

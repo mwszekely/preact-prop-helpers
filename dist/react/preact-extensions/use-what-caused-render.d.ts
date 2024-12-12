@@ -1,5 +1,5 @@
 /**
- * #__NO_SIDE_EFFECTS__
+ *
  */
 export declare function useWhatCausedRender(who: string, { props, state }: {
     props: any;

@@ -19,8 +19,6 @@ export interface UseBlockingElementReturnType {
  * it'll take to find its way into the spec, if ever)
  *
  * @param target
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useBlockingElement<E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>): UseBlockingElementReturnType;
 export declare function getTopElement(): HTMLElement | null;

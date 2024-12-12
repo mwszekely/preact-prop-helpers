@@ -33,8 +33,6 @@ const AsyncFunction = ((async function () { }).constructor);
  *
  * @param asyncHandler - The async function to make sync
  * @param options - @see {@link UseAsyncParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useAsync(asyncHandler, options) {
     return useMonitoring(function useAsync() {

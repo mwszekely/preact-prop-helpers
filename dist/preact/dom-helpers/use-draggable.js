@@ -6,8 +6,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @remarks
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
     return useMonitoring(function useDraggable() {

@@ -72,8 +72,6 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 /**
@@ -84,8 +82,6 @@ export declare function useStaggeredChildren({ managedChildrenReturn: { getChild
  * logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } } }: UseStaggeredChildParameters<M>): UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

@@ -57,8 +57,6 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * @hasChild {@link useChildrenHaveFocusChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
     return useMonitoring(function useChildrenHaveFocus(): UseChildrenHaveFocusReturnType<ChildElement> {
@@ -79,8 +77,6 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 
 /**
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
     return useMonitoring(function useChildrenHaveFocusChild(): UseChildrenHaveFocusChildReturnType<E> {

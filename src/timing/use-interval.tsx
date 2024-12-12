@@ -30,8 +30,6 @@ export interface UseIntervalParameters {
  * 
  * @remarks
  * {@include } {@link UseIntervalParameters}
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useInterval({ interval, callback, noRisingEdge }: UseIntervalParameters) {
     return useMonitoring(function useInterval() {

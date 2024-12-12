@@ -9,8 +9,6 @@ import { useActiveElement } from "./use-active-element.js";
  * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useHasLastFocus(args) {
     return useMonitoring(function useHasLastFocus() {

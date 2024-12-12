@@ -27,8 +27,6 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * Effectively just a wrapper around a `MutationObserver`.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useMutationObserver<E extends Element>({
     refElementParameters,

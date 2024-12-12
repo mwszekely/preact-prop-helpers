@@ -26,8 +26,6 @@ import { useListNavigation, useListNavigationChild } from "./use-list-navigation
  * @hasChild {@link useGridNavigationCell}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, initiallyTabbableColumn, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     return useMonitoring(function useGridNavigation() {
@@ -68,8 +66,6 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
  * As such, this is one of the most complicated hooks here in terms of dependencies.
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
@@ -190,8 +186,6 @@ refElementReturn, ...void1 }) {
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     return useMonitoring(function useGridNavigationCell() {

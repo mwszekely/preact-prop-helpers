@@ -89,8 +89,6 @@ export interface UsePressReturnType<E extends Element> {
  * {@include } {@link setPressVibrate}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E>;
 export interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {

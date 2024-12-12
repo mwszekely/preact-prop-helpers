@@ -25,9 +25,6 @@ export function getFromLocalStorage(key, converter = JSON.parse, storage = defau
     }
     return null;
 }
-/**
- * #__NO_SIDE_EFFECTS__
- */
 export function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
     if (storage != null) {
         try {
@@ -42,7 +39,6 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
         }
     }
 }
-//function dummy<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] { return null!; }
 /**
  * @remarks Use module augmentation to get the correct types for this function.
  *
@@ -59,8 +55,6 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  * @param fromString -
  * @param toString -
  * @returns
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = defaultStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));

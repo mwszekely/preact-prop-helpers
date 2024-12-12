@@ -19,8 +19,6 @@ import { useMonitoring } from "../util/use-call-count.js";
  * In general, you'll want to inspect a specific directory of
  * a path, or a specific query parameter value, not the
  * entire URL.
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function useUrl(onUrlChange: (url: string) => void) {
 

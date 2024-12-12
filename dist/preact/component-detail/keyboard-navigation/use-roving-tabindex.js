@@ -27,8 +27,6 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexDemangler }, ...void1 }) {
     return useMonitoring(function useRovingTabIndex() {
@@ -221,8 +219,6 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
  * @see {@link useRovingTabIndex}
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     return useMonitoring(function useRovingTabIndexChild() {

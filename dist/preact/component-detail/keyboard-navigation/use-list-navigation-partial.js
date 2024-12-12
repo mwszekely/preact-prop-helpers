@@ -52,8 +52,6 @@ const _dummy = null;
  * @hasChild {@link useListNavigationChild}
  *
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, ...void1 }) {
     return useMonitoring(function useListNavigation() {
@@ -83,8 +81,6 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
 }
 /**
  * @compositeParams
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
     return useMonitoring(function useListNavigationChild() {

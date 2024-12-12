@@ -23,8 +23,6 @@ export interface UseTimeoutParameters {
  *
  * @remarks
  * {@include } {@link UseTimeoutParameters}
- *
- * #__NO_SIDE_EFFECTS__
  */
 export declare function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters): {
     getElapsedTime: () => number;

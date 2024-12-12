@@ -28,8 +28,6 @@ function setIsStableGetter(obj) {
  * during render, pass an empty dependency array and it'll act like `useCallback` with an
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
- *
- * #__NO_SIDE_EFFECTS__
  */
 export function useStableCallback(fn, noDeps) {
     return useMonitoring(function useStableCallback() {

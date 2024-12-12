@@ -69,8 +69,6 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * @hasChild {@link usePaginatedChild}
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function usePaginatedChildren<TabbableChildElement extends Element>({
     managedChildrenReturn: { getChildren },
@@ -190,8 +188,6 @@ export interface UsePaginatedChildReturnTypeSelf {
  * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
  * 
  * @compositeParams
- * 
- * #__NO_SIDE_EFFECTS__
  */
 export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     return useMonitoring(function usePaginatedChild(): UsePaginatedChildReturnType<ChildElement> {
