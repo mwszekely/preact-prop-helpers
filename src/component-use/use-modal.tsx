@@ -4,7 +4,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseModalParametersSelf {
     /**
@@ -32,8 +32,10 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useModal = /*@__PURE__*/ monitored(function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
+export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void2 },
     escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 },
     focusTrapParameters: { trapActive, ...focusTrapParameters },
@@ -44,33 +46,35 @@ export const useModal = /*@__PURE__*/ monitored(function useModal<Listeners exte
     modalParameters: { active: modalActive, ...void8 },
     ...void1
 }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
-    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({
-        dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
-        escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
-        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
-        backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
-        lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
-    });
-    const { propsStable, refElementReturn } = useRefElement<NonNullable<FocusContainerElement>>({ refElementParameters: { onElementChange, onMount, onUnmount } })
-    const { props } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
-        focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
-        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
-        refElementReturn
-    });
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    assertEmptyObject(void5);
-    assertEmptyObject(void6);
-    assertEmptyObject(void7);
-    assertEmptyObject(void8);
+    return useMonitoring(function useModal(): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
+        const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({
+            dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
+            escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
+            activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
+            backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
+            lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
+        });
+        const { propsStable, refElementReturn } = useRefElement<NonNullable<FocusContainerElement>>({ refElementParameters: { onElementChange, onMount, onUnmount } })
+        const { props } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
+            focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
+            activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
+            refElementReturn
+        });
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void4);
+        assertEmptyObject(void5);
+        assertEmptyObject(void6);
+        assertEmptyObject(void7);
+        assertEmptyObject(void8);
 
-    return {
-        propsFocusContainer: useMergedProps(propsStable, props),
-        refElementPopupReturn,
-        refElementSourceReturn,
-        propsStablePopup,
-        propsStableSource
-    }
-})
+        return {
+            propsFocusContainer: useMergedProps(propsStable, props),
+            refElementPopupReturn,
+            refElementSourceReturn,
+            propsStablePopup,
+            propsStableSource
+        }
+    });
+}

@@ -1,6 +1,7 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, TargetedPick, useEffect } from "../util/lib.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParametersSelf<E extends Element> {
@@ -37,17 +38,21 @@ export interface UseTextContentReturnType {
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useTextContent = (function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
-    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-    useEffect(() => {
-        const element = getElement();
-        if (element) {
-            const textContent = getText(element);
-            if (textContent) {
-                setTextContent(textContent);
+export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
+    return useMonitoring(function useTextContent(): UseTextContentReturnType {
+        const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        useEffect(() => {
+            const element = getElement();
+            if (element) {
+                const textContent = getText(element);
+                if (textContent) {
+                    setTextContent(textContent);
+                }
             }
-        }
+        });
+        return { textContentReturn: { getTextContent } }
     });
-    return { textContentReturn: { getTextContent } }
-})
+}

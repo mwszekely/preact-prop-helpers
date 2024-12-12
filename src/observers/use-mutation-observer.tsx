@@ -2,7 +2,7 @@ import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from 
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
     onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
@@ -27,82 +27,87 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * Effectively just a wrapper around a `MutationObserver`.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMutationObserver = /*@__PURE__*/ monitored(function useMutationObserver<E extends Element>({
+export function useMutationObserver<E extends Element>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
 }: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
 
-    const { onElementChange, ...rest } = (refElementParameters || {})
+    return useMonitoring(function useMutationObserver(): UseMutationObserverReturnType<E> {
+
+        const { onElementChange, ...rest } = (refElementParameters || {})
 
 
-    if (typeof attributeFilter === "string")
-        attributeFilter = [attributeFilter];
-    const attributeKey = attributeFilter?.join(";");
+        if (typeof attributeFilter === "string")
+            attributeFilter = [attributeFilter];
+        const attributeKey = attributeFilter?.join(";");
 
-    const attributes = !!onAttributes;
-    const characterData = !!onCharacterData;
-    const childList = !!onChildList;
+        const attributes = !!onAttributes;
+        const characterData = !!onCharacterData;
+        const childList = !!onChildList;
 
-    const stableOnChildList = useStableCallback(onChildList ?? (() => { }));
-    const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
-    const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
+        const stableOnChildList = useStableCallback(onChildList ?? (() => { }));
+        const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
+        const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
-    const [_getMo, setMo] = usePassiveState<MutationObserver | null, never>(useStableCallback(observer => {
-        const element = getElement();
-        if (element && observer && (!!attributeKey || !!characterData || !!childList)) {
-            observer.observe(element, {
-                attributeFilter: attributeFilter as Array<string>,
-                attributeOldValue,
-                attributes,
-                characterData,
-                characterDataOldValue,
-                childList,
-                subtree
-            })
+        const [_getMo, setMo] = usePassiveState<MutationObserver | null, never>(useStableCallback(observer => {
+            const element = getElement();
+            if (element && observer && (!!attributeKey || !!characterData || !!childList)) {
+                observer.observe(element, {
+                    attributeFilter: attributeFilter as Array<string>,
+                    attributeOldValue,
+                    attributes,
+                    characterData,
+                    characterDataOldValue,
+                    childList,
+                    subtree
+                })
 
-            return () => observer.disconnect();
-        }
-    }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true })
+                return () => observer.disconnect();
+            }
+        }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true })
 
-    const onNeedMutationObserverReset = useCallback((element: E | null) => {
-        if (element) {
-            queueMicrotask(() => {
-                setMo(new MutationObserver((a) => {
-                    for (const mutation of a) {
-                        switch (mutation.type) {
-                            case "childList":
-                                stableOnChildList(mutation);
-                                break;
+        const onNeedMutationObserverReset = useCallback((element: E | null) => {
+            if (element) {
+                queueMicrotask(() => {
+                    setMo(new MutationObserver((a) => {
+                        for (const mutation of a) {
+                            switch (mutation.type) {
+                                case "childList":
+                                    stableOnChildList(mutation);
+                                    break;
 
-                            case "attributes":
-                                stableOnAttributes(mutation);
-                                break;
+                                case "attributes":
+                                    stableOnAttributes(mutation);
+                                    break;
 
-                            case "characterData":
-                                stableOnCharacterData(mutation);
-                                break;
+                                case "characterData":
+                                    stableOnCharacterData(mutation);
+                                    break;
+                            }
                         }
-                    }
-                }));
-            })
-        }
-    }, []);
+                    }));
+                })
+            }
+        }, []);
 
-    useEffect(() => {
-        onNeedMutationObserverReset(getElement());
-    }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
+        useEffect(() => {
+            onNeedMutationObserverReset(getElement());
+        }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-    const { refElementReturn, propsStable } = useRefElement<E>({
-        refElementParameters: {
-            onElementChange: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
-            ...rest
-        }
+        const { refElementReturn, propsStable } = useRefElement<E>({
+            refElementParameters: {
+                onElementChange: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
+                ...rest
+            }
+        });
+        const { getElement } = refElementReturn;
+
+        return {
+            refElementReturn,
+            propsStable
+        };
     });
-    const { getElement } = refElementReturn;
-
-    return {
-        refElementReturn,
-        propsStable
-    };
-})
+}

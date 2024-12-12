@@ -270,7 +270,7 @@ These hooks don't do anything with HTML elements but are useful extensions to Pr
 
 * [`useStableCallback`](#usestablecallback): Alternate useCallback() which always returns the same (wrapped) function reference so that it can be excluded from the dependency arrays of `useEffect` and friends.
 
-* [`useMemoObject`](#usememoobject): 
+* [`useMemoObject`](#usememoobject): Like useMemo, but checks objects (shallowly)
 
 * [`useForceUpdate`](#useforceupdate): Returns a function that will, when called, force the component that uses this hook to re-render itself.
 
@@ -317,7 +317,7 @@ These hooks are primarily used to build larger hooks, but can be used alone
 
 * [`useRearrangeableChildren`](#userearrangeablechildren): Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
 
-* [`useSortableChildren`](#usesortablechildren): Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+`The member reference "useSortableChildren" was not found`
 
 * [`usePaginatedChildren`](#usepaginatedchildren): Allows children to stop themselves from rendering outside of a narrow range.
 
@@ -435,7 +435,6 @@ useEffect(() => {
 
 ```
 
-
 **Fastest (but slightly more verbose)**
 
 
@@ -446,7 +445,6 @@ const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onEle
 const { propsStable } = useRefElement({ onElementChange: setElement });
 
 ```
-
 
 
 
@@ -523,7 +521,7 @@ All the list-related hooks combined into one large hook that encapsulates everyt
 
 #### UseCompleteListNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseMultiSelectionParameters`](#usemultiselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseMultiSelectionParameters`](#usemultiselectionparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseProcessedIndexManglerParameters`](#useprocessedindexmanglerparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 Every member of `UseCompleteListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -531,7 +529,7 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 
 #### UseCompleteListNavigationReturnType
 
-<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseMultiSelectionReturnType`](#usemultiselectionreturntype), [`UseSelectionReturnType`](#useselectionreturntype), [`UseListNavigationSelectionReturnType`](#uselistnavigationselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseProcessedChildrenReturnType`](#useprocessedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseMultiSelectionReturnType`](#usemultiselectionreturntype), [`UseSelectionReturnType`](#useselectionreturntype), [`UseListNavigationSelectionReturnType`](#uselistnavigationselectionreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -548,7 +546,7 @@ Unlike most others, this hook assume's it's the final one--the "outermost" hook 
 
 ##### UseCompleteListNavigationChildParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteListNavigationChildInfoKeysParameters`](#usecompletelistnavigationchildinfokeysparameters), [`UseListNavigationSelectionSortableChildInfoKeysParameters`](#uselistnavigationselectionsortablechildinfokeysparameters), [`UseListNavigationSelectionChildInfoKeysParameters`](#uselistnavigationselectionchildinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseSelectionChildInfoKeysParameters`](#useselectionchildinfokeysparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseMultiSelectionChildInfoKeysParameters`](#usemultiselectionchildinfokeysparameters), [`UseMultiSelectionChildParameters`](#usemultiselectionchildparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteListNavigationChildInfoKeysParameters`](#usecompletelistnavigationchildinfokeysparameters), [`UseListNavigationSelectionChildInfoKeysParameters`](#uselistnavigationselectionchildinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseSelectionChildInfoKeysParameters`](#useselectionchildinfokeysparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseMultiSelectionChildInfoKeysParameters`](#usemultiselectionchildinfokeysparameters), [`UseMultiSelectionChildParameters`](#usemultiselectionchildparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseCompleteListNavigationChildParameters` is inherited (see the interfaces it `extends` from).
 
@@ -556,7 +554,7 @@ Every member of `UseCompleteListNavigationChildParameters` is inherited (see the
 
 ##### UseCompleteListNavigationChildReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseMultiSelectionChildReturnType`](#usemultiselectionchildreturntype), [`UseListNavigationSelectionChildReturnType`](#uselistnavigationselectionchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseMultiSelectionChildReturnType`](#usemultiselectionchildreturntype), [`UseListNavigationSelectionChildReturnType`](#uselistnavigationselectionchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -578,15 +576,18 @@ Combines all the grid- (&amp; list-) related hooks into one giant hook that acco
 
 #### UseCompleteGridNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationParameters`](#usegridnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseMultiSelectionParameters`](#usemultiselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationParameters`](#usegridnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseMultiSelectionParameters`](#usemultiselectionparameters), [`UseProcessedIndexManglerParameters`](#useprocessedindexmanglerparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
-Every member of `UseCompleteGridNavigationParameters` is inherited (see the interfaces it `extends` from).
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.getSortColumn?|`() => (number \| undefined)`|If this grid is sorted by column, then this should return the index of the column that is currently being sorted by.<br />The value returned will be passed to `getSortValueAt`. If the grid you're using this for doesn't have a concept of a "sortable column", this can be entirely ignored.|-|
+|.getSortValueAt|`(row?: number, column?: number \| undefined) => unknown`|Should return a value that works with `rearrangeableChildrenParameters.compare` (or, by default, that works with the minus operator).<br />The `column` parameter will be whatever `getSortColumn` returns, or `undefined` if none was provided.|-|
 
 
 
 #### UseCompleteGridNavigationReturnType
 
-<small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseMultiSelectionReturnType`](#usemultiselectionreturntype), [`UseSelectionReturnType`](#useselectionreturntype), [`UseGridNavigationSelectionReturnType`](#usegridnavigationselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseGridNavigationSelectionSortableReturnType`](#usegridnavigationselectionsortablereturntype), [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseMultiSelectionReturnType`](#usemultiselectionreturntype), [`UseSelectionReturnType`](#useselectionreturntype), [`UseGridNavigationSelectionReturnType`](#usegridnavigationselectionreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseProcessedChildrenReturnType`](#useprocessedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -601,7 +602,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 ##### UseCompleteGridNavigationRowParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationRowInfoKeysParameters`](#usecompletegridnavigationrowinfokeysparameters), [`UseGridNavigationSelectionSortableRowInfoKeysParameters`](#usegridnavigationselectionsortablerowinfokeysparameters), [`UseGridNavigationSelectionRowInfoKeysParameters`](#usegridnavigationselectionrowinfokeysparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSelectionChildInfoKeysParameters`](#useselectionchildinfokeysparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseMultiSelectionChildInfoKeysParameters`](#usemultiselectionchildinfokeysparameters), [`UseMultiSelectionChildParameters`](#usemultiselectionchildparameters), [`UseGridNavigationSelectionRowParameters`](#usegridnavigationselectionrowparameters), [`UseGridNavigationSelectionSortableRowParameters`](#usegridnavigationselectionsortablerowparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationRowInfoKeysParameters`](#usecompletegridnavigationrowinfokeysparameters), [`UseGridNavigationSelectionRowInfoKeysParameters`](#usegridnavigationselectionrowinfokeysparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSelectionChildInfoKeysParameters`](#useselectionchildinfokeysparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseMultiSelectionChildInfoKeysParameters`](#usemultiselectionchildinfokeysparameters), [`UseMultiSelectionChildParameters`](#usemultiselectionchildparameters), [`UseGridNavigationSelectionRowParameters`](#usegridnavigationselectionrowparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 Every member of `UseCompleteGridNavigationRowParameters` is inherited (see the interfaces it `extends` from).
 
@@ -609,7 +610,7 @@ Every member of `UseCompleteGridNavigationRowParameters` is inherited (see the i
 
 ##### UseCompleteGridNavigationRowReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseMultiSelectionChildReturnType`](#usemultiselectionchildreturntype), [`UseGridNavigationSelectionRowReturnType`](#usegridnavigationselectionrowreturntype), [`UseGridNavigationSelectionSortableRowReturnType`](#usegridnavigationselectionsortablerowreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseMultiSelectionChildReturnType`](#usemultiselectionchildreturntype), [`UseGridNavigationSelectionRowReturnType`](#usegridnavigationselectionrowreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -623,7 +624,7 @@ Every member of `UseCompleteGridNavigationRowParameters` is inherited (see the i
 
 ##### UseCompleteGridNavigationCellParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationCellInfoKeysParameters`](#usecompletegridnavigationcellinfokeysparameters), [`UseGridNavigationSelectionSortableCellInfoKeysParameters`](#usegridnavigationselectionsortablecellinfokeysparameters), [`UseGridNavigationSelectionCellInfoKeysParameters`](#usegridnavigationselectioncellinfokeysparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseGridNavigationSelectionCellParameters`](#usegridnavigationselectioncellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationCellInfoKeysParameters`](#usecompletegridnavigationcellinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseGridNavigationSelectionCellInfoKeysParameters`](#usegridnavigationselectioncellinfokeysparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseGridNavigationSelectionCellParameters`](#usegridnavigationselectioncellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseCompleteGridNavigationCellParameters` is inherited (see the interfaces it `extends` from).
 
@@ -631,7 +632,7 @@ Every member of `UseCompleteGridNavigationCellParameters` is inherited (see the 
 
 ##### UseCompleteGridNavigationCellReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseGridNavigationCellReturnType`](#usegridnavigationcellreturntype), [`UseGridNavigationSelectionCellReturnType`](#usegridnavigationselectioncellreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseGridNavigationCellReturnType`](#usegridnavigationcellreturntype), [`UseGridNavigationSelectionCellReturnType`](#usegridnavigationselectioncellreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -805,7 +806,9 @@ Allows a component to use the boolean result of a media query as part of its ren
 |defaultGuess|`boolean`|Optional. If you pass the same value that's measured after rendering, no re-render will occur.|
 
 
-**Returns** `UseMediaQueryReturnType`
+**Returns** `UseMediaQueryReturnType`.
+
+**Note the return type** is ***not*** a boolean; it is an object that contains a boolean and a stable getter.
 
 Please note that there is a re-render penalty incurred by using this hook -- it will always cause any component that uses it to re-render one extra time on mount as it stores the result of the media query. This can be mitigated with the `defaultGuess` parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.
 
@@ -1014,7 +1017,7 @@ Allows attaching an event handler to any *non-Preact* element, and removing it w
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|target|`T`|A *non-Preact* node to attach the event to. *|
+|target|`T \| null \| undefined`|A *non-Preact* node to attach the event to.|
 |type|`EventType`||
 |handler|`null \| ((e: H) => void)`||
 |options|`Parameters<TypedAddEventListener<T>>[2]`||
@@ -1118,7 +1121,7 @@ Allows examining the rendered component's text content whenever it renders and r
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
 |.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.<br />Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such. `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).|-|
-|.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|-|
+|.onTextContentChange?|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|-|
 
 
 
@@ -1334,7 +1337,7 @@ Inspects the element's style and determines the logical direction that text flow
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{}|[`UseLogicalDirectionParameters`](#uselogicaldirectionparameters)||
+|{ ...void1 }|[`UseLogicalDirectionParameters`](#uselogicaldirectionparameters)||
 
 
 **Returns** An object containing the following functions: * `getLogicalDirection`: retrieves a `LogicalDirectionInfo` representing the current state of the element. (Function is constant between renders) * `convertElementSize`: When used in conjunction with `useElementSize`, allows you to retrieve the logical size of an element instead of the physical size. * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block". * `convertToPhysicalOrientation`: Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
@@ -1396,11 +1399,15 @@ In general, just pass the function you want to be stable (but you can't use it d
 
 ### useMemoObject
 
+Like useMemo, but checks objects (shallowly)
+
 
 |Parameter|Type|Description|
 |---------|----|-----------|
 |t|`T`||
 
+
+**Returns** 
 
 
 <hr />
@@ -1453,7 +1460,7 @@ Similar to `useState`, but for values that aren't "render-important" &ndash; upd
 |---------|----|-----------|
 |onChange|[`Nullable`](#nullable)`<`[`OnPassiveStateChange`](#onpassivestatechange)`<T, R>>`|The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
 |getInitialValue|`() => T`|If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
-|customDebounceRendering|`typeof debounceRendering`|By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.|
+|{ debounceRendering: customDebounceRendering, skipMountInitialization }|`Partial<UsePassiveStateOptions>`||
 
 
 **Returns** 
@@ -1537,11 +1544,7 @@ Note that while this function is like usePassiveState (itself like useState and 
 |stringToValue|`((value: string \| null) => T \| null)`||
 |valueToString?|`((value: T \| null) => (string \| null)) \| undefined`||
 
-#### SearchParamStates
-
-
-
-This interface is empty.
+`The member reference "SearchParamStates" was ambiguous`
 
 
 <hr />
@@ -1582,7 +1585,7 @@ Runs a function every time the specified number of milliseconds elapses while th
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ interval, callback }|[`UseIntervalParameters`](#useintervalparameters)||
+|{ interval, callback, noRisingEdge }|[`UseIntervalParameters`](#useintervalparameters)||
 
 
 #### UseIntervalParameters
@@ -1593,6 +1596,7 @@ Runs a function every time the specified number of milliseconds elapses while th
 |---------|----|-----------|
 |callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.|
 |interval?|`number`|The number of ms to wait before invoking `callback`.|
+|noRisingEdge?|`boolean`|By default, the callback will be called as soon as interval is non-null, and then on every interval afterwards.<br />Set this to true to only call the callback after the first interval has passed.|
 
 
 <hr />
@@ -1750,7 +1754,7 @@ Implements proper keyboard navigation for components like listboxes, button grou
 
 #### UseListNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 Every member of `UseListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -1775,7 +1779,7 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 ##### UseListNavigationChildParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseListNavigationChildParameters` is inherited (see the interfaces it `extends` from).
 
@@ -1783,7 +1787,7 @@ Every member of `UseListNavigationChildParameters` is inherited (see the interfa
 
 ##### UseListNavigationChildReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -1804,10 +1808,11 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 #### UseGridNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
+|.initiallyTabbableColumn|`number`|Which column of cells is initially tabbable the first time the user interacts with the control.|-|
 |.onTabbableColumnChange?|`OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> \| undefined>`|TODO: This may be called even when there is no actual change in the numeric values|Yes|
 
 
@@ -1841,7 +1846,7 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 ##### UseGridNavigationRowParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 Every member of `UseGridNavigationRowParameters` is inherited (see the interfaces it `extends` from).
 
@@ -1849,7 +1854,7 @@ Every member of `UseGridNavigationRowParameters` is inherited (see the interface
 
 ##### UseGridNavigationRowReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -1866,7 +1871,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 ##### UseGridNavigationCellParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
@@ -1876,7 +1881,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 ##### UseGridNavigationCellReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -1897,7 +1902,7 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 #### UseRovingTabIndexParameters
 
-<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
@@ -1967,7 +1972,7 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 
 #### UseLinearNavigationParameters
 
-<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
@@ -2043,7 +2048,7 @@ Allows for the selection of a managed child by typing the given text associated 
 
 ##### UseTypeaheadNavigationChildParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters)</small>
 
 Every member of `UseTypeaheadNavigationChildParameters` is inherited (see the interfaces it `extends` from).
 
@@ -2051,7 +2056,7 @@ Every member of `UseTypeaheadNavigationChildParameters` is inherited (see the in
 
 ##### UseTypeaheadNavigationChildReturnType
 
-<small>`extends` [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseTextContentParameters`](#usetextcontentparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the interfaces it `extends` from).
 
@@ -2241,9 +2246,9 @@ This is not exclusive with [useSingleSelection](#usesingleselection), you can us
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.initiallyMultiSelected|`boolean`||-|
+|.initiallyMultiSelected|`boolean \| null`||-|
 |.multiSelectionDisabled|`boolean`|When true, this child cannot be selected via multi-select, either by focusing it or by clicking it.|-|
-|.onMultiSelectChange?|`(e: MultiSelectChildChangeEvent) => void`|Called when the child is requesting to change whether it's selected or not (generally because the user clicked it)<br />To comply with the child's request, you should either:<br />* Change the `selected` parameter to true (probably by calling `setState` somewhere) if this is declaratively controlled (most cases).
+|.onMultiSelectChange?|`(e: MultiSelectChildChangeEvent<E>) => void`|Called when the child is requesting to change whether it's selected or not (generally because the user clicked it)<br />To comply with the child's request, you should either:<br />* Change the `selected` parameter to true (probably by calling `setState` somewhere) if this is declaratively controlled (most cases).
 * Call `changeSelected`, if this is imperatively controlled.
 |-|
 |context|`UseMultiSelectionContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
@@ -2277,12 +2282,12 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 #### UseRearrangeableChildrenParameters
 
-<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
+<small>`extends` [`UseProcessedIndexManglerParameters`](#useprocessedindexmanglerparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.getIndex|`GetIndex`|This must return the index of this child relative to all its sortable siblings from its `VNode`.<br />In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.|Yes|
-|.onRearranged?|`(() => void)`|Called after the children have been rearranged.|-|
+|.children|`(VNode \| null)[]`|The children to rearrange.|-|
+|context|`UseRearrangedChildrenContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -2292,53 +2297,9 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|.indexDemangler|`(n: number) => number`||Yes|
-|.indexMangler|`(n: number) => number`|This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position. In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)<br />E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)|Yes|
-|.rearrange|`(originalRows: M[], rowsInOrder: M[]) => void`|Pass an array of not-sorted child information to this function and the children will re-arrange themselves to match.<br />This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.|Yes|
-|.reverse|`() => Promise<void> \| void`|Reverses the order of the children|Yes|
-|.shuffle|`() => Promise<void> \| void`|Arranges the children in a random order.|Yes|
-|.toJsonArray|`(transform?: (info: M) => object) => object`|Returns an array of each cell's `getSortValue()` result.|-|
-|.useRearrangedChildren|`(children: VNode[]) => VNode[]`|Call this on your props (that contain the children to sort!!) to allow them to be sortable.|Yes|
-
-*This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
-
-It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
-
-Besides the prop-modifying hook that's returned, the `sort` function that's returned will sort all children according to their value from the `getValue` argument you pass in.
-
-If you want to perform some re-ordering operation that's *not* a sort, you can manually re-map each child's position using `mangleMap` and `demangleMap`, which convert between sorted and unsorted index positions.
-
-Again, unlike some other hooks, **these children must be direct descendants**. This is because the prop-modifying hook inspects the given children, then re-creates them with new `key`s. Because keys are given special treatment and a child has no way of modifying its own key there's no other time or place this can happen other than exactly within the parent component's render function.
-
-
-<hr />
-<hr />
-
-
-
-### useSortableChildren
-
-Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
-
-
-
-#### UseSortableChildrenParameters
-
-<small>`extends` [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
-
-|Member|Type|Description|Must be stable?|
-|---------|----|-----------|----------|
-|.compare?|`Compare<M>`|Controls how values compare against each other when `sort` is called.<br />If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)|-|
-
-
-
-#### UseSortableChildrenReturnType
-
-<small>`extends` [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
-
-|Member|Type|Description|Is stable?|
-|---------|----|-----------|----------|
-|.sort|`(direction: "ascending" \| "descending") => Promise<void> \| void`|Call to rearrange the children in ascending or descending order.|Yes|
+|.children|`(VNode \| null)[]`|The transformed (i.e. rearranged) children to render.|-|
+|.refresh|`() => void`||-|
+|context|`UseRearrangeableChildrenContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
 
@@ -2364,10 +2325,11 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 #### UsePaginatedChildrenParameters
 
-<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseProcessedIndexManglerReturnType`](#useprocessedindexmanglerreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
+|.childCount?|`number`||-|
 |.paginationMax?|`number`||-|
 |.paginationMin?|`number`||-|
 
@@ -2375,11 +2337,10 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 #### UsePaginatedChildrenReturnType
 
-<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
+
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|.childCount?|`number`|**IMPORTANT**: This is only tracked when pagination is enabled.<br />If pagination is not enabled, this is either `null` or some undefined previous number.|-|
 |.refreshPagination|`(min: Nullable<number>, max: Nullable<number>) => void`|If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.|Yes|
 |context|`UsePaginatedChildContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
@@ -2436,6 +2397,7 @@ Allows children to each wait until the previous has finished rendering before it
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
+|.childCount|`number \| null`||-|
 |.staggered|`boolean`|If true, each child will delay rendering itself until the one before it has.|-|
 
 
@@ -2449,7 +2411,9 @@ Allows children to each wait until the previous has finished rendering before it
 |.stillStaggering|`boolean`|Whether any children are still waiting to show themselves because of the staggering behavior|-|
 |context|`UseStaggeredChildContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
-Note that the child itself will still render, but you can delay rendering *its* children, or delay other complicated or heavy logic, until the child is no longer staggered.
+If a child appears on-screen for 100ms then it will be forcibly displayed.
+
+When using the child hook, it's highly recommended to separate out any heavy logic into a separate component that won't be rendered until it's de-staggered into visibility.
 
 
 
@@ -2469,16 +2433,17 @@ Every member of `UseStaggeredChildParameters` is inherited (see the interface it
 
 ##### UseStaggeredChildReturnType
 
-
+<small>`extends` [`UseRefElementParameters`](#userefelementparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
+|.childUseEffect|`() => void`|Call this when the child mounts during useEffect (i.e. something like `useEffect(childUseEffect, [childUseEffect])`).<br />This is generally passed to an inner child, if this is the outer child.|-|
 |.hideBecauseStaggered|`boolean`|If this is true, you should delay showing *your* children or running other heavy logic until this becomes false. Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`|-|
 |.parentIsStaggered|`boolean`|Whether the parent has indicated that all of its children, including this one, are staggered.|-|
-|info|`Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|info|`OmitStrong<UseStaggeredChildrenInfo, "index">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
-When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic. Ideally that kind of heavy logic/CSS will be in a sub-child that can be either rendered or not depending on `hideBecauseStaggered`.
 
 
 
@@ -2857,10 +2822,12 @@ export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ## The following items are missing their documentation (or should not have been linked to):
 
 
+##### UseProcessedIndexManglerParameters
+##### UseProcessedIndexManglerReturnType
+##### UseProcessedChildrenReturnType
 ##### UseListNavigationSelectionReturnType
 ##### UseGenericChildParameters
 ##### UseCompleteListNavigationChildInfoKeysParameters
-##### UseListNavigationSelectionSortableChildInfoKeysParameters
 ##### UseListNavigationSelectionChildInfoKeysParameters
 ##### UseRovingTabIndexChildInfoKeysParameters
 ##### UseTypeaheadNavigationChildInfoKeysParameters
@@ -2869,21 +2836,17 @@ export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ##### UseMultiSelectionChildInfoKeysParameters
 ##### UseListNavigationSelectionChildReturnType
 ##### UseGridNavigationSelectionReturnType
-##### UseGridNavigationSelectionSortableReturnType
 ##### UseCompleteGridNavigationRowInfoKeysParameters
-##### UseGridNavigationSelectionSortableRowInfoKeysParameters
 ##### UseGridNavigationSelectionRowInfoKeysParameters
 ##### UseGridNavigationRowInfoKeysParameters
 ##### UseGridNavigationSelectionRowParameters
-##### UseGridNavigationSelectionSortableRowParameters
 ##### UseGridNavigationSelectionRowReturnType
-##### UseGridNavigationSelectionSortableRowReturnType
 ##### UseCompleteGridNavigationCellInfoKeysParameters
-##### UseGridNavigationSelectionSortableCellInfoKeysParameters
 ##### UseGridNavigationSelectionCellInfoKeysParameters
 ##### UseGridNavigationCellInfoKeysParameters
 ##### UseGridNavigationSelectionCellParameters
 ##### UseGridNavigationSelectionCellReturnType
 ##### UseBlockingElementParameters
+##### SearchParamStates
 ##### getLowestIndex
 ##### navigatePastStart

@@ -142,14 +142,18 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  *
  * This is not exclusive with {@link useSingleSelection}, you can use both at once if you have a use case for it.
  *
+ * @hasChild {@link useMultiSelectionChild}
+ *
  * @compositeParams
  *
- * @hasChild {@link useMultiSelectionChild}
+ * #__NO_SIDE_EFFECTS__
  */
 export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
 /**
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
 export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
@@ -166,6 +170,8 @@ export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelec
 /**
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export declare function useMultiSelectionChildDeclarative<E extends Element>({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>>;
 //# sourceMappingURL=use-multi-selection.d.ts.map

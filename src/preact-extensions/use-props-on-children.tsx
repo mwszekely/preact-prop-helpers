@@ -18,6 +18,8 @@ function childrenIsVnode(children: ElementProps<any>["children"] | null | undefi
  * @param ref 
  * @param Tag 
  * @returns 
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
 export function usePropsOnChildren(children: ElementProps<any>["children"] | undefined | null, props: ElementProps<any>, ref: Ref<any> | null | undefined, Tag: keyof JSX.IntrinsicElements = 'span') {
     const c = (childrenIsVnode(children) ? children : <Tag>{children}</Tag>) as any as VNode;

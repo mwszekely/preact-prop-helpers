@@ -2,8 +2,10 @@
  * Merged the `class` and `className` properties of two sets of props into a single string.
  *
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedClasses = (function useMergedClasses(...classes) {
+export function useMergedClasses(...classes) {
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set();
@@ -17,5 +19,5 @@ export const useMergedClasses = (function useMergedClasses(...classes) {
     else {
         return undefined;
     }
-});
+}
 //# sourceMappingURL=use-merged-classes.js.map

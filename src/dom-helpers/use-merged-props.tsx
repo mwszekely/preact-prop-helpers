@@ -34,8 +34,10 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * @param allProps - A variadic number of props to merge into one
  * 
  * @returns A single object with all the provided props merged into one.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedProps = (function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
+export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret: ElementProps<E> = {};
     for (let nextProps of allProps) {
@@ -43,11 +45,11 @@ export const useMergedProps = (function useMergedProps<E extends EventTarget>(..
     }
 
     return ret;
-})
+}
 
 const knowns = new Set<string>(["children", "ref", "className", "class", "style"])
 
-const mergeUnknown = (function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
+function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
 
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
 
@@ -78,10 +80,10 @@ const mergeUnknown = (function mergeUnknown(key: string, lhsValue: unknown, rhsV
             // Ugh.
             // No good strategies here, just log it if requested
             log?.(`The prop "${key}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
-            return rhsValue as never
+            return rhsValue as never;
         }
     }
-})
+}
 
 /**
  * Helper function.
@@ -89,7 +91,7 @@ const mergeUnknown = (function mergeUnknown(key: string, lhsValue: unknown, rhsV
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = (function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
+function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
 
 
     target.ref = useMergedRefs<E>(target.ref, mods.ref);
@@ -111,9 +113,12 @@ const useMergedPropsHelper = (function useMergedPropsHelper<E extends EventTarge
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
 
-})
+}
 
-export const mergeFunctions = (function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+export function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined) {
 
     if (!lhs)
         return rhs;
@@ -127,4 +132,4 @@ export const mergeFunctions = (function mergeFunctions<T extends (...args: any[]
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);
     };
-})
+}

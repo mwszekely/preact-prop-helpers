@@ -4,7 +4,7 @@ import { getDocument } from "../util/get-window.js";
 import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { VNode } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {
     /**
@@ -41,35 +41,39 @@ export interface UsePortalChildrenReturnType {
  * TODO: Can't push a child until after the very first `useLayoutEffect`
  * 
  * {@include } {@link UsePortalChildrenParameters}
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const usePortalChildren = /*@__PURE__*/ monitored(function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
-    const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
-    const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);
-    const [removeChild, setRemoveChild] = useState<RemovePortalChild | null>(null);
+export function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
+    return useMonitoring(function usePortalChildren() {
+        const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
+        const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);
+        const [removeChild, setRemoveChild] = useState<RemovePortalChild | null>(null);
 
-    const pushChildStable = useStableCallback<NonNullable<typeof pushChild>>((child) => {
-        return pushChild?.(child) ?? -1;
+        const pushChildStable = useStableCallback<NonNullable<typeof pushChild>>((child) => {
+            return pushChild?.(child) ?? -1;
+        });
+
+        const updateChildStable = useStableCallback<NonNullable<typeof updateChild>>((index, child) => {
+            return updateChild?.(index, child);
+        });
+
+        const removeChildStable = useStableCallback<NonNullable<typeof removeChild>>((index) => {
+            return removeChild?.(index);
+        });
+
+        const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
+        const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }) as VNode, element!);
+
+        return {
+            children: children,
+            pushChild: pushChildStable,
+            updateChild: updateChildStable,
+            removeChild: removeChildStable,
+            portalElement: element ?? null
+        }
     });
-
-    const updateChildStable = useStableCallback<NonNullable<typeof updateChild>>((index, child) => {
-        return updateChild?.(index, child);
-    });
-
-    const removeChildStable = useStableCallback<NonNullable<typeof removeChild>>((index) => {
-        return removeChild?.(index);
-    });
-
-    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
-    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }) as VNode, element!);
-
-    return {
-        children: children,
-        pushChild: pushChildStable,
-        updateChild: updateChildStable,
-        removeChild: removeChildStable,
-        portalElement: element ?? null
-    }
-})
+}
 
 
 

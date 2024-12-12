@@ -5,7 +5,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback } from "../../util/lib.js";
 import { FocusEventType, Nullable } from "../../util/types.js";
-import { monitored } from "../../util/use-call-count.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
 
@@ -37,8 +37,10 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
  * 
  * @compositeParams 
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useLostFocusDismiss = /*@__PURE__*/ monitored(function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
+export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
     refElementPopupReturn: { getElement: getPopupElement, ...void3 },
     refElementSourceReturn,
     lostFocusDismissParameters: {
@@ -48,27 +50,29 @@ export const useLostFocusDismiss = /*@__PURE__*/ monitored(function useLostFocus
     },
     ...void1
 }: UseLostFocusDismissParameters<SourceElement, PopupElement, B>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
-    const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
+    return useMonitoring(function useLostFocusDismiss(): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
+        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void4);
 
 
-    const stableOnClose = useStableGetter(onClose);
-    const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEventType<any>>>((newElement, _prevElement, e) => {
-        const open = getOpen();
-        const sourceElement = getSourceElement?.();
-        const popupElement = getPopupElement();
-        if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
-            if (open) {
-                console.assert(e != null);
-                stableOnClose()?.(e!);
+        const stableOnClose = useStableGetter(onClose);
+        const getOpen = useStableGetter(open);
+        const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEventType<any>>>((newElement, _prevElement, e) => {
+            const open = getOpen();
+            const sourceElement = getSourceElement?.();
+            const popupElement = getPopupElement();
+            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
+                if (open) {
+                    console.assert(e != null);
+                    stableOnClose()?.(e!);
+                }
             }
-        }
-    }, [getSourceElement]);
+        }, [getSourceElement]);
 
-    return { activeElementParameters: { onLastActiveElementChange } }
-})
+        return { activeElementParameters: { onLastActiveElementChange } };
+    });
+}

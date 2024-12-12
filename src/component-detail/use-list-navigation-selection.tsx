@@ -4,7 +4,7 @@ import { useStableCallback, useStableMergedCallback } from "../preact-extensions
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong, TargetedOmit } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./keyboard-navigation/use-list-navigation-partial.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild } from "./selection/use-selection.js";
 
@@ -42,8 +42,10 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * @hasChild {@link useListNavigationSelectionChild}
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useListNavigationSelection = /*@__PURE__*/ monitored(function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -56,46 +58,50 @@ export const useListNavigationSelection = /*@__PURE__*/ monitored(function useLi
     childrenHaveFocusReturn,
     ...void3
 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
-    const { context: contextSS, propsStable, ...retSS } = useSelection<ParentOrChildElement, ChildElement>({
-        childrenHaveFocusReturn,
-        rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a) }) },
-        managedChildrenReturn,
-        singleSelectionParameters,
-        multiSelectionParameters
-    });
-    const {
-        context: contextLN,
-        props,
-        rovingTabIndexReturn,
-        ...retLN
-    } = useListNavigation<ParentOrChildElement, ChildElement>({
-        rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
-        linearNavigationParameters,
-        paginatedChildrenParameters,
-        typeaheadNavigationParameters,
-        managedChildrenReturn,
-        refElementReturn,
-        processedIndexManglerReturn
-    });
+    return useMonitoring(function useListNavigationSelection(): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
+        const { context: contextSS, propsStable, ...retSS } = useSelection<ParentOrChildElement, ChildElement>({
+            childrenHaveFocusReturn,
+            rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a) }) },
+            managedChildrenReturn,
+            singleSelectionParameters,
+            multiSelectionParameters
+        });
+        const {
+            context: contextLN,
+            props,
+            rovingTabIndexReturn,
+            ...retLN
+        } = useListNavigation<ParentOrChildElement, ChildElement>({
+            rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
+            linearNavigationParameters,
+            paginatedChildrenParameters,
+            typeaheadNavigationParameters,
+            managedChildrenReturn,
+            refElementReturn,
+            processedIndexManglerReturn
+        });
 
-    assertEmptyObject(void3);
+        assertEmptyObject(void3);
 
-    return {
-        rovingTabIndexReturn,
-        ...retSS,
-        ...retLN,
-        context: useMemoObject({
-            ...contextLN,
-            ...contextSS
-        }),
-        props: useMergedProps(props, propsStable)
-    }
-})
+        return {
+            rovingTabIndexReturn,
+            ...retSS,
+            ...retLN,
+            context: useMemoObject({
+                ...contextLN,
+                ...contextSS
+            }),
+            props: useMergedProps(props, propsStable)
+        }
+    });
+}
 
 /**
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useListNavigationSelectionChild = /*@__PURE__*/ monitored(function useListNavigationSelectionChild<ChildElement extends Element>({
+export function useListNavigationSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, ...void2 },
     context,
     refElementReturn,
@@ -103,51 +109,53 @@ export const useListNavigationSelectionChild = /*@__PURE__*/ monitored(function 
     multiSelectionChildParameters,
     ...void1
 }: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
-    const {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 },
-        info: infoSS,
-        multiSelectionChildReturn,
-        singleSelectionChildReturn,
-        props: propsSS,
-        pressParameters: { onPressSync },
-        ...void9
-    } = useSelectionChild<ChildElement>({
-        info: { index, untabbable },
-        context,
-        multiSelectionChildParameters,
-        singleSelectionChildParameters
+    return useMonitoring(function useListNavigationSelectionChild(): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
+        const {
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 },
+            info: infoSS,
+            multiSelectionChildReturn,
+            singleSelectionChildReturn,
+            props: propsSS,
+            pressParameters: { onPressSync },
+            ...void9
+        } = useSelectionChild<ChildElement>({
+            info: { index, untabbable },
+            context,
+            multiSelectionChildParameters,
+            singleSelectionChildParameters
+        });
+
+        const {
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 },
+            pressParameters: { excludeSpace },
+            rovingTabIndexChildReturn,
+            textContentParameters,
+            props: propsLN,
+            info: infoLN,
+            ...void8
+        } = useListNavigationChild<ChildElement>({
+            info: { index, untabbable },
+            context,
+            refElementReturn,
+        });
+
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void6);
+        assertEmptyObject(void8);
+        assertEmptyObject(void9);
+
+        return {
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
+            pressParameters: { onPressSync, excludeSpace },
+            info: { ...infoSS, ...infoLN },
+            rovingTabIndexChildReturn,
+            multiSelectionChildReturn,
+            singleSelectionChildReturn,
+            textContentParameters,
+            propsChild: propsSS,
+            propsTabbable: propsLN
+        }
     });
-
-    const {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 },
-        pressParameters: { excludeSpace },
-        rovingTabIndexChildReturn,
-        textContentParameters,
-        props: propsLN,
-        info: infoLN,
-        ...void8
-    } = useListNavigationChild<ChildElement>({
-        info: { index, untabbable },
-        context,
-        refElementReturn,
-    });
-
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void6);
-    assertEmptyObject(void8);
-    assertEmptyObject(void9);
-
-    return {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
-        pressParameters: { onPressSync, excludeSpace },
-        info: { ...infoSS, ...infoLN },
-        rovingTabIndexChildReturn,
-        multiSelectionChildReturn,
-        singleSelectionChildReturn,
-        textContentParameters,
-        propsChild: propsSS,
-        propsTabbable: propsLN
-    }
-})
+}

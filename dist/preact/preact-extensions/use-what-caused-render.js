@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "../util/lib.js";
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function useWhatCausedRender(who, { props, state }) {
     const prevProps = useRef(undefined);
     const prevState = useRef(undefined);

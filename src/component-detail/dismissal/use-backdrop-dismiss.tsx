@@ -4,7 +4,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { getWindow } from "../../util/get-window.js";
 import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
-import { monitored } from "../../util/use-call-count.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
 
@@ -30,35 +30,39 @@ export interface UseBackdropDismissParameters<PopupElement extends Element, B ex
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useBackdropDismiss = /*@__PURE__*/ monitored(function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    const getOpen = useStableGetter(open);
-    const onClose = useStableGetter(onCloseUnstable);
+export function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void {
+    return useMonitoring(function useBackdropDismiss(): void {
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        const getOpen = useStableGetter(open);
+        const onClose = useStableGetter(onCloseUnstable);
 
-    const onBackdropClick = useCallback(function onBackdropClick(e: MouseEventType<any>) {
-        if (!getOpen())
-            return;
+        const onBackdropClick = useCallback(function onBackdropClick(e: MouseEventType<any>) {
+            if (!getOpen())
+                return;
 
 
-        // Basically, "was this event fired on an element not contained by the modal?"
-        // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+            // Basically, "was this event fired on an element not contained by the modal?"
+            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
 
-        let element = getElement();
+            let element = getElement();
 
-        let foundInsideClick = false;
+            let foundInsideClick = false;
 
-        if (e.target && element && element.contains(e.target as Node)) {
-            foundInsideClick = true;
-        }
+            if (e.target && element && element.contains(e.target as Node)) {
+                foundInsideClick = true;
+            }
 
-        if (!foundInsideClick) {
-            onClose()?.(e);
-        }
-    }, []);
+            if (!foundInsideClick) {
+                onClose()?.(e);
+            }
+        }, []);
 
-    useGlobalHandler(getWindow(), "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(getWindow(), "touchstart", open ? onBackdropClick : null, { capture: true });
-})
+        useGlobalHandler(getWindow(), "mousedown", open ? onBackdropClick : null, { capture: true });
+        useGlobalHandler(getWindow(), "touchstart", open ? onBackdropClick : null, { capture: true });
+    });
+}

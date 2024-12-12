@@ -1,6 +1,6 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { ElementProps } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseRandomIdParameters, UseRandomIdReturnType, useRandomId } from "./use-random-id.js";
 
 
@@ -20,18 +20,22 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
  * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useRandomDualIds = /*@__PURE__*/ monitored(function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
+export function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
     randomIdInputParameters,
     randomIdLabelParameters,
 }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {
-    const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
-    const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });
+    return useMonitoring(function useRandomDualIds(): UseRandomDualIdsReturnType<InputElement, LabelElement> {
+        const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
+        const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });
 
-    return {
-        propsLabel: useMergedProps<LabelElement>(propsLabelAsReferencer, propsLabelAsSource),
-        propsInput: useMergedProps<InputElement>(propsInputAsReferencer, propsInputAsSource),
-        randomIdInputReturn,
-        randomIdLabelReturn
-    }
-})
+        return {
+            propsLabel: useMergedProps<LabelElement>(propsLabelAsReferencer, propsLabelAsSource),
+            propsInput: useMergedProps<InputElement>(propsInputAsReferencer, propsInputAsSource),
+            randomIdInputReturn,
+            randomIdLabelReturn
+        }
+    });
+}

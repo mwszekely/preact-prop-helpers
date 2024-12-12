@@ -2,7 +2,7 @@ import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 
@@ -16,6 +16,8 @@ const SharedAnimationFrameContext = createContext<null | ContextType>(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
 export function ProvideBatchedAnimationFrames({ children }: { children: ElementProps<EventTarget>["children"] }) {
 
@@ -66,35 +68,39 @@ export interface UseAnimationFrameParameters {
  * {@include } {@link UseAnimationFrameParameters}
  * 
  * {@include } {@link ProvideBatchedAnimationFrames}
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useAnimationFrame = /*@__PURE__*/ monitored(function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
+export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
 
-    // Get a wrapper around the given callback that's stable
-    const stableCallback = useStableCallback(callback ?? noop);
-    const hasCallback = (callback != null);
+    return useMonitoring(function useAnimationFrame() {
+        // Get a wrapper around the given callback that's stable
+        const stableCallback = useStableCallback(callback ?? noop);
+        const hasCallback = (callback != null);
 
-    const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
+        const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
 
-    useEffect(() => {
-        if (sharedAnimationFrameContext) {
-            if (hasCallback) {
-                sharedAnimationFrameContext.addCallback(stableCallback);
+        useEffect(() => {
+            if (sharedAnimationFrameContext) {
+                if (hasCallback) {
+                    sharedAnimationFrameContext.addCallback(stableCallback);
+                }
+                else {
+                    sharedAnimationFrameContext.removeCallback(stableCallback);
+                }
             }
             else {
-                sharedAnimationFrameContext.removeCallback(stableCallback);
-            }
-        }
-        else {
-            if (hasCallback) {
-                // Get a wrapper around the wrapper around the callback
-                // that also calls `requestAnimationFrame` again.
-                const rafCallback = (ms: number) => {
-                    handle = requestAnimationFrame(rafCallback);
-                    stableCallback(ms);
+                if (hasCallback) {
+                    // Get a wrapper around the wrapper around the callback
+                    // that also calls `requestAnimationFrame` again.
+                    const rafCallback = (ms: number) => {
+                        handle = requestAnimationFrame(rafCallback);
+                        stableCallback(ms);
+                    }
+                    let handle = requestAnimationFrame(rafCallback);
+                    return () => cancelAnimationFrame(handle);
                 }
-                let handle = requestAnimationFrame(rafCallback);
-                return () => cancelAnimationFrame(handle);
             }
-        }
-    }, [sharedAnimationFrameContext, hasCallback])
-})
+        }, [sharedAnimationFrameContext, hasCallback]);
+    });
+}

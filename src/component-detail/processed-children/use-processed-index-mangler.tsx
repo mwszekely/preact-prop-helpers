@@ -3,6 +3,7 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { Nullable, createElement, useCallback, useMemo } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 
 type RCMT = 'mangled' | 'demangled';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
@@ -51,34 +52,37 @@ export interface UseProcessedIndexManglerContextSelf {
 
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf { }
 
-
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType {
-    useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
+    return useMonitoring(function useProcessedIndexMangler(): UseProcessedIndexManglerReturnType {
+        useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
 
-    const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
+        const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
 
-    const indexDemangler = useCallback((n: number) => (mangler.map(n, "mangled", "demangled") ?? n), []);
-    const indexMangler = useCallback((n: number) => (mangler.map(n, "demangled", "mangled") ?? n), []);
+        const indexDemangler = useCallback((n: number) => (mangler.map(n, "mangled", "demangled") ?? n), []);
+        const indexMangler = useCallback((n: number) => (mangler.map(n, "demangled", "mangled") ?? n), []);
 
-    const context = useMemoObject<UseProcessedIndexManglerContext>({
-        processedIndexManglerContext: useMemoObject<UseProcessedIndexManglerContextSelf>({
-            mangler,
-            indexDemangler,
-            indexMangler
-        })
+        const context = useMemoObject<UseProcessedIndexManglerContext>({
+            processedIndexManglerContext: useMemoObject<UseProcessedIndexManglerContextSelf>({
+                mangler,
+                indexDemangler,
+                indexMangler
+            })
+        });
+
+
+
+        return {
+            processedIndexManglerReturn: {
+                mangler,
+                indexMangler,
+                indexDemangler
+            },
+            context
+        }
     });
-
-
-
-    return {
-        processedIndexManglerReturn: {
-            mangler,
-            indexMangler,
-            indexDemangler
-        },
-        context
-    }
-
 }
 
 export class ProcessedIndexMangler {
@@ -195,11 +199,11 @@ export class ProcessedIndexMangler {
                 //this._processedToDemangled.set(processedOriginalIndex, originalIndex);
                 //this._mangledToProcessed.set(sortedIndex, processedOriginalIndex);
                 //this._demangledToProcessed.set(originalIndex, processedOriginalIndex);
-                this.sortedChildren[i] = createElement(sortedChild.vnode!.type as any, { 
-                    ...sortedChild.vnode!.props, 
-                    mangledIndex: sortedIndex, 
-                    demangledIndex: originalIndex, 
-                    key: originalIndex 
+                this.sortedChildren[i] = createElement(sortedChild.vnode!.type as any, {
+                    ...sortedChild.vnode!.props,
+                    mangledIndex: sortedIndex,
+                    demangledIndex: originalIndex,
+                    key: originalIndex
                 }); //sortedChild.vnode;
 
                 ++i;
@@ -212,7 +216,9 @@ export class ProcessedIndexMangler {
 
 }
 
-
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined) {
     if (lhs == null || rhs == null) {
         if (lhs == null)

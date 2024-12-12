@@ -5,6 +5,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
 import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
@@ -141,200 +142,202 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * @see {@link useCompleteListNavigation}, which packages everything up together.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useLinearNavigation = (function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 },
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
-    type R = EventType<any, any>;
+    return useMonitoring(function useLinearNavigation(): UseLinearNavigationReturnType<ParentOrChildElement> {
+        type R = EventType<any, any>;
 
-    let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
+        let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
 
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    assertEmptyObject(void5);
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void4);
+        assertEmptyObject(void5);
 
 
-    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
+        useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
 
-    const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
-        const highestChildIndex = getHighestIndex();
-        const lowestChildIndex = getLowestIndex();
-        const _original = (getTabbableIndex() ?? 0);
+        const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
+            const highestChildIndex = getHighestIndex();
+            const lowestChildIndex = getLowestIndex();
+            const _original = (getTabbableIndex() ?? 0);
 
-        const targetDemangled = indexDemangler(requestedIndexMangled);
-        const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
-        if (status == "past-end") {
-            if (navigatePastEnd == "wrap") {
-                if (mode == "single")
-                    navigateToFirst(e, fromUserInteraction);
-                else {
-
-                    /* eslint-disable no-constant-condition */
-                    // Uncomment to allow page up/down to wrap after hitting the top/bottom once.
-                    // It works fine, the problem isn't that -- the problem is it just feels wrong. 
-                    // Page Up/Down don't feel like they should wrap, even if normally requested. 
-                    // That's the arrow keys' domain.
-                    if (false && (valueDemangled == getTabbableIndex()))
+            const targetDemangled = indexDemangler(requestedIndexMangled);
+            const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+            if (status == "past-end") {
+                if (navigatePastEnd == "wrap") {
+                    if (mode == "single")
                         navigateToFirst(e, fromUserInteraction);
-                    else
-                        navigateToLast(e, fromUserInteraction);
+                    else {
+
+                        /* eslint-disable no-constant-condition */
+                        // Uncomment to allow page up/down to wrap after hitting the top/bottom once.
+                        // It works fine, the problem isn't that -- the problem is it just feels wrong. 
+                        // Page Up/Down don't feel like they should wrap, even if normally requested. 
+                        // That's the arrow keys' domain.
+                        if (false && (valueDemangled == getTabbableIndex()))
+                            navigateToFirst(e, fromUserInteraction);
+                        else
+                            navigateToLast(e, fromUserInteraction);
+                    }
+                    return "stop";
                 }
-                return "stop";
-            }
-            else if (navigatePastEnd == "passthrough") {
-                return "passthrough";
-            }
-            else {
-                navigatePastEnd();
-                return "stop";
-            }
-        }
-        else if (status == "past-start") {
-            if (navigatePastStart == "wrap") {
-                if (mode == "single") {
-                    navigateToLast(e, fromUserInteraction);
+                else if (navigatePastEnd == "passthrough") {
+                    return "passthrough";
                 }
                 else {
-                    /* eslint-disable no-constant-condition */
-                    // See above. It works fine but just feels wrong to wrap on Page Up/Down.
-                    if (false && valueDemangled == getTabbableIndex())
-                        navigateToLast(e, fromUserInteraction);
-                    else
-                        navigateToFirst(e, fromUserInteraction);
+                    navigatePastEnd();
+                    return "stop";
                 }
-                return "stop";
             }
-            else if (navigatePastStart == "passthrough") {
-                return "passthrough";
+            else if (status == "past-start") {
+                if (navigatePastStart == "wrap") {
+                    if (mode == "single") {
+                        navigateToLast(e, fromUserInteraction);
+                    }
+                    else {
+                        /* eslint-disable no-constant-condition */
+                        // See above. It works fine but just feels wrong to wrap on Page Up/Down.
+                        if (false && valueDemangled == getTabbableIndex())
+                            navigateToLast(e, fromUserInteraction);
+                        else
+                            navigateToFirst(e, fromUserInteraction);
+                    }
+                    return "stop";
+                }
+                else if (navigatePastStart == "passthrough") {
+                    return "passthrough";
+                }
+                else {
+                    navigatePastStart();
+                    return "stop";
+                }
             }
             else {
-                navigatePastStart();
+                setTabbableIndex(valueDemangled, e, fromUserInteraction);
+                onNavigateLinear?.(valueDemangled!, e as KeyboardEventType<ChildElement>);
                 return "stop";
             }
-        }
-        else {
-            setTabbableIndex(valueDemangled, e, fromUserInteraction);
-            onNavigateLinear?.(valueDemangled!, e as KeyboardEventType<ChildElement>);
-            return "stop";
-        }
-    }, []);
-    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
-    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
-    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
-        const _highestChildIndex = getHighestIndex();
-        const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
-        const original = (getTabbableIndex() ?? 0);
-        /**
-         * To get the target, we need to add (or subtract) 1 to our current value,
-         * but it need to be relative to any sorting/rearranging that's happened.
-         * 
-         * We mangle the index to get its "visual" position, add our offset,
-         * and then demangle it to get the child that corresponds to the next child "visually".
-         */
-        const targetMangled = indexMangler(original) + offset;
-        return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
-    })
-    const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
-        return navigateRelative2(e, 1, fromUserInteraction, "single");
-    });
-    const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
-        return navigateRelative2(e, -1, fromUserInteraction, "single");
-    });
-    //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
-    //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
-    //const getPageNavigationSize = useStableGetter(pageNavigationSize);
+        }, []);
+        const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
+        const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
+        const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
+            const _highestChildIndex = getHighestIndex();
+            const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
+            const original = (getTabbableIndex() ?? 0);
+            /**
+             * To get the target, we need to add (or subtract) 1 to our current value,
+             * but it need to be relative to any sorting/rearranging that's happened.
+             * 
+             * We mangle the index to get its "visual" position, add our offset,
+             * and then demangle it to get the child that corresponds to the next child "visually".
+             */
+            const targetMangled = indexMangler(original) + offset;
+            return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
+        })
+        const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
+            return navigateRelative2(e, 1, fromUserInteraction, "single");
+        });
+        const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
+            return navigateRelative2(e, -1, fromUserInteraction, "single");
+        });
+        //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
+        //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
+        //const getPageNavigationSize = useStableGetter(pageNavigationSize);
 
 
-    const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
-        onKeyDown: useStableCallback((e) => {
-            // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
-            // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
-            if (e.metaKey)
-                return;
+        const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
+            onKeyDown: useStableCallback((e) => {
+                // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
+                // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
+                if (e.metaKey)
+                    return;
 
-            const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
-            const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
+                const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
+                const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
 
 
-            let childRange = (getHighestIndex() - getLowestIndex());
-            let paginatedRange = getPaginatedRange() ?? childRange;
+                let childRange = (getHighestIndex() - getLowestIndex());
+                let paginatedRange = getPaginatedRange() ?? childRange;
 
-            let truePageNavigationSize = pageNavigationSize;
-            if (truePageNavigationSize != null && truePageNavigationSize < 1) {
-                truePageNavigationSize = Math.round(truePageNavigationSize * Math.max(10, paginatedRange + 1));
-            }
+                let truePageNavigationSize = pageNavigationSize;
+                if (truePageNavigationSize != null && truePageNavigationSize < 1) {
+                    truePageNavigationSize = Math.round(truePageNavigationSize * Math.max(10, paginatedRange + 1));
+                }
 
-            let result: "passthrough" | "stop" = "passthrough";
+                let result: "passthrough" | "stop" = "passthrough";
 
-            // Arrow keys only take effect for components oriented in that direction,
-            // so we want to make sure we only listen for left/right or up/down when appropriate.
-            let keyPressIsValidForOrientation = true;
-            switch (e.key) {
-                case "ArrowUp":
-                case "ArrowDown":
-                    keyPressIsValidForOrientation = (allowsVerticalNavigation);
-                    break;
-                case "ArrowLeft":
-                case "ArrowRight":
-                    keyPressIsValidForOrientation = (allowsHorizontalNavigation);
-                    break;
-            }
-
-            if (keyPressIsValidForOrientation) {
+                // Arrow keys only take effect for components oriented in that direction,
+                // so we want to make sure we only listen for left/right or up/down when appropriate.
+                let keyPressIsValidForOrientation = true;
                 switch (e.key) {
                     case "ArrowUp":
-                    case "ArrowLeft":
-                        result = navigateToPrev(e, true);
-                        break;
-
                     case "ArrowDown":
+                        keyPressIsValidForOrientation = (allowsVerticalNavigation);
+                        break;
+                    case "ArrowLeft":
                     case "ArrowRight":
-                        result = navigateToNext(e, true);
-                        break;
-
-                    case "PageUp":
-                    case "PageDown":
-                        if (truePageNavigationSize == null)
-                            break;
-                        else if (truePageNavigationSize > 0)
-                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
-
-                        break;
-
-                    case "Home":
-                    case "End":
-                        if (!disableHomeEndKeys) {
-                            if (e.key.endsWith('e'))
-                                navigateToFirst(e, true);
-                            else
-                                navigateToLast(e, true);
-                            result = 'stop';
-                        }
+                        keyPressIsValidForOrientation = (allowsHorizontalNavigation);
                         break;
                 }
-            }
 
-            if (result && result != 'passthrough') {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        })
-    }, "data-linear-navigation"))
+                if (keyPressIsValidForOrientation) {
+                    switch (e.key) {
+                        case "ArrowUp":
+                        case "ArrowLeft":
+                            result = navigateToPrev(e, true);
+                            break;
+
+                        case "ArrowDown":
+                        case "ArrowRight":
+                            result = navigateToNext(e, true);
+                            break;
+
+                        case "PageUp":
+                        case "PageDown":
+                            if (truePageNavigationSize == null)
+                                break;
+                            else if (truePageNavigationSize > 0)
+                                result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
+
+                            break;
+
+                        case "Home":
+                        case "End":
+                            if (!disableHomeEndKeys) {
+                                if (e.key.endsWith('e'))
+                                    navigateToFirst(e, true);
+                                else
+                                    navigateToLast(e, true);
+                                result = 'stop';
+                            }
+                            break;
+                    }
+                }
+
+                if (result && result != 'passthrough') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            })
+        }, "data-linear-navigation"))
 
 
-    return {
-        linearNavigationReturn: {},
-        propsStable: stableProps.current
-    }
-
-
-})
+        return {
+            linearNavigationReturn: {},
+            propsStable: stableProps.current
+        }
+    });
+}
 
 
 
@@ -351,7 +354,9 @@ export interface TryNavigateToIndexParameters {
     indexDemangler: (n: number) => number;
 
 }
-
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult {
 
     if (searchDirection === -1) {

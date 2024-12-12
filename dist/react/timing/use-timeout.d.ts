@@ -23,8 +23,10 @@ export interface UseTimeoutParameters {
  *
  * @remarks
  * {@include } {@link UseTimeoutParameters}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useTimeout: ({ timeout, callback, triggerIndex }: UseTimeoutParameters) => {
+export declare function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters): {
     getElapsedTime: () => number;
     getRemainingTime: () => number | null;
 };

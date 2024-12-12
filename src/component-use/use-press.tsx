@@ -8,7 +8,7 @@ import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument, getWindow } from "../util/get-window.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
@@ -165,369 +165,372 @@ getDocument()?.addEventListener?.("click", (e) => {
  * 
  * @compositeParams
  * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const usePress = /*@__PURE__*/ monitored(function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
-    const {
-        refElementReturn: { getElement },
-        pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
-    } = args;
+export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
+    return useMonitoring(function usePress(): UsePressReturnType<E> {
+        const {
+            refElementReturn: { getElement },
+            pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
+        } = args;
 
 
-    const excludeEnter = useStableCallback(ee ?? returnFalse);
-    const excludeSpace = useStableCallback(es ?? returnFalse);
-    const excludePointer = useStableCallback(ep ?? returnFalse);
-    const onPressingChange = useStableCallback(opc ?? noop);
+        const excludeEnter = useStableCallback(ee ?? returnFalse);
+        const excludeSpace = useStableCallback(es ?? returnFalse);
+        const excludePointer = useStableCallback(ep ?? returnFalse);
+        const onPressingChange = useStableCallback(opc ?? noop);
 
-    const [getIsPressing, setIsPressing] = usePassiveState<boolean, PressChangeEventReason<E>>(onPressingChange, returnFalse);
-    const hasPressEvent = (onPressSync != null);
+        const [getIsPressing, setIsPressing] = usePassiveState<boolean, PressChangeEventReason<E>>(onPressingChange, returnFalse);
+        const hasPressEvent = (onPressSync != null);
 
-    /**
-     * Explanations:
-     * 
-     * It would be nice to just use pointer events for everything,
-     * but 2019 iOS devices can't run those, amazingly enough, and
-     * that's still pretty recent. So we need to have backup touch
-     * events.
-     * 
-     * Why not just use click? Because at the very, very least,
-     * we also need to be able to handle space and enter key presses,
-     * and that needs to work regardless of if it's a <button> or not.
-     * 
-     * Also, we do still use click, because programmatic clicks can come
-     * from anything from ATs to automation scripts, and we don't want
-     * to break those. But since we are listening for pointer/touch events,
-     * and we can't prevent the subsequent click event from happening,
-     * and we **don't want to duplicate press events**, we need to
-     * ignore click events that happen in the same tick as a handled press event.
-     * 
-     * When we do a pointermove/touchmove, we check to see if we're still hovering over the element
-     * for more accurate "active"/hover detection.
-     * 
-     * "But you have a pointerleave event, why check for hovering during pointermove?"
-     * 
-     * Because for some reason, pointerleave (etc.) aren't fired until *after* pointerup, no matter what.
-     * 
-     */
-
-
-    const [longPress, setLongPress] = useState(null as boolean | null);
-    const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
-    const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
-    const [hovering, setHovering, getHovering] = useState(false);
-    const onTouchStart = useStableCallback((e: TouchEventType<E>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsPressing(true, e);
-        setPointerDownStartedHere(true);
-        setHovering(true);
-        setLongPress(false);
-
-        const element = getElement();
-        if (element)
-            focusSelf(element);
-    });
-    const onTouchMove = useCallback((e: TouchEventType<E>) => {
-        pressLog("touchmove", e);
-        e.preventDefault();
-        e.stopPropagation();
-        const element = getElement();
-        const touch = e.touches[0];
-        // Be as generous as possible with touch events by checking all four corners of the radius too
-        const offsets = [
-            [0, 0] as const,
-            [-(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
-            [+(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
-            [-(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const,
-            [+(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const
-        ] as const;
-        let hoveringAtAnyPoint = false;
-        for (const [x, y] of offsets) {
-            const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-            hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false)
-        }
-        setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
-        setHovering(hoveringAtAnyPoint);
-    }, []);
-    const preventClickEventsOnIosSafari = useCallback((e: TouchEventType<E>) => {
-        e.preventDefault();
-        e.stopPropagation();
-    }, []);
-    const onTouchEnd = useCallback((e: TouchEventType<E>) => {
-        pressLog("touchend", e);
-        e.preventDefault();
-        e.stopPropagation();
-        const hovering = getHovering();
-        const pointerDownStartedHere = getPointerDownStartedHere();
-
-        if (pointerDownStartedHere && hovering) {
-            onHandledManualClickEvent();
-            handlePress(e);
-        }
-        setWaitingForSpaceUp(false);
-        setHovering(false);
-        setPointerDownStartedHere(false);
-        setIsPressing(false, e);
-    }, []);
-
-    const onPointerDown = useStableCallback((e: PointerEventType<E>) => {
-        pressLog("pointerdown", e);
-        if (!excludePointer()) {
-            if ((e.buttons & 1)) {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsPressing(true, e);
-                setPointerDownStartedHere(true);
-                setHovering(true);
-                setLongPress(false);
-
-                const element = getElement();
-                if (element)
-                    focusSelf(element);
-            }
-        }
-    });
-    const onPointerMove = useStableCallback((e: PointerEventType<E>) => {
-        pressLog("pointermove", e);
-        let listeningForPress = getPointerDownStartedHere();
-        // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
-        // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
-        if (!(e.buttons & 1))
-            setPointerDownStartedHere(listeningForPress = false);
+        /**
+         * Explanations:
+         * 
+         * It would be nice to just use pointer events for everything,
+         * but 2019 iOS devices can't run those, amazingly enough, and
+         * that's still pretty recent. So we need to have backup touch
+         * events.
+         * 
+         * Why not just use click? Because at the very, very least,
+         * we also need to be able to handle space and enter key presses,
+         * and that needs to work regardless of if it's a <button> or not.
+         * 
+         * Also, we do still use click, because programmatic clicks can come
+         * from anything from ATs to automation scripts, and we don't want
+         * to break those. But since we are listening for pointer/touch events,
+         * and we can't prevent the subsequent click event from happening,
+         * and we **don't want to duplicate press events**, we need to
+         * ignore click events that happen in the same tick as a handled press event.
+         * 
+         * When we do a pointermove/touchmove, we check to see if we're still hovering over the element
+         * for more accurate "active"/hover detection.
+         * 
+         * "But you have a pointerleave event, why check for hovering during pointermove?"
+         * 
+         * Because for some reason, pointerleave (etc.) aren't fired until *after* pointerup, no matter what.
+         * 
+         */
 
 
-        if (listeningForPress) {
+        const [longPress, setLongPress] = useState(null as boolean | null);
+        const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
+        const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
+        const [hovering, setHovering, getHovering] = useState(false);
+        const onTouchStart = useStableCallback((e: TouchEventType<E>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsPressing(true, e);
+            setPointerDownStartedHere(true);
+            setHovering(true);
+            setLongPress(false);
+
             const element = getElement();
-            // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
-            // so we only test for hovering while actively attempting to detect a press
-            const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
-            const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
-            setHovering(hovering);
-            setIsPressing(hovering && getPointerDownStartedHere(), e);
-        }
+            if (element)
+                focusSelf(element);
+        });
+        const onTouchMove = useCallback((e: TouchEventType<E>) => {
+            pressLog("touchmove", e);
+            e.preventDefault();
+            e.stopPropagation();
+            const element = getElement();
+            const touch = e.touches[0];
+            // Be as generous as possible with touch events by checking all four corners of the radius too
+            const offsets = [
+                [0, 0] as const,
+                [-(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
+                [+(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
+                [-(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const,
+                [+(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const
+            ] as const;
+            let hoveringAtAnyPoint = false;
+            for (const [x, y] of offsets) {
+                const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
+                hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false)
+            }
+            setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
+            setHovering(hoveringAtAnyPoint);
+        }, []);
+        const preventClickEventsOnIosSafari = useCallback((e: TouchEventType<E>) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, []);
+        const onTouchEnd = useCallback((e: TouchEventType<E>) => {
+            pressLog("touchend", e);
+            e.preventDefault();
+            e.stopPropagation();
+            const hovering = getHovering();
+            const pointerDownStartedHere = getPointerDownStartedHere();
 
-    })
-    const onPointerUp = useCallback((e: PointerEventType<E>) => {
-        pressLog("pointerup", e);
-        const hovering = getHovering();
-        const pointerDownStartedHere = getPointerDownStartedHere();
-
-        if (!excludePointer()) {
             if (pointerDownStartedHere && hovering) {
                 onHandledManualClickEvent();
                 handlePress(e);
-                e.preventDefault();
-                e.stopPropagation();
             }
-        }
-        setWaitingForSpaceUp(false);
-        setHovering(false);
-        setPointerDownStartedHere(false);
-        setLongPress(false);
-        setIsPressing(false, e);
+            setWaitingForSpaceUp(false);
+            setHovering(false);
+            setPointerDownStartedHere(false);
+            setIsPressing(false, e);
+        }, []);
 
-    }, []);
-    const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
-        pressLog("pointerenter", _e);
-        setHovering(true);
-    }, [])
-    const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
-        pressLog("pointerleave", _e);
-        setHovering(false);
-        setLongPress(false);
-    }, []);
+        const onPointerDown = useStableCallback((e: PointerEventType<E>) => {
+            pressLog("pointerdown", e);
+            if (!excludePointer()) {
+                if ((e.buttons & 1)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsPressing(true, e);
+                    setPointerDownStartedHere(true);
+                    setHovering(true);
+                    setLongPress(false);
 
-    useTimeout({
-        callback: () => {
-            const element = getElement();
-            setLongPress(pointerDownStartedHere && getHovering());
-            if (element && pointerDownStartedHere && getHovering()) {
-                focusSelf(element);
-
-
-                if (longPressThreshold) {
-                    setWaitingForSpaceUp(false);
-                    setHovering(false);
-                    setPointerDownStartedHere(false);
+                    const element = getElement();
+                    if (element)
+                        focusSelf(element);
                 }
             }
+        });
+        const onPointerMove = useStableCallback((e: PointerEventType<E>) => {
+            pressLog("pointermove", e);
+            let listeningForPress = getPointerDownStartedHere();
+            // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
+            // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
+            if (!(e.buttons & 1))
+                setPointerDownStartedHere(listeningForPress = false);
 
-        },
-        timeout: longPressThreshold ?? null,
-        triggerIndex: longPress ? true : (pointerDownStartedHere && getHovering())
-    })
 
-
-    const handlePress = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
-        pressLog("handlepress", e);
-        setWaitingForSpaceUp(false);
-        setHovering(false);
-        setPointerDownStartedHere(false);
-        setLongPress(null);
-
-        if (onPressSync) {
-
-            // Note: The element is focused here because of iOS Safari.
-            //
-            // It's always iOS Safari.
-            //
-            // iOS Safari (tested on 12) downright refuses to allow 
-            // elements to be manually focused UNLESS it happens within
-            // an event handler like this.  It also doesn't focus
-            // buttons by default when clicked, tapped, etc.
-            //
-            // If it becomes problematic that button-likes explicitly become
-            // focused when they are pressed, then an alternative solution for
-            // the question of "how do menu buttons keep their menus open"
-            // and other focus-related nonsense needs to be figured out.
-            //
-            // For iOS Safari.
-            //
-            const element = getElement();
-            if (element)
-                focusSelf(element as EventTarget as E);
-
-            // Whatever the browser was going to do with this event,
-            // forget it. We're turning it into a "press" event.
-            e.preventDefault();
-
-            // Also stop anyone else from listening to this event,
-            // since we're explicitly handling it.
-            // (Notably, this allows labels to wrap inputs, with them
-            // both having press event handlers, without double-firing)
-            e.stopPropagation();
-
-            // Haptic feedback for this press event
-            try {
-                // The default implementation doesn't throw,
-                // but we should guard against user implementations that could.
-                pulse();
-            }
-            finally {
-                // Actually call our handler.
-                onPressSync(e);
+            if (listeningForPress) {
+                const element = getElement();
+                // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
+                // so we only test for hovering while actively attempting to detect a press
+                const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
+                const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
+                setHovering(hovering);
+                setIsPressing(hovering && getPointerDownStartedHere(), e);
             }
 
-        }
-    });
+        })
+        const onPointerUp = useCallback((e: PointerEventType<E>) => {
+            pressLog("pointerup", e);
+            const hovering = getHovering();
+            const pointerDownStartedHere = getPointerDownStartedHere();
 
-
-    const onKeyDown = useStableCallback((e: KeyboardEventType<E>) => {
-        pressLog("keydown", e);
-        if (onPressSync) {
-            if (e.key == " " && !excludeSpace()) {
-                // We don't actually activate it on a space keydown
-                // but we do preventDefault to stop the page from scrolling.
-                setWaitingForSpaceUp(true);
-                setIsPressing(true, e);
-                e.preventDefault();
+            if (!excludePointer()) {
+                if (pointerDownStartedHere && hovering) {
+                    onHandledManualClickEvent();
+                    handlePress(e);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             }
-
-            if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
-                setIsPressing(true, e);
-                handlePress(e);
-                requestAnimationFrame(() => {
-                    setIsPressing(false, e);
-                });
-            }
-        }
-    })
-
-    const onKeyUp = useStableCallback((e: KeyboardEventType<E>) => {
-        pressLog("keyup", e);
-        const waitingForSpaceUp = getWaitingForSpaceUp();
-        if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
-            handlePress(e);
+            setWaitingForSpaceUp(false);
+            setHovering(false);
+            setPointerDownStartedHere(false);
+            setLongPress(false);
             setIsPressing(false, e);
-        }
-    })
 
-    const onClick = useStableCallback((e: MouseEventType<E>) => {
-        pressLog("click", e);
-        // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
-        // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
-        const element = getElement();
-        if (onPressSync) {
-            if (e.detail > 1) {
-                if ("stopImmediatePropagation" in e)
-                    (e as never as Event).stopImmediatePropagation();
+        }, []);
+        const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
+            pressLog("pointerenter", _e);
+            setHovering(true);
+        }, [])
+        const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
+            pressLog("pointerleave", _e);
+            setHovering(false);
+            setLongPress(false);
+        }, []);
+
+        useTimeout({
+            callback: () => {
+                const element = getElement();
+                setLongPress(pointerDownStartedHere && getHovering());
+                if (element && pointerDownStartedHere && getHovering()) {
+                    focusSelf(element);
+
+
+                    if (longPressThreshold) {
+                        setWaitingForSpaceUp(false);
+                        setHovering(false);
+                        setPointerDownStartedHere(false);
+                    }
+                }
+
+            },
+            timeout: longPressThreshold ?? null,
+            triggerIndex: longPress ? true : (pointerDownStartedHere && getHovering())
+        })
+
+
+        const handlePress = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
+            pressLog("handlepress", e);
+            setWaitingForSpaceUp(false);
+            setHovering(false);
+            setPointerDownStartedHere(false);
+            setLongPress(null);
+
+            if (onPressSync) {
+
+                // Note: The element is focused here because of iOS Safari.
+                //
+                // It's always iOS Safari.
+                //
+                // iOS Safari (tested on 12) downright refuses to allow 
+                // elements to be manually focused UNLESS it happens within
+                // an event handler like this.  It also doesn't focus
+                // buttons by default when clicked, tapped, etc.
+                //
+                // If it becomes problematic that button-likes explicitly become
+                // focused when they are pressed, then an alternative solution for
+                // the question of "how do menu buttons keep their menus open"
+                // and other focus-related nonsense needs to be figured out.
+                //
+                // For iOS Safari.
+                //
+                const element = getElement();
+                if (element)
+                    focusSelf(element as EventTarget as E);
+
+                // Whatever the browser was going to do with this event,
+                // forget it. We're turning it into a "press" event.
+                e.preventDefault();
+
+                // Also stop anyone else from listening to this event,
+                // since we're explicitly handling it.
+                // (Notably, this allows labels to wrap inputs, with them
+                // both having press event handlers, without double-firing)
                 e.stopPropagation();
+
+                // Haptic feedback for this press event
+                try {
+                    // The default implementation doesn't throw,
+                    // but we should guard against user implementations that could.
+                    pulse();
+                }
+                finally {
+                    // Actually call our handler.
+                    onPressSync(e);
+                }
+
             }
-            else {
-                // Listen for "programmatic" click events.
-                if (justHandledManualClickEvent) {
-                    // This is probably the click event after the end of all the pointerdownupleavemoveenter soup.
-                    // Clear the flag a little early.
-                    justHandledManualClickEvent = false;
+        });
+
+
+        const onKeyDown = useStableCallback((e: KeyboardEventType<E>) => {
+            pressLog("keydown", e);
+            if (onPressSync) {
+                if (e.key == " " && !excludeSpace()) {
+                    // We don't actually activate it on a space keydown
+                    // but we do preventDefault to stop the page from scrolling.
+                    setWaitingForSpaceUp(true);
+                    setIsPressing(true, e);
+                    e.preventDefault();
+                }
+
+                if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
+                    setIsPressing(true, e);
+                    handlePress(e);
+                    requestAnimationFrame(() => {
+                        setIsPressing(false, e);
+                    });
+                }
+            }
+        })
+
+        const onKeyUp = useStableCallback((e: KeyboardEventType<E>) => {
+            pressLog("keyup", e);
+            const waitingForSpaceUp = getWaitingForSpaceUp();
+            if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
+                handlePress(e);
+                setIsPressing(false, e);
+            }
+        })
+
+        const onClick = useStableCallback((e: MouseEventType<E>) => {
+            pressLog("click", e);
+            // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
+            // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
+            const element = getElement();
+            if (onPressSync) {
+                if (e.detail > 1) {
+                    if ("stopImmediatePropagation" in e)
+                        (e as never as Event).stopImmediatePropagation();
+                    e.stopPropagation();
                 }
                 else {
-                    console.assert(justHandledManualClickEvent == false, "Logic???");
+                    // Listen for "programmatic" click events.
+                    if (justHandledManualClickEvent) {
+                        // This is probably the click event after the end of all the pointerdownupleavemoveenter soup.
+                        // Clear the flag a little early.
+                        justHandledManualClickEvent = false;
+                    }
+                    else {
+                        console.assert(justHandledManualClickEvent == false, "Logic???");
 
-                    // Ignore stray click events that were't fired ON OR WITHIN on this element
-                    // ("on or within" because sometimes a button's got a label that's a different element than the button)
-                    if ((e.target && element?.contains(e.target as Node))) {
+                        // Ignore stray click events that were't fired ON OR WITHIN on this element
+                        // ("on or within" because sometimes a button's got a label that's a different element than the button)
+                        if ((e.target && element?.contains(e.target as Node))) {
 
-                        if (getHovering()) {
-                            // Okay, I guess the browser decided the click event is happening *now*,
-                            // just after pointerdown but before pointerup, sure.
-                            // Nothing to do here, though, but maybe TODO
-                            // because I think this only happens on Firefox mobile? Maybe?
+                            if (getHovering()) {
+                                // Okay, I guess the browser decided the click event is happening *now*,
+                                // just after pointerdown but before pointerup, sure.
+                                // Nothing to do here, though, but maybe TODO
+                                // because I think this only happens on Firefox mobile? Maybe?
+                            }
+                            else {
+                                // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
+                                // TODO: Remove this when I'm confident stray clicks won't be handled.
+                                /* eslint-disable no-debugger */
+                                debugger;
+                                console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+                                console.assert(justHandledManualClickEvent == false, "Logic???");
+                            }
+
+
+                            setIsPressing(true, e);
+                            requestAnimationFrame(() => {
+                                setIsPressing(false, e);
+                            });
+                            handlePress(e);
                         }
-                        else {
-                            // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
-                            // TODO: Remove this when I'm confident stray clicks won't be handled.
-                            /* eslint-disable no-debugger */
-                            debugger;
-                            console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
-                            console.assert(justHandledManualClickEvent == false, "Logic???");
-                        }
-
-
-                        setIsPressing(true, e);
-                        requestAnimationFrame(() => {
-                            setIsPressing(false, e);
-                        });
-                        handlePress(e);
                     }
                 }
             }
-        }
+        });
+
+
+        const onFocusOut = useStableCallback((e: FocusEventType<E>) => {
+            pressLog("focusout", e);
+            setWaitingForSpaceUp(false);
+            setIsPressing(false, e);
+        })
+
+
+        const p = supportsPointerEvents();
+
+        return {
+            pressReturn: {
+                pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+                getIsPressing,
+                longPress
+            },
+            props: {
+                onKeyDown,
+                onKeyUp,
+
+                onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
+                onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+                onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
+                onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : preventClickEventsOnIosSafari),
+                onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+                onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+                onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
+                onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
+                onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
+                onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
+                [onfocusout as never]: onFocusOut,
+                onClick
+            },
+        };
     });
-
-
-    const onFocusOut = useStableCallback((e: FocusEventType<E>) => {
-        pressLog("focusout", e);
-        setWaitingForSpaceUp(false);
-        setIsPressing(false, e);
-    })
-
-
-    const p = supportsPointerEvents();
-
-    return {
-        pressReturn: {
-            pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-            getIsPressing,
-            longPress
-        },
-        props: {
-            onKeyDown,
-            onKeyUp,
-
-            onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
-            onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
-            onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
-            onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : preventClickEventsOnIosSafari),
-            onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
-            onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
-            onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
-            onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
-            onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
-            onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-            [onfocusout as never]: onFocusOut,
-            onClick
-        },
-    };
-})
+}
 
 export interface UsePressAsyncParameters<E extends Element> extends
     OmitStrong<UsePressParameters<E>, "pressParameters">,

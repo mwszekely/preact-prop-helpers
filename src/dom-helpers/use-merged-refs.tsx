@@ -23,8 +23,10 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
  * 
  * @remarks Or just use {@link useMergedProps}
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedRefs = (function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
+export function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
 
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current: E | null) {
@@ -48,4 +50,4 @@ export const useMergedRefs = (function useMergedRefs<E extends EventTarget>(rhs:
     else {
         return combined;
     }
-})
+}

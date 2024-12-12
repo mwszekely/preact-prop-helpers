@@ -26,6 +26,8 @@ export interface UseRandomIdParameters {
  * Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useRandomId: <S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters) => UseRandomIdReturnType<S, T>;
+export declare function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T>;
 //# sourceMappingURL=use-random-id.d.ts.map

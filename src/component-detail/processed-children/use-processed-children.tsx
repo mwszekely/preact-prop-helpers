@@ -5,7 +5,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { OmitStrong, TargetedOmit } from "../../util/lib.js";
-import { monitored } from "../../util/use-call-count.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 import { UseRovingTabIndexReturnTypeSelf } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UsePaginatedChildContext, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "./use-paginated-children.js";
 import { UseRearrangeableChildInfo, UseRearrangeableChildParameters, UseRearrangeableChildrenContext, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, UseRearrangedChildrenContext, useRearrangeableChild, useRearrangeableChildren } from "./use-rearrangeable-children.js";
@@ -110,11 +110,13 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * Finally, `useListNavigation` imposes no requirements on how your children are laid out in the DOM, but
  * this hook **requires** all children be in one contiguous array.
  * 
+ * @hasChild {@link useProcessedChild}
+ * 
  * @compositeParams
  * 
- * @hasChild {@link useProcessedChild}
+ * #__NO_SIDE_EFFECTS__
  */
-export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
+export function useProcessedChildren<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement>>({
     rearrangeableChildrenParameters,
     paginatedChildrenParameters,
     staggeredChildrenParameters,
@@ -122,102 +124,108 @@ export const useProcessedChildren = /*@__PURE__*/ monitored(function useProcesse
     managedChildrenParameters,
     processedIndexManglerParameters
 }: UseProcessedChildrenParameters<TabbableChildElement, M>): UseProcessedChildrenReturnType<TabbableChildElement, M> {
+    return useMonitoring(function useProcessedChildren(): UseProcessedChildrenReturnType<TabbableChildElement, M> {
+        const childCount = rearrangeableChildrenParameters.children.length;
+        const { paginationMax, paginationMin } = paginatedChildrenParameters;
+        const { staggered } = staggeredChildrenParameters;
 
-    const childCount = rearrangeableChildrenParameters.children.length;
-    const { paginationMax, paginationMin } = paginatedChildrenParameters;
-    const { staggered } = staggeredChildrenParameters;
+        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, });
 
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, });
-
-    const rp = useStableCallback(() => {
-        refreshPagination(paginationMin, paginationMax);
-    })
-
-    const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
-
-    const {
-        rearrangeableChildrenReturn,
-        context: { rearrangeableChildrenContext },
-    } = useRearrangeableChildren({
-        context,
-        processedIndexManglerParameters,
-        rearrangeableChildrenParameters,
-        managedChildrenReturn
-    });
-
-    const {
-        paginatedChildrenReturn,
-        paginatedChildrenReturn: { refreshPagination },
-        context: { paginatedChildContext }
-    }: UsePaginatedChildrenReturnType = usePaginatedChildren<TabbableChildElement>({
-        managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-        rovingTabIndexReturn: context.processedChildrenContext,
-        childrenHaveFocusReturn: context.processedChildrenContext,
-        paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-        processedIndexManglerReturn: { indexDemangler, indexMangler }
-    });
-
-    const {
-        context: { staggeredChildContext },
-        staggeredChildrenReturn
-    }: UseStaggeredChildrenReturnType = useStaggeredChildren({
-        managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
-        staggeredChildrenParameters: { staggered, childCount },
-        //refElementReturn: { getElement: context.processedChildrenContext.getElement }
-    });
-
-    return {
-        rearrangeableChildrenReturn,
-        staggeredChildrenReturn,
-        paginatedChildrenReturn,
-        context: useMemoObject<UseProcessedChildContext<TabbableChildElement, M>>({
-            staggeredChildContext,
-            paginatedChildContext,
-            managedChildContext,
-            rearrangeableChildrenContext
+        const rp = useStableCallback(() => {
+            refreshPagination(paginationMin, paginationMax);
         })
-    };
-});
 
-export const useProcessedChild = /*@__PURE__*/ monitored(function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
+        const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
+
+        const {
+            rearrangeableChildrenReturn,
+            context: { rearrangeableChildrenContext },
+        } = useRearrangeableChildren({
+            context,
+            processedIndexManglerParameters,
+            rearrangeableChildrenParameters,
+            managedChildrenReturn
+        });
+
+        const {
+            paginatedChildrenReturn,
+            paginatedChildrenReturn: { refreshPagination },
+            context: { paginatedChildContext }
+        }: UsePaginatedChildrenReturnType = usePaginatedChildren<TabbableChildElement>({
+            managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
+            rovingTabIndexReturn: context.processedChildrenContext,
+            childrenHaveFocusReturn: context.processedChildrenContext,
+            paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
+            processedIndexManglerReturn: { indexDemangler, indexMangler }
+        });
+
+        const {
+            context: { staggeredChildContext },
+            staggeredChildrenReturn
+        }: UseStaggeredChildrenReturnType = useStaggeredChildren({
+            managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
+            staggeredChildrenParameters: { staggered, childCount },
+            //refElementReturn: { getElement: context.processedChildrenContext.getElement }
+        });
+
+        return {
+            rearrangeableChildrenReturn,
+            staggeredChildrenReturn,
+            paginatedChildrenReturn,
+            context: useMemoObject<UseProcessedChildContext<TabbableChildElement, M>>({
+                staggeredChildContext,
+                paginatedChildContext,
+                managedChildContext,
+                rearrangeableChildrenContext
+            })
+        };
+    });
+};
+
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+export function useProcessedChild<TabbableChildElement extends Element, M extends UseProcessedChildInfo<TabbableChildElement> = UseProcessedChildInfo<TabbableChildElement>>({
     context,
     info: { index, getElement, ...uinfo },
     rearrangeableChildParameters,
     ...void1
 }: UseProcessedChildParameters<TabbableChildElement, M>): UseProcessedChildReturnType<TabbableChildElement, M> {
-    const { paginatedChildContext, staggeredChildContext } = context;
-    const {
-        info: { updateFLIPAnimation }
-    } = useRearrangeableChild<TabbableChildElement, M>({
-        context,
-        info: { getElement, index },
-        rearrangeableChildParameters
-    })
-    const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
-    const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild<TabbableChildElement, M>({ context: { staggeredChildContext }, info: { index } });
-    const { managedChildReturn } = useManagedChild<M>({
-        context,
-        info: {
-            index,
-            setChildCountIfPaginated,
-            setPaginationVisible,
-            setStaggeredVisible,
-            getStaggeredVisible,
-            updateFLIPAnimation,
-            getElement,
-            ...uinfo
-        } as M
+    return useMonitoring(function useProcessedChild(): UseProcessedChildReturnType<TabbableChildElement, M> {
+        const { paginatedChildContext, staggeredChildContext } = context;
+        const {
+            info: { updateFLIPAnimation }
+        } = useRearrangeableChild<TabbableChildElement, M>({
+            context,
+            info: { getElement, index },
+            rearrangeableChildParameters
+        })
+        const { info: { setChildCountIfPaginated, setPaginationVisible }, paginatedChildReturn, props: propsPaginated } = usePaginatedChild<TabbableChildElement>({ context: { paginatedChildContext }, info: { index } });
+        const { info: { setStaggeredVisible, getStaggeredVisible }, staggeredChildReturn, props: propsStaggered, refElementParameters } = useStaggeredChild<TabbableChildElement, M>({ context: { staggeredChildContext }, info: { index } });
+        const { managedChildReturn } = useManagedChild<M>({
+            context,
+            info: {
+                index,
+                setChildCountIfPaginated,
+                setPaginationVisible,
+                setStaggeredVisible,
+                getStaggeredVisible,
+                updateFLIPAnimation,
+                getElement,
+                ...uinfo
+            } as M
+        });
+
+        assertEmptyObject(void1);
+
+        const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
+
+        return {
+            props: propsRet,
+            managedChildReturn,
+            paginatedChildReturn,
+            staggeredChildReturn,
+            refElementParameters
+        }
     });
-
-    assertEmptyObject(void1);
-
-    const propsRet = useMergedProps<TabbableChildElement>(propsStaggered, propsPaginated);
-
-    return {
-        props: propsRet,
-        managedChildReturn,
-        paginatedChildReturn,
-        staggeredChildReturn,
-        refElementParameters
-    }
-})
+}

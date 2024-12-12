@@ -1,7 +1,7 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { monitored } from "../../util/use-call-count.js";
+import { useMonitoring } from "../../util/use-call-count.js";
 import { useLinearNavigation } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
@@ -49,46 +49,54 @@ const _dummy = null;
  * @remarks In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  *
+ * @hasChild {@link useListNavigationChild}
+ *
  * @compositeParams
  *
- * @hasChild {@link useListNavigationChild}
+ * #__NO_SIDE_EFFECTS__
  */
-export const useListNavigation = /*@__PURE__*/ monitored(function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, ...void1 }) {
-    const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
-    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    // Merge the props while keeping them stable
-    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-    //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-    //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
-    return {
-        managedChildrenParameters,
-        rovingTabIndexReturn,
-        typeaheadNavigationReturn,
-        context: useMemoObject({
-            ...contextRovingTabIndex,
-            ...contextTypeahead
-        }),
-        linearNavigationReturn,
-        props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
-    };
-});
+export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, ...void1 }) {
+    return useMonitoring(function useListNavigation() {
+        const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
+        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+        const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void4);
+        // Merge the props while keeping them stable
+        // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
+        //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
+        //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
+        return {
+            managedChildrenParameters,
+            rovingTabIndexReturn,
+            typeaheadNavigationReturn,
+            context: useMemoObject({
+                ...contextRovingTabIndex,
+                ...contextTypeahead
+            }),
+            linearNavigationReturn,
+            props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
+        };
+    });
+}
 /**
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useListNavigationChild = /*@__PURE__*/ monitored(function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
-    const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
-    const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    return {
-        props,
-        ...tncr,
-        ...rticr
-    };
-});
+export function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
+    return useMonitoring(function useListNavigationChild() {
+        const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
+        const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        return {
+            props,
+            ...tncr,
+            ...rticr
+        };
+    });
+}
 //# sourceMappingURL=use-list-navigation-partial.js.map

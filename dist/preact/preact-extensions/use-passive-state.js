@@ -3,6 +3,8 @@ import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function useEnsureStability(parentHookName, ...values) {
     if (process.env.NODE_ENV !== 'development')
@@ -47,6 +49,8 @@ export function useEnsureStability(parentHookName, ...values) {
  * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function usePassiveState(onChange, getInitialValue, { debounceRendering: customDebounceRendering, skipMountInitialization } = { debounceRendering, skipMountInitialization: false }) {
     skipMountInitialization ??= false;

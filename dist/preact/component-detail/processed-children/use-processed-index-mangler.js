@@ -1,26 +1,32 @@
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useMemo } from "../../util/lib.js";
+import { useMonitoring } from "../../util/use-call-count.js";
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }) {
-    useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
-    const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
-    const indexDemangler = useCallback((n) => (mangler.map(n, "mangled", "demangled") ?? n), []);
-    const indexMangler = useCallback((n) => (mangler.map(n, "demangled", "mangled") ?? n), []);
-    const context = useMemoObject({
-        processedIndexManglerContext: useMemoObject({
-            mangler,
-            indexDemangler,
-            indexMangler
-        })
+    return useMonitoring(function useProcessedIndexMangler() {
+        useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
+        const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
+        const indexDemangler = useCallback((n) => (mangler.map(n, "mangled", "demangled") ?? n), []);
+        const indexMangler = useCallback((n) => (mangler.map(n, "demangled", "mangled") ?? n), []);
+        const context = useMemoObject({
+            processedIndexManglerContext: useMemoObject({
+                mangler,
+                indexDemangler,
+                indexMangler
+            })
+        });
+        return {
+            processedIndexManglerReturn: {
+                mangler,
+                indexMangler,
+                indexDemangler
+            },
+            context
+        };
     });
-    return {
-        processedIndexManglerReturn: {
-            mangler,
-            indexMangler,
-            indexDemangler
-        },
-        context
-    };
 }
 export class ProcessedIndexMangler {
     getIndex;
@@ -139,6 +145,9 @@ export class ProcessedIndexMangler {
         return this.sortedChildren;
     }
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function defaultCompare(lhs, rhs) {
     if (lhs == null || rhs == null) {
         if (lhs == null)

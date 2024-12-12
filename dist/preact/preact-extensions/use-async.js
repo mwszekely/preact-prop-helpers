@@ -1,7 +1,7 @@
 import { asyncToSync } from "async-to-sync";
 import { identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 function identityCapture(...t) { return t; }
@@ -34,73 +34,77 @@ const AsyncFunction = ((async function () { }).constructor);
  * @param asyncHandler - The async function to make sync
  * @param options - @see {@link UseAsyncParameters}
  *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useAsync = /*@__PURE__*/ monitored(function useAsync(asyncHandler, options) {
-    // Things related to current execution
-    // Because we can both return and throw undefined, 
-    // we need separate state to track their existence too.
-    //
-    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    const [pending, setPending, _getPending] = useState(false);
-    const [result, setResult, _getResult] = useState(undefined);
-    const [error, setError, _getError] = useState(undefined);
-    const [hasError, setHasError, _getHasError] = useState(false);
-    const [hasResult, setHasResult, _getHasResult] = useState(false);
-    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-    const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
-    // Keep track of this for the caller's sake -- we don't really care.
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
-    const incrementCallCount = useCallback(() => { setRunCount(c => c + 1); }, []);
-    const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1); }, []);
-    const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
-    const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
-    /* eslint-disable prefer-const */
-    let { throttle, debounce, capture: captureUnstable } = (options ?? {});
-    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
-    const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
-        return asyncToSync({
-            asyncInput: asyncHandlerStable,
-            capture: captureStable,
-            onAsyncDebounce: setAsyncDebouncing,
-            onError: setError,
-            onPending: setPending,
-            onReturnValue: setResult,
-            onSyncDebounce: setSyncDebouncing,
-            onHasError: setHasError,
-            onHasResult: setHasResult,
-            onInvoked: setInvocationResult,
-            onInvoke: incrementCallCount,
-            onFinally: incrementFinallyCount,
-            onReject: incrementRejectCount,
-            onResolve: incrementResolveCount,
-            throttle: options?.throttle ?? undefined,
-            wait: options?.debounce ?? undefined
-        });
-    }, [throttle, debounce]);
-    useEffect(() => {
-        return () => cancelSyncDebounce();
-    }, [cancelSyncDebounce]);
-    return {
-        syncHandler: syncOutput,
-        pending,
-        result,
-        error,
-        hasError: hasError || false,
-        hasResult: hasResult || false,
-        resolveCount,
-        rejectCount,
-        settleCount,
-        debouncingAsync: asyncDebouncing,
-        debouncingSync: syncDebouncing,
-        invocationResult,
-        callCount: runCount,
-        flushDebouncedPromise: flushSyncDebounce
-    };
-});
+export function useAsync(asyncHandler, options) {
+    return useMonitoring(function useAsync() {
+        // Things related to current execution
+        // Because we can both return and throw undefined, 
+        // we need separate state to track their existence too.
+        //
+        // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+        // when we start/stop an async action.
+        const [pending, setPending, _getPending] = useState(false);
+        const [result, setResult, _getResult] = useState(undefined);
+        const [error, setError, _getError] = useState(undefined);
+        const [hasError, setHasError, _getHasError] = useState(false);
+        const [hasResult, setHasResult, _getHasResult] = useState(false);
+        const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+        const [syncDebouncing, setSyncDebouncing] = useState(false);
+        const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
+        // Keep track of this for the caller's sake -- we don't really care.
+        const [runCount, setRunCount] = useState(0);
+        const [settleCount, setSettleCount] = useState(0);
+        const [resolveCount, setResolveCount] = useState(0);
+        const [rejectCount, setRejectCount] = useState(0);
+        const incrementCallCount = useCallback(() => { setRunCount(c => c + 1); }, []);
+        const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1); }, []);
+        const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
+        const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
+        /* eslint-disable prefer-const */
+        let { throttle, debounce, capture: captureUnstable } = (options ?? {});
+        const captureStable = useStableCallback(captureUnstable ?? identityCapture);
+        const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
+        const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
+            return asyncToSync({
+                asyncInput: asyncHandlerStable,
+                capture: captureStable,
+                onAsyncDebounce: setAsyncDebouncing,
+                onError: setError,
+                onPending: setPending,
+                onReturnValue: setResult,
+                onSyncDebounce: setSyncDebouncing,
+                onHasError: setHasError,
+                onHasResult: setHasResult,
+                onInvoked: setInvocationResult,
+                onInvoke: incrementCallCount,
+                onFinally: incrementFinallyCount,
+                onReject: incrementRejectCount,
+                onResolve: incrementResolveCount,
+                throttle: options?.throttle ?? undefined,
+                wait: options?.debounce ?? undefined
+            });
+        }, [throttle, debounce]);
+        useEffect(() => {
+            return () => cancelSyncDebounce();
+        }, [cancelSyncDebounce]);
+        return {
+            syncHandler: syncOutput,
+            pending,
+            result,
+            error,
+            hasError: hasError || false,
+            hasResult: hasResult || false,
+            resolveCount,
+            rejectCount,
+            settleCount,
+            debouncingAsync: asyncDebouncing,
+            debouncingSync: syncDebouncing,
+            invocationResult,
+            callCount: runCount,
+            flushDebouncedPromise: flushSyncDebounce
+        };
+    });
+}
+;
 //# sourceMappingURL=use-async.js.map

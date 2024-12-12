@@ -10,17 +10,22 @@ let i = 0;
 /**
  * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if process.env.NODE_ENV is "development").
  *
- * @remarks Some functions in this library are parenthesized but not wrapped in `monitored` --
- * they are so small that their duration generally rounds down to 0 (or epsilon), so using
+ * @remarks Some of the more basic hooks, like `setState`, do not call `useMonitoring` at all.
+ * They are so small that their duration generally rounds down to 0 (or epsilon), so using
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
- *
- * important for Typescript: If passed a generic function its types may be slightly erased (see usePersistentState). No clue why or what's happening.
- *
- * @param hook
- * @returns
  */
-export function monitored(hook) {
+export const useMonitoring = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+function dontUseMonitoringImpl(t) {
+    return t();
+}
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+function useMonitoringImpl(hook) {
     const h = hook;
     if (process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) {
         return (function (...args) {
@@ -75,6 +80,9 @@ function monitorCallCount(hook) {
 }
 let filterAll = false;
 const filters = new Set();
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function hideCallCount(hook) {
     filterAll = (hook === "all");
     if (hook != "all")

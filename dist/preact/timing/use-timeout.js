@@ -1,7 +1,7 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 /**
  * Runs a function the specified number of milliseconds after the component renders.
  *
@@ -9,35 +9,39 @@ import { monitored } from "../util/use-call-count.js";
  *
  * @remarks
  * {@include } {@link UseTimeoutParameters}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useTimeout = /*@__PURE__*/ monitored(function useTimeout({ timeout, callback, triggerIndex }) {
-    const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
-    const getTimeout = useStableGetter(timeout);
-    // Set any time we start timeout.
-    // Unset any time the timeout completes
-    const startTimeRef = useRef(null);
-    const disabled = (timeout == null);
-    // Any time the triggerIndex changes (including on mount)
-    // restart the timeout.  The timeout does NOT reset
-    // when the duration or callback changes, only triggerIndex.
-    useEffect(() => {
-        if (!disabled) {
-            const timeout = getTimeout();
-            console.assert(disabled == (timeout == null));
-            if (timeout != null) {
-                startTimeRef.current = +(new Date());
-                const handle = setTimeout(stableCallback, timeout);
-                return () => clearTimeout(handle);
+export function useTimeout({ timeout, callback, triggerIndex }) {
+    return useMonitoring(function useTimeout() {
+        const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
+        const getTimeout = useStableGetter(timeout);
+        // Set any time we start timeout.
+        // Unset any time the timeout completes
+        const startTimeRef = useRef(null);
+        const disabled = (timeout == null);
+        // Any time the triggerIndex changes (including on mount)
+        // restart the timeout.  The timeout does NOT reset
+        // when the duration or callback changes, only triggerIndex.
+        useEffect(() => {
+            if (!disabled) {
+                const timeout = getTimeout();
+                console.assert(disabled == (timeout == null));
+                if (timeout != null) {
+                    startTimeRef.current = +(new Date());
+                    const handle = setTimeout(stableCallback, timeout);
+                    return () => clearTimeout(handle);
+                }
             }
-        }
-    }, [triggerIndex, disabled]);
-    const getElapsedTime = useCallback(() => {
-        return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
-    }, []);
-    const getRemainingTime = useCallback(() => {
-        const timeout = getTimeout();
-        return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-    }, []);
-    return { getElapsedTime, getRemainingTime };
-});
+        }, [triggerIndex, disabled]);
+        const getElapsedTime = useCallback(() => {
+            return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
+        }, []);
+        const getRemainingTime = useCallback(() => {
+            const timeout = getTimeout();
+            return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+        }, []);
+        return { getElapsedTime, getRemainingTime };
+    });
+}
 //# sourceMappingURL=use-timeout.js.map

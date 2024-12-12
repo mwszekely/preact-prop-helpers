@@ -72,6 +72,8 @@ export interface UseRefElementParameters<T> {
  * ```
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useRefElement: <T extends EventTarget>(args: UseRefElementParameters<T>) => UseRefElementReturnType<T>;
+export declare function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T>;
 //# sourceMappingURL=use-ref-element.d.ts.map

@@ -90,8 +90,9 @@ export interface UsePressReturnType<E extends Element> {
  *
  * @compositeParams
  *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const usePress: <E extends Element>(args: UsePressParameters<E>) => UsePressReturnType<E>;
+export declare function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E>;
 export interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
     asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
 }

@@ -1,7 +1,7 @@
 import { useAsync } from "../preact-extensions/use-async.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
  * along with some other information related to the current state.
@@ -66,29 +66,33 @@ import { monitored } from "../util/use-call-count.js";
  * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useAsyncHandler = /*@__PURE__*/ monitored(function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
-    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-    const [hasCapture, setHasCapture] = useState(false);
-    // Wrap around the normal `useAsync` `capture` function to also
-    // keep track of the last value the user actually input.
-    // 
-    // Without this there's no way to re-render the control with
-    // it being both controlled and also having the "correct" value,
-    // and at any rate also protects against sudden exceptions reverting
-    // your change out from under you.
-    const capture = useStableCallback((e) => {
-        const captured = originalCapture(e);
-        setCurrentCapture(captured);
-        setHasCapture(true);
-        return [captured, e];
+export function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
+    return useMonitoring(function useAsyncHandler() {
+        // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+        const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+        const [hasCapture, setHasCapture] = useState(false);
+        // Wrap around the normal `useAsync` `capture` function to also
+        // keep track of the last value the user actually input.
+        // 
+        // Without this there's no way to re-render the control with
+        // it being both controlled and also having the "correct" value,
+        // and at any rate also protects against sudden exceptions reverting
+        // your change out from under you.
+        const capture = useStableCallback((e) => {
+            const captured = originalCapture(e);
+            setCurrentCapture(captured);
+            setHasCapture(true);
+            return [captured, e];
+        });
+        return {
+            getCurrentCapture,
+            currentCapture,
+            hasCapture,
+            ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+        };
     });
-    return {
-        getCurrentCapture,
-        currentCapture,
-        hasCapture,
-        ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
-    };
-});
+}
 //# sourceMappingURL=use-async-handler.js.map

@@ -10,20 +10,8 @@ import { UseAsyncParameters } from "./use-async.js";
  * only remembering the most recent request.
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useAsyncEffect: <I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) => {
-    pending: boolean;
-    debouncingSync: boolean;
-    debouncingAsync: boolean;
-    callCount: number;
-    settleCount: number;
-    resolveCount: number;
-    rejectCount: number;
-    result: void | (() => void) | undefined;
-    hasResult: boolean;
-    error: unknown;
-    hasError: boolean;
-    invocationResult: "async" | "sync" | "throw" | null;
-    flushDebouncedPromise: () => void;
-};
+export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">): void;
 //# sourceMappingURL=use-async-effect.d.ts.map

@@ -15,7 +15,6 @@ import {
     VNode,
     focus,
     memo,
-    monitored,
     useCompleteListNavigationChildDeclarative,
     useCompleteListNavigationChildOuter,
     useCompleteListNavigationChildren,
@@ -41,7 +40,7 @@ function _getDocument() {
 const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
 const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
-export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabIndex() {
+export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
 
@@ -171,9 +170,9 @@ export const DemoUseRovingTabIndex = memo(monitored(function DemoUseRovingTabInd
             </UntabbableContext.Provider>
         </div>
     );
-}))
+});
 
-export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
+export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
     const {
         context,
         paginatedChildrenReturn,
@@ -203,7 +202,7 @@ export const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovi
     return (
         <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
     )
-}));
+});
 
 interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElement> {
     foo: "bar";
@@ -212,7 +211,7 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex?: number, demangledIndex?: number }) {
+const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex?: number, demangledIndex?: number }) {
     
     const { 
         hide, 
@@ -233,9 +232,9 @@ const DemoUseRovingTabIndexChildOuter = memo(monitored(function DemoUseRovingTab
     return (
         <li {...props}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
-}));
+});
 
-const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined }) {
+const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined }) {
 
     let disabled = (index == 6);
     let hidden = (index == 7);
@@ -282,4 +281,4 @@ const DemoUseRovingTabIndexChild = memo(monitored(function DemoUseRovingTabIndex
     return (
         <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<HTMLInputElement>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
     )
-}));
+});

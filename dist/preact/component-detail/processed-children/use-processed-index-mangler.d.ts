@@ -37,6 +37,9 @@ export interface UseProcessedIndexManglerContextSelf {
 }
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf {
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export declare function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType;
 export declare class ProcessedIndexMangler {
     private getIndex;
@@ -50,6 +53,9 @@ export declare class ProcessedIndexMangler {
     private _demangledToMangled;
     setChildren(children: (VNode | null)[]): (createElement.JSX.Element | null)[];
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
 export {};
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

@@ -13,6 +13,8 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  * 
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
     if (process.env.NODE_ENV !== 'development')
@@ -70,6 +72,8 @@ export interface UsePassiveStateOptions {
  * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
 export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, { debounceRendering: customDebounceRendering, skipMountInitialization }: Partial<UsePassiveStateOptions> = { debounceRendering, skipMountInitialization: false }): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
 
@@ -129,7 +133,7 @@ export function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T,
         // Grid navigation needs it (for reasons I haven't investigated and do not recall, but is related to a row's 0th cell sometimes erroneously entering the tab order)
         // so it's the default until all use cases are thoroughly exhausted.
         // But in general, we probably don't need so many invocations of `use(Layout!!)Effect`.
-        
+
 
         // Also it is safe to wrap this hook in an `if` because 
         // `skipMountInitialization` can't change throughout the lifetime of the component, 

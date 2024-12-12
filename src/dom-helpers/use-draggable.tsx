@@ -1,6 +1,6 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { DragEventType, ElementProps, Nullable } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 /*
 export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
@@ -62,54 +62,58 @@ export interface UseDraggableParameters {
  * @remarks
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useDraggable = /*@__PURE__*/ monitored(function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
-    const [dragging, setDragging, getDragging] = useState(false);
-    const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
+export function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
+    return useMonitoring(function useDraggable(): UseDraggableReturnType<E> {
+        const [dragging, setDragging, getDragging] = useState(false);
+        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
 
-    const onDragStart = (e: DragEventType<E>) => {
-        //e.preventDefault();
-        setDragging(true);
-        if (e.dataTransfer) {
-            e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
-            if (dragImage)
-                e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0)
+        const onDragStart = (e: DragEventType<E>) => {
+            //e.preventDefault();
+            setDragging(true);
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
+                if (dragImage)
+                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0)
 
-            const entries = Object.entries(data) as [mimeType: string, data: string][];
-            for (const [mimeType, data] of entries) {
-                e.dataTransfer.setData(mimeType, data);
+                const entries = Object.entries(data) as [mimeType: string, data: string][];
+                for (const [mimeType, data] of entries) {
+                    e.dataTransfer.setData(mimeType, data);
+                }
             }
         }
-    }
 
 
-    const onDragEnd = (e: DragEventType<E>) => {
-        e.preventDefault();
-        setDragging(false);
-        if (e.dataTransfer) {
-            if (e.dataTransfer.dropEffect != "none") {
-                setLastDropEffect(e.dataTransfer.dropEffect);
+        const onDragEnd = (e: DragEventType<E>) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer) {
+                if (e.dataTransfer.dropEffect != "none") {
+                    setLastDropEffect(e.dataTransfer.dropEffect);
+                }
+                else {
+                    setLastDropEffect(null);
+                }
             }
-            else {
-                setLastDropEffect(null);
-            }
-        }
-    };
+        };
 
-    // Return both the element and the hook that modifies 
-    // the props and allows us to actually find the element
-    const ret: UseDraggableReturnType<E> = {
-        propsUnstable: {
-            draggable: true,
-            onDragStart,
-            onDragEnd
-        },
-        dragging,
-        getDragging,
-        lastDropEffect,
-        getLastDropEffect
-    };
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        const ret: UseDraggableReturnType<E> = {
+            propsUnstable: {
+                draggable: true,
+                onDragStart,
+                onDragEnd
+            },
+            dragging,
+            getDragging,
+            lastDropEffect,
+            getLastDropEffect
+        };
 
-    return ret;
-})
+        return ret;
+    });
+}
 

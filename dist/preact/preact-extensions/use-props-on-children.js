@@ -17,6 +17,8 @@ function childrenIsVnode(children) {
  * @param ref
  * @param Tag
  * @returns
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function usePropsOnChildren(children, props, ref, Tag = 'span') {
     const c = (childrenIsVnode(children) ? children : _jsx(Tag, { children: children }));

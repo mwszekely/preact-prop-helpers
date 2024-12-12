@@ -2,7 +2,7 @@ import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from 
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseElementSizeParametersSelf {
     /**
@@ -59,65 +59,68 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  * Measures an element, allowing you to react to its changes in size.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useElementSize = /*@__PURE__*/ monitored(function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
-    const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
+export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+    return useMonitoring(function useElementSize(): UseElementSizeReturnType<E> {
+        const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
-    useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
+        useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 
-    const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
 
-    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
+        const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 
-    const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
-        if (element) {
-            const document = getDocument(element);
-            const window = getWindow(element);
+        const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
+            if (element) {
+                const document = getDocument(element);
+                const window = getWindow(element);
 
-            const handleUpdate = (entries: ResizeObserverEntry[] | UIEvent) => {
-                if (element.isConnected) {
-                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as Element & Partial<HTMLElement>);
-                    setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop }, entries);
+                const handleUpdate = (entries: ResizeObserverEntry[] | UIEvent) => {
+                    if (element.isConnected) {
+                        const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as Element & Partial<HTMLElement>);
+                        setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop }, entries);
+                    }
+                }
+
+
+                if (window && ("ResizeObserver" in window)) {
+                    const observer = new ResizeObserver((entries) => { handleUpdate(entries); });
+
+                    observer.observe(element, { box: observeBox });
+
+                    return () => observer.disconnect();
+                }
+                else {
+                    document?.addEventListener("resize", handleUpdate, { passive: true });
+                    return () => document?.removeEventListener("resize", handleUpdate);
                 }
             }
+        }, [])
 
-
-            if (window && ("ResizeObserver" in window)) {
-                const observer = new ResizeObserver((entries) => { handleUpdate(entries); });
-
-                observer.observe(element, { box: observeBox });
-
-                return () => observer.disconnect();
+        const { refElementReturn, ...rest } = useRefElement<E>({
+            refElementParameters: {
+                onElementChange: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
+                onMount,
+                onUnmount
             }
-            else {
-                document?.addEventListener("resize", handleUpdate, { passive: true });
-                return () => document?.removeEventListener("resize", handleUpdate);
+        });
+
+        const { getElement } = refElementReturn;
+
+        useEffect(() => {
+            if (getObserveBox) {
+                if (currentObserveBox.current !== getObserveBox())
+                    needANewObserver(getElement(), getObserveBox());
             }
-        }
-    }, [])
+        });
 
-    const { refElementReturn, ...rest } = useRefElement<E>({
-        refElementParameters: {
-            onElementChange: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
-            onMount,
-            onUnmount
+        return {
+            elementSizeReturn: { getSize },
+            refElementReturn,
+            ...rest
         }
+
     });
-
-    const { getElement } = refElementReturn;
-
-    useEffect(() => {
-        if (getObserveBox) {
-            if (currentObserveBox.current !== getObserveBox())
-                needANewObserver(getElement(), getObserveBox());
-        }
-    });
-
-    return {
-        elementSizeReturn: { getSize },
-        refElementReturn,
-        ...rest
-    }
-
-
-})
+}

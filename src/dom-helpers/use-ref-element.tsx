@@ -1,6 +1,7 @@
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
@@ -43,7 +44,7 @@ export interface UseRefElementParameters<T> {
 }
 
 /**
- * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  * 
  * @remarks
  * 
@@ -76,47 +77,51 @@ export interface UseRefElementParameters<T> {
  * ```
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useRefElement = (function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
-    const nonElementWarn = useRef(false);
-    if (nonElementWarn.current) {
-        nonElementWarn.current = false;
-        // There are two of these to catch the problem in the two most useful areas --
-        // when it initially happens, and also in the component stack.
-        console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-    }
-
-    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
-    useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
-
-    // Called (indirectly) by the ref that the element receives.
-    const handler = useCallback<OnPassiveStateChange<T | null, never>>((e, prevValue) => {
-        if (!(e == null || e instanceof Element)) {
-            console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-            nonElementWarn.current = true;
+export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
+    return useMonitoring(function useRefElement(): UseRefElementReturnType<T> {
+        const nonElementWarn = useRef(false);
+        if (nonElementWarn.current) {
+            nonElementWarn.current = false;
+            // There are two of these to catch the problem in the two most useful areas --
+            // when it initially happens, and also in the component stack.
+            console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
         }
-        const cleanup = onElementChange?.(e, prevValue);
-        if (prevValue)
-            onUnmount?.(prevValue!);
 
-        if (e)
-            onMount?.(e);
+        const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
+        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
-        return cleanup;
-    }, []);
+        // Called (indirectly) by the ref that the element receives.
+        const handler = useCallback<OnPassiveStateChange<T | null, never>>((e, prevValue) => {
+            if (!(e == null || e instanceof Element)) {
+                console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+                nonElementWarn.current = true;
+            }
+            const cleanup = onElementChange?.(e, prevValue);
+            if (prevValue)
+                onUnmount?.(prevValue!);
 
-    // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement as never }, "data-use-ref-element"));
+            if (e)
+                onMount?.(e);
 
-    // Return both the element and the hook that modifies 
-    // the props and allows us to actually find the element
-    return {
-        propsStable: propsStable.current,
+            return cleanup;
+        }, []);
 
-        refElementReturn: {
-            getElement,
+        // Let us store the actual (reference to) the element we capture
+        const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement as never }, "data-use-ref-element"));
+
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        return {
+            propsStable: propsStable.current,
+
+            refElementReturn: {
+                getElement,
+            }
         }
-    }
-})
+    });
+}
 

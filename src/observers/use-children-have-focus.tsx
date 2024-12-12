@@ -2,7 +2,7 @@ import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnZero, run
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { FocusEventType, TargetedPick } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
 
@@ -54,39 +54,47 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * 
  * @remarks I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  * 
+ * @hasChild {@link useChildrenHaveFocusChild}
+ * 
  * @compositeParams
  * 
- * @hasChild {@link useChildrenHaveFocusChild}
+ * #__NO_SIDE_EFFECTS__
  */
-export const useChildrenHaveFocus = /*@__PURE__*/ monitored(function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
-    const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
+export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
+    return useMonitoring(function useChildrenHaveFocus(): UseChildrenHaveFocusReturnType<ChildElement> {
+        const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
-    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
-        console.assert(anyFocused >= 0 && anyFocused <= 1);
-        setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
-    }), returnZero, { debounceRendering: setTimeout, skipMountInitialization: true });    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
+        const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
+            console.assert(anyFocused >= 0 && anyFocused <= 1);
+            setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
+        }), returnZero, { debounceRendering: setTimeout, skipMountInitialization: true });    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
 
-    return {
-        childrenHaveFocusReturn: { getAnyFocused },
-        context: useMemoObject<UseChildrenHaveFocusContext<ChildElement>>({ childrenHaveFocusChildContext: useMemoObject<UseChildrenHaveFocusContext<ChildElement>["childrenHaveFocusChildContext"]>({ setFocusCount }) }),
-    }
-})
+        return {
+            childrenHaveFocusReturn: { getAnyFocused },
+            context: useMemoObject<UseChildrenHaveFocusContext<ChildElement>>({ childrenHaveFocusChildContext: useMemoObject<UseChildrenHaveFocusContext<ChildElement>["childrenHaveFocusChildContext"]>({ setFocusCount }) }),
+        }
+    });
+}
 
 /**
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useChildrenHaveFocusChild = /*@__PURE__*/ monitored(function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
-    return {
-        hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
-                if (focused) {
-                    setFocusCount(p => (p ?? 0) + 1, e);
-                }
-                else if (!focused && prev) {
-                    setFocusCount(p => (p ?? 0) - 1, e);
-                }
-            }),
-        }
-    };
-})
+export function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
+    return useMonitoring(function useChildrenHaveFocusChild(): UseChildrenHaveFocusChildReturnType<E> {
+        return {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
+                    if (focused) {
+                        setFocusCount(p => (p ?? 0) + 1, e);
+                    }
+                    else if (!focused && prev) {
+                        setFocusCount(p => (p ?? 0) - 1, e);
+                    }
+                }),
+            }
+        };
+    });
+}

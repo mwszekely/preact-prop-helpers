@@ -1,64 +1,69 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 /**
+ * Allows a component to use the boolean result of a media query as part of its render. 
  * 
- * Allows a component to use the boolean result of a media query as part of its render.
+ * @remarks **Note the return type** is ***not*** a boolean; it is an object that contains
+ * a boolean and a stable getter.
  * 
- * @remarks Please note that there is a re-render penalty incurred by using this hook -- it will
+ * Please note that there is a re-render penalty incurred by using this hook -- it will
  * always cause any component that uses it to re-render one extra time on mount as it
  * stores the result of the media query. This can be mitigated with the `defaultGuess`
  * parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.
  * 
  * @param query - Must be in parens, e.g. `(max-width: 600px)`
  * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
- * @returns `UseMediaQueryReturnType`
+ * @returns `UseMediaQueryReturnType`.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMediaQuery = /*@__PURE__*/ monitored(function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
+export function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
+    return useMonitoring(function useMediaQuery(): UseMediaQueryReturnType {
+        if (typeof window === "undefined") {
+            const matches = defaultGuess || false;
+            return {
+                matches,
+                getMatches: useCallback(() => matches, [matches])
+            };
+        }
+        else {
 
-    if (typeof window === "undefined") {
-        const matches = defaultGuess || false;
-        return {
-            matches,
-            getMatches: useCallback(() => matches, [matches])
-        };
-    }
-    else {
+            const queryList = useRef<MediaQueryList | null>();
 
-        const queryList = useRef<MediaQueryList | null>();
+            // queryList.current ??= (query == null ? null : matchMedia(query))
+            // This ^^^ is not done because it seems to cause reflows at inopportune moments.
+            // Specifically on iOS Safari (tested on 12).
+            // It's always iOS Safari.
+            // At any rate it botches transitions that happen on a just-mounted component, somehow.
+            const [matches, setMatches, getMatches] = useState<null | boolean>(defaultGuess ?? null);
 
-        // queryList.current ??= (query == null ? null : matchMedia(query))
-        // This ^^^ is not done because it seems to cause reflows at inopportune moments.
-        // Specifically on iOS Safari (tested on 12).
-        // It's always iOS Safari.
-        // At any rate it botches transitions that happen on a just-mounted component, somehow.
-        const [matches, setMatches, getMatches] = useState<null | boolean>(defaultGuess ?? null);
+            console.assert(!query || query.startsWith("("));
 
-        console.assert(!query || query.startsWith("("));
+            useLayoutEffect(() => {
+                if (!query)
+                    return;
 
-        useLayoutEffect(() => {
-            if (!query)
-                return;
+                queryList.current = matchMedia(query);
+                setMatches(queryList.current.matches || false);
 
-            queryList.current = matchMedia(query);
-            setMatches(queryList.current.matches || false);
+                const handler = (e: MediaQueryListEvent) => {
+                    setMatches(e.matches);
+                }
 
-            const handler = (e: MediaQueryListEvent) => {
-                setMatches(e.matches);
-            }
+                queryList.current.addEventListener("change", handler, { passive: true });
+                return () => queryList.current?.removeEventListener("change", handler);
 
-            queryList.current.addEventListener("change", handler, { passive: true });
-            return () => queryList.current?.removeEventListener("change", handler);
+            }, [query]);
 
-        }, [query]);
-
-        return {
-            matches,
-            getMatches
-        };
-    }
-})
+            return {
+                matches,
+                getMatches
+            };
+        }
+    });
+}
 
 export interface UseMediaQueryReturnType {
     matches: boolean | null;

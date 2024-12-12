@@ -9,8 +9,10 @@ import { useStack } from "../util/stack.js";
  * Useful if you want to trace whose state is being updated.
  *
  * @param initialState - Same as the built-in `setState`'s
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useState = (function useState(initialState) {
+export function useState(initialState) {
     const getStack = useStack();
     // We keep both, but override the `setState` functionality
     const [state, setStateP] = useStateP(initialState);
@@ -44,5 +46,5 @@ export const useState = (function useState(initialState) {
     });
     const getState = useCallback(() => { return ref.current; }, []);
     return [state, setState.current, getState];
-});
+}
 //# sourceMappingURL=use-state.js.map

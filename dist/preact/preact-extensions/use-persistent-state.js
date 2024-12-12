@@ -6,6 +6,9 @@ import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
 export const PersistentStates = undefined; // Needed for the isolatedModules flag?
 const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage);
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStorage) {
     if (storage != null) {
         try {
@@ -22,6 +25,9 @@ export function getFromLocalStorage(key, converter = JSON.parse, storage = defau
     }
     return null;
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
     if (storage != null) {
         try {
@@ -53,6 +59,8 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  * @param fromString -
  * @param toString -
  * @returns
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = defaultStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));

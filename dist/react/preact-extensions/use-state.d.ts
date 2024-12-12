@@ -8,6 +8,8 @@ import { StateUpdater } from "../util/lib.js";
  * Useful if you want to trace whose state is being updated.
  *
  * @param initialState - Same as the built-in `setState`'s
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useState: <T>(initialState: T | (() => T)) => readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
+export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
 //# sourceMappingURL=use-state.d.ts.map

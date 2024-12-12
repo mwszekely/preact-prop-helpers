@@ -3,7 +3,7 @@ import { useState } from "../preact-extensions/use-state.js";
 import { getDocument } from "../util/get-window.js";
 import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 /**
  * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
  *
@@ -12,30 +12,34 @@ import { monitored } from "../util/use-call-count.js";
  * TODO: Can't push a child until after the very first `useLayoutEffect`
  *
  * {@include } {@link UsePortalChildrenParameters}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const usePortalChildren = /*@__PURE__*/ monitored(function usePortalChildren({ target }) {
-    const [pushChild, setPushChild] = useState(null);
-    const [updateChild, setUpdateChild] = useState(null);
-    const [removeChild, setRemoveChild] = useState(null);
-    const pushChildStable = useStableCallback((child) => {
-        return pushChild?.(child) ?? -1;
+export function usePortalChildren({ target }) {
+    return useMonitoring(function usePortalChildren() {
+        const [pushChild, setPushChild] = useState(null);
+        const [updateChild, setUpdateChild] = useState(null);
+        const [removeChild, setRemoveChild] = useState(null);
+        const pushChildStable = useStableCallback((child) => {
+            return pushChild?.(child) ?? -1;
+        });
+        const updateChildStable = useStableCallback((index, child) => {
+            return updateChild?.(index, child);
+        });
+        const removeChildStable = useStableCallback((index) => {
+            return removeChild?.(index);
+        });
+        const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
+        const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
+        return {
+            children: children,
+            pushChild: pushChildStable,
+            updateChild: updateChildStable,
+            removeChild: removeChildStable,
+            portalElement: element ?? null
+        };
     });
-    const updateChildStable = useStableCallback((index, child) => {
-        return updateChild?.(index, child);
-    });
-    const removeChildStable = useStableCallback((index) => {
-        return removeChild?.(index);
-    });
-    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
-    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
-    return {
-        children: children,
-        pushChild: pushChildStable,
-        updateChild: updateChildStable,
-        removeChild: removeChildStable,
-        portalElement: element ?? null
-    };
-});
+}
 /**
  * Implementation
  */

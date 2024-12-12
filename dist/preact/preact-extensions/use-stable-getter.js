@@ -1,4 +1,5 @@
 import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 const Unset = Symbol("unset");
 /**
@@ -7,17 +8,21 @@ const Unset = Symbol("unset");
  *
  * @remarks This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useStableGetter = (function useStableGetter(value) {
-    const ref = useRef(Unset);
-    useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
-    return useCallback(() => {
-        if (ref.current === Unset) {
-            throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-        }
-        return ref.current;
-    }, []);
-});
+export function useStableGetter(value) {
+    return useMonitoring(function useStableGetter() {
+        const ref = useRef(Unset);
+        useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
+        return useCallback(() => {
+            if (ref.current === Unset) {
+                throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+            }
+            return ref.current;
+        }, []);
+    });
+}
 /**
  * Like `useStableGetter`, but ***requires*** that everything in the object is also stable,
  * and in turn returns an object that itself is stable.
@@ -34,6 +39,8 @@ function _useStableObject(t) {
  *
  * @param t
  * @returns
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function useMemoObject(t) {
     return useMemo(() => { return t; }, Object.values(t));

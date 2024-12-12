@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, monitored, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/preact/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/preact/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -208,7 +208,7 @@ export const DemoUseGrid = memo(() => {
 });
 
 
-const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIndexChildren({ count, max, min, staggered }: { count: number, min: number | null, max: number | null, staggered: boolean }) {
+const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildren({ count, max, min, staggered }: { count: number, min: number | null, max: number | null, staggered: boolean }) {
     const {
         context,
         paginatedChildrenReturn,
@@ -232,7 +232,7 @@ const DemoUseRovingTabIndexChildren = memo(monitored(function DemoUseRovingTabIn
     return (
         <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>
     )
-}));
+});
 
 interface CustomGridInfo extends UseCompleteGridNavigationRowInfo<HTMLTableRowElement> { foo: "bar" }
 interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<HTMLTableCellElement> { bar: "baz" }
@@ -241,7 +241,7 @@ interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<HTMLTableC
 //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
 
 
-const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
+const DemoUseGridRowOuter = memo(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const {
         hide,
         managedChildReturn,
@@ -265,7 +265,7 @@ const DemoUseGridRowOuter = memo(monitored(function DemoUseRovingTabIndexChildOu
             <DemoUseGridRow index={index} childUseEffect={childUseEffect} {...props} />
         )
     }
-}));
+});
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: number, childUseEffect: () => void }) => {

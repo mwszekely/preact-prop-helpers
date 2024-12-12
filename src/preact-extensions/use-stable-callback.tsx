@@ -1,4 +1,5 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 
@@ -35,33 +36,40 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * during render, pass an empty dependency array and it'll act like `useCallback` with an
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useStableCallback = (function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+    return useMonitoring(function useStableCallback() {
+        type U = (NonNullable<T> & ((...args: any) => any));
+        useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
+        if (isStableGetter(fn))
+            return fn;
 
-    type U = (NonNullable<T> & ((...args: any) => any));
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
-    if (isStableGetter(fn))
-        return fn;
+        if (noDeps == null) {
+            const currentCallbackGetter = useStableGetter<U>(fn);
+            return setIsStableGetter(useCallbackNative<U>(((...args) => {
+                return currentCallbackGetter()(...args);
+            }) as U, []));
 
-    if (noDeps == null) {
-        const currentCallbackGetter = useStableGetter<U>(fn);
-        return setIsStableGetter(useCallbackNative<U>(((...args) => {
-            return currentCallbackGetter()(...args);
-        }) as U, []));
-
-    }
-    else {
-        console.assert(noDeps.length === 0);
-        return setIsStableGetter(useCallbackNative<U>(fn, []));
-    }
-})
-
-export const useStableMergedCallback = (function useStableMergedCallback<T extends (Function | null | undefined)[]>(...fns: T) {
-    return useStableCallback<T[number]>((...args: any[]) => {
-        for (let i = 0; i < fns.length; ++i) {
-            fns[i]?.(...args);
+        }
+        else {
+            console.assert(noDeps.length === 0);
+            return setIsStableGetter(useCallbackNative<U>(fn, []));
         }
     });
+}
 
-});
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+export function useStableMergedCallback<T extends (Function | null | undefined)[]>(...fns: T) {
+    return useMonitoring(function useStableMergedCallback() {
+        return useStableCallback<T[number]>((...args: any[]) => {
+            for (let i = 0; i < fns.length; ++i) {
+                fns[i]?.(...args);
+            }
+        });
+    });
+};
 

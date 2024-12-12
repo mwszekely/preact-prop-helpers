@@ -3,7 +3,7 @@ import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
 
@@ -53,50 +53,54 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * @see {@link useHasLastFocus}, in which even if the `body` is clicked it's not considered a loss in focus.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useHasCurrentFocus = /*@__PURE__*/ monitored(function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
-    const {
-        hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
-        refElementReturn: { getElement }
-    } = args;
+export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+    return useMonitoring(function useHasCurrentFocus(): UseHasCurrentFocusReturnType<T> {
+        const {
+            hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
+            refElementReturn: { getElement }
+        } = args;
 
 
-    useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
+        useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
 
-    const onFocusIn = useCallback((e: FocusEventType<T>) => {
-        setFocusedInner(true, e);
-        setFocused(e.target == getElement(), e)
-    }, []);
+        const onFocusIn = useCallback((e: FocusEventType<T>) => {
+            setFocusedInner(true, e);
+            setFocused(e.target == getElement(), e)
+        }, []);
 
-    const onFocusOut = useCallback((e: FocusEventType<T>) => {
-        // Even if we're focusOut-ing to another inner element,
-        // that'll be caught during onFocusIn,
-        // so just set everything to false and let that revert things back to true if necessary.
-        setFocusedInner(false, e);
-        setFocused(false, e);
-    }, []);
+        const onFocusOut = useCallback((e: FocusEventType<T>) => {
+            // Even if we're focusOut-ing to another inner element,
+            // that'll be caught during onFocusIn,
+            // so just set everything to false and let that revert things back to true if necessary.
+            setFocusedInner(false, e);
+            setFocused(false, e);
+        }, []);
 
-    useEffect(() => {
-        return () => {
-            setFocused(false, undefined);
-            setFocusedInner(false, undefined);
-        }
-    }, []);
+        useEffect(() => {
+            return () => {
+                setFocused(false, undefined);
+                setFocusedInner(false, undefined);
+            }
+        }, []);
 
-    const propsStable = useRef<ElementProps<T>>({
-        [onfocusin as never]: onFocusIn,
-        [onfocusout as never]: onFocusOut
+        const propsStable = useRef<ElementProps<T>>({
+            [onfocusin as never]: onFocusIn,
+            [onfocusout as never]: onFocusOut
+        });
+
+        return {
+            hasCurrentFocusReturn: {
+                propsStable: propsStable.current,
+                getCurrentFocused: getFocused,
+                getCurrentFocusedInner: getFocusedInner,
+            }
+        };
     });
-
-    return {
-        hasCurrentFocusReturn: {
-            propsStable: propsStable.current,
-            getCurrentFocused: getFocused,
-            getCurrentFocusedInner: getFocusedInner,
-        }
-    };
-})
+}
 

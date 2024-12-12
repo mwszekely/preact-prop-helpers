@@ -29,17 +29,19 @@ export function enableLoggingPropConflicts(log2) {
  * @param allProps - A variadic number of props to merge into one
  *
  * @returns A single object with all the provided props merged into one.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedProps = (function useMergedProps(...allProps) {
+export function useMergedProps(...allProps) {
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {
         useMergedPropsHelper(ret, nextProps);
     }
     return ret;
-});
+}
 const knowns = new Set(["children", "ref", "className", "class", "style"]);
-const mergeUnknown = (function mergeUnknown(key, lhsValue, rhsValue) {
+function mergeUnknown(key, lhsValue, rhsValue) {
     if (typeof lhsValue === "function" || typeof rhsValue === "function") {
         // They're both functions that can be merged (or one's a function and the other's null).
         // Not an *easy* case, but a well-defined one.
@@ -71,14 +73,14 @@ const mergeUnknown = (function mergeUnknown(key, lhsValue, rhsValue) {
             return rhsValue;
         }
     }
-});
+}
 /**
  * Helper function.
  *
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-const useMergedPropsHelper = (function useMergedPropsHelper(target, mods) {
+function useMergedPropsHelper(target, mods) {
     target.ref = useMergedRefs(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
     target.className = useMergedClasses(target["class"], target.className, mods["class"], mods.className);
@@ -99,8 +101,11 @@ const useMergedPropsHelper = (function useMergedPropsHelper(target, mods) {
             continue;
         target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
     }
-});
-export const mergeFunctions = (function mergeFunctions(lhs, rhs) {
+}
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+export function mergeFunctions(lhs, rhs) {
     if (!lhs)
         return rhs;
     if (!rhs)
@@ -111,5 +116,5 @@ export const mergeFunctions = (function mergeFunctions(lhs, rhs) {
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);
     };
-});
+}
 //# sourceMappingURL=use-merged-props.js.map

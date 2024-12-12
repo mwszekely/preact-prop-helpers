@@ -12,8 +12,10 @@ import { useStack } from "../util/stack.js";
  * Useful if you want to trace whose state is being updated.
  * 
  * @param initialState - Same as the built-in `setState`'s
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useState = (function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
+export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
     const getStack = useStack();
 
     // We keep both, but override the `setState` functionality
@@ -51,4 +53,4 @@ export const useState = (function useState<T>(initialState: T | (() => T)): read
     const getState = useCallback(() => { return ref.current; }, []);
 
     return [state, setState.current, getState] as const;
-})
+}

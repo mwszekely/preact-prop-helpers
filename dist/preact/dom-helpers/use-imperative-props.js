@@ -1,5 +1,5 @@
 import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 let templateElement = null;
@@ -25,110 +25,114 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useImperativeProps = /*@__PURE__*/ monitored(function useImperativeProps({ refElementReturn: { getElement } }) {
-    const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
-    const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
-    const setClass = useCallback((cls, enabled) => {
-        if (hasClass(cls) == !enabled) {
-            getElement()?.classList[enabled ? "add" : "remove"](cls);
-            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
-        }
-    }, []);
-    const setStyle = useCallback((prop, value) => {
-        const element = getElement();
-        if (element) {
-            if (currentImperativeProps.current.style[prop] != value) {
-                currentImperativeProps.current.style[prop] = value;
-                if (prop.startsWith("--")) {
-                    if (value != null)
-                        element.style.setProperty(prop, `${value}`);
-                    else
-                        element.style.removeProperty(prop);
-                }
-                else {
-                    element.style[prop] = value ?? "";
+export function useImperativeProps({ refElementReturn: { getElement } }) {
+    return useMonitoring(function useImperativeProps() {
+        const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
+        const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
+        const setClass = useCallback((cls, enabled) => {
+            if (hasClass(cls) == !enabled) {
+                getElement()?.classList[enabled ? "add" : "remove"](cls);
+                currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+            }
+        }, []);
+        const setStyle = useCallback((prop, value) => {
+            const element = getElement();
+            if (element) {
+                if (currentImperativeProps.current.style[prop] != value) {
+                    currentImperativeProps.current.style[prop] = value;
+                    if (prop.startsWith("--")) {
+                        if (value != null)
+                            element.style.setProperty(prop, `${value}`);
+                        else
+                            element.style.removeProperty(prop);
+                    }
+                    else {
+                        element.style[prop] = value ?? "";
+                    }
                 }
             }
-        }
-    }, []);
-    const setChildren = useCallback((children) => {
-        let e = getElement();
-        if (e && currentImperativeProps.current.children != children) {
-            currentImperativeProps.current.children = children;
-            currentImperativeProps.current.html = null;
-            e.textContent = children;
-        }
-    }, []);
-    const dangerouslySetInnerHTML = useCallback((children) => {
-        let e = getElement();
-        if (e && currentImperativeProps.current.html != children) {
-            currentImperativeProps.current.children = null;
-            currentImperativeProps.current.html = children;
-            e.innerHTML = children;
-        }
-    }, []);
-    const dangerouslyAppendHTML = useCallback((children) => {
-        let e = getElement();
-        if (e && children) {
-            const newChild = htmlToElement(e, children);
-            console.assert((newChild && newChild instanceof Node));
-            if (newChild && newChild instanceof Node) {
+        }, []);
+        const setChildren = useCallback((children) => {
+            let e = getElement();
+            if (e && currentImperativeProps.current.children != children) {
+                currentImperativeProps.current.children = children;
+                currentImperativeProps.current.html = null;
+                e.textContent = children;
+            }
+        }, []);
+        const dangerouslySetInnerHTML = useCallback((children) => {
+            let e = getElement();
+            if (e && currentImperativeProps.current.html != children) {
                 currentImperativeProps.current.children = null;
-                currentImperativeProps.current.html ||= "";
-                currentImperativeProps.current.html += children;
-                e.appendChild(newChild);
-                return newChild;
+                currentImperativeProps.current.html = children;
+                e.innerHTML = children;
             }
-        }
-        return null;
-    }, []);
-    const getAttribute = useCallback((prop) => {
-        return currentImperativeProps.current.others[prop];
-    }, []);
-    const setAttribute = useCallback((prop, value) => {
-        if (value != null) {
-            if (getAttribute(prop) != value) {
-                currentImperativeProps.current.others[prop] = value;
-                getElement()?.setAttribute(prop, value);
+        }, []);
+        const dangerouslyAppendHTML = useCallback((children) => {
+            let e = getElement();
+            if (e && children) {
+                const newChild = htmlToElement(e, children);
+                console.assert((newChild && newChild instanceof Node));
+                if (newChild && newChild instanceof Node) {
+                    currentImperativeProps.current.children = null;
+                    currentImperativeProps.current.html ||= "";
+                    currentImperativeProps.current.html += children;
+                    e.appendChild(newChild);
+                    return newChild;
+                }
             }
-        }
-        else {
-            if (getAttribute(prop) != undefined) {
-                delete currentImperativeProps.current.others[prop];
-                getElement()?.removeAttribute(prop);
+            return null;
+        }, []);
+        const getAttribute = useCallback((prop) => {
+            return currentImperativeProps.current.others[prop];
+        }, []);
+        const setAttribute = useCallback((prop, value) => {
+            if (value != null) {
+                if (getAttribute(prop) != value) {
+                    currentImperativeProps.current.others[prop] = value;
+                    getElement()?.setAttribute(prop, value);
+                }
             }
-        }
-    }, []);
-    const setEventHandler = useCallback((type, handler, options) => {
-        const element = getElement();
-        const mappedKey = EventMapping[type];
-        if (element) {
-            if (handler) {
-                element.addEventListener(type, handler, options);
-                currentImperativeProps.current.others[mappedKey] = handler;
+            else {
+                if (getAttribute(prop) != undefined) {
+                    delete currentImperativeProps.current.others[prop];
+                    getElement()?.removeAttribute(prop);
+                }
             }
-            else if (currentImperativeProps.current.others[mappedKey]) {
-                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
-                currentImperativeProps.current.others[mappedKey] = undefined;
+        }, []);
+        const setEventHandler = useCallback((type, handler, options) => {
+            const element = getElement();
+            const mappedKey = EventMapping[type];
+            if (element) {
+                if (handler) {
+                    element.addEventListener(type, handler, options);
+                    currentImperativeProps.current.others[mappedKey] = handler;
+                }
+                else if (currentImperativeProps.current.others[mappedKey]) {
+                    element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+                    currentImperativeProps.current.others[mappedKey] = undefined;
+                }
             }
-        }
-    }, []);
-    return {
-        imperativePropsReturn: useRef({
-            hasClass,
-            setClass,
-            setStyle,
-            getAttribute,
-            setAttribute,
-            setEventHandler,
-            setChildren,
-            dangerouslySetInnerHTML,
-            dangerouslyAppendHTML
-        }).current,
-        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
-    };
-});
+        }, []);
+        return {
+            imperativePropsReturn: useRef({
+                hasClass,
+                setClass,
+                setStyle,
+                getAttribute,
+                setAttribute,
+                setEventHandler,
+                setChildren,
+                dangerouslySetInnerHTML,
+                dangerouslyAppendHTML
+            }).current,
+            props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
+        };
+    });
+}
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
     const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });

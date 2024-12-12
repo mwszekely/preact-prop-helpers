@@ -3,7 +3,7 @@ import { MapOfSets } from "map-and-set-extensions";
 
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 
 /**
@@ -182,46 +182,50 @@ export interface UseActiveElementReturnType {
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useActiveElement = /*@__PURE__*/ monitored(function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
+export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
+    return useMonitoring(function useActiveElement(): UseActiveElementReturnType {
+        useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
 
-    useEffect(() => {
-        const document = getDocument();
-        const window = (document?.defaultView);
+        useEffect(() => {
+            const document = getDocument();
+            const window = (document?.defaultView);
 
-        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
-            document?.addEventListener("focusin", focusin, { passive: true });
-            document?.addEventListener("focusout", focusout, { passive: true });
-            window?.addEventListener("focus", windowFocus, { passive: true });
-            window?.addEventListener("blur", windowBlur, { passive: true });
-        }
-
-        const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
-        const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
-        const lwfu = { send: setWindowFocused, lastSent: undefined };
-
-        MapOfSets.add(activeElementUpdaters, window, laeu);
-        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
-        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
-
-        return () => {
-            MapOfSets.delete(activeElementUpdaters, window, laeu);
-            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
-            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
-
-            if (activeElementUpdaters.size === 0) {
-                document?.removeEventListener("focusin", focusin);
-                document?.removeEventListener("focusout", focusout);
-                window?.removeEventListener("focus", windowFocus);
-                window?.removeEventListener("blur", windowBlur);
+            if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+                document?.addEventListener("focusin", focusin, { passive: true });
+                document?.addEventListener("focusout", focusout, { passive: true });
+                window?.addEventListener("focus", windowFocus, { passive: true });
+                window?.addEventListener("blur", windowBlur, { passive: true });
             }
-        }
-    }, [])
 
-    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
+            const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
+            const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
+            const lwfu = { send: setWindowFocused, lastSent: undefined };
 
-    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-})
+            MapOfSets.add(activeElementUpdaters, window, laeu);
+            MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+            MapOfSets.add(windowFocusedUpdaters, window, lwfu);
+
+            return () => {
+                MapOfSets.delete(activeElementUpdaters, window, laeu);
+                MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+                MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
+
+                if (activeElementUpdaters.size === 0) {
+                    document?.removeEventListener("focusin", focusin);
+                    document?.removeEventListener("focusout", focusout);
+                    window?.removeEventListener("focus", windowFocus);
+                    window?.removeEventListener("blur", windowBlur);
+                }
+            }
+        }, [])
+
+        const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
+
+        return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
+    });
+}

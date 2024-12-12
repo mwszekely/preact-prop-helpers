@@ -30,6 +30,8 @@ export interface UseTextContentReturnType {
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useTextContent: <E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>) => UseTextContentReturnType;
+export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType;
 //# sourceMappingURL=use-text-content.d.ts.map

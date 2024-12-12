@@ -12,8 +12,10 @@ function styleStringToObject(style: string): CSSProperties {
  * @param style - The user-given style prop for this component
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedStyles = (function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
+export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -49,5 +51,5 @@ export const useMergedStyles = (function useMergedStyles(lhs: ElementProps<Event
         ...(lhs ?? {}) as CSSProperties,
         ...(rhs ?? {}) as CSSProperties
     } as CSSProperties
-})
+}
 

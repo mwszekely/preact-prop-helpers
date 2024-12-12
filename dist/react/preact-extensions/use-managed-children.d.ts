@@ -180,12 +180,16 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * @hasChild {@link useManagedChild}
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useManagedChildren: <M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>) => UseManagedChildrenReturnType<M>;
+export declare function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M>;
 /**
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useManagedChild: <M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
+export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /**
      * Which child is considered active on mount.
@@ -256,6 +260,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  *
+ * #__NO_SIDE_EFFECTS__
  */
 export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};

@@ -7,6 +7,8 @@ interface ContextType {
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
@@ -30,7 +32,9 @@ export interface UseAnimationFrameParameters {
  * {@include } {@link UseAnimationFrameParameters}
  *
  * {@include } {@link ProvideBatchedAnimationFrames}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useAnimationFrame: ({ callback }: UseAnimationFrameParameters) => void;
+export declare function useAnimationFrame({ callback }: UseAnimationFrameParameters): void;
 export {};
 //# sourceMappingURL=use-animation-frame.d.ts.map

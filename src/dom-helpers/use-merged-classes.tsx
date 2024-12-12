@@ -4,8 +4,10 @@ import { ElementProps } from "../util/types.js";
  * Merged the `class` and `className` properties of two sets of props into a single string.
  * 
  * @remarks Duplicate classes are removed (order doesn't matter anyway).
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useMergedClasses = (function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined {
+export function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined {
 
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
@@ -21,4 +23,4 @@ export const useMergedClasses = (function useMergedClasses(...classes: ElementPr
     else {
         return undefined;
     }
-})
+}

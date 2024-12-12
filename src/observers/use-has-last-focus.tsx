@@ -5,7 +5,7 @@ import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, 
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedPick, useCallback, useEffect } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
 
 export interface UseHasLastFocusParametersSelf {
@@ -48,48 +48,52 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useHasLastFocus = /*@__PURE__*/ monitored(function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
-    const {
-        refElementReturn: { getElement },
-        activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
-        hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 }
-    } = args;
+export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
+    return useMonitoring(function useHasLastFocus(): UseHasLastFocusReturnType {
+        const {
+            refElementReturn: { getElement },
+            activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
+            hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 }
+        } = args;
 
-    assertEmptyObject(void1);
+        assertEmptyObject(void1);
 
 
-    useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
+        useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
 
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
 
-    const { activeElementReturn } = useActiveElement({
-        activeElementParameters: {
-            onLastActiveElementChange: useCallback<NonNullable<typeof onLastActiveElementChange>>((lastActiveElement, prevLastActiveElement, e) => {
-                const selfElement = getElement();
-                const focused = (selfElement != null && (selfElement == lastActiveElement as Node | null));
-                const focusedInner = (!!selfElement?.contains(lastActiveElement as Node | null));
-                setLastFocused(focused, e);
-                setLastFocusedInner(focusedInner, e);
-                onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement, e);
-            }, []),
-            ...activeElementParameters
-        },
+        const { activeElementReturn } = useActiveElement({
+            activeElementParameters: {
+                onLastActiveElementChange: useCallback<NonNullable<typeof onLastActiveElementChange>>((lastActiveElement, prevLastActiveElement, e) => {
+                    const selfElement = getElement();
+                    const focused = (selfElement != null && (selfElement == lastActiveElement as Node | null));
+                    const focusedInner = (!!selfElement?.contains(lastActiveElement as Node | null));
+                    setLastFocused(focused, e);
+                    setLastFocusedInner(focusedInner, e);
+                    onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement, e);
+                }, []),
+                ...activeElementParameters
+            },
+        });
+
+        useEffect(() => {
+            return () => {
+                setLastFocused(false, undefined);
+                setLastFocusedInner(false, undefined);
+            }
+        }, []);
+
+        return {
+            activeElementReturn,
+            hasLastFocusReturn: {
+                getLastFocused,
+                getLastFocusedInner,
+            }
+        };
     });
-
-    useEffect(() => {
-        return () => {
-            setLastFocused(false, undefined);
-            setLastFocusedInner(false, undefined);
-        }
-    }, []);
-
-    return {
-        activeElementReturn,
-        hasLastFocusReturn: {
-            getLastFocused,
-            getLastFocusedInner,
-        }
-    };
-})
+}

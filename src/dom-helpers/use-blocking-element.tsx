@@ -6,7 +6,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { blockingElements } from "../util/blocking-elements.js";
 import { FocusEventType, useLayoutEffect } from "../util/lib.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 
 export interface UseBlockingElementParametersSelf<E extends Element> {
@@ -18,6 +18,12 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
     blockingElementParameters: UseBlockingElementParametersSelf<E>;
 }
 
+export interface UseBlockingElementReturnType {
+    getTop: () => HTMLElement | null;
+    getLastActiveWhenClosed: () => HTMLElement | null;
+    getLastActiveWhenOpen: () => HTMLElement | null;
+}
+
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  * 
@@ -26,8 +32,10 @@ export interface UseBlockingElementParameters<E extends Element> extends UseActi
  * it'll take to find its way into the spec, if ever)
  * 
  * @param target 
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useBlockingElement = /*@__PURE__*/ monitored(function useBlockingElement<E extends Element>({
+export function useBlockingElement<E extends Element>({
     activeElementParameters: {
         getDocument,
         onActiveElementChange,
@@ -41,66 +49,67 @@ export const useBlockingElement = /*@__PURE__*/ monitored(function useBlockingEl
         ...void1
     },
     ...void2
-}: UseBlockingElementParameters<E>) {
+}: UseBlockingElementParameters<E>): UseBlockingElementReturnType {
+    return useMonitoring(function useBlockingElement(): UseBlockingElementReturnType {
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
 
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
+        const stableGetTarget = useStableCallback(getTarget);
 
-    const stableGetTarget = useStableCallback(getTarget);
+        //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+        useActiveElement({
+            activeElementParameters: {
+                getDocument,
+                onActiveElementChange,
+                onWindowFocusedChange,
+                onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+                    onLastActiveElementChange?.(e, prev, reason);
 
-    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
-    useActiveElement({
-        activeElementParameters: {
-            getDocument,
-            onActiveElementChange,
-            onWindowFocusedChange,
-            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
-                onLastActiveElementChange?.(e, prev, reason);
+                    if (e) {
+                        if (enabled)
+                            setLastActiveWhenOpen(e as HTMLElement, reason);
+                        else
+                            setLastActiveWhenClosed(e as HTMLElement, reason);
+                    }
+                })
+            }
+        })
 
-                if (e) {
-                    if (enabled)
-                        setLastActiveWhenOpen(e as HTMLElement, reason);
-                    else
-                        setLastActiveWhenClosed(e as HTMLElement, reason);
+        const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
+        const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
+        const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
+
+        /**
+         * Push/pop the element from the blockingElements stack.
+         */
+        useLayoutEffect(() => {
+            const target = stableGetTarget();
+
+            if (enabled) {
+
+                // Sometimes blockingElements will fail if, for example,
+                // the target element isn't connected to document.body.
+                // This is rare, but it's better to fail silently with weird tabbing behavior
+                // than to crash the entire application.
+                try {
+                    blockingElements().push(target as Element as HTMLElement);
+
+                    setTop(target as Element as HTMLElement);
+                    return () => {
+                        blockingElements().remove(target as Element as HTMLElement);
+                    };
                 }
-            })
-        }
-    })
-
-    const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
-    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
-    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
-
-    /**
-     * Push/pop the element from the blockingElements stack.
-     */
-    useLayoutEffect(() => {
-        const target = stableGetTarget();
-
-        if (enabled) {
-
-            // Sometimes blockingElements will fail if, for example,
-            // the target element isn't connected to document.body.
-            // This is rare, but it's better to fail silently with weird tabbing behavior
-            // than to crash the entire application.
-            try {
-                blockingElements().push(target as Element as HTMLElement);
-
-                setTop(target as Element as HTMLElement);
-                return () => {
-                    blockingElements().remove(target as Element as HTMLElement);
-                };
+                catch (ex) {
+                    // Well, semi-silently.
+                    console.error(ex);
+                }
             }
-            catch (ex) {
-                // Well, semi-silently.
-                console.error(ex);
-            }
-        }
-    }, [enabled]);
+        }, [enabled]);
 
-    return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen }
-})
+        return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen };
+    });
+}
 
 export function getTopElement() {
     return blockingElements().top;

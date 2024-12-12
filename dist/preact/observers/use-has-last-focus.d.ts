@@ -37,6 +37,8 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useHasLastFocus: <T extends Node>(args: UseHasLastFocusParameters<T>) => UseHasLastFocusReturnType;
+export declare function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType;
 //# sourceMappingURL=use-has-last-focus.d.ts.map

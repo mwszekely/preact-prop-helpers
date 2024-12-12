@@ -391,7 +391,7 @@ export { findBackupFocus, focus } from "./util/focus.js";
 export { getDocument, getWindow } from "./util/get-window.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
-export { hideCallCount, monitored } from "./util/use-call-count.js";
+export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
 export { EventMapping, Fragment, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
 //# sourceMappingURL=index.js.map

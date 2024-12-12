@@ -19,9 +19,11 @@ import { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarat
  * @see {@link useSingleSelection}
  * @see {@link useMultiSelection}
  *
+ * @hasChild {@link useSelectionChild}
+ *
  * @compositeParams
  *
- * @hasChild {@link useSelectionChild}
+ * #__NO_SIDE_EFFECTS__
  */
 export function useSelection({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }) {
     const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...void3 }, context: contextSS, singleSelectionReturn, ...void1 } = useSingleSelection({ managedChildrenReturn, rovingTabIndexReturn, singleSelectionParameters });
@@ -41,6 +43,8 @@ export function useSelection({ managedChildrenReturn, multiSelectionParameters, 
 /**
  *
  * @compositeParams
+ *
+ * #__NO_SIDE_EFFECTS__
  */
 export function useSelectionChild({ context, info: { index, untabbable, ...void2 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void3 }) {
     const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: opc1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild({ context, info: { index, untabbable }, singleSelectionChildParameters });
@@ -66,9 +70,15 @@ export function useSelectionChild({ context, info: { index, untabbable, ...void2
         singleSelectionChildReturn
     };
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function useSelectionDeclarative(args) {
     return useSingleSelectionDeclarative(args);
 }
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
 export function useSelectionChildDeclarative(args) {
     return useMultiSelectionChildDeclarative(args);
 }

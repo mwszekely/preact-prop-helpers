@@ -5,7 +5,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "../util/get-window.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
@@ -69,61 +69,65 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useFocusTrap = /*@__PURE__*/ monitored(function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
+export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
-    const focusSelf = useStableCallback(focusSelfUnstable);
-    const focusOpener = useStableCallback(focusOpenerUnstable);
+    return useMonitoring(function useFocusTrap(): UseFocusTrapReturnType<PopupElement> {
+        const focusSelf = useStableCallback(focusSelfUnstable);
+        const focusOpener = useStableCallback(focusOpenerUnstable);
 
-    useEffect(() => {
-        const document = getDocument();
-        if (trapActive) {
-            let top = getTop();
-            const lastFocusedInThisComponent = getLastActiveWhenOpen();
+        useEffect(() => {
+            const document = getDocument();
+            if (trapActive) {
+                let top = getTop();
+                const lastFocusedInThisComponent = getLastActiveWhenOpen();
 
-            if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
-                focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
+                if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
+                    focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
+                }
+                else {
+                    top ??= refElementReturn.getElement() as unknown as HTMLElement;
+                    console.assert(!!top);
+                    if (top)
+                        focusSelf(top as any as PopupElement, () => findFirstFocusable(top!));
+                }
             }
             else {
-                top ??= refElementReturn.getElement() as unknown as HTMLElement;
-                console.assert(!!top);
-                if (top)
-                    focusSelf(top as any as PopupElement, () => findFirstFocusable(top!));
+                const lastActive = getLastActiveWhenClosed();
+                let currentFocus = document?.activeElement;
+
+                // Restore focus to whatever caused this trap to trigger,
+                // but only if it wasn't caused by explicitly focusing something else 
+                // (generally if `onlyMoveFocus` is true)
+                let top = refElementReturn.getElement();
+                if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
+                    if (lastActive)
+                        focusOpener(lastActive as any as SourceElement);
+                }
             }
-        }
-        else {
-            const lastActive = getLastActiveWhenClosed();
-            let currentFocus = document?.activeElement;
+        }, [trapActive]);
 
-            // Restore focus to whatever caused this trap to trigger,
-            // but only if it wasn't caused by explicitly focusing something else 
-            // (generally if `onlyMoveFocus` is true)
-            let top = refElementReturn.getElement();
-            if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
-                if (lastActive)
-                    focusOpener(lastActive as any as SourceElement);
+        const { getElement } = refElementReturn;
+
+        const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
+            activeElementParameters,
+            blockingElementParameters: {
+                enabled: trapActive && !onlyMoveFocus,
+                getTarget: getElement
             }
-        }
-    }, [trapActive]);
+        });
 
-    const { getElement } = refElementReturn;
 
-    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
-        activeElementParameters,
-        blockingElementParameters: {
-            enabled: trapActive && !onlyMoveFocus,
-            getTarget: getElement
-        }
+        return {
+            props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElement>, "data-focus-trap")
+        };
     });
-
-
-    return {
-        props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElement>, "data-focus-trap")
-    };
-})
+}
 
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
@@ -142,7 +146,7 @@ export function findFirstTabbable<T extends Node>(element: T): T | null {
 function findFirstCondition<T extends Node>(element: T, filter: (node: Node) => boolean): T | null {
     const document = getDocument(element);
     if (!document)
-            return null;
+        return null;
 
     if (element && filter(element))
         return element;

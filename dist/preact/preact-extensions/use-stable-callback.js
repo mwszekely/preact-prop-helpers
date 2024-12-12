@@ -1,4 +1,5 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 /**
@@ -27,27 +28,37 @@ function setIsStableGetter(obj) {
  * during render, pass an empty dependency array and it'll act like `useCallback` with an
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export const useStableCallback = (function useStableCallback(fn, noDeps) {
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
-    if (isStableGetter(fn))
-        return fn;
-    if (noDeps == null) {
-        const currentCallbackGetter = useStableGetter(fn);
-        return setIsStableGetter(useCallbackNative(((...args) => {
-            return currentCallbackGetter()(...args);
-        }), []));
-    }
-    else {
-        console.assert(noDeps.length === 0);
-        return setIsStableGetter(useCallbackNative(fn, []));
-    }
-});
-export const useStableMergedCallback = (function useStableMergedCallback(...fns) {
-    return useStableCallback((...args) => {
-        for (let i = 0; i < fns.length; ++i) {
-            fns[i]?.(...args);
+export function useStableCallback(fn, noDeps) {
+    return useMonitoring(function useStableCallback() {
+        useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
+        if (isStableGetter(fn))
+            return fn;
+        if (noDeps == null) {
+            const currentCallbackGetter = useStableGetter(fn);
+            return setIsStableGetter(useCallbackNative(((...args) => {
+                return currentCallbackGetter()(...args);
+            }), []));
+        }
+        else {
+            console.assert(noDeps.length === 0);
+            return setIsStableGetter(useCallbackNative(fn, []));
         }
     });
-});
+}
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+export function useStableMergedCallback(...fns) {
+    return useMonitoring(function useStableMergedCallback() {
+        return useStableCallback((...args) => {
+            for (let i = 0; i < fns.length; ++i) {
+                fns[i]?.(...args);
+            }
+        });
+    });
+}
+;
 //# sourceMappingURL=use-stable-callback.js.map

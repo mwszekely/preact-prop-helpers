@@ -60,7 +60,9 @@ export declare class DroppableFileError extends Error {
  * @remarks
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useDroppable: <E extends Element>({ effect }: UseDroppableParameters) => UseDroppableReturnType<E>;
+export declare function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E>;
 export {};
 //# sourceMappingURL=use-droppable.d.ts.map

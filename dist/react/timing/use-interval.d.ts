@@ -20,6 +20,8 @@ export interface UseIntervalParameters {
  *
  * @remarks
  * {@include } {@link UseIntervalParameters}
+ *
+ * #__NO_SIDE_EFFECTS__
  */
-export declare const useInterval: ({ interval, callback, noRisingEdge }: UseIntervalParameters) => void;
+export declare function useInterval({ interval, callback, noRisingEdge }: UseIntervalParameters): void;
 //# sourceMappingURL=use-interval.d.ts.map

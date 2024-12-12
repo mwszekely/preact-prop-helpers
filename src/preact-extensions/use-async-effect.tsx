@@ -1,7 +1,7 @@
 
 import { Inputs, useEffect } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 import { UseAsyncParameters, useAsync } from "./use-async.js";
 
 /**
@@ -13,9 +13,13 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
  * only remembering the most recent request.
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useAsyncEffect = /*@__PURE__*/ monitored(function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
-    const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
-    useEffect(syncHandler, inputs);
-    return rest;
-})
+export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
+    useMonitoring(function useAsyncEffect() {
+        const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
+        useEffect(syncHandler, inputs);
+        return rest;
+    });
+}

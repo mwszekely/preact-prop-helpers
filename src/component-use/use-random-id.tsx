@@ -2,7 +2,7 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
-import { monitored } from "../util/use-call-count.js";
+import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: ElementProps<S>;
@@ -35,21 +35,25 @@ export interface UseRandomIdParameters {
  * Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
  * 
  * @compositeParams
+ * 
+ * #__NO_SIDE_EFFECTS__
  */
-export const useRandomId = /*@__PURE__*/ monitored(function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
-    const id = (prefix + useId());
-    useEnsureStability("useRandomId", prefix, id);
+export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+    return useMonitoring(function useRandomId(): UseRandomIdReturnType<S, T> {
+        const id = (prefix + useId());
+        useEnsureStability("useRandomId", prefix, id);
 
-    const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-    const sourceElementProps = useRef<ElementProps<S>>({ id });
-    useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
+        const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+        const sourceElementProps = useRef<ElementProps<S>>({ id });
+        useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
 
 
-    return {
-        propsReferencer: referencerElementProps.current,
-        propsSource: sourceElementProps.current,
-        randomIdReturn: {
-            id: id
+        return {
+            propsReferencer: referencerElementProps.current,
+            propsSource: sourceElementProps.current,
+            randomIdReturn: {
+                id: id
+            }
         }
-    }
-})
+    });
+}
