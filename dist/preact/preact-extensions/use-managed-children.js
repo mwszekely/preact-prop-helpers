@@ -48,6 +48,11 @@ export function useManagedChildren(parentParameters) {
         useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
         const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
         const getLowestIndex = useCallback(() => { return managedChildrenArray.current.lowestIndex; }, []);
+        const updateMinMax = useCallback((index) => {
+            // The opposite of this is done during the "shrinkwrap" phase, which is debounced.
+            managedChildrenArray.current.highestIndex = Math.max(index, managedChildrenArray.current.highestIndex);
+            managedChildrenArray.current.lowestIndex = Math.min(index, managedChildrenArray.current.lowestIndex);
+        }, []);
         // All the information we have about our children is stored in this **stable** array.
         // Any mutations to this array **DO NOT** trigger any sort of a re-render.
         const managedChildrenArray = useRef({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
@@ -173,7 +178,8 @@ export function useManagedChildren(parentParameters) {
                     managedChildrenArray: managedChildrenArray.current,
                     remoteULEChildMounted,
                     //remoteULEChildChanged,
-                    getChildren
+                    getChildren,
+                    updateMinMax
                 })
             }),
             managedChildrenReturn: { getChildren }
@@ -185,7 +191,7 @@ export function useManagedChildren(parentParameters) {
  */
 export function useManagedChild({ context, info }) {
     return useMonitoring(function useManagedChild() {
-        const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted } } = (context ?? { managedChildContext: {} });
+        const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, updateMinMax } } = (context ?? { managedChildContext: {} });
         const index = info.index;
         // Any time our child props change, make that information available
         // the parent if they need it.
@@ -197,6 +203,7 @@ export function useManagedChild({ context, info }) {
             // Insert this information in-place
             if (typeof index == "number") {
                 managedChildrenArray.arr[index] = { ...info };
+                updateMinMax?.(index);
             }
             else {
                 managedChildrenArray.rec[index] = { ...info };

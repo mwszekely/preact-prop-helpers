@@ -3484,6 +3484,11 @@ function useManagedChildren(parentParameters) {
     const getLowestIndex = useCallback(() => {
       return managedChildrenArray.current.lowestIndex;
     }, []);
+    const updateMinMax = useCallback(index => {
+      // The opposite of this is done during the "shrinkwrap" phase, which is debounced.
+      managedChildrenArray.current.highestIndex = Math.max(index, managedChildrenArray.current.highestIndex);
+      managedChildrenArray.current.lowestIndex = Math.min(index, managedChildrenArray.current.lowestIndex);
+    }, []);
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
     const managedChildrenArray = A$1({
@@ -3610,7 +3615,8 @@ function useManagedChildren(parentParameters) {
           managedChildrenArray: managedChildrenArray.current,
           remoteULEChildMounted,
           //remoteULEChildChanged,
-          getChildren
+          getChildren,
+          updateMinMax
         })
       }),
       managedChildrenReturn: {
@@ -3631,7 +3637,8 @@ function useManagedChild({
       managedChildContext: {
         getChildren,
         managedChildrenArray,
-        remoteULEChildMounted
+        remoteULEChildMounted,
+        updateMinMax
       }
     } = context ?? {
       managedChildContext: {}
@@ -3648,6 +3655,7 @@ function useManagedChild({
         managedChildrenArray.arr[index] = {
           ...info
         };
+        updateMinMax?.(index);
       } else {
         managedChildrenArray.rec[index] = {
           ...info
