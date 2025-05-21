@@ -1949,7 +1949,7 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
                         debugger;
                         console.error("setTabbable(true) called on a hidden child?");
                     }
-                    console.log(`setTabbable(${HACK2.current}, ${ret})`);
+                    //console.log(`setTabbable(${HACK2.current}, ${ret})`)
                     return ret;
                 });
             }
@@ -1959,7 +1959,7 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
                     console.error("setTabbable(true) called on a hidden child?");
                 }
                 const ret = st(t);
-                console.log(`setTabbable(${HACK2.current}, ${t})`);
+                //console.log(`setTabbable(${HACK2.current}, ${t})`);
                 return ret;
             }
         }, []);
@@ -2421,7 +2421,7 @@ refElementReturn, ...void1 }) {
         const focusSelf = whenThisRowIsFocused;
         const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, hasCurrentFocusParameters, pressParameters, rovingTabIndexChildReturn, textContentParameters, ...void6 } = useListNavigationChild({ info: { index, untabbable }, refElementReturn, context: contextFromParent });
         const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
-        console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`);
+        //console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`)
         const { props: propsLN, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn, ...void5 } = useListNavigation({
             managedChildrenReturn,
             refElementReturn,
@@ -2712,8 +2712,8 @@ function useRearrangeableChild({ context, info: { getElement, index }, rearrange
             if (cssProperty && animationIndex > 0) {
                 const element = getElement();
                 const first = getFLIPStart(index); //flipStartPosition.current;
-                const mid = element.getBoundingClientRect();
-                console.log(mid);
+                //const mid = element.getBoundingClientRect();
+                //console.log(mid);
                 // Forcibly end any previous transitions.
                 // Otherwise, interruptions end up causing exponentially larger transforms.
                 // Which, TODO, is definitely fixable.

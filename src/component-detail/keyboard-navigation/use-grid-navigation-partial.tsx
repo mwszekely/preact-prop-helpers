@@ -264,7 +264,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             ...void6
         } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, context: contextFromParent });
         const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
-        console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`)
+        //console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`)
 
         const {
             props: propsLN,

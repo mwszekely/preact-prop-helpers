@@ -235,7 +235,7 @@ export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbabl
                         debugger;
                         console.error("setTabbable(true) called on a hidden child?");
                     }
-                    console.log(`setTabbable(${HACK2.current}, ${ret})`);
+                    //console.log(`setTabbable(${HACK2.current}, ${ret})`)
                     return ret;
                 });
             }
@@ -245,7 +245,7 @@ export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbabl
                     console.error("setTabbable(true) called on a hidden child?");
                 }
                 const ret = st(t);
-                console.log(`setTabbable(${HACK2.current}, ${t})`);
+                //console.log(`setTabbable(${HACK2.current}, ${t})`);
                 return ret;
             }
         }, []);

@@ -114,7 +114,7 @@ refElementReturn, ...void1 }) {
         const focusSelf = whenThisRowIsFocused;
         const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, hasCurrentFocusParameters, pressParameters, rovingTabIndexChildReturn, textContentParameters, ...void6 } = useListNavigationChild({ info: { index, untabbable }, refElementReturn, context: contextFromParent });
         const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
-        console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`);
+        //console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`)
         const { props: propsLN, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn, ...void5 } = useListNavigation({
             managedChildrenReturn,
             refElementReturn,

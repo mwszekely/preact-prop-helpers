@@ -4135,7 +4135,7 @@ function useRovingTabIndexChild({
             debugger;
             console.error("setTabbable(true) called on a hidden child?");
           }
-          console.log(`setTabbable(${HACK2.current}, ${ret})`);
+          //console.log(`setTabbable(${HACK2.current}, ${ret})`)
           return ret;
         });
       } else {
@@ -4144,7 +4144,7 @@ function useRovingTabIndexChild({
           console.error("setTabbable(true) called on a hidden child?");
         }
         const ret = st(t);
-        console.log(`setTabbable(${HACK2.current}, ${t})`);
+        //console.log(`setTabbable(${HACK2.current}, ${t})`);
         return ret;
       }
     }, []);
@@ -4860,8 +4860,8 @@ function useRearrangeableChild({
       if (cssProperty && animationIndex > 0) {
         const element = getElement();
         const first = getFLIPStart(index); //flipStartPosition.current;
-        const mid = element.getBoundingClientRect();
-        console.log(mid);
+        //const mid = element.getBoundingClientRect();
+        //console.log(mid);
         // Forcibly end any previous transitions.
         // Otherwise, interruptions end up causing exponentially larger transforms.
         // Which, TODO, is definitely fixable.

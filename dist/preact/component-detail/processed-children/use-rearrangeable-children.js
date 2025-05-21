@@ -86,8 +86,8 @@ export function useRearrangeableChild({ context, info: { getElement, index }, re
             if (cssProperty && animationIndex > 0) {
                 const element = getElement();
                 const first = getFLIPStart(index); //flipStartPosition.current;
-                const mid = element.getBoundingClientRect();
-                console.log(mid);
+                //const mid = element.getBoundingClientRect();
+                //console.log(mid);
                 // Forcibly end any previous transitions.
                 // Otherwise, interruptions end up causing exponentially larger transforms.
                 // Which, TODO, is definitely fixable.
