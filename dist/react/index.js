@@ -328,9 +328,9 @@ function dontUseMonitoringImpl(t) {
  *
  */
 function useMonitoringImpl(hook) {
-    const h = hook;
+    let h = hook;
     if (process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) {
-        return (function (...args) {
+        h = (function (...args) {
             const r = useRef(++i);
             monitorCallCount(h);
             const start = performance.mark(`${h.name}-start-${r.current}`);
@@ -340,9 +340,7 @@ function useMonitoringImpl(hook) {
             return ret;
         });
     }
-    else {
-        return hook;
-    }
+    return h();
 }
 /**
  * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.

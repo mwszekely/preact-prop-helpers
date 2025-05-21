@@ -39,10 +39,11 @@ function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnT
 /**
  * 
  */
-function useMonitoringImpl<T>(hook: T) {
-    const h = (hook as (...args: any) => any);
+function useMonitoringImpl<T extends (...args: any[]) => any>(hook: T): ReturnType<T> {
+    let h: T = hook;
+    
     if (process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration) {
-        return (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
+        h = (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
             const r = useRef(++i);
             monitorCallCount(h);
             const start = performance.mark(`${h.name}-start-${r.current}`);
@@ -52,9 +53,9 @@ function useMonitoringImpl<T>(hook: T) {
             return ret;
         }) as T;
     }
-    else {
-        return hook as T;
-    }
+
+    return h();
+
 }
 
 /**
