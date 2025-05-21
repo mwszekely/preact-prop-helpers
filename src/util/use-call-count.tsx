@@ -47,7 +47,7 @@ function useMonitoringImpl<T extends (...args: any[]) => any>(hook: T): ReturnTy
             const r = useRef(++i);
             monitorCallCount(h);
             const start = performance.mark(`${h.name}-start-${r.current}`);
-            const ret = h(...args);
+            const ret = hook(...args);
             const end = performance.mark(`${h.name}-end-${r.current}`);
             performance.measure(h.name, start.name, end.name);
             return ret;
