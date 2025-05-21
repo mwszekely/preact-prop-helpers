@@ -39,22 +39,22 @@ function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnT
 /**
  * 
  */
-function useMonitoringImpl<T extends (...args: any[]) => any>(hook: T): ReturnType<T> {
-    let h: T = hook;
+function useMonitoringImpl<T extends (...args: any[]) => any>(originalHook: T): ReturnType<T> {
+    let wrappedHook: T = originalHook;
     
     if (process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration) {
-        h = (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
+        wrappedHook = (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
             const r = useRef(++i);
-            monitorCallCount(h);
-            const start = performance.mark(`${h.name}-start-${r.current}`);
-            const ret = hook(...args);
-            const end = performance.mark(`${h.name}-end-${r.current}`);
-            performance.measure(h.name, start.name, end.name);
+            monitorCallCount(originalHook);
+            const start = performance.mark(`${originalHook.name}-start-${r.current}`);
+            const ret = originalHook(...args);
+            const end = performance.mark(`${originalHook.name}-end-${r.current}`);
+            performance.measure(originalHook.name, start.name, end.name);
             return ret;
         }) as T;
     }
 
-    return h();
+    return wrappedHook();
 
 }
 
