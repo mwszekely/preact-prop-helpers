@@ -2920,7 +2920,7 @@ context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisibl
         // (We don't ask when the child becomes visible due to screen-scrolling,
         // only when it becomes visible because we were next in line to do so)
         const becauseScreen = useRef(false);
-        usePassiveState(useStableCallback((next, _prev, _reason) => {
+        const [_getOnScreen, _setOnScreen] = usePassiveState(useStableCallback((next, _prev, _reason) => {
             if (staggeredVisible)
                 return;
             if (next) {
@@ -3961,7 +3961,7 @@ function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 },
             refElementPopupReturn,
             refElementSourceReturn
         });
-        useActiveElement({
+        const { activeElementReturn: { getActiveElement: _getActiveElement, getLastActiveElement: _getLastActiveElement, getWindowFocused: _getWindowFocused } } = useActiveElement({
             activeElementParameters: {
                 onLastActiveElementChange: useStableMergedCallback(olaec2, olaec1),
                 onActiveElementChange,
@@ -4505,7 +4505,7 @@ function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, s
         const { completeGridNavigationContext: { compare, getIndex, getSortValueAt, provideParentWithRefreshRows } } = context;
         const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
             paginatedChildrenParameters,
-            processedIndexManglerParameters: { compare, getIndex, getSortValueAt },
+            processedIndexManglerParameters: { getIndex, getSortValueAt },
             staggeredChildrenParameters,
             managedChildrenParameters,
             rearrangeableChildrenParameters,
@@ -4803,7 +4803,7 @@ function useCompleteListNavigationChildren({ context, paginatedChildrenParameter
         const { listNavigationCompleteContext: { getSortValueAt, compare, getIndex, provideParentWithRefreshRows } } = context;
         const { context: contextRPS, paginatedChildrenReturn, rearrangeableChildrenReturn, staggeredChildrenReturn, } = useProcessedChildren({
             paginatedChildrenParameters,
-            processedIndexManglerParameters: { getSortValueAt, compare, getIndex },
+            processedIndexManglerParameters: { getSortValueAt, getIndex },
             rearrangeableChildrenParameters,
             staggeredChildrenParameters,
             managedChildrenParameters,
@@ -6960,7 +6960,7 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
 
 var l;l={__e:function(n,l,u,t){for(var i,r,o;l=l.__;)if((i=l.__c)&&!i.__)try{if((r=i.constructor)&&null!=r.getDerivedStateFromError&&(i.setState(r.getDerivedStateFromError(n)),o=i.__d),null!=i.componentDidCatch&&(i.componentDidCatch(n,t||{}),o=i.__d),o)return i.__E=i}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
 
-var f=0;function u(e,t,n,o,i,u){t||(t={});var a,c,l$1=t;"ref"in t&&(a=t.ref,delete t.ref);var p={type:e,props:l$1,key:n,ref:a,__k:null,__:null,__b:0,__e:null,__c:null,constructor:void 0,__v:--f,__i:-1,__u:0,__source:i,__self:u};if("function"==typeof e&&(a=e.defaultProps))for(c in a)void 0===l$1[c]&&(l$1[c]=a[c]);return l.vnode&&l.vnode(p),p}
+var f=0;function u(e,t,n,o,i,u){t||(t={});var a,c,p=t;if("ref"in p)for(c in p={},t)"ref"==c?a=t[c]:p[c]=t[c];var l$1={type:e,props:p,key:n,ref:a,__k:null,__:null,__b:0,__e:null,__c:null,constructor:void 0,__v:--f,__i:-1,__u:0,__source:i,__self:u};if("function"==typeof e&&(a=e.defaultProps))for(c in a) void 0===p[c]&&(p[c]=a[c]);return l.vnode&&l.vnode(l$1),l$1}
 
 function childrenIsVnode(children) {
     if (children && children.type && children.props)
