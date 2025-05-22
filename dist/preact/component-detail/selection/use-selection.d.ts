@@ -1,5 +1,5 @@
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { ExtendMerge, OmitStrong } from "../../util/types.js";
+import { ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
 import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType } from "./use-multi-selection.js";
 import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 export interface UseSelectionChildInfo<E extends Element> extends UseSingleSelectionChildInfo<E>, UseMultiSelectionChildInfo<E> {
@@ -8,14 +8,29 @@ export type UseSelectionChildInfoKeysParameters = UseSingleSelectionChildInfoKey
 export type UseSelectionChildInfoKeysReturnType = UseSingleSelectionChildInfoKeysReturnType | UseMultiSelectionChildInfoKeysReturnType;
 export interface UseSelectionContext extends UseSingleSelectionContext, UseMultiSelectionContext {
 }
+export interface UseSelectionChildReturnTypeSelf {
+    /**
+     * When the parent's as an "activation" selection mode,
+     * (for either single- or multi-select)
+     * then the consumer is responsible for calling this function
+     * when whatever you define as "activation" occurs. Generally,
+     * this is a click or press event (from `usePress`).
+     *
+     * This is not necessary in the "focus" selection mode, though
+     * it's not recommended to use "focus" mode for multi-selection
+     * anyway.
+     */
+    firePressSelectionEvent: (e: Event) => void;
+}
 export interface UseSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, UseMultiSelectionParameters<M> {
 }
-export interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseSingleSelectionReturnType<ChildElement>, UseMultiSelectionReturnType<ParentElement, ChildElement> {
+export interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends ExtendMerge<UseSingleSelectionReturnType<ParentElement>, UseMultiSelectionReturnType<ParentElement, ChildElement>> {
     context: UseSelectionContext;
 }
 export interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<M, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
 }
-export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>, UseMultiSelectionChildReturnType<ChildElement, M>> {
+export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends ExtendMerge<OmitStrong<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn">, OmitStrong<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn">>, TargetedOmit<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn", "firePressSelectionEvent">, TargetedOmit<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn", "firePressSelectionEvent"> {
+    selectionChildReturn: UseSelectionChildReturnTypeSelf;
 }
 /**
  * Allows the children of this component to be selected, either with a `singleSelectedIndex` prop on the parent, or via each child's individual `multiSelected` prop.
@@ -55,7 +70,9 @@ export interface UseSelectionChildDeclarativeParameters<ChildElement extends Ele
  */
 export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): {
     singleSelectionParameters: {
-        onSingleSelectedIndexChange: import("./use-single-selection.js").SelectedIndexChangeHandler;
+        onSingleSelectedIndexChange: (e: import("../../index.js").TargetedEnhancedEvent<Event, {
+            selectedIndex: number;
+        }>) => void | undefined;
     };
 };
 /**

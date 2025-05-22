@@ -1,5 +1,4 @@
 
-import { PressEventReason, UsePressParameters } from "../../component-use/use-press.js";
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
 import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
@@ -12,10 +11,24 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
+import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+
+/**
+ * 
+ * General reminder on event order of operations:
+ * 
+ * 1. The API consumer wires up a button's onClick handler to `firePressSelectionEvent`.
+ * 2. The child calls its own `onMultiSelectChange` handler.
+ * 3. The API consumer passes a callback to `onMultiSelectChange` that
+ *  a. Calls `changeMultiSelected`
+ *  b. Probably calls setState for local bookkeeping.
+ * 4. `changeMultiSelected` re-renders the child with the new selected status
+ */
+const DUMMY = 0;
+
 
 export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
 export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, { multiSelected: boolean; }>;
@@ -148,8 +161,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
 }
 
 export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync">,
-    TargetedPick<UseHasCurrentFocusParameters<any>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+    TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
     multiSelectionChildReturn: UseMultiSelectionChildReturnTypeSelf;
     props: ElementProps<E>;
     info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
@@ -170,6 +182,22 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
      * @stable
      */
     getMultiSelected(): boolean;
+
+    /** 
+     * When the parent's `multiSelectionMode` is "activation", 
+     * then the consumer is responsible for calling this function 
+     * when whatever you define as "activation" occurs. Generally, 
+     * this is a click or press event (from `usePress`). 
+     * 
+     * Calling this function will indirectly call 
+     * `onMultiSelectChange`, which is generally hooked up to
+     * `changeMultiSelected`.
+     * 
+     * This is not necessary in the "focus" selection mode, though
+     * it's not recommended to use "focus" mode for multi-selection
+     * anyway.
+     */
+    firePressSelectionEvent: (e: Event) => void;
 }
 
 /**
@@ -387,23 +415,23 @@ export function useMultiSelectionChild<E extends Element>({
         const pressFreebie = useRef(false);
 
 
-        const onPressSync = (e: PressEventReason<E>) => {
+        const firePressSelectionEvent = (e: Event) => {
             if (!multiSelectionDisabled) {
                 if (multiSelectionMode == "activation") {
-                    if (e.shiftKey) {
+                    if ((e as KeyboardEvent).shiftKey) {
                         doContiguousSelection(e, index);
                     }
                     else {
-                        onMultiSelectChange?.(enhanceEvent(e, { multiSelected: !getLocalSelected() }));
+                        onMultiSelectChange?.(enhanceEvent(e as any, { multiSelected: !getLocalSelected() }));
                     }
                 }
                 else {
-                    if (e.ctrlKey) {
-                        onMultiSelectChange?.(enhanceEvent(e, { multiSelected: !getLocalSelected() }));
+                    if ((e as KeyboardEvent).ctrlKey) {
+                        onMultiSelectChange?.(enhanceEvent(e as any, { multiSelected: !getLocalSelected() }));
                     }
                     else {
                         pressFreebie.current = true;
-                        focus(e.currentTarget);
+                        focus(e.currentTarget as any);
                         onCurrentFocusedInnerChanged(true, false, e as any);
                     }
                 }
@@ -479,10 +507,8 @@ export function useMultiSelectionChild<E extends Element>({
                 changeMultiSelected,
                 multiSelected: localSelected,
                 getMultiSelected: getLocalSelected,
-                multiSelectionMode
-            },
-            pressParameters: {
-                onPressSync
+                multiSelectionMode,
+                firePressSelectionEvent
             },
             hasCurrentFocusParameters: {
                 onCurrentFocusedInnerChanged
@@ -526,19 +552,10 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
     ...void1
 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>> {
     let reasonRef = useRef<MultiSelectChildChangeEvent<E> | undefined>(undefined);
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (multiSelected != null)
             changeMultiSelected(reasonRef.current!, multiSelected);
     }, [multiSelected]);
-
-    const omsc = useStableCallback<NonNullable<UseMultiSelectionChildParametersSelf<E>["onMultiSelectChange"]>>((e) => {
-        reasonRef.current = e;
-        return onMultiSelectedChange?.(e);
-    });
-
-    const setSelectedFromParent = useStableCallback((event: EventType<any, any>, multiSelected: boolean) => {
-        onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
-    })
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -546,8 +563,15 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
 
     return {
         multiSelectionChildParameters: {
-            onMultiSelectChange: omsc
+            onMultiSelectChange: useStableCallback((e) => {
+                reasonRef.current = e;
+                return onMultiSelectedChange?.(e);
+            })
         },
-        info: { setSelectedFromParent }
+        info: {
+            setSelectedFromParent: useStableCallback((event: EventType<any, any>, multiSelected: boolean) => {
+                onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
+            })
+        }
     }
 }

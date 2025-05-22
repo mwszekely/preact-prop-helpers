@@ -123,7 +123,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
     Pick<UseTextContentReturnType, "textContentReturn">,
     UseHasCurrentFocusReturnType<ChildElement>,
     UseManagedChildReturnType<M>,
-    TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
+    TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
 
     /**
      * These props should be passed to whichever element is tabbable. 
@@ -384,7 +384,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         const { refElementReturn, propsStable, ...void6 } = useRefElement<ChildElement>({ refElementParameters });
         const {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
-            pressParameters: { excludeSpace, onPressSync, ...void2 },
+            pressParameters: { excludeSpace, ...void2 },
+            selectionChildReturn,
             textContentParameters: { onTextContentChange: otcc2, ...void8 },
             singleSelectionChildReturn,
             multiSelectionChildReturn,
@@ -444,9 +445,9 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
             propsChild: props,
             propsTabbable,
             pressParameters: {
-                onPressSync,
                 excludeSpace
             },
+            selectionChildReturn,
             textContentReturn,
             refElementReturn,
             singleSelectionChildReturn,

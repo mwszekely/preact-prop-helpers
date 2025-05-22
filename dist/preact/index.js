@@ -283,37 +283,30 @@
  *     * This means that the child data is *always* the single source of truth (even if the parent creates those children and the data they use), and maps nicely to how components are built and diffed.
  * * Re-render as few times as possible. In general this means instead of a hook returning a value to use during render, it will accept an `onChange`-ish handler that will let you explicitly do that if you want (and is no-cost otherwise).
  *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
- * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then it:
- *     * ...**will always** take a single parameter that's at least like `{ fooParameters: {...} }`.
+ * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take just a single parameter and return just a single object, each with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then:
+ *     * ...if it takes arguments, they will be in an object named `fooParameters`.
  *         * E.G. `useRefElement({ refElementParameters: { onMount: ... } })`
  *         * `UseFooParameters` is the type of the hook's 1 argument.
  *         * `UseFooParametersSelf` is the type of the `fooParameters` member.
- *     * ...**will always** return a single object that's at least like `{ fooReturn: { ... } }`.
+ *     * ...if it has return values, they will always be in an object named `fooReturn`.
  *         * E.G. `const { refElementReturn: { getElement } } = useRefElement(...)`
  *         * `UseFooReturnType` is the type of the hook's return type.
  *         * `UseFooReturnTypeSelf` is the type of the `fooReturn` member.
- *     * ...*may also* return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsSource` and `propsTarget`, etc.
+ *     * ...if it calls other hooks, it will accept and pass along that hooks parameters, with the same naming scheme:
+ *         * E.G. `useFoo({ barParameters, fooParameters })
+ *     * ...if it **relies** on other hooks being called (but doesn't call it itself, to avoid redundant calls to the same common hook, like [`useRefElement`](#userefelement)), it will take the *return type of that hook* as a parameter:
+ *         * E.G. `const { barReturn } = useBar({ barParameters }); useFoo({ barReturn, fooParameters })`
+ *     * ...it *may also* return `props`, which must be spread onto an HTMLElement for the hook to function. Sometimes multiple elements need separate sets of props, in which case names like `propsTarget` or `propsInput` are used; these **always** begin with the word `props`.
+ *         * If the name includes `Stable` (such as `propsStable` or `propsTargetStable`), this indicates that nothing about the object ever changes, including the identity of the object itself and each of its fields, and can, for example, be safely passed around in `Context` objects without re-rendering or becoming stale.
  *         * E.G. `const { propsStable } = useRefElement(...)`, then `<div {...propsStable} />`
- *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
- *     * ...*may also*, as the parent of child components, return `{ context: { ... } }` that those children rely on.
+ *     * ...it *may also*, if it is the parent of child components, return `context` that those children rely on. Contexts passed this way are virtually always stable, to prevent re-rendering every single child when the parent renders.
  *         1. E.G. Parent does `const { context, ...etc } = useFoo({...});`
  *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
  *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
- *     * ...*may also*, as a child of a parent component, require or return pieces of `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
+ *     * ...it *may also*, if it is a child of a parent component, require or return pieces of `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
  *         * E.G. `useSingleSelectionChild` requires `info.index` to function, and returns some other pieces of the `info` object, like `info.getSelected`. Just keep swizzling back and forth to create the complete `info` object.
  *         * The `info` type can be customized with a generic type parameter generally named `M` (grid navigation has `RM` for rows' info and `CM` for cells' info).
  *             * If you have a custom hook that calls this child, you can customize the `info` it expects via that type parameter.
- *     * When hooks themselves use other hooks:
- *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
- *         * If `useFoo` relies on `useBar` (but doesn't call it itself, to avoid redundant calls to the same common hook, like [`useRefElement`](#userefelement)), then will do one of the following:
- *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
- *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
- *             * (Ultimately the point of this is to allow us to just call `useRefElement` once and pass the result around to whoever needs it)
- *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
- *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
- *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.
- *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
- *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
  * ```
  *
  * @packageDocumentation
@@ -376,7 +369,7 @@ export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
 export { useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
-export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
+export { getFromLocalStorage, PersistentStates, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { usePropsOnChildren } from "./preact-extensions/use-props-on-children.js";
 export { SearchParamStates, useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback, useStableMergedCallback } from "./preact-extensions/use-stable-callback.js";
@@ -387,12 +380,12 @@ export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-a
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
-export { EventDetail, enhanceEvent, getEventDetail } from "./util/event.js";
+export { enhanceEvent, EventDetail, getEventDetail } from "./util/event.js";
 export { findBackupFocus, focus } from "./util/focus.js";
 export { getDocument, getWindow } from "./util/get-window.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
-export { EventMapping, Fragment, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
+export { cloneElement, createContext, createElement, createPortal, debounceRendering, EventMapping, forwardRef, Fragment, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
 //# sourceMappingURL=index.js.map

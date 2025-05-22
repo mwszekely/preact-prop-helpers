@@ -162,7 +162,7 @@ export function useCompleteListNavigationChild({ info: { index, focusSelf, untab
 textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, processedIndexManglerContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
     return useMonitoring(function useCompleteListNavigationChild() {
         const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, ...void2 }, selectionChildReturn, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
             info: { index, untabbable },
             context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
             singleSelectionChildParameters,
@@ -202,9 +202,9 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
             propsChild: props,
             propsTabbable,
             pressParameters: {
-                onPressSync,
                 excludeSpace
             },
+            selectionChildReturn,
             textContentReturn,
             refElementReturn,
             singleSelectionChildReturn,

@@ -43,8 +43,8 @@ export function useSelection({ managedChildrenReturn, multiSelectionParameters, 
  * @compositeParams
  */
 export function useSelectionChild({ context, info: { index, untabbable, ...void2 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void3 }) {
-    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: opc1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild({ context, info: { index, untabbable }, singleSelectionChildParameters });
-    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, pressParameters: { onPressSync: opc2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild({ context, info: { index }, multiSelectionChildParameters });
+    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild({ context, info: { index, untabbable }, singleSelectionChildParameters });
+    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild({ context, info: { index }, multiSelectionChildParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -60,10 +60,10 @@ export function useSelectionChild({ context, info: { index, untabbable, ...void2
             singleSelected,
             getMultiSelectionDisabled,
         },
+        singleSelectionChildReturn,
         multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
-        props: useMergedProps(p1, p2),
-        singleSelectionChildReturn
+        selectionChildReturn: { firePressSelectionEvent: useStableMergedCallback(singleSelectionChildReturn.firePressSelectionEvent, multiSelectionChildReturn.firePressSelectionEvent) },
+        props: useMergedProps(p1, p2)
     };
 }
 /**

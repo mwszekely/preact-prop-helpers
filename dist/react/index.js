@@ -3409,7 +3409,7 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
         // The exception is press events, because a click can come from anywhere, focusing a child even if focus is elsewhere (or the window doesn't even have focus!)
         // So when a press event happens during focus-selection mode, we disable the disabling with this flag.
         const pressFreebie = useRef(false);
-        const onPressSync = (e) => {
+        const firePressSelectionEvent = (e) => {
             if (!multiSelectionDisabled) {
                 if (multiSelectionMode == "activation") {
                     if (e.shiftKey) {
@@ -3487,10 +3487,8 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
                 changeMultiSelected,
                 multiSelected: localSelected,
                 getMultiSelected: getLocalSelected,
-                multiSelectionMode
-            },
-            pressParameters: {
-                onPressSync
+                multiSelectionMode,
+                firePressSelectionEvent
             },
             hasCurrentFocusParameters: {
                 onCurrentFocusedInnerChanged
@@ -3512,22 +3510,22 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
  */
 function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }) {
     let reasonRef = useRef(undefined);
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (multiSelected != null)
             changeMultiSelected(reasonRef.current, multiSelected);
     }, [multiSelected]);
-    const omsc = useStableCallback((e) => {
-        reasonRef.current = e;
-        return onMultiSelectedChange?.(e);
-    });
-    const setSelectedFromParent = useStableCallback((event, multiSelected) => {
-        onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
-    });
     return {
         multiSelectionChildParameters: {
-            onMultiSelectChange: omsc
+            onMultiSelectChange: useStableCallback((e) => {
+                reasonRef.current = e;
+                return onMultiSelectedChange?.(e);
+            })
         },
-        info: { setSelectedFromParent }
+        info: {
+            setSelectedFromParent: useStableCallback((event, multiSelected) => {
+                onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
+            })
+        }
     };
 }
 
@@ -3608,7 +3606,7 @@ function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelec
                 onSingleSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
             }
         });
-        const onPressSync = useStableCallback((e) => {
+        const firePressSelectionEvent = useStableCallback((e) => {
             // We allow press events for selectionMode == 'focus' because
             // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
             if (!singleSelectionDisabled && !untabbable) {
@@ -3634,13 +3632,13 @@ function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelec
                 getSingleSelected: getLocalSelected,
                 singleSelectedOffset: direction,
                 singleSelectionMode,
-                getSingleSelectedOffset: getDirection
+                getSingleSelectedOffset: getDirection,
+                firePressSelectionEvent
             },
             props: useTagProps(ariaPropName == null || singleSelectionMode == "disabled" ? {} : {
                 [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
             }, "data-single-selection-child"),
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-            pressParameters: { onPressSync }
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
         };
     });
 }
@@ -3650,12 +3648,15 @@ function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelec
 function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef(undefined);
-    useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
-    const osic = useCallback((e) => {
-        reasonRef.current = e;
-        return onSingleSelectedIndexChange?.(e);
-    }, [onSingleSelectedIndexChange]);
-    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } };
+    useLayoutEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
+    return {
+        singleSelectionParameters: {
+            onSingleSelectedIndexChange: useCallback((e) => {
+                reasonRef.current = e;
+                return onSingleSelectedIndexChange?.(e);
+            }, [onSingleSelectedIndexChange])
+        }
+    };
 }
 
 /**
@@ -3693,8 +3694,8 @@ function useSelection({ managedChildrenReturn, multiSelectionParameters, childre
  * @compositeParams
  */
 function useSelectionChild({ context, info: { index, untabbable, ...void2 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void3 }) {
-    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: opc1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild({ context, info: { index, untabbable }, singleSelectionChildParameters });
-    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, pressParameters: { onPressSync: opc2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild({ context, info: { index }, multiSelectionChildParameters });
+    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild({ context, info: { index, untabbable }, singleSelectionChildParameters });
+    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild({ context, info: { index }, multiSelectionChildParameters });
     return {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
         info: {
@@ -3705,10 +3706,10 @@ function useSelectionChild({ context, info: { index, untabbable, ...void2 }, sin
             singleSelected,
             getMultiSelectionDisabled,
         },
+        singleSelectionChildReturn,
         multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
-        props: useMergedProps(p1, p2),
-        singleSelectionChildReturn
+        selectionChildReturn: { firePressSelectionEvent: useStableMergedCallback(singleSelectionChildReturn.firePressSelectionEvent, multiSelectionChildReturn.firePressSelectionEvent) },
+        props: useMergedProps(p1, p2)
     };
 }
 /**
@@ -4182,7 +4183,7 @@ function useGridNavigationSelection({ gridNavigationParameters, linearNavigation
  */
 function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useMonitoring(function useGridNavigationSelectionRow() {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, selectionChildReturn, singleSelectionChildReturn, multiSelectionChildReturn, ...void2 } = useSelectionChild({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
         const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentParameters, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, typeaheadNavigationParameters });
         return {
             context: contextGridNavigation,
@@ -4199,7 +4200,8 @@ function useGridNavigationSelectionRow({ info: mcp1, linearNavigationParameters,
                 getMultiSelectionDisabled
             },
             managedChildrenParameters,
-            pressParameters: { onPressSync, excludeSpace },
+            pressParameters: { excludeSpace },
+            selectionChildReturn,
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
             props: useMergedProps(propsGridNavigation, propsSelection),
             rovingTabIndexChildReturn,
@@ -4264,7 +4266,7 @@ function useListNavigationSelection({ linearNavigationParameters, rovingTabIndex
  */
 function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useMonitoring(function useListNavigationSelectionChild() {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, selectionChildReturn, ...void9 } = useSelectionChild({
             info: { index, untabbable },
             context,
             multiSelectionChildParameters,
@@ -4277,7 +4279,8 @@ function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }
         });
         return {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
-            pressParameters: { onPressSync, excludeSpace },
+            pressParameters: { excludeSpace },
+            selectionChildReturn,
             info: { ...infoSS, ...infoLN },
             rovingTabIndexChildReturn,
             multiSelectionChildReturn,
@@ -4583,7 +4586,7 @@ function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUser
         };
         // Actually call useGridNavigationRow,
         // and get an enormous bag of return values
-        const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentParameters: { onTextContentChange: otcc2 }, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
+        const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, selectionChildReturn, textContentParameters: { onTextContentChange: otcc2 }, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
         const { textContentReturn, ...void7 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
         // This is all the info the parent needs about us, the row
         // (NOT the info the cells provide to us, the row)
@@ -4618,6 +4621,7 @@ function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUser
             linearNavigationReturn,
             rovingTabIndexChildReturn,
             rovingTabIndexReturn,
+            selectionChildReturn,
             singleSelectionChildReturn,
             multiSelectionChildReturn,
             typeaheadNavigationReturn,
@@ -4853,7 +4857,7 @@ function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, 
 textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, processedChildrenContext, processedIndexManglerContext, listNavigationCompleteContext, ...void5 }, ...void1 }) {
     return useMonitoring(function useCompleteListNavigationChild() {
         const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, ...void2 }, selectionChildReturn, textContentParameters: { onTextContentChange: otcc2, ...void8 }, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionChild({
             info: { index, untabbable },
             context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
             singleSelectionChildParameters,
@@ -4883,9 +4887,9 @@ textContentParameters: { getText, onTextContentChange: otcc1, ...void10 }, refEl
             propsChild: props,
             propsTabbable,
             pressParameters: {
-                onPressSync,
                 excludeSpace
             },
+            selectionChildReturn,
             textContentReturn,
             refElementReturn,
             singleSelectionChildReturn,

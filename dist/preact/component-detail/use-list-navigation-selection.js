@@ -50,7 +50,7 @@ export function useListNavigationSelection({ linearNavigationParameters, rovingT
  */
 export function useListNavigationSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     return useMonitoring(function useListNavigationSelectionChild() {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSelectionChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, multiSelectionChildReturn, singleSelectionChildReturn, props: propsSS, selectionChildReturn, ...void9 } = useSelectionChild({
             info: { index, untabbable },
             context,
             multiSelectionChildParameters,
@@ -69,7 +69,8 @@ export function useListNavigationSelectionChild({ info: { index, untabbable, ...
         assertEmptyObject(void9);
         return {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
-            pressParameters: { onPressSync, excludeSpace },
+            pressParameters: { excludeSpace },
+            selectionChildReturn,
             info: { ...infoSS, ...infoLN },
             rovingTabIndexChildReturn,
             multiSelectionChildReturn,

@@ -203,7 +203,7 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
         };
         // Actually call useGridNavigationRow,
         // and get an enormous bag of return values
-        const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentParameters: { onTextContentChange: otcc2 }, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
+        const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, selectionChildReturn, textContentParameters: { onTextContentChange: otcc2 }, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = useGridNavigationSelectionRow(parameters);
         const { textContentReturn, ...void7 } = useTextContent({ refElementReturn, textContentParameters: { getText, onTextContentChange: useStableMergedCallback(otcc1, otcc2) } });
         // This is all the info the parent needs about us, the row
         // (NOT the info the cells provide to us, the row)
@@ -245,6 +245,7 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
             linearNavigationReturn,
             rovingTabIndexChildReturn,
             rovingTabIndexReturn,
+            selectionChildReturn,
             singleSelectionChildReturn,
             multiSelectionChildReturn,
             typeaheadNavigationReturn,

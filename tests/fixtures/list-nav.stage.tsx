@@ -319,7 +319,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
         singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
         //staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
-        pressParameters: { onPressSync, excludeSpace },
+        pressParameters: { excludeSpace },
+        selectionChildReturn: { firePressSelectionEvent }
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context1),
         info: {
@@ -339,7 +340,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({
         pressParameters: {
             focusSelf,
-            onPressSync,
+            onPressSync: firePressSelectionEvent,
             excludeSpace,
             allowRepeatPresses: null,
             excludeEnter: null,

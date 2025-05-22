@@ -1,4 +1,3 @@
-import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
@@ -21,10 +20,10 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      */
     setLocalSingleSelected(selected: boolean, direction: number | null): void;
 }
-export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, {
+export type SingleSelectionChangeHandler = EnhancedEventHandler<Event, {
     selectedIndex: number;
 }>;
-export type SelectedIndexChangeEvent = TargetedEnhancedEvent<Event, {
+export type SingleSelectionChangeEvent = TargetedEnhancedEvent<Event, {
     selectedIndex: number;
 }>;
 export interface UseSingleSelectionParametersSelf {
@@ -46,7 +45,7 @@ export interface UseSingleSelectionParametersSelf {
      *
      * @nonstable
      */
-    onSingleSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
+    onSingleSelectedIndexChange: Nullable<SingleSelectionChangeHandler>;
     /**
      * What causes a child to become selected?
      *
@@ -76,7 +75,7 @@ export interface UseSingleSelectionReturnTypeSelf {
      *
      * @stable
      */
-    changeSingleSelectedIndex: PassiveStateUpdater<number | null, SelectedIndexChangeEvent>;
+    changeSingleSelectedIndex: PassiveStateUpdater<number | null, SingleSelectionChangeEvent>;
     /**
      * @stable
      */
@@ -99,6 +98,21 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
     singleSelectedOffset: Nullable<number>;
     /** @stable */
     getSingleSelectedOffset: () => (number | null);
+    /**
+     * When `singleSelectionMode` is "activation", then the consumer
+     * is responsible for calling this function when whatever you
+     * define as "activation" occurs. Generally, this is a click
+     * or press event (from `usePress`).
+     *
+     * Calling this function will indirectly call
+     * `onSingleSelectedIndexChange` on the parent. When you hook
+     * that up to a `setState` that updates the `singleSelectedIndex`,
+     * then this child's selected status will update.
+     *
+     * This is not necessary in the "focus" selection mode, as the
+     * focus handler is quite capable of firing the event itself.
+     */
+    firePressSelectionEvent: (e: Event) => void;
 }
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
@@ -112,7 +126,7 @@ export interface UseSingleSelectionChildParametersSelf {
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseGenericChildParameters<UseSingleSelectionContext, Pick<M, UseSingleSelectionChildInfoKeysParameters>> {
     singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
 }
-export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
+export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E> {
     props: ElementProps<E>;
     info: Pick<M, UseSingleSelectionChildInfoKeysReturnType>;
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
@@ -156,7 +170,9 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  */
 export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): {
     singleSelectionParameters: {
-        onSingleSelectedIndexChange: SelectedIndexChangeHandler;
+        onSingleSelectedIndexChange: (e: TargetedEnhancedEvent<Event, {
+            selectedIndex: number;
+        }>) => void | undefined;
     };
 };
 //# sourceMappingURL=use-single-selection.d.ts.map

@@ -7,9 +7,24 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
-import { useCallback, useEffect, useRef } from "../../util/lib.js";
+import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+/**
+ *
+ * General reminder on event order of operations:
+ *
+ * 1. The API consumer wires up a button's onClick handler to `firePressSelectionEvent`.
+ * 2. The child calls the parent's `onSingleSelectedIndexChange` handler.
+ * 3. The API consumer passes a callback to `onSingleSelectedIndexChange` that
+ *  a. Calls `changeSingleSelectedIndex`
+ *  b. Probably calls setState for local bookkeeping.
+ * 4. `changeSingleSelectedIndex` re-renders the parent with the new selected index
+ *  a. The previously-selected child re-renders to be de-selected
+ *  b. The newly-selected child re-renders to be selected
+ *
+ */
+const DUMMY = 0;
 /**
  * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  *
@@ -96,7 +111,7 @@ export function useSingleSelectionChild({ singleSelectionChildParameters: { sing
                 onSingleSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
             }
         });
-        const onPressSync = useStableCallback((e) => {
+        const firePressSelectionEvent = useStableCallback((e) => {
             // We allow press events for selectionMode == 'focus' because
             // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
             if (!singleSelectionDisabled && !untabbable) {
@@ -122,13 +137,13 @@ export function useSingleSelectionChild({ singleSelectionChildParameters: { sing
                 getSingleSelected: getLocalSelected,
                 singleSelectedOffset: direction,
                 singleSelectionMode,
-                getSingleSelectedOffset: getDirection
+                getSingleSelectedOffset: getDirection,
+                firePressSelectionEvent
             },
             props: useTagProps(ariaPropName == null || singleSelectionMode == "disabled" ? {} : {
                 [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
             }, "data-single-selection-child"),
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-            pressParameters: { onPressSync }
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
         };
     });
 }
@@ -138,11 +153,14 @@ export function useSingleSelectionChild({ singleSelectionChildParameters: { sing
 export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef(undefined);
-    useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
-    const osic = useCallback((e) => {
-        reasonRef.current = e;
-        return onSingleSelectedIndexChange?.(e);
-    }, [onSingleSelectedIndexChange]);
-    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } };
+    useLayoutEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
+    return {
+        singleSelectionParameters: {
+            onSingleSelectedIndexChange: useCallback((e) => {
+                reasonRef.current = e;
+                return onSingleSelectedIndexChange?.(e);
+            }, [onSingleSelectedIndexChange])
+        }
+    };
 }
 //# sourceMappingURL=use-single-selection.js.map

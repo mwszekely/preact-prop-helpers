@@ -3,7 +3,7 @@ import { UseGenericChildParameters } from "../../preact-extensions/use-managed-c
 import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ExtendMerge, OmitStrong } from "../../util/types.js";
+import { ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
 import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
 import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
 
@@ -13,6 +13,21 @@ export type UseSelectionChildInfoKeysParameters = UseSingleSelectionChildInfoKey
 export type UseSelectionChildInfoKeysReturnType = UseSingleSelectionChildInfoKeysReturnType | UseMultiSelectionChildInfoKeysReturnType;
 export interface UseSelectionContext extends UseSingleSelectionContext, UseMultiSelectionContext { }
 
+export interface UseSelectionChildReturnTypeSelf {
+
+    /** 
+     * When the parent's as an "activation" selection mode,
+     * (for either single- or multi-select) 
+     * then the consumer is responsible for calling this function 
+     * when whatever you define as "activation" occurs. Generally, 
+     * this is a click or press event (from `usePress`).
+     * 
+     * This is not necessary in the "focus" selection mode, though
+     * it's not recommended to use "focus" mode for multi-selection
+     * anyway.
+     */
+    firePressSelectionEvent: (e: Event) => void;
+}
 
 export interface UseSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
     UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>,
@@ -20,8 +35,8 @@ export interface UseSelectionParameters<ParentOrChildElement extends Element, Ch
 }
 
 export interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends
-    UseSingleSelectionReturnType<ChildElement>,
-    UseMultiSelectionReturnType<ParentElement, ChildElement> {
+    ExtendMerge<UseSingleSelectionReturnType<ParentElement>,
+    UseMultiSelectionReturnType<ParentElement, ChildElement>> {
     context: UseSelectionContext;
 }
 
@@ -32,8 +47,12 @@ export interface UseSelectionChildParameters<ChildElement extends Element, M ext
 }
 
 export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
-    ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>,
-        UseMultiSelectionChildReturnType<ChildElement, M>> {
+    ExtendMerge<
+        OmitStrong<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn">,
+        OmitStrong<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn">>,
+    TargetedOmit<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn", "firePressSelectionEvent">,
+    TargetedOmit<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn", "firePressSelectionEvent"> {
+        selectionChildReturn: UseSelectionChildReturnTypeSelf;
 }
 
 /**
@@ -65,7 +84,7 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
 
     return {
         propsStable,
-        childrenHaveFocusParameters: { onCompositeFocusChange: useStableMergedCallback(ocfc1, ocfc2) },
+        childrenHaveFocusParameters: { onCompositeFocusChange: useStableMergedCallback(ocfc1 as any, ocfc2) },
         context: useMemoObject({ ...contextSS, ...contextMS }),
         multiSelectionReturn,
         singleSelectionReturn
@@ -87,8 +106,8 @@ export function useSelectionChild<ChildElement extends Element>({
     multiSelectionChildParameters,
     ...void3
 }: UseSelectionChildParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionChildReturnType<ChildElement, UseSelectionChildInfo<ChildElement>> {
-    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: opc1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild<ChildElement>({ context, info: { index, untabbable }, singleSelectionChildParameters });
-    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, pressParameters: { onPressSync: opc2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElement>({ context, info: { index }, multiSelectionChildParameters });
+    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild<ChildElement>({ context, info: { index, untabbable }, singleSelectionChildParameters });
+    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElement>({ context, info: { index }, multiSelectionChildParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -105,10 +124,10 @@ export function useSelectionChild<ChildElement extends Element>({
             singleSelected,
             getMultiSelectionDisabled,
         },
+        singleSelectionChildReturn,
         multiSelectionChildReturn,
-        pressParameters: { onPressSync: useStableMergedCallback(opc1, opc2) },
-        props: useMergedProps(p1, p2),
-        singleSelectionChildReturn
+        selectionChildReturn: { firePressSelectionEvent: useStableMergedCallback(singleSelectionChildReturn.firePressSelectionEvent, multiSelectionChildReturn.firePressSelectionEvent) },
+        props: useMergedProps(p1, p2)
     }
 }
 

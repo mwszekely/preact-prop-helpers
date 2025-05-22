@@ -156,13 +156,12 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
     ...void1
 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>): UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>> {
     return useMonitoring(function useGridNavigationSelectionRow() {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, singleSelectionChildReturn, multiSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSelectionChild<RowElement>({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void8 }, props: propsSelection, selectionChildReturn, singleSelectionChildReturn, multiSelectionChildReturn, ...void2 } = useSelectionChild<RowElement>({ info: mcp1, context, singleSelectionChildParameters, multiSelectionChildParameters });
         const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentParameters, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow<RowElement, CellElement>({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, typeaheadNavigationParameters });
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
-        assertEmptyObject(void4);
         assertEmptyObject(void5);
         assertEmptyObject(void6);
         assertEmptyObject(void7);
@@ -184,7 +183,8 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
                 getMultiSelectionDisabled
             },
             managedChildrenParameters,
-            pressParameters: { onPressSync, excludeSpace },
+            pressParameters: { excludeSpace },
+            selectionChildReturn,
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
             props: useMergedProps(propsGridNavigation, propsSelection),
             rovingTabIndexChildReturn,

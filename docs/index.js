@@ -5733,7 +5733,7 @@ function useMultiSelectionChild({
     // The exception is press events, because a click can come from anywhere, focusing a child even if focus is elsewhere (or the window doesn't even have focus!)
     // So when a press event happens during focus-selection mode, we disable the disabling with this flag.
     const pressFreebie = A$1(false);
-    const onPressSync = e => {
+    const firePressSelectionEvent = e => {
       if (!multiSelectionDisabled) {
         if (multiSelectionMode == "activation") {
           if (e.shiftKey) {
@@ -5814,10 +5814,8 @@ function useMultiSelectionChild({
         changeMultiSelected,
         multiSelected: localSelected,
         getMultiSelected: getLocalSelected,
-        multiSelectionMode
-      },
-      pressParameters: {
-        onPressSync
+        multiSelectionMode,
+        firePressSelectionEvent
       },
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged
@@ -5852,24 +5850,22 @@ function useMultiSelectionChildDeclarative({
   ...void1
 }) {
   let reasonRef = A$1(undefined);
-  y(() => {
+  _(() => {
     if (multiSelected != null) changeMultiSelected(reasonRef.current, multiSelected);
   }, [multiSelected]);
-  const omsc = useStableCallback(e => {
-    reasonRef.current = e;
-    return onMultiSelectedChange?.(e);
-  });
-  const setSelectedFromParent = useStableCallback((event, multiSelected) => {
-    onMultiSelectedChange?.(enhanceEvent(event, {
-      multiSelected
-    }));
-  });
   return {
     multiSelectionChildParameters: {
-      onMultiSelectChange: omsc
+      onMultiSelectChange: useStableCallback(e => {
+        reasonRef.current = e;
+        return onMultiSelectedChange?.(e);
+      })
     },
     info: {
-      setSelectedFromParent
+      setSelectedFromParent: useStableCallback((event, multiSelected) => {
+        onMultiSelectedChange?.(enhanceEvent(event, {
+          multiSelected
+        }));
+      })
     }
   };
 }
@@ -5994,7 +5990,7 @@ function useSingleSelectionChild({
         }));
       }
     });
-    const onPressSync = useStableCallback(e => {
+    const firePressSelectionEvent = useStableCallback(e => {
       // We allow press events for selectionMode == 'focus' because
       // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
       if (!singleSelectionDisabled && !untabbable) {
@@ -6020,16 +6016,14 @@ function useSingleSelectionChild({
         getSingleSelected: getLocalSelected,
         singleSelectedOffset: direction,
         singleSelectionMode,
-        getSingleSelectedOffset: getDirection
+        getSingleSelectedOffset: getDirection,
+        firePressSelectionEvent
       },
       props: useTagProps(ariaPropName == null || singleSelectionMode == "disabled" ? {} : {
         [`${propParts[0]}-${propParts[1]}`]: localSelected ? propParts[1] == "current" ? `${propParts[2]}` : `true` : "false"
       }),
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged
-      },
-      pressParameters: {
-        onPressSync
       }
     };
   });
@@ -6048,16 +6042,15 @@ function useSingleSelectionDeclarative({
 }) {
   let s = singleSelectedIndex ?? null;
   let reasonRef = A$1(undefined);
-  y(() => {
+  _(() => {
     changeSingleSelectedIndex(s, reasonRef.current);
   }, [s]);
-  const osic = useCallback(e => {
-    reasonRef.current = e;
-    return onSingleSelectedIndexChange?.(e);
-  }, [onSingleSelectedIndexChange]);
   return {
     singleSelectionParameters: {
-      onSingleSelectedIndexChange: osic
+      onSingleSelectedIndexChange: useCallback(e => {
+        reasonRef.current = e;
+        return onSingleSelectedIndexChange?.(e);
+      }, [onSingleSelectedIndexChange])
     }
   };
 }
@@ -6148,9 +6141,6 @@ function useSelectionChild({
     hasCurrentFocusParameters: {
       onCurrentFocusedInnerChanged: ocfic1
     },
-    pressParameters: {
-      onPressSync: opc1
-    },
     info: {
       getSingleSelected,
       setLocalSingleSelected,
@@ -6170,9 +6160,6 @@ function useSelectionChild({
     props: p2,
     hasCurrentFocusParameters: {
       onCurrentFocusedInnerChanged: ocfic2
-    },
-    pressParameters: {
-      onPressSync: opc2
     },
     multiSelectionChildReturn,
     info: {
@@ -6201,12 +6188,12 @@ function useSelectionChild({
       singleSelected,
       getMultiSelectionDisabled
     },
+    singleSelectionChildReturn,
     multiSelectionChildReturn,
-    pressParameters: {
-      onPressSync: useStableMergedCallback(opc1, opc2)
+    selectionChildReturn: {
+      firePressSelectionEvent: useStableMergedCallback(singleSelectionChildReturn.firePressSelectionEvent, multiSelectionChildReturn.firePressSelectionEvent)
     },
-    props: useMergedProps(p1, p2),
-    singleSelectionChildReturn
+    props: useMergedProps(p1, p2)
   };
 }
 /**
@@ -6720,9 +6707,7 @@ function useListNavigationSelectionChild({
       multiSelectionChildReturn,
       singleSelectionChildReturn,
       props: propsSS,
-      pressParameters: {
-        onPressSync
-      },
+      selectionChildReturn,
       ...void9
     } = useSelectionChild({
       info: {
@@ -6759,9 +6744,9 @@ function useListNavigationSelectionChild({
         onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2)
       },
       pressParameters: {
-        onPressSync,
         excludeSpace
       },
+      selectionChildReturn,
       info: {
         ...infoSS,
         ...infoLN
@@ -7274,9 +7259,9 @@ function useCompleteListNavigationChild({
       },
       pressParameters: {
         excludeSpace,
-        onPressSync,
         ...void2
       },
+      selectionChildReturn,
       textContentParameters: {
         onTextContentChange: otcc2,
         ...void8
@@ -7355,9 +7340,9 @@ function useCompleteListNavigationChild({
       propsChild: props,
       propsTabbable,
       pressParameters: {
-        onPressSync,
         excludeSpace
       },
+      selectionChildReturn,
       textContentReturn,
       refElementReturn,
       singleSelectionChildReturn,
@@ -8870,8 +8855,10 @@ const DemoUseRovingTabIndexChild = N(function DemoUseRovingTabIndexChild({
       getMultiSelected
     },
     pressParameters: {
-      onPressSync,
       excludeSpace
+    },
+    selectionChildReturn: {
+      firePressSelectionEvent
     },
     refElementReturn
   } = useCompleteListNavigationChildDeclarative({
@@ -8914,7 +8901,7 @@ const DemoUseRovingTabIndexChild = N(function DemoUseRovingTabIndexChild({
   } = usePress({
     pressParameters: {
       focusSelf,
-      onPressSync,
+      onPressSync: firePressSelectionEvent,
       excludeSpace,
       allowRepeatPresses: false,
       excludeEnter: null,

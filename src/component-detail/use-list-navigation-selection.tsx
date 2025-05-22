@@ -112,7 +112,7 @@ export function useListNavigationSelectionChild<ChildElement extends Element>({
             multiSelectionChildReturn,
             singleSelectionChildReturn,
             props: propsSS,
-            pressParameters: { onPressSync },
+            selectionChildReturn,
             ...void9
         } = useSelectionChild<ChildElement>({
             info: { index, untabbable },
@@ -144,7 +144,8 @@ export function useListNavigationSelectionChild<ChildElement extends Element>({
 
         return {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableMergedCallback(ocfic1, ocfic2) },
-            pressParameters: { onPressSync, excludeSpace },
+            pressParameters: { excludeSpace },
+            selectionChildReturn,
             info: { ...infoSS, ...infoLN },
             rovingTabIndexChildReturn,
             multiSelectionChildReturn,

@@ -259,7 +259,8 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
         rovingTabIndexChildReturn: { tabbable },
         singleSelectionChildReturn: { singleSelected, getSingleSelected, singleSelectedOffset, getSingleSelectedOffset },
         multiSelectionChildReturn: { getMultiSelected },
-        pressParameters: { onPressSync, excludeSpace },
+        pressParameters: { excludeSpace },
+        selectionChildReturn: { firePressSelectionEvent },
         refElementReturn
     } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
@@ -272,7 +273,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
         multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
-    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
+    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync: firePressSelectionEvent, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 

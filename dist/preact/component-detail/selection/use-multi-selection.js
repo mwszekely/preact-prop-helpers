@@ -7,8 +7,20 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "../../util/lib.js";
+import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
+/**
+ *
+ * General reminder on event order of operations:
+ *
+ * 1. The API consumer wires up a button's onClick handler to `firePressSelectionEvent`.
+ * 2. The child calls its own `onMultiSelectChange` handler.
+ * 3. The API consumer passes a callback to `onMultiSelectChange` that
+ *  a. Calls `changeMultiSelected`
+ *  b. Probably calls setState for local bookkeeping.
+ * 4. `changeMultiSelected` re-renders the child with the new selected status
+ */
+const DUMMY = 0;
 /**
  * Allows a parent to track the changes made to multi-selection children.
  *
@@ -174,7 +186,7 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
         // The exception is press events, because a click can come from anywhere, focusing a child even if focus is elsewhere (or the window doesn't even have focus!)
         // So when a press event happens during focus-selection mode, we disable the disabling with this flag.
         const pressFreebie = useRef(false);
-        const onPressSync = (e) => {
+        const firePressSelectionEvent = (e) => {
             if (!multiSelectionDisabled) {
                 if (multiSelectionMode == "activation") {
                     if (e.shiftKey) {
@@ -257,10 +269,8 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
                 changeMultiSelected,
                 multiSelected: localSelected,
                 getMultiSelected: getLocalSelected,
-                multiSelectionMode
-            },
-            pressParameters: {
-                onPressSync
+                multiSelectionMode,
+                firePressSelectionEvent
             },
             hasCurrentFocusParameters: {
                 onCurrentFocusedInnerChanged
@@ -282,25 +292,25 @@ export function useMultiSelectionChild({ info: { index, ...void4 }, multiSelecti
  */
 export function useMultiSelectionChildDeclarative({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }) {
     let reasonRef = useRef(undefined);
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (multiSelected != null)
             changeMultiSelected(reasonRef.current, multiSelected);
     }, [multiSelected]);
-    const omsc = useStableCallback((e) => {
-        reasonRef.current = e;
-        return onMultiSelectedChange?.(e);
-    });
-    const setSelectedFromParent = useStableCallback((event, multiSelected) => {
-        onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
-    });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
         multiSelectionChildParameters: {
-            onMultiSelectChange: omsc
+            onMultiSelectChange: useStableCallback((e) => {
+                reasonRef.current = e;
+                return onMultiSelectedChange?.(e);
+            })
         },
-        info: { setSelectedFromParent }
+        info: {
+            setSelectedFromParent: useStableCallback((event, multiSelected) => {
+                onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
+            })
+        }
     };
 }
 //# sourceMappingURL=use-multi-selection.js.map

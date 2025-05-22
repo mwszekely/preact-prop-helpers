@@ -1,4 +1,3 @@
-import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "../../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
@@ -115,7 +114,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
     /** When true, this child cannot be selected via multi-select, either by focusing it or by clicking it. */
     multiSelectionDisabled: boolean;
 }
-export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync">, TargetedPick<UseHasCurrentFocusParameters<any>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
     multiSelectionChildReturn: UseMultiSelectionChildReturnTypeSelf;
     props: ElementProps<E>;
     info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
@@ -133,6 +132,21 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
      * @stable
      */
     getMultiSelected(): boolean;
+    /**
+     * When the parent's `multiSelectionMode` is "activation",
+     * then the consumer is responsible for calling this function
+     * when whatever you define as "activation" occurs. Generally,
+     * this is a click or press event (from `usePress`).
+     *
+     * Calling this function will indirectly call
+     * `onMultiSelectChange`, which is generally hooked up to
+     * `changeMultiSelected`.
+     *
+     * This is not necessary in the "focus" selection mode, though
+     * it's not recommended to use "focus" mode for multi-selection
+     * anyway.
+     */
+    firePressSelectionEvent: (e: Event) => void;
 }
 /**
  * Allows a parent to track the changes made to multi-selection children.
