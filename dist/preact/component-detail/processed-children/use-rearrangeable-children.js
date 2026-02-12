@@ -26,7 +26,7 @@ import { useMonitoring } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
+export function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn, animate }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
     return useMonitoring(function useRearrangeableChildren() {
         useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt);
         const allChildPositions = useRef([]);
@@ -40,19 +40,20 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ch
                 if (index != null && mangledIndex != null) {
                     const info = getManagedChildren().getAt(index);
                     const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2) {
+                    if (info && info2 && animate) {
                         const element = info2.getElement();
                         const rect = element?.getBoundingClientRect();
                         if (rect) {
                             // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed
+                            // Find a way to bail out if this child's position hasn't changed.
+                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
                             info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
                         }
                     }
                 }
             }
             return rearrangedChildren;
-        }, [childrenIn, refreshIndex]);
+        }, [childrenIn, refreshIndex, animate]);
         const getFLIPStart = useCallback((index) => {
             return allChildPositions.current[index];
         }, []);
@@ -62,7 +63,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ch
                 refresh: useStableCallback(() => { setRefreshIndex(p => ++p); }, [])
             },
             context: useMemoObject({
-                rearrangeableChildrenContext: useMemoObject({ getFLIPStart })
+                rearrangeableChildrenContext: useMemoObject({ getFLIPStart, animate })
             })
         };
     });
@@ -72,7 +73,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ch
  */
 export function useRearrangeableChild({ context, info: { getElement, index }, rearrangeableChildParameters: { cssProperty, duration } }) {
     return useMonitoring(function useRearrangeableChild() {
-        const { rearrangeableChildrenContext: { getFLIPStart } } = context;
+        const { rearrangeableChildrenContext: { getFLIPStart, animate } } = context;
         const getCssProperty = useStableGetter(cssProperty);
         const getDuration = useStableGetter(duration);
         // TODO: This ref doesn't work correctly? Or info.updateFLIPAnimation isn't update right? Not sure.
@@ -81,45 +82,47 @@ export function useRearrangeableChild({ context, info: { getElement, index }, re
         const flipStartPosition = useRef(undefined);
         const [animationIndex, setAnimationIndex] = useState(0);
         useLayoutEffect(() => {
-            const duration = getDuration();
-            const cssProperty = getCssProperty();
-            if (cssProperty && animationIndex > 0) {
-                const element = getElement();
-                const first = getFLIPStart(index); //flipStartPosition.current;
-                //const mid = element.getBoundingClientRect();
-                //console.log(mid);
-                // Forcibly end any previous transitions.
-                // Otherwise, interruptions end up causing exponentially larger transforms.
-                // Which, TODO, is definitely fixable.
-                if (cssProperty === 'translate')
-                    element.style.scale = element.style.translate = '';
-                else if (cssProperty === 'transform')
-                    element.style.transform = '';
-                element.style.transition = 'none';
-                const last = element.getBoundingClientRect();
-                if (first && last) {
-                    const dx = first.left - last.left;
-                    const dy = first.top - last.top;
-                    const dsx = first.width / last.width;
-                    const dsy = first.height / last.height;
-                    if (cssProperty === 'translate') {
-                        element.style.translate = `${dx}px ${dy}px`;
-                        element.style.scale = `${dsx} ${dsy}`;
+            if (animate) {
+                const duration = getDuration();
+                const cssProperty = getCssProperty();
+                if (cssProperty && animationIndex > 0) {
+                    const element = getElement();
+                    const first = getFLIPStart(index); //flipStartPosition.current;
+                    //const mid = element.getBoundingClientRect();
+                    //console.log(mid);
+                    // Forcibly end any previous transitions.
+                    // Otherwise, interruptions end up causing exponentially larger transforms.
+                    // Which, TODO, is definitely fixable.
+                    if (cssProperty === 'translate')
+                        element.style.scale = element.style.translate = '';
+                    else if (cssProperty === 'transform')
+                        element.style.transform = '';
+                    element.style.transition = 'none';
+                    const last = element.getBoundingClientRect();
+                    if (first && last) {
+                        const dx = first.left - last.left;
+                        const dy = first.top - last.top;
+                        const dsx = first.width / last.width;
+                        const dsy = first.height / last.height;
+                        if (cssProperty === 'translate') {
+                            element.style.translate = `${dx}px ${dy}px`;
+                            element.style.scale = `${dsx} ${dsy}`;
+                        }
+                        else if (cssProperty === 'transform') {
+                            element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+                        }
+                        element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
+                        requestAnimationFrame(() => {
+                            if (cssProperty === 'translate')
+                                element.style.scale = element.style.translate = '';
+                            else if (cssProperty === 'transform')
+                                element.style.transform = '';
+                            element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
+                        });
                     }
-                    else if (cssProperty === 'transform') {
-                        element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
-                    }
-                    element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
-                    requestAnimationFrame(() => {
-                        if (cssProperty === 'translate')
-                            element.style.scale = element.style.translate = '';
-                        else if (cssProperty === 'transform')
-                            element.style.transform = '';
-                        element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
-                    });
                 }
             }
-        }, [index, animationIndex]);
+        }, [index, animationIndex, animate]);
         const updateFLIPAnimation = useCallback((position) => {
             flipStartPosition.current = position;
             setAnimationIndex(p => ++p);

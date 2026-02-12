@@ -83,7 +83,7 @@ test("Focus should not be stolen when mounting/unmounting", async ({ page, listN
 
 test("Focus should not be stolen when selecting an index", async ({ page, listNav: { list }, shared: { run, install, focusableFirst, focusableLast } }) => {
     await focusableFirst.focus();
-    
+
     await run("ListNav", "setSelectedIndex", 5);
     await expect(focusableFirst, "Selecting a list item should not move focus if the list is not focused").toBeFocused();
     await run("ListNav", "setUntabbable", true);
@@ -102,19 +102,32 @@ test("Focus is preserved when the focused child is unmounted", async ({ page, li
     await page.keyboard.press("End");
     await expect(page.locator("li").nth(count - 1), `(Redundant)`).toBeFocused();
 
+    // TODO: Chrome-only test-env-only requirement????
+    // I have no clue why it's specific to both because it's hard to test--
+    // it doesn't seem to happen in practice at all,
+    // but it fails at the body focus test otherwise.
+    // Again, only in Chrome, and only in the test environment
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+
     // Ensure that as we decrease the # of children,
     // focus is managed properly and never gets sent to the body.
     for (let c = count; c >= 0; --c) {
+
+
+
         await run("ListNav", "setChildCount", c);
+        //await new Promise(resolve => setTimeout(resolve, 100));
         let next = c - 1;
         if (next == DefaultMissingIndex || next == DefaultHiddenIndex)
             next -= 1;
 
         // A non-existent element can't be focused, so this line would always error
         //await expect(page.locator("li").nth(c), `After setting the child count to ${c}, the ${c}-th child should no longer be focused.`).not.toBeFocused();
-        
-        // TODO: Flakey only on test-environment Chrome??? Seems to work fine in practice
+
+        //await new Promise(resolve => setTimeout(resolve, 100));
         await expect(page.locator("body"), `Unmounting the focused child child should not focus the body`).not.toBeFocused();
+        //await new Promise(resolve => setTimeout(resolve, 100));
 
         if (next == -1)
             await expect.soft(focusableLast).toBeFocused();
@@ -123,9 +136,9 @@ test("Focus is preserved when the focused child is unmounted", async ({ page, li
     }
 });
 
-test("Clicking a child focuses it", async ({ page, shared: { focusableFirst, focusableLast }, listNav: { items }}) => {
+test("Clicking a child focuses it", async ({ page, shared: { focusableFirst, focusableLast }, listNav: { items } }) => {
     let l;
-    await items.nth(l = 2).click({force: true});
+    await items.nth(l = 2).click({ force: true });
     await expect(items.nth(l)).toBeFocused();
     await page.keyboard.press("ArrowUp");
     await expect(items.nth(l = 1)).toBeFocused();
@@ -134,14 +147,14 @@ test("Clicking a child focuses it", async ({ page, shared: { focusableFirst, foc
     await page.keyboard.press("Shift+Tab")
     await expect(items.nth(l)).toBeFocused();
 
-    await items.nth(DefaultMissingIndex).click({force: true});
+    await items.nth(DefaultMissingIndex).click({ force: true });
     await expect(page.locator("body")).not.toBeFocused();
     await expect(items.nth(l)).toBeFocused();
 
-    await items.nth(l=DefaultDisabledIndex).click({force: true});
+    await items.nth(l = DefaultDisabledIndex).click({ force: true });
     await expect(items.nth(l)).toBeFocused();
 
-    await items.nth(DefaultHiddenIndex).click({force: true});
+    await items.nth(DefaultHiddenIndex).click({ force: true });
     await expect(page.locator("body")).not.toBeFocused();
     await expect(items.nth(l)).toBeFocused();
 

@@ -2,7 +2,7 @@ import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useE
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
 export { createPortal } from 'react-dom';
-import { identity, noop, debounce } from 'lodash-es';
+import { identity, noop } from 'lodash-es';
 export { identity } from 'lodash-es';
 import { isTabbable, isFocusable } from 'tabbable';
 import { clsx } from 'clsx';
@@ -2112,6 +2112,8 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
         };
         function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
+                if (currentTypeahead == "se")
+                    debugger;
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
                 if (sortedTypeaheadIndex < 0) {
                     // The user has typed an entry that doesn't exist in the list
@@ -2182,6 +2184,10 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
                         setIndex(toSet, reason, true);
                         onNavigateTypeahead?.(toSet, reason);
                     }
+                    else {
+                        // We get here if the only matching child we found was untabbable/missing
+                        setTypeaheadStatus("invalid");
+                    }
                 }
             }
         }
@@ -2218,7 +2224,7 @@ context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparato
                     sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, unsortedIndex: index });
                 }
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
@@ -2650,7 +2656,7 @@ function usePaginatedChild({ info: { index }, context: { paginatedChildContext: 
  *
  * @compositeParams
  */
-function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
+function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn, animate }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
     return useMonitoring(function useRearrangeableChildren() {
         useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt);
         const allChildPositions = useRef([]);
@@ -2664,19 +2670,20 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { children:
                 if (index != null && mangledIndex != null) {
                     const info = getManagedChildren().getAt(index);
                     const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2) {
+                    if (info && info2 && animate) {
                         const element = info2.getElement();
                         const rect = element?.getBoundingClientRect();
                         if (rect) {
                             // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed
+                            // Find a way to bail out if this child's position hasn't changed.
+                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
                             info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
                         }
                     }
                 }
             }
             return rearrangedChildren;
-        }, [childrenIn, refreshIndex]);
+        }, [childrenIn, refreshIndex, animate]);
         const getFLIPStart = useCallback((index) => {
             return allChildPositions.current[index];
         }, []);
@@ -2686,7 +2693,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { children:
                 refresh: useStableCallback(() => { setRefreshIndex(p => ++p); }, [])
             },
             context: useMemoObject({
-                rearrangeableChildrenContext: useMemoObject({ getFLIPStart })
+                rearrangeableChildrenContext: useMemoObject({ getFLIPStart, animate })
             })
         };
     });
@@ -2696,7 +2703,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { children:
  */
 function useRearrangeableChild({ context, info: { getElement, index }, rearrangeableChildParameters: { cssProperty, duration } }) {
     return useMonitoring(function useRearrangeableChild() {
-        const { rearrangeableChildrenContext: { getFLIPStart } } = context;
+        const { rearrangeableChildrenContext: { getFLIPStart, animate } } = context;
         const getCssProperty = useStableGetter(cssProperty);
         const getDuration = useStableGetter(duration);
         // TODO: This ref doesn't work correctly? Or info.updateFLIPAnimation isn't update right? Not sure.
@@ -2705,45 +2712,47 @@ function useRearrangeableChild({ context, info: { getElement, index }, rearrange
         const flipStartPosition = useRef(undefined);
         const [animationIndex, setAnimationIndex] = useState$1(0);
         useLayoutEffect(() => {
-            const duration = getDuration();
-            const cssProperty = getCssProperty();
-            if (cssProperty && animationIndex > 0) {
-                const element = getElement();
-                const first = getFLIPStart(index); //flipStartPosition.current;
-                //const mid = element.getBoundingClientRect();
-                //console.log(mid);
-                // Forcibly end any previous transitions.
-                // Otherwise, interruptions end up causing exponentially larger transforms.
-                // Which, TODO, is definitely fixable.
-                if (cssProperty === 'translate')
-                    element.style.scale = element.style.translate = '';
-                else if (cssProperty === 'transform')
-                    element.style.transform = '';
-                element.style.transition = 'none';
-                const last = element.getBoundingClientRect();
-                if (first && last) {
-                    const dx = first.left - last.left;
-                    const dy = first.top - last.top;
-                    const dsx = first.width / last.width;
-                    const dsy = first.height / last.height;
-                    if (cssProperty === 'translate') {
-                        element.style.translate = `${dx}px ${dy}px`;
-                        element.style.scale = `${dsx} ${dsy}`;
+            if (animate) {
+                const duration = getDuration();
+                const cssProperty = getCssProperty();
+                if (cssProperty && animationIndex > 0) {
+                    const element = getElement();
+                    const first = getFLIPStart(index); //flipStartPosition.current;
+                    //const mid = element.getBoundingClientRect();
+                    //console.log(mid);
+                    // Forcibly end any previous transitions.
+                    // Otherwise, interruptions end up causing exponentially larger transforms.
+                    // Which, TODO, is definitely fixable.
+                    if (cssProperty === 'translate')
+                        element.style.scale = element.style.translate = '';
+                    else if (cssProperty === 'transform')
+                        element.style.transform = '';
+                    element.style.transition = 'none';
+                    const last = element.getBoundingClientRect();
+                    if (first && last) {
+                        const dx = first.left - last.left;
+                        const dy = first.top - last.top;
+                        const dsx = first.width / last.width;
+                        const dsy = first.height / last.height;
+                        if (cssProperty === 'translate') {
+                            element.style.translate = `${dx}px ${dy}px`;
+                            element.style.scale = `${dsx} ${dsy}`;
+                        }
+                        else if (cssProperty === 'transform') {
+                            element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+                        }
+                        element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
+                        requestAnimationFrame(() => {
+                            if (cssProperty === 'translate')
+                                element.style.scale = element.style.translate = '';
+                            else if (cssProperty === 'transform')
+                                element.style.transform = '';
+                            element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
+                        });
                     }
-                    else if (cssProperty === 'transform') {
-                        element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
-                    }
-                    element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
-                    requestAnimationFrame(() => {
-                        if (cssProperty === 'translate')
-                            element.style.scale = element.style.translate = '';
-                        else if (cssProperty === 'transform')
-                            element.style.transform = '';
-                        element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
-                    });
                 }
             }
-        }, [index, animationIndex]);
+        }, [index, animationIndex, animate]);
         const updateFLIPAnimation = useCallback((position) => {
             flipStartPosition.current = position;
             setAnimationIndex(p => ++p);
@@ -2767,7 +2776,7 @@ function useRearrangeableChild({ context, info: { getElement, index }, rearrange
  *
  * @compositeParams
  */
-function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount },
+function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
 //refElementReturn: { getElement }
  }) {
     return useMonitoring(function useStaggeredChildren() {
@@ -2881,19 +2890,24 @@ function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggere
             getIntersectionObserver,
             setElementToIndexMap
         }), [parentIsStaggered]);
+        // TODO: The fact that we use an IntersectionObserver makes it
+        // very impossible to see the staggering effect, for better or worse.
+        // Add an option to disable it? Maybe? Mostly for testing.
         useEffect(() => {
-            const io = intersectionObserver.current = new IntersectionObserver((entries) => {
-                for (let entry of entries) {
-                    if (entry.isIntersecting) {
-                        const index = elementToIndex.current.get(entry.target);
-                        if (index != null) {
-                            getChildren().getAt(index)?.setStaggeredVisible(true);
+            if (!disableIntersectionObserver) {
+                const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+                    for (let entry of entries) {
+                        if (entry.isIntersecting) {
+                            const index = elementToIndex.current.get(entry.target);
+                            if (index != null) {
+                                getChildren().getAt(index)?.setStaggeredVisible(true);
+                            }
                         }
                     }
-                }
-            });
-            return () => io.disconnect();
-        }, []);
+                });
+                return () => io.disconnect();
+            }
+        }, [disableIntersectionObserver]);
         return {
             staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
             context: useMemo(() => ({
@@ -2920,16 +2934,20 @@ context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisibl
         // (We don't ask when the child becomes visible due to screen-scrolling,
         // only when it becomes visible because we were next in line to do so)
         const becauseScreen = useRef(false);
-        const [_getOnScreen, _setOnScreen] = usePassiveState(useStableCallback((next, _prev, _reason) => {
+        /*
+        const [_getOnScreen, _setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, _prev, _reason) => {
+
             if (staggeredVisible)
                 return;
+
             if (next) {
                 const io = getIntersectionObserver();
-                io?.unobserve(e.current);
-                setStaggeredVisible(true);
-                becauseScreen.current = true;
+                io?.unobserve(e.current!);
+
+                //setStaggeredVisible(true);
+                //becauseScreen.current = true;
             }
-        }), returnFalse);
+        }), returnFalse);*/
         // This isn't called during useEffect here, because we want to wait for the
         // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
         // So we return the effect we want to run and let the caller run it as appropriate.
@@ -2954,13 +2972,14 @@ context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisibl
             refElementParameters: {
                 onElementChange: useStableCallback((element) => {
                     setElementToIndexMap(index, element);
-                    e.current = (element || e.current);
                     const io = getIntersectionObserver();
-                    if (e.current) {
-                        io?.observe(e.current);
+                    if (element) {
+                        e.current = element;
+                        io?.observe(element);
                     }
                     else {
-                        io?.unobserve(e.current);
+                        if (e.current)
+                            io?.unobserve(e.current);
                     }
                 })
             }
@@ -3018,7 +3037,7 @@ function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildr
     return useMonitoring(function useProcessedChildren() {
         const childCount = rearrangeableChildrenParameters.children.length;
         const { paginationMax, paginationMin } = paginatedChildrenParameters;
-        const { staggered } = staggeredChildrenParameters;
+        const { staggered, disableIntersectionObserver } = staggeredChildrenParameters;
         const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
         useStableCallback(() => {
             refreshPagination(paginationMin, paginationMax);
@@ -3039,7 +3058,7 @@ function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildr
         });
         const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-            staggeredChildrenParameters: { staggered, childCount },
+            staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
             //refElementReturn: { getElement: context.processedChildrenContext.getElement }
         });
         return {
@@ -3276,35 +3295,35 @@ function useMultiSelection({ multiSelectionParameters: { onSelectionChange, mult
         // When a child changes selection state, it calls this function.
         const notifyParentOfChildSelectChange = useStableCallback((event, index, selected, previous) => {
             console.assert(selected != previous);
+            // The commented-out asserts are don't work for rearranged children,
+            // and are staying for now as a reminder of that, because it is a bit weird.
             if (selected == undefined) {
                 // This child is unmounting itself.
                 if (previous === true) {
-                    console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+                    //console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
                     selectedIndices.current.delete(index);
                 }
                 else if (previous === false) {
-                    console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+                    //console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
                     unselectedIndices.current.delete(index);
                 }
-                else {
-                    console.assert(false, `The child at index ${index} was not selected or unselected but a secret third thing: ${selected}`);
-                }
+                else ;
             }
             else if (selected) {
                 if (previous != undefined) {
-                    console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
+                    //console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
                     unselectedIndices.current.delete(index);
                 }
-                console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`);
+                //console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`)
                 selectedIndices.current.add(index);
                 startOfShiftSelect.current = index;
             }
             else {
                 if (previous != undefined) {
-                    console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
+                    //console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
                     selectedIndices.current.delete(index);
                 }
-                console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`);
+                //console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`)
                 unselectedIndices.current.add(index);
             }
             const childCount = (selectedIndices.current.size + unselectedIndices.current.size);
@@ -3434,8 +3453,10 @@ function useMultiSelectionChild({ info: { index, ...void4 }, multiSelectionChild
         const [localSelected, setLocalSelected, getLocalSelected] = useState(initiallyMultiSelected ?? false);
         const changeMultiSelected = useStableCallback((e, selected) => {
             console.assert(selected != null);
-            console.assert(!multiSelectionDisabled);
-            console.assert(multiSelectIsEnabled);
+            if (selected)
+                console.assert(!multiSelectionDisabled);
+            else
+                console.assert(multiSelectIsEnabled);
             // We're selected now (because someone told us we are, this hook doesn't call this function directly)
             //
             // So update our own internal state so we can re-render with the correct props,
@@ -4975,9 +4996,113 @@ function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, e
     });
 }
 
-function isPromise(p) {
-    return p instanceof Promise;
+//
+// Types (and a single function) that are shared
+// between both throttle and debounce.
+//
+function getTimeout(v) {
+    if (v == null)
+        return null;
+    if (typeof v == 'number') {
+        if (v < 0)
+            return null;
+        return v;
+    }
+    return getTimeout(v());
 }
+
+function debounce({ debounceDuration: durationOrGetter, handlerIn: handler }) {
+    let timeoutHandle = null;
+    let queuedArgs = null;
+    function onDebounceEnded() {
+        if (queuedArgs != null) {
+            handler?.(...queuedArgs);
+            queuedArgs = null;
+        }
+    }
+    function debounced(...args) {
+        queuedArgs = args;
+        const debounceTimeout = getTimeout(durationOrGetter);
+        if (debounceTimeout == null)
+            handler?.(...queuedArgs);
+        else {
+            if (timeoutHandle != null)
+                cancel();
+            timeoutHandle = setTimeout(onDebounceEnded, debounceTimeout);
+        }
+    }
+    function flush() {
+        if (timeoutHandle != null) {
+            onDebounceEnded();
+            cancel();
+        }
+    }
+    function cancel() {
+        if (timeoutHandle != null)
+            clearTimeout(timeoutHandle);
+    }
+    return {
+        handlerOut: debounced,
+        flush,
+        cancel
+    };
+}
+
+function throttle({ handlerIn: handler, throttleDuration: durationOrGetter }) {
+    let timeoutHandle = null;
+    // We have called `handler` during the throttle period.
+    //let queuedUp = false;
+    let queuedArgs = null;
+    function runIfQueued() {
+        if (queuedArgs != null) {
+            const throttleTimeout = getTimeout(durationOrGetter);
+            if (throttleTimeout == null) {
+                handler?.(...queuedArgs);
+            }
+            else {
+                if (timeoutHandle == null) {
+                    handler?.(...queuedArgs);
+                    queuedArgs = null;
+                }
+                timeoutHandle = setTimeout(() => { timeoutHandle = null; runIfQueued(); }, throttleTimeout);
+            }
+        }
+    }
+    function throttled(...args) {
+        queuedArgs = args;
+        runIfQueued();
+    }
+    function cancel() {
+        if (timeoutHandle != null) {
+            clearTimeout(timeoutHandle);
+            timeoutHandle = null;
+        }
+    }
+    function flush() {
+        runIfQueued();
+        cancel();
+    }
+    return {
+        handlerOut: throttled,
+        cancel,
+        flush
+    };
+}
+
+function throttleDebounce({ debounceDuration, throttleDuration, handlerIn }) {
+    const t = throttle({ handlerIn, throttleDuration });
+    const d = debounce({ handlerIn: t.handlerOut, debounceDuration });
+    return {
+        handlerOut: d.handlerOut,
+        cancel: () => { t.cancel(); d.cancel(); },
+        flush: () => { d.flush(); }
+    };
+}
+
+function isPromise(p) {
+    return p && typeof p == 'object' && "then" in p;
+}
+function defaultCapture(...args) { return args; }
 const Unset = Symbol("Unset");
 /**
  * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
@@ -4986,13 +5111,18 @@ const Unset = Symbol("Unset");
  * Note that part of this is emulating the fact that the sync handler cannot have a return value,
  * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
  *
- * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
+ * @type `ReturnType` The type that your async function returns (may or may not be wrapped in a `Promise<>`)
+ * @type `AsyncArgs` The arguments that your async function takes (as an array)
+ * @type `SyncArgs` The arguments that the returned sync function takes (as an array). Defaults to the same type as `AsyncArgs`.
  */
-function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny, onReject, onResolve, onHasError, onHasResult, onError, onReturnValue, capture, onAsyncDebounce, onSyncDebounce, onPending, throttle, wait }) {
+function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny, onReject, onResolve, onHasError, onHasResult, onError, onReturnValue, capture, onAsyncDebounce, onSyncDebounce, onPending, throttle: throttleDuration, debounce: debounceDuration }) {
+    // 0. The comments are numbered in approximate execution order 
+    // for your reading pleasure (1 is near the bottom).
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
     let currentCapture = Unset;
+    capture ??= defaultCapture;
     const onFinally = () => {
         // 8. This is run at the end of every invocation of the async handler,
         // whether it completed or not, and whether it was async or not.
@@ -5026,7 +5156,7 @@ function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny,
             // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
             // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
             onInvoke?.();
-            promiseOrReturn = asyncInput(...args);
+            promiseOrReturn = asyncInput?.(...args);
             onHasError?.(false);
         }
         catch (ex) {
@@ -5038,8 +5168,8 @@ function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny,
         if (isPromise(promiseOrReturn)) {
             onInvoked?.("async");
             promiseOrReturn
-                .then(r => { onResolve?.(); onHasResult?.(true); onReturnValue?.(r); return r; })
-                .catch(e => { onReject?.(); onHasError?.(true); onError?.(e); return e; })
+                .then(r => { onResolve?.(); onHasResult?.(true, r); onReturnValue?.(r); return r; })
+                .catch(e => { onReject?.(); onHasError?.(true, e); onError?.(e); return e; })
                 .finally(onFinally);
         }
         else {
@@ -5048,46 +5178,39 @@ function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny,
                 onResolve?.();
                 onHasResult?.(true);
                 onHasError?.(false);
+                onReturnValue?.(promiseOrReturn); // The ! assertion is safe here because it's only undefined if ReturnType includes undefined already.
             }
             else {
                 onReject?.();
                 onHasResult?.(false);
                 onHasError?.(true);
             }
-            onReturnValue?.(promiseOrReturn);
-            onPending?.(pending = false);
             onFinally();
         }
     };
-    // lodash uses "in" instead of checking for `undefined`...
-    const lodashOptions = {
-        leading: !wait,
-        trailing: true
-    };
-    if (throttle) {
-        if (wait == null || (wait < throttle))
-            wait = throttle;
-        lodashOptions.maxWait = throttle;
-    }
-    const syncDebounced = debounce(() => {
-        // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
-        // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-        onSyncDebounce?.(syncDebouncing = false);
-        if (!pending) {
-            // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
-            // then we can just go ahead and run the debounced version of our function.
-            console.assert(currentCapture != Unset);
-            sync(...currentCapture);
-        }
-        else {
-            // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
-            // then we'll need to delay this one. When that previous invocation finishes, it'll check
-            // to see if it needs to run again, and it will use these new captured arguments from step 2.
-            onAsyncDebounce?.(asyncDebouncing = true);
-        }
-    }, wait || undefined, lodashOptions);
+    const { handlerOut: syncDebounced, cancel: syncCancel, flush: syncFlush } = throttleDebounce({
+        handlerIn: () => {
+            // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+            // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
+            onSyncDebounce?.(syncDebouncing = false);
+            if (!pending) {
+                // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+                // then we can just go ahead and run the debounced version of our function.
+                console.assert(currentCapture != Unset);
+                sync(...currentCapture);
+            }
+            else {
+                // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
+                // then we'll need to delay this one. When that previous invocation finishes, it'll check
+                // to see if it needs to run again, and it will use these new captured arguments from step 2.
+                onAsyncDebounce?.(asyncDebouncing = true);
+            }
+        }, debounceDuration: debounceDuration, throttleDuration: throttleDuration
+    });
     return {
         syncOutput: (...args) => {
+            if (asyncInput == null)
+                return;
             // 1. Someone just called the sync version of our async function.
             // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
             currentCapture = capture?.(...args) ?? [];
@@ -5095,10 +5218,10 @@ function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny,
             syncDebounced();
         },
         flushSyncDebounce: () => {
-            syncDebounced.flush();
+            syncFlush();
         },
         cancelSyncDebounce: () => {
-            syncDebounced.cancel();
+            syncCancel();
         }
     };
 }
@@ -5179,7 +5302,7 @@ function useAsync(asyncHandler, options) {
                 onReject: incrementRejectCount,
                 onResolve: incrementResolveCount,
                 throttle: options?.throttle ?? undefined,
-                wait: options?.debounce ?? undefined
+                debounce: options?.debounce ?? undefined
             });
         }, [throttle, debounce]);
         useEffect(() => {
@@ -6958,7 +7081,7 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
     return [localCopy, setValueWrapper, getValue];
 }
 
-var l;l={__e:function(n,l,u,t){for(var i,r,o;l=l.__;)if((i=l.__c)&&!i.__)try{if((r=i.constructor)&&null!=r.getDerivedStateFromError&&(i.setState(r.getDerivedStateFromError(n)),o=i.__d),null!=i.componentDidCatch&&(i.componentDidCatch(n,t||{}),o=i.__d),o)return i.__E=i}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
+var l;l={__e:function(n,l,u,t){for(var i,o,r;l=l.__;)if((i=l.__c)&&!i.__)try{if((o=i.constructor)&&null!=o.getDerivedStateFromError&&(i.setState(o.getDerivedStateFromError(n)),r=i.__d),null!=i.componentDidCatch&&(i.componentDidCatch(n,t||{}),r=i.__d),r)return i.__E=i}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
 
 var f=0;function u(e,t,n,o,i,u){t||(t={});var a,c,p=t;if("ref"in p)for(c in p={},t)"ref"==c?a=t[c]:p[c]=t[c];var l$1={type:e,props:p,key:n,ref:a,__k:null,__:null,__b:0,__e:null,__c:null,constructor:void 0,__v:--f,__i:-1,__u:0,__source:i,__self:u};if("function"==typeof e&&(a=e.defaultProps))for(c in a) void 0===p[c]&&(p[c]=a[c]);return l.vnode&&l.vnode(l$1),l$1}
 

@@ -57,7 +57,7 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
     return useMonitoring(function useProcessedChildren() {
         const childCount = rearrangeableChildrenParameters.children.length;
         const { paginationMax, paginationMin } = paginatedChildrenParameters;
-        const { staggered } = staggeredChildrenParameters;
+        const { staggered, disableIntersectionObserver } = staggeredChildrenParameters;
         const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters, });
         const rp = useStableCallback(() => {
             refreshPagination(paginationMin, paginationMax);
@@ -78,7 +78,7 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
         });
         const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
-            staggeredChildrenParameters: { staggered, childCount },
+            staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
             //refElementReturn: { getElement: context.processedChildrenContext.getElement }
         });
         return {

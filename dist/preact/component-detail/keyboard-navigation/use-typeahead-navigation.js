@@ -134,6 +134,8 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         };
         function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
+                if (currentTypeahead == "se")
+                    debugger;
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
                 if (sortedTypeaheadIndex < 0) {
                     // The user has typed an entry that doesn't exist in the list
@@ -204,6 +206,10 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
                         setIndex(toSet, reason, true);
                         onNavigateTypeahead?.(toSet, reason);
                     }
+                    else {
+                        // We get here if the only matching child we found was untabbable/missing
+                        setTypeaheadStatus("invalid");
+                    }
                 }
             }
         }
@@ -243,7 +249,7 @@ context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparato
                     sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, unsortedIndex: index });
                 }
                 return () => {
                     // When unmounting, find where we were and remove ourselves.

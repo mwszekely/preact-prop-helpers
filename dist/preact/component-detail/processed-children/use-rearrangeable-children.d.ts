@@ -2,7 +2,6 @@ import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-ext
 import { Nullable, TargetedPick, VNode } from "../../util/types.js";
 import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 export interface UseRearrangedChildrenContextSelf {
-    _unused: undefined;
 }
 /**
  * Unusually, this context is not passed from parent to child,
@@ -31,6 +30,11 @@ export interface UseRearrangeableChildrenParametersSelf {
      * The children to rearrange.
      */
     children: (VNode | null)[];
+    /**
+     * If true, moving children around will visually translate
+     * them to their new position via CSS transforms.
+     */
+    animate: boolean;
 }
 /**
  * All of these functions **MUST** be stable across renders.
@@ -48,6 +52,7 @@ export interface UseRearrangeableChildrenContext {
 }
 export interface UseRearrangeableChildrenContextSelf {
     getFLIPStart(index: number): RearrangeableChildPositionInfo | undefined;
+    animate: boolean;
 }
 export interface UseRearrangeableChildrenReturnTypeSelf {
     refresh(): void;
@@ -115,7 +120,7 @@ export interface UseRearrangeableChildParametersSelf {
  *
  * @compositeParams
  */
-export declare function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ rearrangeableChildrenParameters: { children: childrenIn }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType;
+export declare function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ rearrangeableChildrenParameters: { children: childrenIn, animate }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType;
 export interface UseRearrangeableChildReturnType<ChildElement extends Element> {
     info: Pick<UseRearrangeableChildInfo<ChildElement>, "updateFLIPAnimation">;
 }

@@ -217,6 +217,7 @@ const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildre
     } = useCompleteGridNavigationRows({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
+            animate: false,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     yield <DemoUseGridRowOuter index={i} key={i} />
@@ -224,10 +225,10 @@ const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildre
             })()), [count]),
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        staggeredChildrenParameters: { staggered, disableIntersectionObserver: true },
         
         context: useContext(ListChildrenContext)
-    })
+    });
 
     return (
         <ListChildContext.Provider value={context}>{rearrangeableChildrenReturn.children}</ListChildContext.Provider>

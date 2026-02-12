@@ -125,7 +125,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
     return useMonitoring(function useProcessedChildren(): UseProcessedChildrenReturnType<TabbableChildElement, M> {
         const childCount = rearrangeableChildrenParameters.children.length;
         const { paginationMax, paginationMin } = paginatedChildrenParameters;
-        const { staggered } = staggeredChildrenParameters;
+        const { staggered, disableIntersectionObserver } = staggeredChildrenParameters;
 
         const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters, });
 
@@ -162,7 +162,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
             staggeredChildrenReturn
         }: UseStaggeredChildrenReturnType = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
-            staggeredChildrenParameters: { staggered, childCount },
+            staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
             //refElementReturn: { getElement: context.processedChildrenContext.getElement }
         });
 

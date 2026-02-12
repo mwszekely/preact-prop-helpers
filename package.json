@@ -7,7 +7,7 @@
   "module": "/dist/preact/index.js",
   "types": "/dist/preact/index.d.ts",
   "typings": "./dist/preact/index.d.ts",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc",
   "exports": {
     ".": {
       "types": "./dist/preact/index.d.ts",
@@ -34,6 +34,7 @@
     "build:react": "npx rollup -c",
     "watch:react": "npx rollup -c --watch",
     "test": "playwright test",
+    "test-ui": "playwright test --ui",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
     "rebuild": "rm \"./pnpm-lock.yaml\" && rm -R \"./node_modules\" && pnpm install && pnpm run build"
@@ -41,18 +42,18 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "preact": "^10.13.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "preact": "^10.28.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
     "@playwright/test": "^1.52.0",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@typescript-eslint/eslint-plugin": "^8.18.0",

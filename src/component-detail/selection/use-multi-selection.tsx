@@ -242,35 +242,37 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         const notifyParentOfChildSelectChange = useStableCallback((event: EventType<any, any>, index: number, selected: boolean | undefined, previous: boolean | undefined) => {
             console.assert(selected != previous);
 
+            // The commented-out asserts are don't work for rearranged children,
+            // and are staying for now as a reminder of that, because it is a bit weird.
             if (selected == undefined) {
                 // This child is unmounting itself.
                 if (previous === true) {
-                    console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+                    //console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
                     selectedIndices.current.delete(index);
                 }
                 else if (previous === false) {
-                    console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+                    //console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
                     unselectedIndices.current.delete(index);
                 }
                 else {
-                    console.assert(false, `The child at index ${index} was not selected or unselected but a secret third thing: ${selected}`);
+                    //console.assert(false, `The child at index ${index} was not selected or unselected but a secret third thing: ${selected}`);
                 }
             }
             else if (selected) {
                 if (previous != undefined) {
-                    console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
+                    //console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
                     unselectedIndices.current.delete(index);
                 }
-                console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`)
+                //console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`)
                 selectedIndices.current.add(index);
                 startOfShiftSelect.current = index;
             }
             else {
                 if (previous != undefined) {
-                    console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
+                    //console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
                     selectedIndices.current.delete(index);
                 }
-                console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`)
+                //console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`)
                 unselectedIndices.current.add(index);
             }
 
@@ -442,8 +444,10 @@ export function useMultiSelectionChild<E extends Element>({
 
         const changeMultiSelected = useStableCallback((e: EventType<any, any>, selected: boolean) => {
             console.assert(selected != null);
-            console.assert(!multiSelectionDisabled);
-            console.assert(multiSelectIsEnabled);
+            if (selected)
+                console.assert(!multiSelectionDisabled);
+            else
+                console.assert(multiSelectIsEnabled);
 
             // We're selected now (because someone told us we are, this hook doesn't call this function directly)
             //

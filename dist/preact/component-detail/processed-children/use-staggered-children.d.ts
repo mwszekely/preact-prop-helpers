@@ -12,6 +12,20 @@ export interface UseStaggeredChildrenParametersSelf {
      */
     staggered: boolean;
     childCount: number | null;
+    /**
+     * @stable
+     *
+     * If enabled, children will mount strictly one-by-one, in order.
+     *
+     * If false, an IntersectionObserver tracks each element
+     * and ensures it (**and all prior elements**) are loaded when it scrolls on screen.
+     * This may cause lag.
+     *
+     * This must be false if the children are reorderable, as the staggering calculations
+     * do not currently account for index mangling/demangling.
+     *
+     */
+    disableIntersectionObserver: boolean;
 }
 export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
@@ -73,7 +87,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  *
  * @compositeParams
  */
-export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount }, }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver }, }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

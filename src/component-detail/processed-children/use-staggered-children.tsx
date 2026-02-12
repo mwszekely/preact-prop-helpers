@@ -1,6 +1,6 @@
 import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { returnFalse, returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { returnNull, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
@@ -23,6 +23,21 @@ export interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
 
     childCount: number | null;
+
+    /**
+     * @stable
+     * 
+     * If enabled, children will mount strictly one-by-one, in order.
+     * 
+     * If false, an IntersectionObserver tracks each element
+     * and ensures it (**and all prior elements**) are loaded when it scrolls on screen.
+     * This may cause lag.
+     * 
+     * This must be false if the children are reorderable, as the staggering calculations
+     * do not currently account for index mangling/demangling.
+     * 
+     */
+    disableIntersectionObserver: boolean;
 }
 
 export interface UseStaggeredChildrenParameters extends
@@ -104,11 +119,10 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  */
 export function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
-    staggeredChildrenParameters: { staggered, childCount },
+    staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
     //refElementReturn: { getElement }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
     return useMonitoring(function useStaggeredChildren(): UseStaggeredChildrenReturnType {
-
 
         // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
         // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -241,19 +255,24 @@ export function useStaggeredChildren({
             setElementToIndexMap
         }), [parentIsStaggered]);
 
+        // TODO: The fact that we use an IntersectionObserver makes it
+        // very impossible to see the staggering effect, for better or worse.
+        // Add an option to disable it? Maybe? Mostly for testing.
         useEffect(() => {
-            const io = intersectionObserver.current = new IntersectionObserver((entries) => {
-                for (let entry of entries) {
-                    if (entry.isIntersecting) {
-                        const index = elementToIndex.current.get(entry.target)
-                        if (index != null) {
-                            getChildren().getAt(index)?.setStaggeredVisible(true);
+            if (!disableIntersectionObserver) {
+                const io = intersectionObserver.current = new IntersectionObserver((entries) => {
+                    for (let entry of entries) {
+                        if (entry.isIntersecting) {
+                            const index = elementToIndex.current.get(entry.target)
+                            if (index != null) {
+                                getChildren().getAt(index)?.setStaggeredVisible(true);
+                            }
                         }
                     }
-                }
-            });
-            return () => io.disconnect();
-        }, [])
+                });
+                return () => io.disconnect();
+            }
+        }, [disableIntersectionObserver])
 
         return {
             staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
@@ -287,6 +306,7 @@ export function useStaggeredChild<ChildElement extends Element, M extends UseSta
         // only when it becomes visible because we were next in line to do so)
         const becauseScreen = useRef(false);
 
+        /*
         const [_getOnScreen, _setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, _prev, _reason) => {
 
             if (staggeredVisible)
@@ -296,10 +316,10 @@ export function useStaggeredChild<ChildElement extends Element, M extends UseSta
                 const io = getIntersectionObserver();
                 io?.unobserve(e.current!);
 
-                setStaggeredVisible(true);
-                becauseScreen.current = true;
+                //setStaggeredVisible(true);
+                //becauseScreen.current = true;
             }
-        }), returnFalse);
+        }), returnFalse);*/
 
         // This isn't called during useEffect here, because we want to wait for the
         // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
@@ -327,13 +347,14 @@ export function useStaggeredChild<ChildElement extends Element, M extends UseSta
             refElementParameters: {
                 onElementChange: useStableCallback((element) => {
                     setElementToIndexMap(index, element);
-                    e.current = (element || e.current);
                     const io = getIntersectionObserver();
-                    if (e.current) {
-                        io?.observe(e.current);
+                    if (element) {
+                        e.current = element;
+                        io?.observe(element);
                     }
                     else {
-                        io?.unobserve(e.current!);
+                        if (e.current)
+                            io?.unobserve(e.current!);
                     }
                 })
             }

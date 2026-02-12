@@ -283,8 +283,6 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventType<any, any>) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
-
-
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
 
                 if (sortedTypeaheadIndex < 0) {
@@ -367,6 +365,10 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                         setIndex(toSet, reason, true);
                         onNavigateTypeahead?.(toSet, reason as KeyboardEventType<any>);
                     }
+                    else {
+                        // We get here if the only matching child we found was untabbable/missing
+                        setTypeaheadStatus("invalid");
+                    }
                 }
             }
         }
@@ -411,7 +413,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
                     sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, unsortedIndex: index });
                 }
 
                 return () => {

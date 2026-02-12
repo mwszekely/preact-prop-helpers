@@ -112,6 +112,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
 
     const [staggering, setStaggering] = useState(false);
+    const [animate, setAnimate] = useState(true);
 
     return (
         <div className="demo">
@@ -130,7 +131,8 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
                 <li>Items can be marked as "hidden", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead.</li>
                 <li>Items can be marked as "disabled" to prevent selection (with or without also marking them as "hidden", though "hidden" implies "disabled").</li>
                 <li>Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless.</li>
-                <li>The parent's selected index is <strong>uncontrolled</strong> and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See <code>useSingleSelectionDeclarative</code> for a shortcut to do exactly that)</li>
+                <li>Staggering can be enabled on the list, which mounts children one at a time instead of all at once. With some precise CSS applied this can drastically improve the performance of mounting long lists on slower devices.</li>
+                <li>The parent controls the selected index, only re-rendering affected children when it changes.</li>
                 <li>Changing which child is focused or selected only re-renders a maximum of 2 children each time.</li>
                 <li>Lists can be nested, and there is no strict requirement on DOM structure (except for sorting/rearranging children, if you use that).
                     <ul><li>If you don't need sorting/rearranging this DOM requirement is <strong>optional</strong>; rearranging requires all children be in one contiguous array of VNodes so that their <code>key</code> props can be manipulated.</li></ul>
@@ -147,6 +149,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
+            <label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>
             <label>Single-Selection mode:
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setSingleSelectionMode("disabled"); }} /> Off</label>
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setSingleSelectionMode("focus"); }} /> On focus</label>
@@ -163,8 +166,8 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
             <UntabbableContext.Provider value={untabbable}>
                 <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                    <ol start={0} {...props}>
-                        <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} setStaggering={setStaggering} />
+                    <ol start={0} {...props} className="demo-list">
+                        <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} animate={animate} setStaggering={setStaggering} />
                     </ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </UntabbableContext.Provider>
@@ -172,15 +175,16 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
     );
 });
 
-export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering }: { setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
+export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildren({ count, max, min, staggered, setStaggering, animate }: { animate: boolean, setStaggering: StateUpdater<boolean>, count: number, min: number | null, max: number | null, staggered: boolean }) {
     const {
         context,
         paginatedChildrenReturn,
         rearrangeableChildrenReturn,
-        staggeredChildrenReturn
+        staggeredChildrenReturn,
     } = useCompleteListNavigationChildren({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
+            animate,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     if (i == 1)
@@ -191,7 +195,7 @@ export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndex
             })()), [count]),
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        staggeredChildrenParameters: { staggered, disableIntersectionObserver: true },
         context: useContext(ListNavigationSingleSelectionChildContext)
     })
 
@@ -228,14 +232,14 @@ const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChild
     });
 
     //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />, [mangledIndex, demangledIndex, index]);
-    const c = <DemoUseRovingTabIndexChild word={word} index={index} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />;
+    const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />;
     return (
         <li {...props}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
 });
 
-const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined }) {
-
+const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex, childUseEffect }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined, childUseEffect: () => void }) {
+    useEffect(childUseEffect, [childUseEffect]);
     let disabled = (index == 6);
     let hidden = (index == 7);
     if (index == 8) {

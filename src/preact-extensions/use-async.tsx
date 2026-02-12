@@ -233,7 +233,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
         const captureStable = useStableCallback(captureUnstable ?? identityCapture);
         const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler ?? (identity as any));
         const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
-            return asyncToSync<AP, SP, R>({
+            return asyncToSync<R, AP, SP>({
                 asyncInput: asyncHandlerStable,
                 capture: captureStable,
                 onAsyncDebounce: setAsyncDebouncing,
@@ -249,7 +249,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
                 onReject: incrementRejectCount,
                 onResolve: incrementResolveCount,
                 throttle: options?.throttle ?? undefined,
-                wait: options?.debounce ?? undefined
+                debounce: options?.debounce ?? undefined
             })
         }, [throttle, debounce]);
 

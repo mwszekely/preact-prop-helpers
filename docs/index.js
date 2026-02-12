@@ -2,8 +2,8 @@ var n,
   l$1,
   u$2,
   i$1,
-  r$1,
   o$1,
+  r$1,
   e$1,
   f$2,
   c$1,
@@ -11,10 +11,10 @@ var n,
   a$1,
   h$1,
   p$1 = {},
-  y$1 = [],
-  v$1 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i,
-  w$1 = Array.isArray;
-function d$1(n, l) {
+  v$1 = [],
+  y$1 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i,
+  d$1 = Array.isArray;
+function w$1(n, l) {
   for (var u in l) n[u] = l[u];
   return n;
 }
@@ -23,30 +23,30 @@ function g$1(n) {
 }
 function _$1(l, u, t) {
   var i,
-    r,
     o,
+    r,
     e = {};
-  for (o in u) "key" == o ? i = u[o] : "ref" == o ? r = u[o] : e[o] = u[o];
-  if (arguments.length > 2 && (e.children = arguments.length > 3 ? n.call(arguments, 2) : t), "function" == typeof l && null != l.defaultProps) for (o in l.defaultProps) null == e[o] && (e[o] = l.defaultProps[o]);
-  return m$1(l, e, i, r, null);
+  for (r in u) "key" == r ? i = u[r] : "ref" == r ? o = u[r] : e[r] = u[r];
+  if (arguments.length > 2 && (e.children = arguments.length > 3 ? n.call(arguments, 2) : t), "function" == typeof l && null != l.defaultProps) for (r in l.defaultProps) void 0 === e[r] && (e[r] = l.defaultProps[r]);
+  return m$1(l, e, i, o, null);
 }
-function m$1(n, t, i, r, o) {
+function m$1(n, t, i, o, r) {
   var e = {
     type: n,
     props: t,
     key: i,
-    ref: r,
+    ref: o,
     __k: null,
     __: null,
     __b: 0,
     __e: null,
     __c: null,
     constructor: void 0,
-    __v: null == o ? ++u$2 : o,
+    __v: null == r ? ++u$2 : r,
     __i: -1,
     __u: 0
   };
-  return null == o && null != l$1.vnode && l$1.vnode(e), e;
+  return null == r && null != l$1.vnode && l$1.vnode(e), e;
 }
 function k$1(n) {
   return n.children;
@@ -70,86 +70,80 @@ function C$1(n) {
   }
 }
 function M$1(n) {
-  (!n.__d && (n.__d = !0) && i$1.push(n) && !$.__r++ || r$1 != l$1.debounceRendering) && ((r$1 = l$1.debounceRendering) || o$1)($);
+  (!n.__d && (n.__d = !0) && i$1.push(n) && !$.__r++ || o$1 != l$1.debounceRendering) && ((o$1 = l$1.debounceRendering) || r$1)($);
 }
 function $() {
-  for (var n, u, t, r, o, f, c, s = 1; i$1.length;) i$1.length > s && i$1.sort(e$1), n = i$1.shift(), s = i$1.length, n.__d && (t = void 0, o = (r = (u = n).__v).__e, f = [], c = [], u.__P && ((t = d$1({}, r)).__v = r.__v + 1, l$1.vnode && l$1.vnode(t), O(u.__P, t, r, u.__n, u.__P.namespaceURI, 32 & r.__u ? [o] : null, f, null == o ? S(r) : o, !!(32 & r.__u), c), t.__v = r.__v, t.__.__k[t.__i] = t, z$1(f, t, c), t.__e != o && C$1(t)));
+  for (var n, u, t, o, r, f, c, s = 1; i$1.length;) i$1.length > s && i$1.sort(e$1), n = i$1.shift(), s = i$1.length, n.__d && (t = void 0, o = void 0, r = (o = (u = n).__v).__e, f = [], c = [], u.__P && ((t = w$1({}, o)).__v = o.__v + 1, l$1.vnode && l$1.vnode(t), O(u.__P, t, o, u.__n, u.__P.namespaceURI, 32 & o.__u ? [r] : null, f, null == r ? S(o) : r, !!(32 & o.__u), c), t.__v = o.__v, t.__.__k[t.__i] = t, N$1(f, t, c), o.__e = o.__ = null, t.__e != r && C$1(t)));
   $.__r = 0;
 }
-function I(n, l, u, t, i, r, o, e, f, c, s) {
+function I(n, l, u, t, i, o, r, e, f, c, s) {
   var a,
     h,
-    v,
-    w,
+    y,
     d,
+    w,
     g,
-    _ = t && t.__k || y$1,
-    m = l.length;
-  for (f = P$1(u, l, _, f, m), a = 0; a < m; a++) null != (v = u.__k[a]) && (h = -1 == v.__i ? p$1 : _[v.__i] || p$1, v.__i = a, g = O(n, v, h, i, r, o, e, f, c, s), w = v.__e, v.ref && h.ref != v.ref && (h.ref && q$2(h.ref, null, v), s.push(v.ref, v.__c || w, v)), null == d && null != w && (d = w), 4 & v.__u || h.__k === v.__k ? f = A$2(v, f, n) : "function" == typeof v.type && void 0 !== g ? f = g : w && (f = w.nextSibling), v.__u &= -7);
-  return u.__e = d, f;
+    _,
+    m = t && t.__k || v$1,
+    b = l.length;
+  for (f = P$1(u, l, m, f, b), a = 0; a < b; a++) null != (y = u.__k[a]) && (h = -1 == y.__i ? p$1 : m[y.__i] || p$1, y.__i = a, g = O(n, y, h, i, o, r, e, f, c, s), d = y.__e, y.ref && h.ref != y.ref && (h.ref && B$2(h.ref, null, y), s.push(y.ref, y.__c || d, y)), null == w && null != d && (w = d), (_ = !!(4 & y.__u)) || h.__k === y.__k ? f = A$2(y, f, n, _) : "function" == typeof y.type && void 0 !== g ? f = g : d && (f = d.nextSibling), y.__u &= -7);
+  return u.__e = w, f;
 }
 function P$1(n, l, u, t, i) {
-  var r,
-    o,
+  var o,
+    r,
     e,
     f,
     c,
     s = u.length,
     a = s,
     h = 0;
-  for (n.__k = new Array(i), r = 0; r < i; r++) null != (o = l[r]) && "boolean" != typeof o && "function" != typeof o ? (f = r + h, (o = n.__k[r] = "string" == typeof o || "number" == typeof o || "bigint" == typeof o || o.constructor == String ? m$1(null, o, null, null, null) : w$1(o) ? m$1(k$1, {
-    children: o
-  }, null, null, null) : null == o.constructor && o.__b > 0 ? m$1(o.type, o.props, o.key, o.ref ? o.ref : null, o.__v) : o).__ = n, o.__b = n.__b + 1, e = null, -1 != (c = o.__i = L(o, u, f, a)) && (a--, (e = u[c]) && (e.__u |= 2)), null == e || null == e.__v ? (-1 == c && (i > s ? h-- : i < s && h++), "function" != typeof o.type && (o.__u |= 4)) : c != f && (c == f - 1 ? h-- : c == f + 1 ? h++ : (c > f ? h-- : h++, o.__u |= 4))) : n.__k[r] = null;
-  if (a) for (r = 0; r < s; r++) null != (e = u[r]) && 0 == (2 & e.__u) && (e.__e == t && (t = S(e)), B$2(e, e));
+  for (n.__k = new Array(i), o = 0; o < i; o++) null != (r = l[o]) && "boolean" != typeof r && "function" != typeof r ? ("string" == typeof r || "number" == typeof r || "bigint" == typeof r || r.constructor == String ? r = n.__k[o] = m$1(null, r, null, null, null) : d$1(r) ? r = n.__k[o] = m$1(k$1, {
+    children: r
+  }, null, null, null) : void 0 === r.constructor && r.__b > 0 ? r = n.__k[o] = m$1(r.type, r.props, r.key, r.ref ? r.ref : null, r.__v) : n.__k[o] = r, f = o + h, r.__ = n, r.__b = n.__b + 1, e = null, -1 != (c = r.__i = L(r, u, f, a)) && (a--, (e = u[c]) && (e.__u |= 2)), null == e || null == e.__v ? (-1 == c && (i > s ? h-- : i < s && h++), "function" != typeof r.type && (r.__u |= 4)) : c != f && (c == f - 1 ? h-- : c == f + 1 ? h++ : (c > f ? h-- : h++, r.__u |= 4))) : n.__k[o] = null;
+  if (a) for (o = 0; o < s; o++) null != (e = u[o]) && 0 == (2 & e.__u) && (e.__e == t && (t = S(e)), D$2(e, e));
   return t;
 }
-function A$2(n, l, u) {
-  var t, i;
+function A$2(n, l, u, t) {
+  var i, o;
   if ("function" == typeof n.type) {
-    for (t = n.__k, i = 0; t && i < t.length; i++) t[i] && (t[i].__ = n, l = A$2(t[i], l, u));
+    for (i = n.__k, o = 0; i && o < i.length; o++) i[o] && (i[o].__ = n, l = A$2(i[o], l, u, t));
     return l;
   }
-  n.__e != l && (l && n.type && !u.contains(l) && (l = S(n)), u.insertBefore(n.__e, l || null), l = n.__e);
+  n.__e != l && (t && (l && n.type && !l.parentNode && (l = S(n)), u.insertBefore(n.__e, l || null)), l = n.__e);
   do {
     l = l && l.nextSibling;
   } while (null != l && 8 == l.nodeType);
   return l;
 }
 function H$1(n, l) {
-  return l = l || [], null == n || "boolean" == typeof n || (w$1(n) ? n.some(function (n) {
+  return l = l || [], null == n || "boolean" == typeof n || (d$1(n) ? n.some(function (n) {
     H$1(n, l);
   }) : l.push(n)), l;
 }
 function L(n, l, u, t) {
   var i,
+    o,
     r,
-    o = n.key,
-    e = n.type,
-    f = l[u];
-  if (null === f && null == n.key || f && o == f.key && e == f.type && 0 == (2 & f.__u)) return u;
-  if (t > (null != f && 0 == (2 & f.__u) ? 1 : 0)) for (i = u - 1, r = u + 1; i >= 0 || r < l.length;) {
-    if (i >= 0) {
-      if ((f = l[i]) && 0 == (2 & f.__u) && o == f.key && e == f.type) return i;
-      i--;
-    }
-    if (r < l.length) {
-      if ((f = l[r]) && 0 == (2 & f.__u) && o == f.key && e == f.type) return r;
-      r++;
-    }
-  }
+    e = n.key,
+    f = n.type,
+    c = l[u],
+    s = null != c && 0 == (2 & c.__u);
+  if (null === c && null == e || s && e == c.key && f == c.type) return u;
+  if (t > (s ? 1 : 0)) for (i = u - 1, o = u + 1; i >= 0 || o < l.length;) if (null != (c = l[r = i >= 0 ? i-- : o++]) && 0 == (2 & c.__u) && e == c.key && f == c.type) return r;
   return -1;
 }
 function T$2(n, l, u) {
-  "-" == l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || v$1.test(l) ? u : u + "px";
+  "-" == l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || y$1.test(l) ? u : u + "px";
 }
 function j$2(n, l, u, t, i) {
-  var r;
+  var o, r;
   n: if ("style" == l) {
     if ("string" == typeof u) n.style.cssText = u;else {
       if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || T$2(n.style, l, "");
       if (u) for (l in u) t && u[l] == t[l] || T$2(n.style, l, u[l]);
     }
-  } else if ("o" == l[0] && "n" == l[1]) r = l != (l = l.replace(f$2, "$1")), l = l.toLowerCase() in n || "onFocusOut" == l || "onFocusIn" == l ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + r] = u, u ? t ? u.u = t.u : (u.u = c$1, n.addEventListener(l, r ? a$1 : s$1, r)) : n.removeEventListener(l, r ? a$1 : s$1, r);else {
+  } else if ("o" == l[0] && "n" == l[1]) o = l != (l = l.replace(f$2, "$1")), r = l.toLowerCase(), l = r in n || "onFocusOut" == l || "onFocusIn" == l ? r.slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + o] = u, u ? t ? u.u = t.u : (u.u = c$1, n.addEventListener(l, o ? a$1 : s$1, o)) : n.removeEventListener(l, o ? a$1 : s$1, o);else {
     if ("http://www.w3.org/2000/svg" == i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");else if ("width" != l && "height" != l && "href" != l && "list" != l && "form" != l && "tabIndex" != l && "download" != l && "rowSpan" != l && "colSpan" != l && "role" != l && "popover" != l && l in n) try {
       n[l] = null == u ? "" : u;
       break n;
@@ -166,12 +160,12 @@ function F$2(n) {
     }
   };
 }
-function O(n, u, t, i, r, o, e, f, c, s) {
+function O(n, u, t, i, o, r, e, f, c, s) {
   var a,
     h,
     p,
-    y,
     v,
+    y,
     _,
     m,
     b,
@@ -185,11 +179,11 @@ function O(n, u, t, i, r, o, e, f, c, s) {
     L,
     T,
     j = u.type;
-  if (null != u.constructor) return null;
-  128 & t.__u && (c = !!(32 & t.__u), o = [f = u.__e = t.__e]), (a = l$1.__b) && a(u);
+  if (void 0 !== u.constructor) return null;
+  128 & t.__u && (c = !!(32 & t.__u), r = [f = u.__e = t.__e]), (a = l$1.__b) && a(u);
   n: if ("function" == typeof j) try {
-    if (b = u.props, S = "prototype" in j && j.prototype.render, C = (a = j.contextType) && i[a.__c], M = a ? C ? C.props.value : a.__ : i, t.__c ? m = (h = u.__c = t.__c).__ = h.__E : (S ? u.__c = h = new j(b, M) : (u.__c = h = new x$1(b, M), h.constructor = j, h.render = D$2), C && C.sub(h), h.props = b, h.state || (h.state = {}), h.context = M, h.__n = i, p = h.__d = !0, h.__h = [], h._sb = []), S && null == h.__s && (h.__s = h.state), S && null != j.getDerivedStateFromProps && (h.__s == h.state && (h.__s = d$1({}, h.__s)), d$1(h.__s, j.getDerivedStateFromProps(b, h.__s))), y = h.props, v = h.state, h.__v = u, p) S && null == j.getDerivedStateFromProps && null != h.componentWillMount && h.componentWillMount(), S && null != h.componentDidMount && h.__h.push(h.componentDidMount);else {
-      if (S && null == j.getDerivedStateFromProps && b !== y && null != h.componentWillReceiveProps && h.componentWillReceiveProps(b, M), !h.__e && null != h.shouldComponentUpdate && !1 === h.shouldComponentUpdate(b, h.__s, M) || u.__v == t.__v) {
+    if (b = u.props, S = "prototype" in j && j.prototype.render, C = (a = j.contextType) && i[a.__c], M = a ? C ? C.props.value : a.__ : i, t.__c ? m = (h = u.__c = t.__c).__ = h.__E : (S ? u.__c = h = new j(b, M) : (u.__c = h = new x$1(b, M), h.constructor = j, h.render = E$1), C && C.sub(h), h.state || (h.state = {}), h.__n = i, p = h.__d = !0, h.__h = [], h._sb = []), S && null == h.__s && (h.__s = h.state), S && null != j.getDerivedStateFromProps && (h.__s == h.state && (h.__s = w$1({}, h.__s)), w$1(h.__s, j.getDerivedStateFromProps(b, h.__s))), v = h.props, y = h.state, h.__v = u, p) S && null == j.getDerivedStateFromProps && null != h.componentWillMount && h.componentWillMount(), S && null != h.componentDidMount && h.__h.push(h.componentDidMount);else {
+      if (S && null == j.getDerivedStateFromProps && b !== v && null != h.componentWillReceiveProps && h.componentWillReceiveProps(b, M), u.__v == t.__v || !h.__e && null != h.shouldComponentUpdate && !1 === h.shouldComponentUpdate(b, h.__s, M)) {
         for (u.__v != t.__v && (h.props = b, h.state = h.__s, h.__d = !1), u.__e = t.__e, u.__k = t.__k, u.__k.some(function (n) {
           n && (n.__ = u);
         }), $ = 0; $ < h._sb.length; $++) h.__h.push(h._sb[$]);
@@ -197,7 +191,7 @@ function O(n, u, t, i, r, o, e, f, c, s) {
         break n;
       }
       null != h.componentWillUpdate && h.componentWillUpdate(b, h.__s, M), S && null != h.componentDidUpdate && h.__h.push(function () {
-        h.componentDidUpdate(y, v, _);
+        h.componentDidUpdate(v, y, _);
       });
     }
     if (h.context = M, h.props = b, h.__P = n, h.__e = !1, P = l$1.__r, A = 0, S) {
@@ -206,20 +200,26 @@ function O(n, u, t, i, r, o, e, f, c, s) {
     } else do {
       h.__d = !1, P && P(u), a = h.render(h.props, h.state, h.context), h.state = h.__s;
     } while (h.__d && ++A < 25);
-    h.state = h.__s, null != h.getChildContext && (i = d$1(d$1({}, i), h.getChildContext())), S && !p && null != h.getSnapshotBeforeUpdate && (_ = h.getSnapshotBeforeUpdate(y, v)), L = a, null != a && a.type === k$1 && null == a.key && (L = N$1(a.props.children)), f = I(n, w$1(L) ? L : [L], u, t, i, r, o, e, f, c, s), h.base = u.__e, u.__u &= -161, h.__h.length && e.push(h), m && (h.__E = h.__ = null);
+    h.state = h.__s, null != h.getChildContext && (i = w$1(w$1({}, i), h.getChildContext())), S && !p && null != h.getSnapshotBeforeUpdate && (_ = h.getSnapshotBeforeUpdate(v, y)), L = a, null != a && a.type === k$1 && null == a.key && (L = V$1(a.props.children)), f = I(n, d$1(L) ? L : [L], u, t, i, o, r, e, f, c, s), h.base = u.__e, u.__u &= -161, h.__h.length && e.push(h), m && (h.__E = h.__ = null);
   } catch (n) {
-    if (u.__v = null, c || null != o) {
+    if (u.__v = null, c || null != r) {
       if (n.then) {
         for (u.__u |= c ? 160 : 128; f && 8 == f.nodeType && f.nextSibling;) f = f.nextSibling;
-        o[o.indexOf(f)] = null, u.__e = f;
-      } else for (T = o.length; T--;) g$1(o[T]);
-    } else u.__e = t.__e, u.__k = t.__k;
+        r[r.indexOf(f)] = null, u.__e = f;
+      } else {
+        for (T = r.length; T--;) g$1(r[T]);
+        z$1(u);
+      }
+    } else u.__e = t.__e, u.__k = t.__k, n.then || z$1(u);
     l$1.__e(n, u, t);
-  } else null == o && u.__v == t.__v ? (u.__k = t.__k, u.__e = t.__e) : f = u.__e = V$1(t.__e, u, t, i, r, o, e, c, s);
+  } else null == r && u.__v == t.__v ? (u.__k = t.__k, u.__e = t.__e) : f = u.__e = q$2(t.__e, u, t, i, o, r, e, c, s);
   return (a = l$1.diffed) && a(u), 128 & u.__u ? void 0 : f;
 }
-function z$1(n, u, t) {
-  for (var i = 0; i < t.length; i++) q$2(t[i], t[++i], t[++i]);
+function z$1(n) {
+  n && n.__c && (n.__c.__e = !0), n && n.__k && n.__k.forEach(z$1);
+}
+function N$1(n, u, t) {
+  for (var i = 0; i < t.length; i++) B$2(t[i], t[++i], t[++i]);
   l$1.__c && l$1.__c(u, n), n.some(function (u) {
     try {
       n = u.__h, u.__h = [], n.some(function (n) {
@@ -230,41 +230,41 @@ function z$1(n, u, t) {
     }
   });
 }
-function N$1(n) {
-  return "object" != typeof n || null == n || n.__b && n.__b > 0 ? n : w$1(n) ? n.map(N$1) : d$1({}, n);
+function V$1(n) {
+  return "object" != typeof n || null == n || n.__b && n.__b > 0 ? n : d$1(n) ? n.map(V$1) : w$1({}, n);
 }
-function V$1(u, t, i, r, o, e, f, c, s) {
+function q$2(u, t, i, o, r, e, f, c, s) {
   var a,
     h,
-    y,
     v,
-    d,
+    y,
+    w,
     _,
     m,
-    b = i.props,
+    b = i.props || p$1,
     k = t.props,
     x = t.type;
-  if ("svg" == x ? o = "http://www.w3.org/2000/svg" : "math" == x ? o = "http://www.w3.org/1998/Math/MathML" : o || (o = "http://www.w3.org/1999/xhtml"), null != e) for (a = 0; a < e.length; a++) if ((d = e[a]) && "setAttribute" in d == !!x && (x ? d.localName == x : 3 == d.nodeType)) {
-    u = d, e[a] = null;
+  if ("svg" == x ? r = "http://www.w3.org/2000/svg" : "math" == x ? r = "http://www.w3.org/1998/Math/MathML" : r || (r = "http://www.w3.org/1999/xhtml"), null != e) for (a = 0; a < e.length; a++) if ((w = e[a]) && "setAttribute" in w == !!x && (x ? w.localName == x : 3 == w.nodeType)) {
+    u = w, e[a] = null;
     break;
   }
   if (null == u) {
     if (null == x) return document.createTextNode(k);
-    u = document.createElementNS(o, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = !1), e = null;
+    u = document.createElementNS(r, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = !1), e = null;
   }
   if (null == x) b === k || c && u.data == k || (u.data = k);else {
-    if (e = e && n.call(u.childNodes), b = i.props || p$1, !c && null != e) for (b = {}, a = 0; a < u.attributes.length; a++) b[(d = u.attributes[a]).name] = d.value;
-    for (a in b) if (d = b[a], "children" == a) ;else if ("dangerouslySetInnerHTML" == a) y = d;else if (!(a in k)) {
+    if (e = e && n.call(u.childNodes), !c && null != e) for (b = {}, a = 0; a < u.attributes.length; a++) b[(w = u.attributes[a]).name] = w.value;
+    for (a in b) if (w = b[a], "children" == a) ;else if ("dangerouslySetInnerHTML" == a) v = w;else if (!(a in k)) {
       if ("value" == a && "defaultValue" in k || "checked" == a && "defaultChecked" in k) continue;
-      j$2(u, a, null, d, o);
+      j$2(u, a, null, w, r);
     }
-    for (a in k) d = k[a], "children" == a ? v = d : "dangerouslySetInnerHTML" == a ? h = d : "value" == a ? _ = d : "checked" == a ? m = d : c && "function" != typeof d || b[a] === d || j$2(u, a, d, b[a], o);
-    if (h) c || y && (h.__html == y.__html || h.__html == u.innerHTML) || (u.innerHTML = h.__html), t.__k = [];else if (y && (u.innerHTML = ""), I("template" == t.type ? u.content : u, w$1(v) ? v : [v], t, i, r, "foreignObject" == x ? "http://www.w3.org/1999/xhtml" : o, e, f, e ? e[0] : i.__k && S(i, 0), c, s), null != e) for (a = e.length; a--;) g$1(e[a]);
-    c || (a = "value", "progress" == x && null == _ ? u.removeAttribute("value") : null != _ && (_ !== u[a] || "progress" == x && !_ || "option" == x && _ != b[a]) && j$2(u, a, _, b[a], o), a = "checked", null != m && m != u[a] && j$2(u, a, m, b[a], o));
+    for (a in k) w = k[a], "children" == a ? y = w : "dangerouslySetInnerHTML" == a ? h = w : "value" == a ? _ = w : "checked" == a ? m = w : c && "function" != typeof w || b[a] === w || j$2(u, a, w, b[a], r);
+    if (h) c || v && (h.__html == v.__html || h.__html == u.innerHTML) || (u.innerHTML = h.__html), t.__k = [];else if (v && (u.innerHTML = ""), I("template" == t.type ? u.content : u, d$1(y) ? y : [y], t, i, o, "foreignObject" == x ? "http://www.w3.org/1999/xhtml" : r, e, f, e ? e[0] : i.__k && S(i, 0), c, s), null != e) for (a = e.length; a--;) g$1(e[a]);
+    c || (a = "value", "progress" == x && null == _ ? u.removeAttribute("value") : null != _ && (_ !== u[a] || "progress" == x && !_ || "option" == x && _ != b[a]) && j$2(u, a, _, b[a], r), a = "checked", null != m && m != u[a] && j$2(u, a, m, b[a], r));
   }
   return u;
 }
-function q$2(n, u, t) {
+function B$2(n, u, t) {
   try {
     if ("function" == typeof n) {
       var i = "function" == typeof n.__u;
@@ -274,9 +274,9 @@ function q$2(n, u, t) {
     l$1.__e(n, t);
   }
 }
-function B$2(n, u, t) {
-  var i, r;
-  if (l$1.unmount && l$1.unmount(n), (i = n.ref) && (i.current && i.current != n.__e || q$2(i, null, u)), null != (i = n.__c)) {
+function D$2(n, u, t) {
+  var i, o;
+  if (l$1.unmount && l$1.unmount(n), (i = n.ref) && (i.current && i.current != n.__e || B$2(i, null, u)), null != (i = n.__c)) {
     if (i.componentWillUnmount) try {
       i.componentWillUnmount();
     } catch (n) {
@@ -284,17 +284,17 @@ function B$2(n, u, t) {
     }
     i.base = i.__P = null;
   }
-  if (i = n.__k) for (r = 0; r < i.length; r++) i[r] && B$2(i[r], u, t || "function" != typeof n.type);
+  if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && D$2(i[o], u, t || "function" != typeof n.type);
   t || g$1(n.__e), n.__c = n.__ = n.__e = void 0;
 }
-function D$2(n, l, u) {
+function E$1(n, l, u) {
   return this.constructor(n, u);
 }
-function E$1(u, t, i) {
-  var r, o, e, f;
-  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), o = (r = "function" == typeof i) ? null : t.__k, e = [], f = [], O(t, u = (!r && i || t).__k = _$1(k$1, null, [u]), o || p$1, p$1, t.namespaceURI, !r && i ? [i] : o ? null : t.firstChild ? n.call(t.childNodes) : null, e, !r && i ? i : o ? o.__e : t.firstChild, r, f), z$1(e, u, f);
+function G$1(u, t, i) {
+  var o, r, e, f;
+  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), r = (o = "function" == typeof i) ? null : t.__k, e = [], f = [], O(t, u = (!o && i || t).__k = _$1(k$1, null, [u]), r || p$1, p$1, t.namespaceURI, !o && i ? [i] : r ? null : t.firstChild ? n.call(t.childNodes) : null, e, !o && i ? i : r ? r.__e : t.firstChild, o, f), N$1(e, u, f);
 }
-function K$1(n) {
+function Q$1(n) {
   function l(n) {
     var u, t;
     return this.getChildContext || (u = new Set(), (t = {})[l.__c] = this, this.getChildContext = function () {
@@ -317,10 +317,10 @@ function K$1(n) {
     return n.children(l);
   }).contextType = l, l;
 }
-n = y$1.slice, l$1 = {
+n = v$1.slice, l$1 = {
   __e: function (n, l, u, t) {
-    for (var i, r, o; l = l.__;) if ((i = l.__c) && !i.__) try {
-      if ((r = i.constructor) && null != r.getDerivedStateFromError && (i.setState(r.getDerivedStateFromError(n)), o = i.__d), null != i.componentDidCatch && (i.componentDidCatch(n, t || {}), o = i.__d), o) return i.__E = i;
+    for (var i, o, r; l = l.__;) if ((i = l.__c) && !i.__) try {
+      if ((o = i.constructor) && null != o.getDerivedStateFromError && (i.setState(o.getDerivedStateFromError(n)), r = i.__d), null != i.componentDidCatch && (i.componentDidCatch(n, t || {}), r = i.__d), r) return i.__E = i;
     } catch (l) {
       n = l;
     }
@@ -328,10 +328,10 @@ n = y$1.slice, l$1 = {
   }
 }, u$2 = 0, x$1.prototype.setState = function (n, l) {
   var u;
-  u = null != this.__s && this.__s != this.state ? this.__s : this.__s = d$1({}, this.state), "function" == typeof n && (n = n(d$1({}, u), this.props)), n && d$1(u, n), null != n && this.__v && (l && this._sb.push(l), M$1(this));
+  u = null != this.__s && this.__s != this.state ? this.__s : this.__s = w$1({}, this.state), "function" == typeof n && (n = n(w$1({}, u), this.props)), n && w$1(u, n), null != n && this.__v && (l && this._sb.push(l), M$1(this));
 }, x$1.prototype.forceUpdate = function (n) {
   this.__v && (this.__e = !0, n && this.__h.push(n), M$1(this));
-}, x$1.prototype.render = k$1, i$1 = [], o$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function (n, l) {
+}, x$1.prototype.render = k$1, i$1 = [], r$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function (n, l) {
   return n.__v.__b - l.__v.__b;
 }, $.__r = 0, f$2 = /(PointerCapture)$|Capture$/i, c$1 = 0, s$1 = F$2(!1), a$1 = F$2(!0), h$1 = 0;
 var f$1 = 0;
@@ -516,7 +516,7 @@ function w(n) {
     r = function () {
       clearTimeout(u), k && cancelAnimationFrame(t), setTimeout(n);
     },
-    u = setTimeout(r, 100);
+    u = setTimeout(r, 35);
   k && (t = requestAnimationFrame(r));
 }
 function z(n) {
@@ -557,7 +557,7 @@ function M(n, e) {
   function u(e) {
     return this.shouldComponentUpdate = r, _$1(n, e);
   }
-  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.prototype.isReactComponent = !0, u.__f = !0, u;
+  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.prototype.isReactComponent = !0, u.__f = !0, u.type = n, u;
 }
 (N.prototype = new x$1()).isPureReactComponent = !0, N.prototype.shouldComponentUpdate = function (n, t) {
   return E(this.props, n) || E(this.state, t);
@@ -572,14 +572,14 @@ function D(n) {
     var e = g({}, t);
     return delete e.ref, n(e, t.ref || null);
   }
-  return t.$$typeof = A, t.render = t, t.prototype.isReactComponent = t.__f = !0, t.displayName = "ForwardRef(" + (n.displayName || n.name) + ")", t;
+  return t.$$typeof = A, t.render = n, t.prototype.isReactComponent = t.__f = !0, t.displayName = "ForwardRef(" + (n.displayName || n.name) + ")", t;
 }
-var F = l$1.__e;
+var U = l$1.__e;
 l$1.__e = function (n, t, e, r) {
   if (n.then) for (var u, o = t; o = o.__;) if ((u = o.__c) && u.__c) return null == t.__e && (t.__e = e.__e, t.__k = e.__k), u.__c(n, t);
-  F(n, t, e, r);
+  U(n, t, e, r);
 };
-var U = l$1.unmount;
+var F = l$1.unmount;
 function V(n, t, e) {
   return n && (n.__c && n.__c.__H && (n.__c.__H.__.forEach(function (n) {
     "function" == typeof n.__c && n.__c();
@@ -596,6 +596,7 @@ function P() {
   this.__u = 0, this.o = null, this.__b = null;
 }
 function j(n) {
+  if (!n.__) return null;
   var t = n.__.__c;
   return t && t.__a && t.__a(n);
 }
@@ -604,7 +605,7 @@ function B() {
 }
 l$1.unmount = function (n) {
   var t = n.__c;
-  t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), U && U(n);
+  t && (t.__z = !0), t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), F && F(n);
 }, (P.prototype = new x$1()).__c = function (n, t) {
   var e = t.__c,
     r = this;
@@ -612,10 +613,12 @@ l$1.unmount = function (n) {
   var u = j(r.__v),
     o = !1,
     i = function () {
-      o || (o = !0, e.__R = null, u ? u(l) : l());
+      o || r.__z || (o = !0, e.__R = null, u ? u(c) : c());
     };
   e.__R = i;
-  var l = function () {
+  var l = e.__P;
+  e.__P = null;
+  var c = function () {
     if (! --r.__u) {
       if (r.state.__a) {
         var n = r.state.__a;
@@ -624,7 +627,7 @@ l$1.unmount = function (n) {
       var t;
       for (r.setState({
         __a: r.__b = null
-      }); t = r.o.pop();) t.forceUpdate();
+      }); t = r.o.pop();) t.__P = l, t.forceUpdate();
     }
   };
   r.__u++ || 32 & t.__u || r.setState({
@@ -1430,30 +1433,6 @@ function isObjectLike(value) {
   return value != null && typeof value == 'object';
 }
 
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' || isObjectLike(value) && baseGetTag(value) == symbolTag;
-}
-
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -1498,37 +1477,6 @@ function arrayMap(array, iteratee) {
  */
 var isArray = Array.isArray;
 
-/** Used to match a single whitespace character. */
-var reWhitespace = /\s/;
-
-/**
- * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
- * character of `string`.
- *
- * @private
- * @param {string} string The string to inspect.
- * @returns {number} Returns the index of the last non-whitespace character.
- */
-function trimmedEndIndex(string) {
-  var index = string.length;
-  while (index-- && reWhitespace.test(string.charAt(index))) {}
-  return index;
-}
-
-/** Used to match leading whitespace. */
-var reTrimStart = /^\s+/;
-
-/**
- * The base implementation of `_.trim`.
- *
- * @private
- * @param {string} string The string to trim.
- * @returns {string} Returns the trimmed string.
- */
-function baseTrim(string) {
-  return string ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '') : string;
-}
-
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -1557,63 +1505,6 @@ function baseTrim(string) {
 function isObject(value) {
   var type = typeof value;
   return value != null && (type == 'object' || type == 'function');
-}
-
-/** Used as references for various `Number` constants. */
-var NAN = 0 / 0;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol(value)) {
-    return NAN;
-  }
-  if (isObject(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject(other) ? other + '' : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = baseTrim(value);
-  var isBinary = reIsBinary.test(value);
-  return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
 }
 
 /**
@@ -2134,195 +2025,6 @@ function keys(object) {
 }
 
 /**
- * Gets the timestamp of the number of milliseconds that have elapsed since
- * the Unix epoch (1 January 1970 00:00:00 UTC).
- *
- * @static
- * @memberOf _
- * @since 2.4.0
- * @category Date
- * @returns {number} Returns the timestamp.
- * @example
- *
- * _.defer(function(stamp) {
- *   console.log(_.now() - stamp);
- * }, _.now());
- * // => Logs the number of milliseconds it took for the deferred invocation.
- */
-var now = function () {
-  return root.Date.now();
-};
-
-/** Error message constants. */
-var FUNC_ERROR_TEXT = 'Expected a function';
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max,
-  nativeMin = Math.min;
-
-/**
- * Creates a debounced function that delays invoking `func` until after `wait`
- * milliseconds have elapsed since the last time the debounced function was
- * invoked. The debounced function comes with a `cancel` method to cancel
- * delayed `func` invocations and a `flush` method to immediately invoke them.
- * Provide `options` to indicate whether `func` should be invoked on the
- * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
- * with the last arguments provided to the debounced function. Subsequent
- * calls to the debounced function return the result of the last `func`
- * invocation.
- *
- * **Note:** If `leading` and `trailing` options are `true`, `func` is
- * invoked on the trailing edge of the timeout only if the debounced function
- * is invoked more than once during the `wait` timeout.
- *
- * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
- * until to the next tick, similar to `setTimeout` with a timeout of `0`.
- *
- * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
- * for details over the differences between `_.debounce` and `_.throttle`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to debounce.
- * @param {number} [wait=0] The number of milliseconds to delay.
- * @param {Object} [options={}] The options object.
- * @param {boolean} [options.leading=false]
- *  Specify invoking on the leading edge of the timeout.
- * @param {number} [options.maxWait]
- *  The maximum time `func` is allowed to be delayed before it's invoked.
- * @param {boolean} [options.trailing=true]
- *  Specify invoking on the trailing edge of the timeout.
- * @returns {Function} Returns the new debounced function.
- * @example
- *
- * // Avoid costly calculations while the window size is in flux.
- * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
- *
- * // Invoke `sendMail` when clicked, debouncing subsequent calls.
- * jQuery(element).on('click', _.debounce(sendMail, 300, {
- *   'leading': true,
- *   'trailing': false
- * }));
- *
- * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
- * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
- * var source = new EventSource('/stream');
- * jQuery(source).on('message', debounced);
- *
- * // Cancel the trailing debounced invocation.
- * jQuery(window).on('popstate', debounced.cancel);
- */
-function debounce(func, wait, options) {
-  var lastArgs,
-    lastThis,
-    maxWait,
-    result,
-    timerId,
-    lastCallTime,
-    lastInvokeTime = 0,
-    leading = false,
-    maxing = false,
-    trailing = true;
-  if (typeof func != 'function') {
-    throw new TypeError(FUNC_ERROR_TEXT);
-  }
-  wait = toNumber(wait) || 0;
-  if (isObject(options)) {
-    leading = !!options.leading;
-    maxing = 'maxWait' in options;
-    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-    trailing = 'trailing' in options ? !!options.trailing : trailing;
-  }
-  function invokeFunc(time) {
-    var args = lastArgs,
-      thisArg = lastThis;
-    lastArgs = lastThis = undefined;
-    lastInvokeTime = time;
-    result = func.apply(thisArg, args);
-    return result;
-  }
-  function leadingEdge(time) {
-    // Reset any `maxWait` timer.
-    lastInvokeTime = time;
-    // Start the timer for the trailing edge.
-    timerId = setTimeout(timerExpired, wait);
-    // Invoke the leading edge.
-    return leading ? invokeFunc(time) : result;
-  }
-  function remainingWait(time) {
-    var timeSinceLastCall = time - lastCallTime,
-      timeSinceLastInvoke = time - lastInvokeTime,
-      timeWaiting = wait - timeSinceLastCall;
-    return maxing ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke) : timeWaiting;
-  }
-  function shouldInvoke(time) {
-    var timeSinceLastCall = time - lastCallTime,
-      timeSinceLastInvoke = time - lastInvokeTime;
-
-    // Either this is the first call, activity has stopped and we're at the
-    // trailing edge, the system time has gone backwards and we're treating
-    // it as the trailing edge, or we've hit the `maxWait` limit.
-    return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
-  }
-  function timerExpired() {
-    var time = now();
-    if (shouldInvoke(time)) {
-      return trailingEdge(time);
-    }
-    // Restart the timer.
-    timerId = setTimeout(timerExpired, remainingWait(time));
-  }
-  function trailingEdge(time) {
-    timerId = undefined;
-
-    // Only invoke if we have `lastArgs` which means `func` has been
-    // debounced at least once.
-    if (trailing && lastArgs) {
-      return invokeFunc(time);
-    }
-    lastArgs = lastThis = undefined;
-    return result;
-  }
-  function cancel() {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-    lastInvokeTime = 0;
-    lastArgs = lastCallTime = lastThis = timerId = undefined;
-  }
-  function flush() {
-    return timerId === undefined ? result : trailingEdge(now());
-  }
-  function debounced() {
-    var time = now(),
-      isInvoking = shouldInvoke(time);
-    lastArgs = arguments;
-    lastThis = this;
-    lastCallTime = time;
-    if (isInvoking) {
-      if (timerId === undefined) {
-        return leadingEdge(lastCallTime);
-      }
-      if (maxing) {
-        // Handle invocations in a tight loop.
-        clearTimeout(timerId);
-        timerId = setTimeout(timerExpired, wait);
-        return invokeFunc(lastCallTime);
-      }
-    }
-    if (timerId === undefined) {
-      timerId = setTimeout(timerExpired, wait);
-    }
-    return result;
-  }
-  debounced.cancel = cancel;
-  debounced.flush = flush;
-  return debounced;
-}
-
-/**
  * The base implementation of `_.values` and `_.valuesIn` which creates an
  * array of `object` property values corresponding to the property names
  * of `props`.
@@ -2678,15 +2380,12 @@ function mergeFunctions(lhs, rhs) {
 }
 
 /*!
-* tabbable 6.2.0
+* tabbable 6.4.0
 * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
 */
 // NOTE: separate `:not()` selectors has broader browser support than the newer
 //  `:not([inert], [inert] *)` (Feb 2023)
-// CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
-//  the entire query to fail, resulting in no nodes found, which will break a lot
-//  of things... so we have to rely on JS to identify nodes inside an inert container
-var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
+var candidateSelectors = ['input:not([inert]):not([inert] *)', 'select:not([inert]):not([inert] *)', 'textarea:not([inert]):not([inert] *)', 'a[href]:not([inert]):not([inert] *)', 'button:not([inert]):not([inert] *)', '[tabindex]:not(slot):not([inert]):not([inert] *)', 'audio[controls]:not([inert]):not([inert] *)', 'video[controls]:not([inert]):not([inert] *)', '[contenteditable]:not([contenteditable="false"]):not([inert]):not([inert] *)', 'details>summary:first-of-type:not([inert]):not([inert] *)', 'details:not([inert]):not([inert] *)'];
 var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
 var NoElement = typeof Element === 'undefined';
 var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
@@ -2695,35 +2394,6 @@ var getRootNode = !NoElement && Element.prototype.getRootNode ? function (elemen
   return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
 } : function (element) {
   return element === null || element === void 0 ? void 0 : element.ownerDocument;
-};
-
-/**
- * Determines if a node is inert or in an inert ancestor.
- * @param {Element} [node]
- * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
- *  see if any of them are inert. If false, only `node` itself is considered.
- * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
- *  False if `node` is falsy.
- */
-var isInert = function isInert(node, lookUp) {
-  var _node$getAttribute;
-  if (lookUp === void 0) {
-    lookUp = true;
-  }
-  // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
-  //  JS API property; we have to check the attribute, which can either be empty or 'true';
-  //  if it's `null` (not specified) or 'false', it's an active element
-  var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
-  var inert = inertAtt === '' || inertAtt === 'true';
-
-  // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
-  //  if it weren't for `matches()` not being a function on shadow roots; the following
-  //  code works for any kind of node
-  // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
-  //  so it likely would not support `:is([inert] *)` either...
-  var result = inert || lookUp && node && isInert(node.parentNode); // recursive
-
-  return result;
 };
 
 /**
@@ -2879,6 +2549,28 @@ var isZeroArea = function isZeroArea(node) {
 var isHidden = function isHidden(node, _ref) {
   var displayCheck = _ref.displayCheck,
     getShadowRoot = _ref.getShadowRoot;
+  if (displayCheck === 'full-native') {
+    if ('checkVisibility' in node) {
+      // Chrome >= 105, Edge >= 105, Firefox >= 106, Safari >= 17.4
+      // @see https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility#browser_compatibility
+      var visible = node.checkVisibility({
+        // Checking opacity might be desirable for some use cases, but natively,
+        // opacity zero elements _are_ focusable and tabbable.
+        checkOpacity: false,
+        opacityProperty: false,
+        contentVisibilityAuto: true,
+        visibilityProperty: true,
+        // This is an alias for `visibilityProperty`. Contemporary browsers
+        // support both. However, this alias has wider browser support (Chrome
+        // >= 105 and Firefox >= 106, vs. Chrome >= 121 and Firefox >= 122), so
+        // we include it anyway.
+        checkVisibilityCSS: true
+      });
+      return !visible;
+    }
+    // Fall through to manual visibility checks
+  }
+
   // NOTE: visibility will be `undefined` if node is detached from the document
   //  (see notes about this further down), which means we will consider it visible
   //  (this is legacy behavior from a very long way back)
@@ -2892,7 +2584,10 @@ var isHidden = function isHidden(node, _ref) {
   if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
     return true;
   }
-  if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
+  if (!displayCheck || displayCheck === 'full' ||
+  // full-native can run this branch when it falls through in case
+  // Element#checkVisibility is unsupported
+  displayCheck === 'full-native' || displayCheck === 'legacy-full') {
     if (typeof getShadowRoot === 'function') {
       // figure out if we should consider the node to be in an undisclosed shadow and use the
       //  'non-zero-area' fallback
@@ -3001,11 +2696,7 @@ var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
   return false;
 };
 var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-  if (node.disabled ||
-  // we must do an inert look up to filter out any elements inside an inert ancestor
-  //  because we're limited in the type of selectors we can use in JSDom (see related
-  //  note related to `candidateSelectors`)
-  isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
+  if (node.disabled || isHiddenInput(node) || isHidden(node, options) ||
   // For a details element with a summary, the summary element gets the focus
   isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
     return false;
@@ -3028,7 +2719,7 @@ var isTabbable = function isTabbable(node, options) {
   }
   return isNodeMatchingSelectorTabbable(options, node);
 };
-var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
+var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe:not([inert]):not([inert] *)').join(',');
 var isFocusable = function isFocusable(node, options) {
   options = options || {};
   if (!node) {
@@ -4312,6 +4003,7 @@ function useTypeaheadNavigation({
     };
     function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
       if (currentTypeahead && sortedTypeaheadInfo.current.length) {
+        if (currentTypeahead == "se") debugger;
         const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
         if (sortedTypeaheadIndex < 0) {
           // The user has typed an entry that doesn't exist in the list
@@ -4372,6 +4064,9 @@ function useTypeaheadNavigation({
           if (toSet != null) {
             setIndex(toSet, reason, true);
             onNavigateTypeahead?.(toSet, reason);
+          } else {
+            // We get here if the only matching child we found was untabbable/missing
+            setTypeaheadStatus("invalid");
           }
         }
       }
@@ -4427,7 +4122,7 @@ function useTypeaheadNavigationChild({
             unsortedIndex: index
           });
         } else {
-          sortedTypeaheadInfo.splice(sortedIndex, 0, {
+          sortedTypeaheadInfo.splice(sortedIndex, 1, {
             text,
             unsortedIndex: index
           });
@@ -4762,7 +4457,8 @@ function usePaginatedChild({
  */
 function useRearrangeableChildren({
   rearrangeableChildrenParameters: {
-    children: childrenIn
+    children: childrenIn,
+    animate
   },
   processedIndexManglerParameters: {
     getIndex,
@@ -4789,12 +4485,13 @@ function useRearrangeableChildren({
         if (index != null && mangledIndex != null) {
           const info = getManagedChildren().getAt(index);
           const info2 = getManagedChildren().getAt(mangledIndex);
-          if (info && info2) {
+          if (info && info2 && animate) {
             const element = info2.getElement();
             const rect = element?.getBoundingClientRect();
             if (rect) {
               // TODO: This still fires even if the index hasn't changed for this child.
-              // Find a way to bail out if this child's position hasn't changed
+              // Find a way to bail out if this child's position hasn't changed.
+              // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
               info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = {
                 left: rect.left,
                 top: rect.top,
@@ -4806,7 +4503,7 @@ function useRearrangeableChildren({
         }
       }
       return rearrangedChildren;
-    }, [childrenIn, refreshIndex]);
+    }, [childrenIn, refreshIndex, animate]);
     const getFLIPStart = useCallback(index => {
       return allChildPositions.current[index];
     }, []);
@@ -4819,7 +4516,8 @@ function useRearrangeableChildren({
       },
       context: useMemoObject({
         rearrangeableChildrenContext: useMemoObject({
-          getFLIPStart
+          getFLIPStart,
+          animate
         })
       })
     };
@@ -4842,7 +4540,8 @@ function useRearrangeableChild({
   return useMonitoring(function useRearrangeableChild() {
     const {
       rearrangeableChildrenContext: {
-        getFLIPStart
+        getFLIPStart,
+        animate
       }
     } = context;
     const getCssProperty = useStableGetter(cssProperty);
@@ -4853,38 +4552,40 @@ function useRearrangeableChild({
     const flipStartPosition = A$1(undefined);
     const [animationIndex, setAnimationIndex] = d(0);
     _(() => {
-      const duration = getDuration();
-      const cssProperty = getCssProperty();
-      if (cssProperty && animationIndex > 0) {
-        const element = getElement();
-        const first = getFLIPStart(index); //flipStartPosition.current;
-        //const mid = element.getBoundingClientRect();
-        //console.log(mid);
-        // Forcibly end any previous transitions.
-        // Otherwise, interruptions end up causing exponentially larger transforms.
-        // Which, TODO, is definitely fixable.
-        if (cssProperty === 'translate') element.style.scale = element.style.translate = '';else if (cssProperty === 'transform') element.style.transform = '';
-        element.style.transition = 'none';
-        const last = element.getBoundingClientRect();
-        if (first && last) {
-          const dx = first.left - last.left;
-          const dy = first.top - last.top;
-          const dsx = first.width / last.width;
-          const dsy = first.height / last.height;
-          if (cssProperty === 'translate') {
-            element.style.translate = `${dx}px ${dy}px`;
-            element.style.scale = `${dsx} ${dsy}`;
-          } else if (cssProperty === 'transform') {
-            element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+      if (animate) {
+        const duration = getDuration();
+        const cssProperty = getCssProperty();
+        if (cssProperty && animationIndex > 0) {
+          const element = getElement();
+          const first = getFLIPStart(index); //flipStartPosition.current;
+          //const mid = element.getBoundingClientRect();
+          //console.log(mid);
+          // Forcibly end any previous transitions.
+          // Otherwise, interruptions end up causing exponentially larger transforms.
+          // Which, TODO, is definitely fixable.
+          if (cssProperty === 'translate') element.style.scale = element.style.translate = '';else if (cssProperty === 'transform') element.style.transform = '';
+          element.style.transition = 'none';
+          const last = element.getBoundingClientRect();
+          if (first && last) {
+            const dx = first.left - last.left;
+            const dy = first.top - last.top;
+            const dsx = first.width / last.width;
+            const dsy = first.height / last.height;
+            if (cssProperty === 'translate') {
+              element.style.translate = `${dx}px ${dy}px`;
+              element.style.scale = `${dsx} ${dsy}`;
+            } else if (cssProperty === 'transform') {
+              element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+            }
+            element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
+            requestAnimationFrame(() => {
+              if (cssProperty === 'translate') element.style.scale = element.style.translate = '';else if (cssProperty === 'transform') element.style.transform = '';
+              element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
+            });
           }
-          element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
-          requestAnimationFrame(() => {
-            if (cssProperty === 'translate') element.style.scale = element.style.translate = '';else if (cssProperty === 'transform') element.style.transform = '';
-            element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
-          });
         }
       }
-    }, [index, animationIndex]);
+    }, [index, animationIndex, animate]);
     const updateFLIPAnimation = useCallback(position => {
       flipStartPosition.current = position;
       setAnimationIndex(p => ++p);
@@ -4916,7 +4617,8 @@ function useStaggeredChildren({
   },
   staggeredChildrenParameters: {
     staggered,
-    childCount
+    childCount,
+    disableIntersectionObserver
   }
   //refElementReturn: { getElement }
 }) {
@@ -5028,19 +4730,24 @@ function useStaggeredChildren({
       getIntersectionObserver,
       setElementToIndexMap
     }), [parentIsStaggered]);
+    // TODO: The fact that we use an IntersectionObserver makes it
+    // very impossible to see the staggering effect, for better or worse.
+    // Add an option to disable it? Maybe? Mostly for testing.
     y(() => {
-      const io = intersectionObserver.current = new IntersectionObserver(entries => {
-        for (let entry of entries) {
-          if (entry.isIntersecting) {
-            const index = elementToIndex.current.get(entry.target);
-            if (index != null) {
-              getChildren().getAt(index)?.setStaggeredVisible(true);
+      if (!disableIntersectionObserver) {
+        const io = intersectionObserver.current = new IntersectionObserver(entries => {
+          for (let entry of entries) {
+            if (entry.isIntersecting) {
+              const index = elementToIndex.current.get(entry.target);
+              if (index != null) {
+                getChildren().getAt(index)?.setStaggeredVisible(true);
+              }
             }
           }
-        }
-      });
-      return () => io.disconnect();
-    }, []);
+        });
+        return () => io.disconnect();
+      }
+    }, [disableIntersectionObserver]);
     return {
       staggeredChildrenReturn: {
         stillStaggering: currentlyStaggering
@@ -5081,15 +4788,17 @@ function useStaggeredChild({
     // (We don't ask when the child becomes visible due to screen-scrolling,
     // only when it becomes visible because we were next in line to do so)
     const becauseScreen = A$1(false);
-    usePassiveState(useStableCallback((next, _prev, _reason) => {
-      if (staggeredVisible) return;
-      if (next) {
-        const io = getIntersectionObserver();
-        io?.unobserve(e.current);
-        setStaggeredVisible(true);
-        becauseScreen.current = true;
-      }
-    }), returnFalse);
+    /*
+    const [_getOnScreen, _setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, _prev, _reason) => {
+         if (staggeredVisible)
+            return;
+         if (next) {
+            const io = getIntersectionObserver();
+            io?.unobserve(e.current!);
+             //setStaggeredVisible(true);
+            //becauseScreen.current = true;
+        }
+    }), returnFalse);*/
     // This isn't called during useEffect here, because we want to wait for the
     // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
     // So we return the effect we want to run and let the caller run it as appropriate.
@@ -5122,12 +4831,12 @@ function useStaggeredChild({
       refElementParameters: {
         onElementChange: useStableCallback(element => {
           setElementToIndexMap(index, element);
-          e.current = element || e.current;
           const io = getIntersectionObserver();
-          if (e.current) {
-            io?.observe(e.current);
+          if (element) {
+            e.current = element;
+            io?.observe(element);
           } else {
-            io?.unobserve(e.current);
+            if (e.current) io?.unobserve(e.current);
           }
         })
       }
@@ -5196,7 +4905,8 @@ function useProcessedChildren({
       paginationMin
     } = paginatedChildrenParameters;
     const {
-      staggered
+      staggered,
+      disableIntersectionObserver
     } = staggeredChildrenParameters;
     const {
       context: {
@@ -5261,7 +4971,8 @@ function useProcessedChildren({
       },
       staggeredChildrenParameters: {
         staggered,
-        childCount
+        childCount,
+        disableIntersectionObserver
       }
       //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
@@ -5570,31 +5281,31 @@ function useMultiSelection({
     // When a child changes selection state, it calls this function.
     const notifyParentOfChildSelectChange = useStableCallback((event, index, selected, previous) => {
       console.assert(selected != previous);
+      // The commented-out asserts are don't work for rearranged children,
+      // and are staying for now as a reminder of that, because it is a bit weird.
       if (selected == undefined) {
         // This child is unmounting itself.
         if (previous === true) {
-          console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+          //console.assert(selectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
           selectedIndices.current.delete(index);
         } else if (previous === false) {
-          console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
+          //console.assert(unselectedIndices.current.has(index), `The selected child at index ${index} is unmounting itself, but the parent was unaware of it being selected.`);
           unselectedIndices.current.delete(index);
-        } else {
-          console.assert(false, `The child at index ${index} was not selected or unselected but a secret third thing: ${selected}`);
-        }
+        } else ;
       } else if (selected) {
         if (previous != undefined) {
-          console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
+          //console.assert(unselectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though it was not unselected before, somehow.`);
           unselectedIndices.current.delete(index);
         }
-        console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`);
+        //console.assert(!selectedIndices.current.has(index), `The multi-select child at index ${index} changed to selected even though there is already a selected child with that index.`)
         selectedIndices.current.add(index);
         startOfShiftSelect.current = index;
       } else {
         if (previous != undefined) {
-          console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
+          //console.assert(selectedIndices.current.has(index), `The multi-select child at index ${index} changed to unselected even though it was not selected before, somehow.`);
           selectedIndices.current.delete(index);
         }
-        console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`);
+        //console.assert(!unselectedIndices.current.has(index), `The multi-select child at index ${index} was marked as unselected even though there is already an unselected child with that index.`)
         unselectedIndices.current.add(index);
       }
       const childCount = selectedIndices.current.size + unselectedIndices.current.size;
@@ -5757,8 +5468,7 @@ function useMultiSelectionChild({
     const [localSelected, setLocalSelected, getLocalSelected] = useState(initiallyMultiSelected ?? false);
     const changeMultiSelected = useStableCallback((e, selected) => {
       console.assert(selected != null);
-      console.assert(!multiSelectionDisabled);
-      console.assert(multiSelectIsEnabled);
+      if (selected) console.assert(!multiSelectionDisabled);else console.assert(multiSelectIsEnabled);
       // We're selected now (because someone told us we are, this hook doesn't call this function directly)
       //
       // So update our own internal state so we can re-render with the correct props,
@@ -7443,8 +7153,128 @@ function useCompleteListNavigationChildDeclarative({
     multiSelectionChildReturn
   };
 }
+
+//
+// Types (and a single function) that are shared
+// between both throttle and debounce.
+//
+function getTimeout(v) {
+  if (v == null) return null;
+  if (typeof v == 'number') {
+    if (v < 0) return null;
+    return v;
+  }
+  return getTimeout(v());
+}
+function debounce({
+  debounceDuration: durationOrGetter,
+  handlerIn: handler
+}) {
+  let timeoutHandle = null;
+  let queuedArgs = null;
+  function onDebounceEnded() {
+    if (queuedArgs != null) {
+      handler?.(...queuedArgs);
+      queuedArgs = null;
+    }
+  }
+  function debounced(...args) {
+    queuedArgs = args;
+    const debounceTimeout = getTimeout(durationOrGetter);
+    if (debounceTimeout == null) handler?.(...queuedArgs);else {
+      if (timeoutHandle != null) cancel();
+      timeoutHandle = setTimeout(onDebounceEnded, debounceTimeout);
+    }
+  }
+  function flush() {
+    if (timeoutHandle != null) {
+      onDebounceEnded();
+      cancel();
+    }
+  }
+  function cancel() {
+    if (timeoutHandle != null) clearTimeout(timeoutHandle);
+  }
+  return {
+    handlerOut: debounced,
+    flush,
+    cancel
+  };
+}
+function throttle({
+  handlerIn: handler,
+  throttleDuration: durationOrGetter
+}) {
+  let timeoutHandle = null;
+  // We have called `handler` during the throttle period.
+  //let queuedUp = false;
+  let queuedArgs = null;
+  function runIfQueued() {
+    if (queuedArgs != null) {
+      const throttleTimeout = getTimeout(durationOrGetter);
+      if (throttleTimeout == null) {
+        handler?.(...queuedArgs);
+      } else {
+        if (timeoutHandle == null) {
+          handler?.(...queuedArgs);
+          queuedArgs = null;
+        }
+        timeoutHandle = setTimeout(() => {
+          timeoutHandle = null;
+          runIfQueued();
+        }, throttleTimeout);
+      }
+    }
+  }
+  function throttled(...args) {
+    queuedArgs = args;
+    runIfQueued();
+  }
+  function cancel() {
+    if (timeoutHandle != null) {
+      clearTimeout(timeoutHandle);
+      timeoutHandle = null;
+    }
+  }
+  function flush() {
+    runIfQueued();
+    cancel();
+  }
+  return {
+    handlerOut: throttled,
+    cancel,
+    flush
+  };
+}
+function throttleDebounce({
+  debounceDuration,
+  throttleDuration,
+  handlerIn
+}) {
+  const t = throttle({
+    handlerIn,
+    throttleDuration
+  });
+  const d = debounce({
+    handlerIn: t.handlerOut,
+    debounceDuration
+  });
+  return {
+    handlerOut: d.handlerOut,
+    cancel: () => {
+      t.cancel();
+      d.cancel();
+    },
+    flush: () => {
+      d.flush();
+    }
+  };
+}
 function isPromise(p) {
-  return p instanceof Promise;
+  return p && typeof p == 'object' && "then" in p;
+}
+function defaultCapture(...args) {
+  return args;
 }
 const Unset = Symbol("Unset");
 /**
@@ -7454,7 +7284,9 @@ const Unset = Symbol("Unset");
  * Note that part of this is emulating the fact that the sync handler cannot have a return value,
  * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
  *
- * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
+ * @type `ReturnType` The type that your async function returns (may or may not be wrapped in a `Promise<>`)
+ * @type `AsyncArgs` The arguments that your async function takes (as an array)
+ * @type `SyncArgs` The arguments that the returned sync function takes (as an array). Defaults to the same type as `AsyncArgs`.
  */
 function asyncToSync({
   asyncInput,
@@ -7471,13 +7303,16 @@ function asyncToSync({
   onAsyncDebounce,
   onSyncDebounce,
   onPending,
-  throttle,
-  wait
+  throttle: throttleDuration,
+  debounce: debounceDuration
 }) {
+  // 0. The comments are numbered in approximate execution order 
+  // for your reading pleasure (1 is near the bottom).
   let pending = false;
   let syncDebouncing = false;
   let asyncDebouncing = false;
   let currentCapture = Unset;
+  capture ??= defaultCapture;
   const onFinally = () => {
     // 8. This is run at the end of every invocation of the async handler,
     // whether it completed or not, and whether it was async or not.
@@ -7510,7 +7345,7 @@ function asyncToSync({
       // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
       // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
       onInvoke?.();
-      promiseOrReturn = asyncInput(...args);
+      promiseOrReturn = asyncInput?.(...args);
       onHasError?.(false);
     } catch (ex) {
       hadSyncError = true;
@@ -7522,12 +7357,12 @@ function asyncToSync({
       onInvoked?.("async");
       promiseOrReturn.then(r => {
         onResolve?.();
-        onHasResult?.(true);
+        onHasResult?.(true, r);
         onReturnValue?.(r);
         return r;
       }).catch(e => {
         onReject?.();
-        onHasError?.(true);
+        onHasError?.(true, e);
         onError?.(e);
         return e;
       }).finally(onFinally);
@@ -7537,43 +7372,42 @@ function asyncToSync({
         onResolve?.();
         onHasResult?.(true);
         onHasError?.(false);
+        onReturnValue?.(promiseOrReturn); // The ! assertion is safe here because it's only undefined if ReturnType includes undefined already.
       } else {
         onReject?.();
         onHasResult?.(false);
         onHasError?.(true);
       }
-      onReturnValue?.(promiseOrReturn);
-      onPending?.(pending = false);
       onFinally();
     }
   };
-  // lodash uses "in" instead of checking for `undefined`...
-  const lodashOptions = {
-    leading: !wait,
-    trailing: true
-  };
-  if (throttle) {
-    if (wait == null || wait < throttle) wait = throttle;
-    lodashOptions.maxWait = throttle;
-  }
-  const syncDebounced = debounce(() => {
-    // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
-    // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-    onSyncDebounce?.(syncDebouncing = false);
-    if (!pending) {
-      // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
-      // then we can just go ahead and run the debounced version of our function.
-      console.assert(currentCapture != Unset);
-      sync(...currentCapture);
-    } else {
-      // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
-      // then we'll need to delay this one. When that previous invocation finishes, it'll check
-      // to see if it needs to run again, and it will use these new captured arguments from step 2.
-      onAsyncDebounce?.(asyncDebouncing = true);
-    }
-  }, wait || undefined, lodashOptions);
+  const {
+    handlerOut: syncDebounced,
+    cancel: syncCancel,
+    flush: syncFlush
+  } = throttleDebounce({
+    handlerIn: () => {
+      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
+      onSyncDebounce?.(syncDebouncing = false);
+      if (!pending) {
+        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+        // then we can just go ahead and run the debounced version of our function.
+        console.assert(currentCapture != Unset);
+        sync(...currentCapture);
+      } else {
+        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
+        // then we'll need to delay this one. When that previous invocation finishes, it'll check
+        // to see if it needs to run again, and it will use these new captured arguments from step 2.
+        onAsyncDebounce?.(asyncDebouncing = true);
+      }
+    },
+    debounceDuration: debounceDuration,
+    throttleDuration: throttleDuration
+  });
   return {
     syncOutput: (...args) => {
+      if (asyncInput == null) return;
       // 1. Someone just called the sync version of our async function.
       // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
       currentCapture = capture?.(...args) ?? [];
@@ -7581,10 +7415,10 @@ function asyncToSync({
       syncDebounced();
     },
     flushSyncDebounce: () => {
-      syncDebounced.flush();
+      syncFlush();
     },
     cancelSyncDebounce: () => {
-      syncDebounced.cancel();
+      syncCancel();
     }
   };
 }
@@ -7682,7 +7516,7 @@ function useAsync(asyncHandler, options) {
         onReject: incrementRejectCount,
         onResolve: incrementResolveCount,
         throttle: options?.throttle ?? undefined,
-        wait: options?.debounce ?? undefined
+        debounce: options?.debounce ?? undefined
       });
     }, [throttle, debounce]);
     y(() => {
@@ -8422,15 +8256,15 @@ function useHasLastFocus(args) {
     };
   });
 }
-K$1(null);
+Q$1(null);
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 // TODO: Too lazy to set this up as context properly
 //const shuffledWords = { current: RandomWords2 };
 //const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
 //const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
-const UntabbableContext = K$1(false);
-const ListNavigationSingleSelectionChildContext = K$1(null);
-const ListChildContext = K$1(null);
+const UntabbableContext = Q$1(false);
+const ListNavigationSingleSelectionChildContext = Q$1(null);
+const ListChildContext = Q$1(null);
 const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
   const [multiSelectPercent, setMultiSelectPercent] = useState(0);
   const [singleSelectedIndex, setSingleSelectedIndex] = useState(null);
@@ -8526,6 +8360,7 @@ const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
     }, secondsToHalve * 1000);
   }, []);
   const [staggering, setStaggering] = useState(false);
+  const [animate, setAnimate] = useState(true);
   return u$1("div", {
     className: "demo",
     children: [u$1("h2", {
@@ -8558,11 +8393,9 @@ const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
       }), u$1("li", {
         children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless."
       }), u$1("li", {
-        children: ["The parent's selected index is ", u$1("strong", {
-          children: "uncontrolled"
-        }), " and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See ", u$1("code", {
-          children: "useSingleSelectionDeclarative"
-        }), " for a shortcut to do exactly that)"]
+        children: "Staggering can be enabled on the list, which mounts children one at a time instead of all at once. With some precise CSS applied this can drastically improve the performance of mounting long lists on slower devices."
+      }), u$1("li", {
+        children: "The parent controls the selected index, only re-rendering affected children when it changes."
       }), u$1("li", {
         children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time."
       }), u$1("li", {
@@ -8645,6 +8478,15 @@ const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
         }
       })]
     }), u$1("label", {
+      children: ["Animate reorderings: ", u$1("input", {
+        type: "checkbox",
+        checked: staggered,
+        onInput: e => {
+          e.preventDefault();
+          setAnimate(e.currentTarget.checked);
+        }
+      })]
+    }), u$1("label", {
       children: ["Single-Selection mode:", u$1("label", {
         children: [u$1("input", {
           name: "rti-demo-single-selection-mode",
@@ -8721,11 +8563,13 @@ const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
         children: u$1("ol", {
           start: 0,
           ...props,
+          className: "demo-list",
           children: u$1(DemoUseRovingTabIndexChildren, {
             max: max,
             min: min,
             staggered: staggered,
             count: count,
+            animate: animate,
             setStaggering: setStaggering
           })
         })
@@ -8738,7 +8582,8 @@ const DemoUseRovingTabIndexChildren = M(function DemoUseRovingTabIndexChildren({
   max,
   min,
   staggered,
-  setStaggering
+  setStaggering,
+  animate
 }) {
   const {
     context,
@@ -8751,6 +8596,7 @@ const DemoUseRovingTabIndexChildren = M(function DemoUseRovingTabIndexChildren({
       paginationMin: min
     },
     rearrangeableChildrenParameters: {
+      animate,
       children: T$1(() => Array.from(function* () {
         for (let i = 0; i < count; ++i) {
           if (i == 1) yield u$1("li", {
@@ -8768,7 +8614,8 @@ const DemoUseRovingTabIndexChildren = M(function DemoUseRovingTabIndexChildren({
     },
     managedChildrenParameters: {},
     staggeredChildrenParameters: {
-      staggered
+      staggered,
+      disableIntersectionObserver: true
     },
     context: x(ListNavigationSingleSelectionChildContext)
   });
@@ -8808,6 +8655,7 @@ const DemoUseRovingTabIndexChildOuter = M(function DemoUseRovingTabIndexChildOut
   const c = u$1(DemoUseRovingTabIndexChild, {
     word: word,
     index: index,
+    childUseEffect: staggeredChildReturn.childUseEffect,
     mangledIndex: mangledIndex,
     demangledIndex: demangledIndex
   });
@@ -8820,8 +8668,10 @@ const DemoUseRovingTabIndexChild = M(function DemoUseRovingTabIndexChild({
   index,
   word,
   mangledIndex,
-  demangledIndex
+  demangledIndex,
+  childUseEffect
 }) {
+  y(childUseEffect, [childUseEffect]);
   let disabled = index == 6;
   let hidden = index == 7;
   if (index == 8) {
@@ -8924,7 +8774,7 @@ const DemoUseRovingTabIndexChild = M(function DemoUseRovingTabIndexChild({
   });
 });
 window._generate_setState_stacks = false;
-K$1(null);
+Q$1(null);
 M(({
   depth
 }) => {
@@ -9450,6 +9300,6 @@ const Component = () => {
   });
 };
 requestAnimationFrame(() => {
-  E$1(u$1(Component, {}), document.getElementById("root"));
+  G$1(u$1(Component, {}), document.getElementById("root"));
 });
 //# sourceMappingURL=index.js.map

@@ -170,9 +170,10 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             children,
+            animate: false
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        staggeredChildrenParameters: { staggered,disableIntersectionObserver: true },
     });
 
     return (

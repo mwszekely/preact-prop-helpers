@@ -211,6 +211,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         context: contextFromList,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
+            animate: false,
             children: Array.from(function* () {
                 for (let i = 0; i < childCount; ++i) {
                     if (i == MissingIndex)
@@ -223,7 +224,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
             }()),
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered },
+        staggeredChildrenParameters: { staggered, disableIntersectionObserver: false },
     });
 
     useEffect(() => {

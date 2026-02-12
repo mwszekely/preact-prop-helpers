@@ -16,7 +16,6 @@ import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } f
 
 
 export interface UseRearrangedChildrenContextSelf {
-    _unused: undefined;
     //provideManglers(mangler: ProcessedIndexMangler): void;
 }
 
@@ -84,6 +83,12 @@ export interface UseRearrangeableChildrenParametersSelf {
      * The children to rearrange.
      */
     children: (VNode | null)[];
+
+    /**
+     * If true, moving children around will visually translate 
+     * them to their new position via CSS transforms.
+     */
+    animate: boolean;
 }
 
 /**
@@ -106,6 +111,8 @@ export interface UseRearrangeableChildrenContext {
 
 export interface UseRearrangeableChildrenContextSelf {
     getFLIPStart(index: number): RearrangeableChildPositionInfo | undefined;
+
+    animate: boolean;
 }
 
 export interface UseRearrangeableChildrenReturnTypeSelf {
@@ -205,7 +212,7 @@ export interface UseRearrangeableChildParametersSelf {
  * @compositeParams
  */
 export function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
-    rearrangeableChildrenParameters: { children: childrenIn },
+    rearrangeableChildrenParameters: { children: childrenIn, animate },
     processedIndexManglerParameters: { getIndex, getSortValueAt },
     managedChildrenReturn: { getChildren: getManagedChildren },
     context: { processedIndexManglerContext: { mangler } }
@@ -227,14 +234,15 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
                 if (index != null && mangledIndex != null) {
                     const info = getManagedChildren().getAt(index);
                     const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2) {
+                    if (info && info2 && animate) {
 
                         const element = info2.getElement();
 
                         const rect = element?.getBoundingClientRect();
                         if (rect) {
                             // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed
+                            // Find a way to bail out if this child's position hasn't changed.
+                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
                             info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
                         }
                     }
@@ -242,7 +250,7 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
             }
 
             return rearrangedChildren;
-        }, [childrenIn, refreshIndex]);
+        }, [childrenIn, refreshIndex, animate]);
 
         const getFLIPStart = useCallback((index: number) => {
             return allChildPositions.current[index];
@@ -254,7 +262,7 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
                 refresh: useStableCallback(() => { setRefreshIndex(p => ++p); }, [])
             },
             context: useMemoObject<UseRearrangeableChildrenContext>({
-                rearrangeableChildrenContext: useMemoObject({ getFLIPStart })
+                rearrangeableChildrenContext: useMemoObject<UseRearrangeableChildrenContextSelf>({ getFLIPStart, animate })
             })
         }
     });
@@ -273,7 +281,7 @@ export function useRearrangeableChild<ChildElement extends Element, M extends Us
     rearrangeableChildParameters: { cssProperty, duration }
 }: UseRearrangeableChildParameters<ChildElement>): UseRearrangeableChildReturnType<ChildElement> {
     return useMonitoring(function useRearrangeableChild(): UseRearrangeableChildReturnType<ChildElement> {
-        const { rearrangeableChildrenContext: { getFLIPStart } } = context;
+        const { rearrangeableChildrenContext: { getFLIPStart, animate } } = context;
 
         const getCssProperty = useStableGetter(cssProperty);
         const getDuration = useStableGetter(duration);
@@ -285,50 +293,52 @@ export function useRearrangeableChild<ChildElement extends Element, M extends Us
         const [animationIndex, setAnimationIndex] = useState(0);
 
         useLayoutEffect(() => {
-            const duration = getDuration();
-            const cssProperty = getCssProperty();
-            if (cssProperty && animationIndex > 0) {
-                const element = getElement() as Element as HTMLElement;
-                const first = getFLIPStart(index); //flipStartPosition.current;
+            if (animate) {
+                const duration = getDuration();
+                const cssProperty = getCssProperty();
+                if (cssProperty && animationIndex > 0) {
+                    const element = getElement() as Element as HTMLElement;
+                    const first = getFLIPStart(index); //flipStartPosition.current;
 
-                //const mid = element.getBoundingClientRect();
-                //console.log(mid);
-                // Forcibly end any previous transitions.
-                // Otherwise, interruptions end up causing exponentially larger transforms.
-                // Which, TODO, is definitely fixable.
-                if (cssProperty === 'translate')
-                    element.style.scale = element.style.translate = '';
-                else if (cssProperty === 'transform')
-                    element.style.transform = '';
-                element.style.transition = 'none';
+                    //const mid = element.getBoundingClientRect();
+                    //console.log(mid);
+                    // Forcibly end any previous transitions.
+                    // Otherwise, interruptions end up causing exponentially larger transforms.
+                    // Which, TODO, is definitely fixable.
+                    if (cssProperty === 'translate')
+                        element.style.scale = element.style.translate = '';
+                    else if (cssProperty === 'transform')
+                        element.style.transform = '';
+                    element.style.transition = 'none';
 
-                const last = element.getBoundingClientRect();
+                    const last = element.getBoundingClientRect();
 
-                if (first && last) {
-                    const dx = first.left - last.left;
-                    const dy = first.top - last.top;
-                    const dsx = first.width / last.width;
-                    const dsy = first.height / last.height;
+                    if (first && last) {
+                        const dx = first.left - last.left;
+                        const dy = first.top - last.top;
+                        const dsx = first.width / last.width;
+                        const dsy = first.height / last.height;
 
-                    if (cssProperty === 'translate') {
-                        element.style.translate = `${dx}px ${dy}px`;
-                        element.style.scale = `${dsx} ${dsy}`;
+                        if (cssProperty === 'translate') {
+                            element.style.translate = `${dx}px ${dy}px`;
+                            element.style.scale = `${dsx} ${dsy}`;
+                        }
+                        else if (cssProperty === 'transform') {
+                            element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+                        }
+                        element.style.transition = cssProperty === 'translate' ? 'translate 0s, scale 0s' : `transform 0s`;
+                        requestAnimationFrame(() => {
+                            if (cssProperty === 'translate')
+                                element.style.scale = element.style.translate = '';
+                            else if (cssProperty === 'transform')
+                                element.style.transform = '';
+
+                            element.style.transition = cssProperty === 'translate' ? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
+                        });
                     }
-                    else if (cssProperty === 'transform') {
-                        element.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
-                    }
-                    element.style.transition = cssProperty === 'translate'? 'translate 0s, scale 0s' : `transform 0s`;
-                    requestAnimationFrame(() => {
-                        if (cssProperty === 'translate')
-                            element.style.scale = element.style.translate = '';
-                        else if (cssProperty === 'transform')
-                            element.style.transform = '';
-
-                        element.style.transition = cssProperty === 'translate'? `translate ${duration}, scale ${duration}` : `transform ${duration}`;
-                    });
                 }
             }
-        }, [index, animationIndex]);
+        }, [index, animationIndex, animate]);
 
         const updateFLIPAnimation = useCallback((position: RearrangeableChildPositionInfo) => {
             flipStartPosition.current = position;
