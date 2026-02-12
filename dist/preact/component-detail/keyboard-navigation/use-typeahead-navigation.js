@@ -134,8 +134,6 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         };
         function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
-                if (currentTypeahead == "se")
-                    debugger;
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
                 if (sortedTypeaheadIndex < 0) {
                     // The user has typed an entry that doesn't exist in the list

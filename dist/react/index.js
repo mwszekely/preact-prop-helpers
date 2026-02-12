@@ -108,6 +108,7 @@ const EventMapping$1 = {
     webkittransitionend: null,
 };
 
+/// @ts-expect-error
 function debounceRendering(f) {
     // TODO?
     return queueMicrotask(f);
@@ -2112,8 +2113,6 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
         };
         function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
-                if (currentTypeahead == "se")
-                    debugger;
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
                 if (sortedTypeaheadIndex < 0) {
                     // The user has typed an entry that doesn't exist in the list

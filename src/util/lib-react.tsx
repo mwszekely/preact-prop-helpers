@@ -1,9 +1,13 @@
+/// @ts-expect-error
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState, type ComponentType } from "react";
+/// @ts-expect-error
 export type { ReactNode as ComponentChildren, Context, Dispatch, EffectCallback, DependencyList as Inputs, JSX, MutableRefObject as MutableRef, PropsWithChildren, PropsWithRef, Reducer, Ref, RefCallback, SetStateAction } from "react";
-import { JSX } from "react/jsx-runtime"
+/// @ts-expect-error
+import { JSX } from "react/jsx-runtime";
+import { EventMapping as em } from "./lib-shared.js";
+/// @ts-expect-error
 export { createPortal } from "react-dom";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
-import { EventMapping as em } from "./lib-shared.js";
 
 export type RenderableProps<P> = PropsWithChildren<PropsWithRef<P>>;
 
@@ -18,7 +22,7 @@ export function debounceRendering(f: () => void) {
 export const onfocusin = "onFocus" satisfies keyof ElementProps<any>;
 export const onfocusout = "onBlur" satisfies keyof ElementProps<any>;
 
-
+/// @ts-expect-error
 import { CompositionEvent, Dispatch, DragEvent, FocusEvent, HTMLProps as HTMLAttributes, KeyboardEvent, MouseEvent, PointerEvent, PropsWithChildren, PropsWithRef, SetStateAction, SyntheticEvent, TouchEvent, CSSProperties as react_CSSProperties } from "react";
 
 export type ElementProps<E extends EventTarget> = PropsWithRef<HTMLAttributes<E>>;
