@@ -1,6 +1,6 @@
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { getWindow } from "../util/get-window.js";
-import { StateUpdater, useLayoutEffect } from "../util/lib.js";
+import { StateUpdater, useCallback, useEffect, useLayoutEffect } from "../util/lib.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
@@ -60,6 +60,11 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
     }
 }
 
+// The "storage" event will catch all change to the storage from another window/tab.
+// This is to notice changes made from other components.
+// It can't catch changes from other sources, though. Probably nothing we can do about that.
+const AllListeners = new Set<() => void>();
+
 /**
  * @remarks Use module augmentation to get the correct types for this function.
  * 
@@ -82,13 +87,24 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
     const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
 
+    const getKey = useStableGetter(key);
+    const updateFromOtherSource = useCallback((key?: Key | null) => {
+        key ??= getKey()!;
+        const newCopy = getFromLocalStorage(key, fromString as any, storage);
+        setLocalCopy(newCopy ?? getInitialValue());
+    }, [setLocalCopy])
+
     // Ensure that if our key changes, we also update `localCopy` to match.
     useLayoutEffect(() => {
         if (key) {
-            const newCopy = getFromLocalStorage(key, fromString as any, storage);
-            setLocalCopy(newCopy ?? getInitialValue());
+            updateFromOtherSource(key);
         }
-    }, [key, storage])
+    }, [key, storage]);
+
+    useEffect(() => {
+        AllListeners.add(updateFromOtherSource);
+        return () => AllListeners.delete(updateFromOtherSource);
+    }, [updateFromOtherSource])
 
     // Listen for changes to this storage in other browser tabs
     useGlobalHandler(getWindow(), "storage", useStableCallback((e: StorageEvent) => {
@@ -117,6 +133,9 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
             if (typeof value == "object" && (value as object) instanceof Date) {
                 console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
             }
+
+            // Notify all other listeners on the same page of the change.
+            AllListeners.forEach(f => { if (f != updateFromOtherSource) f(); });
         }
     });
 

@@ -7024,6 +7024,10 @@ function storeToLocalStorage(key, value, converter = JSON.stringify, storage = d
         }
     }
 }
+// The "storage" event will catch all change to the storage from another window/tab.
+// This is to notice changes made from other components.
+// It can't catch changes from other sources, though. Probably nothing we can do about that.
+const AllListeners = new Set();
 /**
  * @remarks Use module augmentation to get the correct types for this function.
  *
@@ -7044,13 +7048,22 @@ function storeToLocalStorage(key, value, converter = JSON.stringify, storage = d
 function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = defaultStorage) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
+    const getKey = useStableGetter(key);
+    const updateFromOtherSource = useCallback((key) => {
+        key ??= getKey();
+        const newCopy = getFromLocalStorage(key, fromString, storage);
+        setLocalCopy(newCopy ?? getInitialValue());
+    }, [setLocalCopy]);
     // Ensure that if our key changes, we also update `localCopy` to match.
     useLayoutEffect(() => {
         if (key) {
-            const newCopy = getFromLocalStorage(key, fromString, storage);
-            setLocalCopy(newCopy ?? getInitialValue());
+            updateFromOtherSource(key);
         }
     }, [key, storage]);
+    useEffect(() => {
+        AllListeners.add(updateFromOtherSource);
+        return () => AllListeners.delete(updateFromOtherSource);
+    }, [updateFromOtherSource]);
     // Listen for changes to this storage in other browser tabs
     useGlobalHandler(getWindow(), "storage", useStableCallback((e) => {
         if (key && e.key === key && e.storageArea == storage) {
@@ -7071,6 +7084,9 @@ function usePersistentState(key, initialValue, fromString = JSON.parse, toString
             if (typeof value == "object" && value instanceof Date) {
                 console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
             }
+            // Notify all other listeners on the same page of the change.
+            AllListeners.forEach(f => { if (f != updateFromOtherSource)
+                f(); });
         }
     });
     const getValue = useStableCallback(() => {
