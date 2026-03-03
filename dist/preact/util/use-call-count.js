@@ -15,7 +15,10 @@ let i = 0;
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  */
-export const useMonitoring = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
+export function useMonitoring(originalHook) {
+    const impl = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
+    return impl(originalHook);
+}
 /**
  *
  */

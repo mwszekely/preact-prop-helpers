@@ -24,7 +24,7 @@ export type CompositionEventType<E extends EventTarget> = preact.TargetedComposi
 export type DragEventType<E extends EventTarget> = preact.TargetedDragEvent<E>;
 export type CSSProperties = preact.CSSProperties;
 export type VNode = JSX.Element;
-export declare const EventMapping: {
+export declare function getEventMapping(): {
     [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`);
 };
 //# sourceMappingURL=lib-preact.d.ts.map

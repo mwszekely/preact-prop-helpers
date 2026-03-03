@@ -27,7 +27,10 @@ let i = 0;
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  */
-export const useMonitoring = ((process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration)? useMonitoringImpl : dontUseMonitoringImpl) as typeof dontUseMonitoringImpl;
+export function useMonitoring<T extends (...args: any[]) => any>(originalHook: T) {
+    const impl = (((process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration)? useMonitoringImpl : dontUseMonitoringImpl) as typeof dontUseMonitoringImpl);
+    return impl(originalHook);
+}
 
 /**
  * 

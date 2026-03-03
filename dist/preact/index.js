@@ -387,5 +387,5 @@ export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
-export { cloneElement, createContext, createElement, createPortal, debounceRendering, EventMapping, forwardRef, Fragment, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
+export { cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, Fragment, getEventMapping, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
 //# sourceMappingURL=index.js.map

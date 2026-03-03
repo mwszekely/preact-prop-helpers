@@ -1,4 +1,4 @@
-import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
+import { TargetedPick, createElement, forwardRef, getEventMapping, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
@@ -165,7 +165,7 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
 
     const setEventHandler = useCallback<SetEventHandler>((type, handler, options) => {
         const element = (getElement() as Element as HTMLElement | undefined);
-        const mappedKey = EventMapping[type] as keyof ElementProps<E>;
+        const mappedKey = getEventMapping()[type] as keyof ElementProps<E>;
         if (element) {
             if (handler) {
                 element.addEventListener(type, handler, options);

@@ -1,4 +1,4 @@
-import { useRef, useCallback, useLayoutEffect, useMemo, useInsertionEffect, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
+import { useRef, useCallback, useLayoutEffect, useMemo, useInsertionEffect, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, useContext, createContext } from 'react';
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
 export { createPortal } from 'react-dom';
@@ -8,105 +8,107 @@ import { isTabbable, isFocusable } from 'tabbable';
 import { clsx } from 'clsx';
 
 /** These are all the event mappings that are shared between Preact/React */
-const EventMapping$1 = {
-    abort: "onAbort",
-    animationend: "onAnimationEnd",
-    animationstart: "onAnimationStart",
-    animationiteration: "onAnimationIteration",
-    beforeinput: "onBeforeInput",
-    blur: "onBlur",
-    canplay: "onCanPlay",
-    canplaythrough: "onCanPlayThrough",
-    change: "onChange",
-    click: "onClick",
-    compositionend: "onCompositionEnd",
-    compositionstart: "onCompositionStart",
-    compositionupdate: "onCompositionUpdate",
-    contextmenu: "onContextMenu",
-    cut: "onCut",
-    drag: "onDrag",
-    dragend: "onDragEnd",
-    dragenter: "onDragEnter",
-    dragleave: "onDragLeave",
-    dragover: "onDragOver",
-    dragstart: "onDragStart",
-    drop: "onDrop",
-    durationchange: "onDurationChange",
-    emptied: "onEmptied",
-    ended: "onEnded",
-    error: "onError",
-    focus: "onFocus",
-    gotpointercapture: "onGotPointerCapture",
-    input: "onInput",
-    invalid: "onInvalid",
-    keydown: "onKeyDown",
-    keypress: "onKeyPress",
-    keyup: "onKeyUp",
-    load: "onLoad",
-    loadeddata: "onLoadedData",
-    loadedmetadata: "onLoadedMetadata",
-    loadstart: "onLoadStart",
-    lostpointercapture: "onLostPointerCapture",
-    mousedown: "onMouseDown",
-    mouseenter: "onMouseEnter",
-    mouseleave: "onMouseLeave",
-    mousemove: "onMouseMove",
-    mouseout: "onMouseOut",
-    mouseover: "onMouseOver",
-    mouseup: "onMouseUp",
-    paste: "onPaste",
-    pause: "onPause",
-    play: "onPlay",
-    playing: "onPlaying",
-    pointercancel: "onPointerCancel",
-    pointerdown: "onPointerDown",
-    pointerenter: "onPointerEnter",
-    pointerleave: "onPointerLeave",
-    pointermove: "onPointerMove",
-    pointerout: "onPointerOut",
-    pointerover: "onPointerOver",
-    pointerup: "onPointerUp",
-    progress: "onProgress",
-    reset: "onReset",
-    scroll: "onScroll",
-    seeked: "onSeeked",
-    seeking: "onSeeking",
-    select: "onSelect",
-    stalled: "onStalled",
-    submit: "onSubmit",
-    suspend: "onSuspend",
-    timeupdate: "onTimeUpdate",
-    touchcancel: "onTouchCancel",
-    touchend: "onTouchEnd",
-    touchmove: "onTouchMove",
-    touchstart: "onTouchStart",
-    transitionend: "onTransitionEnd",
-    volumechange: "onVolumeChange",
-    waiting: "onWaiting",
-    wheel: "onWheel",
-    fullscreenchange: null,
-    animationcancel: null,
-    auxclick: null,
-    cancel: null,
-    close: null,
-    copy: null,
-    cuechange: null,
-    fullscreenerror: null,
-    ratechange: null,
-    resize: null,
-    scrollend: null,
-    securitypolicyviolation: null,
-    selectionchange: null,
-    selectstart: null,
-    slotchange: null,
-    transitioncancel: null,
-    transitionrun: null,
-    transitionstart: null,
-    webkitanimationend: null,
-    webkitanimationiteration: null,
-    webkitanimationstart: null,
-    webkittransitionend: null,
-};
+function getEventMapping$1() {
+    return {
+        abort: "onAbort",
+        animationend: "onAnimationEnd",
+        animationstart: "onAnimationStart",
+        animationiteration: "onAnimationIteration",
+        beforeinput: "onBeforeInput",
+        blur: "onBlur",
+        canplay: "onCanPlay",
+        canplaythrough: "onCanPlayThrough",
+        change: "onChange",
+        click: "onClick",
+        compositionend: "onCompositionEnd",
+        compositionstart: "onCompositionStart",
+        compositionupdate: "onCompositionUpdate",
+        contextmenu: "onContextMenu",
+        cut: "onCut",
+        drag: "onDrag",
+        dragend: "onDragEnd",
+        dragenter: "onDragEnter",
+        dragleave: "onDragLeave",
+        dragover: "onDragOver",
+        dragstart: "onDragStart",
+        drop: "onDrop",
+        durationchange: "onDurationChange",
+        emptied: "onEmptied",
+        ended: "onEnded",
+        error: "onError",
+        focus: "onFocus",
+        gotpointercapture: "onGotPointerCapture",
+        input: "onInput",
+        invalid: "onInvalid",
+        keydown: "onKeyDown",
+        keypress: "onKeyPress",
+        keyup: "onKeyUp",
+        load: "onLoad",
+        loadeddata: "onLoadedData",
+        loadedmetadata: "onLoadedMetadata",
+        loadstart: "onLoadStart",
+        lostpointercapture: "onLostPointerCapture",
+        mousedown: "onMouseDown",
+        mouseenter: "onMouseEnter",
+        mouseleave: "onMouseLeave",
+        mousemove: "onMouseMove",
+        mouseout: "onMouseOut",
+        mouseover: "onMouseOver",
+        mouseup: "onMouseUp",
+        paste: "onPaste",
+        pause: "onPause",
+        play: "onPlay",
+        playing: "onPlaying",
+        pointercancel: "onPointerCancel",
+        pointerdown: "onPointerDown",
+        pointerenter: "onPointerEnter",
+        pointerleave: "onPointerLeave",
+        pointermove: "onPointerMove",
+        pointerout: "onPointerOut",
+        pointerover: "onPointerOver",
+        pointerup: "onPointerUp",
+        progress: "onProgress",
+        reset: "onReset",
+        scroll: "onScroll",
+        seeked: "onSeeked",
+        seeking: "onSeeking",
+        select: "onSelect",
+        stalled: "onStalled",
+        submit: "onSubmit",
+        suspend: "onSuspend",
+        timeupdate: "onTimeUpdate",
+        touchcancel: "onTouchCancel",
+        touchend: "onTouchEnd",
+        touchmove: "onTouchMove",
+        touchstart: "onTouchStart",
+        transitionend: "onTransitionEnd",
+        volumechange: "onVolumeChange",
+        waiting: "onWaiting",
+        wheel: "onWheel",
+        fullscreenchange: null,
+        animationcancel: null,
+        auxclick: null,
+        cancel: null,
+        close: null,
+        copy: null,
+        cuechange: null,
+        fullscreenerror: null,
+        ratechange: null,
+        resize: null,
+        scrollend: null,
+        securitypolicyviolation: null,
+        selectionchange: null,
+        selectstart: null,
+        slotchange: null,
+        transitioncancel: null,
+        transitionrun: null,
+        transitionstart: null,
+        webkitanimationend: null,
+        webkitanimationiteration: null,
+        webkitanimationstart: null,
+        webkittransitionend: null,
+    };
+}
 
 /// @ts-expect-error
 function debounceRendering(f) {
@@ -116,17 +118,19 @@ function debounceRendering(f) {
 }
 const onfocusin = "onFocus";
 const onfocusout = "onBlur";
-const EventMapping = {
-    beforetoggle: null,
-    dblclick: "onDoubleClick",
-    focusin: "onFocus",
-    focusout: "onBlur",
-    formdata: null,
-    toggle: null,
-    contextlost: null,
-    contextrestored: null,
-    ...EventMapping$1,
-};
+function getEventMapping() {
+    return {
+        beforetoggle: null,
+        dblclick: "onDoubleClick",
+        focusin: "onFocus",
+        focusout: "onBlur",
+        formdata: null,
+        toggle: null,
+        contextlost: null,
+        contextrestored: null,
+        ...getEventMapping$1(),
+    };
+}
 
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
@@ -485,7 +489,10 @@ let i = 0;
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  */
-const useMonitoring = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
+function useMonitoring(originalHook) {
+    const impl = ((process.env.NODE_ENV === 'development' && globalThis._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl);
+    return impl(originalHook);
+}
 /**
  *
  */
@@ -6242,7 +6249,7 @@ function useImperativeProps({ refElementReturn: { getElement } }) {
     }, []);
     const setEventHandler = useCallback((type, handler, options) => {
         const element = getElement();
-        const mappedKey = EventMapping[type];
+        const mappedKey = getEventMapping()[type];
         if (element) {
             if (handler) {
                 element.addEventListener(type, handler, options);
@@ -7250,7 +7257,7 @@ function describeDifferences(maxDepth, path, lhs, rhs, depth) {
     return Array.from(allKeys).map(key => describeDifferences(maxDepth, path + "." + key, lhs[key], rhs[key], depth + 1)).flat();
 }
 
-const SharedAnimationFrameContext = createContext(null);
+const SharedAnimationFrameContext = /* @__PURE__ */ createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
@@ -7372,5 +7379,5 @@ var blockingElements_min = /*#__PURE__*/Object.freeze({
     __proto__: null
 });
 
-export { EventDetail, EventMapping, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, getWindow, hideCallCount, mergeFunctions, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMonitoring, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, useProcessedIndexMangler, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChild, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { EventDetail, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getEventMapping, getFromLocalStorage, getTopElement, getWindow, hideCallCount, mergeFunctions, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMonitoring, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, useProcessedIndexMangler, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChild, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.js.map

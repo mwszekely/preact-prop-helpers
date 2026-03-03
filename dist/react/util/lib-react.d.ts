@@ -20,7 +20,7 @@ export type CompositionEventType<E extends EventTarget> = CompositionEvent<E>;
 export type DragEventType<E extends EventTarget> = DragEvent<E>;
 export type CSSProperties = react_CSSProperties;
 export type VNode = JSX.Element;
-export declare const EventMapping: {
+export declare function getEventMapping(): {
     [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`);
 };
 //# sourceMappingURL=lib-react.d.ts.map

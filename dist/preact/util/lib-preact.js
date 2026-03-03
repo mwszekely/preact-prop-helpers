@@ -1,6 +1,6 @@
 import { options } from "preact";
 import { useCallback as ucb } from "preact/hooks";
-import { EventMapping as em } from "./lib-shared.js";
+import { getEventMapping as gem } from "./lib-shared.js";
 export { cloneElement, createContext, createElement, Fragment } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
@@ -15,15 +15,17 @@ export function debounceRendering(f) {
 export const onfocusin = "onfocusin";
 // @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 export const onfocusout = "onfocusout";
-export const EventMapping = {
-    beforetoggle: null,
-    dblclick: "onDblClick",
-    focusin: "onFocusIn",
-    focusout: "onFocusOut",
-    formdata: "onFormData",
-    toggle: "onToggle",
-    contextlost: null,
-    contextrestored: null,
-    ...em
-};
+export function getEventMapping() {
+    return {
+        beforetoggle: null,
+        dblclick: "onDblClick",
+        focusin: "onFocusIn",
+        focusout: "onFocusOut",
+        formdata: "onFormData",
+        toggle: "onToggle",
+        contextlost: null,
+        contextrestored: null,
+        ...gem()
+    };
+}
 //# sourceMappingURL=lib-preact.js.map

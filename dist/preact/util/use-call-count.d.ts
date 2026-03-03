@@ -7,14 +7,9 @@ import "./mode.js";
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  */
-export declare const useMonitoring: typeof dontUseMonitoringImpl;
-/**
- *
- */
-declare function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnType<T>;
+export declare function useMonitoring<T extends (...args: any[]) => any>(originalHook: T): ReturnType<T>;
 /**
  *
  */
 export declare function hideCallCount(hook: Function | "all"): void;
-export {};
 //# sourceMappingURL=use-call-count.d.ts.map

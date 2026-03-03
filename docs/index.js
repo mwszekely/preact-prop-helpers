@@ -1147,7 +1147,10 @@ globalThis.requestIdleCallback ??= callback => {
  * this function usually makes no sense on them. The performance monitoring takes more time
  * than the function itself.
  */
-const useMonitoring = dontUseMonitoringImpl;
+function useMonitoring(originalHook) {
+  const impl = dontUseMonitoringImpl;
+  return impl(originalHook);
+}
 /**
  *
  */
@@ -7935,7 +7938,6 @@ function useHasLastFocus(args) {
     };
   });
 }
-Q$1(null);
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 // TODO: Too lazy to set this up as context properly
 //const shuffledWords = { current: RandomWords2 };

@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
-const SharedAnimationFrameContext = createContext(null);
+const SharedAnimationFrameContext = /* @__PURE__ */ createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.

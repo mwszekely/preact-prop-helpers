@@ -10,7 +10,7 @@ interface ContextType {
     removeCallback: (callback: RafCallbackType) => void;
 }
 
-const SharedAnimationFrameContext = createContext<null | ContextType>(null);
+const SharedAnimationFrameContext = /* @__PURE__ */ createContext<null | ContextType>(null);
 
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,

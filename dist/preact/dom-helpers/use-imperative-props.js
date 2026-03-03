@@ -1,4 +1,4 @@
-import { EventMapping, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
+import { createElement, forwardRef, getEventMapping, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 let templateElement = null;
@@ -101,7 +101,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     }, []);
     const setEventHandler = useCallback((type, handler, options) => {
         const element = getElement();
-        const mappedKey = EventMapping[type];
+        const mappedKey = getEventMapping()[type];
         if (element) {
             if (handler) {
                 element.addEventListener(type, handler, options);

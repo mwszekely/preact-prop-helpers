@@ -4,7 +4,7 @@ export { Fragment, cloneElement, createContext, createElement, forwardRef, memo,
 export type { ReactNode as ComponentChildren, Context, Dispatch, EffectCallback, DependencyList as Inputs, JSX, MutableRefObject as MutableRef, PropsWithChildren, PropsWithRef, Reducer, Ref, RefCallback, SetStateAction } from "react";
 /// @ts-expect-error
 import { JSX } from "react/jsx-runtime";
-import { EventMapping as em } from "./lib-shared.js";
+import { getEventMapping as gem } from "./lib-shared.js";
 /// @ts-expect-error
 export { createPortal } from "react-dom";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
@@ -38,14 +38,16 @@ export type CSSProperties = react_CSSProperties;
 export type VNode = JSX.Element;
 
 
-export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } = {
-    beforetoggle: null!,
-    dblclick: "onDoubleClick",
-    focusin: "onFocus",
-    focusout: "onBlur",
-    formdata: null!,
-    toggle: null!,
-    contextlost: null!,
-    contextrestored: null!,
-    ...em,
+export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
+    return {
+        beforetoggle: null!,
+        dblclick: "onDoubleClick",
+        focusin: "onFocus",
+        focusout: "onBlur",
+        formdata: null!,
+        toggle: null!,
+        contextlost: null!,
+        contextrestored: null!,
+        ...gem(),
+    }
 }

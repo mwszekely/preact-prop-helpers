@@ -1,7 +1,7 @@
 import { options } from "preact";
 import { Dispatch, Inputs, StateUpdater as SU, useCallback as ucb } from "preact/hooks";
 import type { JSX } from "preact/jsx-runtime";
-import { EventMapping as em } from "./lib-shared.js";
+import { getEventMapping as gem } from "./lib-shared.js";
 
 
 export { cloneElement, createContext, createElement, Fragment, type ComponentChildren, type ComponentType, type Context } from "preact";
@@ -46,14 +46,16 @@ export type VNode = JSX.Element;
 
 
 
-export const EventMapping: { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } = {
-    beforetoggle: null!,
-    dblclick: "onDblClick",
-    focusin: "onFocusIn",
-    focusout: "onFocusOut",
-    formdata: "onFormData",
-    toggle: "onToggle",
-    contextlost: null!,
-    contextrestored: null!,
-    ...em
+export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
+    return {
+        beforetoggle: null!,
+        dblclick: "onDblClick",
+        focusin: "onFocusIn",
+        focusout: "onFocusOut",
+        formdata: "onFormData",
+        toggle: "onToggle",
+        contextlost: null!,
+        contextrestored: null!,
+        ...gem()
+    };
 }
