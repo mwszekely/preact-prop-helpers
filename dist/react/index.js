@@ -294,6 +294,173 @@ function returnZero() { return 0; }
  */
 function runImmediately(f) { f(); }
 
+const Unset$1 = Symbol("unset");
+/**
+ * Given an input value, returns a constant getter function that can be used
+ * inside of `useEffect` and friends without including it in the dependency array.
+ *
+ * @remarks This uses `options.diffed` in order to run before everything, even
+ * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+ */
+function useStableGetter(value) {
+    const ref = useRef(Unset$1);
+    useInsertionEffect((() => { ref.current = value; }), [value]);
+    return useCallback(() => {
+        if (ref.current === Unset$1) {
+            throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+        }
+        return ref.current;
+    }, []);
+}
+/**
+ * Like useMemo, but checks objects (shallowly)
+ *
+ * @param t
+ * @returns
+ */
+function useMemoObject(t) {
+    return useMemo(() => { return t; }, Object.values(t));
+}
+
+function isStableGetter(obj) {
+    return false;
+}
+function setIsStableGetter(obj) {
+    return obj;
+}
+/**
+ * Alternate useCallback() which always returns the same (wrapped) function reference
+ * so that it can be excluded from the dependency arrays of `useEffect` and friends.
+ *
+ * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
+ * so be careful!).  Alternatively, if you need a stable callback that **can** be used
+ * during render, pass an empty dependency array and it'll act like `useCallback` with an
+ * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
+ * truly has no dependencies/only stable dependencies!!
+ */
+function useStableCallback(fn, noDeps) {
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
+    if (isStableGetter())
+        return fn;
+    if (noDeps == null) {
+        const currentCallbackGetter = useStableGetter(fn);
+        return setIsStableGetter(useCallback(((...args) => {
+            return currentCallbackGetter()(...args);
+        }), []));
+    }
+    else {
+        console.assert(noDeps.length === 0);
+        return setIsStableGetter(useCallback(fn, []));
+    }
+}
+/**
+ * #__NO_SIDE_EFFECTS__
+ */
+function useStableMergedCallback(...fns) {
+    return useStableCallback((...args) => {
+        for (let i = 0; i < fns.length; ++i) {
+            fns[i]?.(...args);
+        }
+    });
+}
+
+/**
+ * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
+ *
+ * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
+ *
+ * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
+ *
+ * @param target - A *non-Preact* node to attach the event to.
+ */
+function useGlobalHandler(target, type, handler, options, mode) {
+    mode ||= "grouped";
+    useEnsureStability("useGlobalHandler", target, mode);
+    if (!target)
+        return;
+    if (mode === "grouped") {
+        // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+        // No matter what, it seems impossible to get the handler's event object typed perfectly.
+        // It seems like it's guaranteed to always be a union of all available types.
+        // Again, no matter what combination of sub- or sub-sub-functions used.
+        useGlobalHandlerGrouped(target, type, handler, options);
+    }
+    else {
+        useGlobalHandlerSingle(target, type, handler, options);
+    }
+}
+let mapThing = new Map();
+function doMapThing(op, target, type, handler, options) {
+    if (handler) {
+        const optionsKey = JSON.stringify(options);
+        const byType = mapThing.get(target) || new Map();
+        const byOptions = (byType.get(type) || new Map());
+        const info = byOptions.get(optionsKey) || { listener: null, listeners: new Set() };
+        op(info, handler);
+        byOptions.set(optionsKey, info);
+        byType.set(type, byOptions);
+        mapThing.set(target, byType);
+    }
+}
+function addToMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+        info.listeners.add(h);
+        if (info.listener == null)
+            target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+}
+function removeFromMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+        info.listeners.delete(h);
+        if (info.listener == null)
+            target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+}
+/**
+ * This is way faster for large numbers of event handlers.
+ *
+ * For example, if every button listens for a global click, or something,
+ * it would be nice if it was efficient at least.
+ */
+function useGlobalHandlerGrouped(target, type, handler, options) {
+    let stableHandler = useStableCallback(handler ?? (() => { }));
+    if (handler == null)
+        stableHandler = null;
+    useEffect(() => {
+        if (stableHandler) {
+            addToMapThing(target, type, stableHandler, options);
+            return () => removeFromMapThing(target, type, stableHandler, options);
+        }
+    }, [target, type, stableHandler]);
+}
+function useGlobalHandlerSingle(target, type, handler, options) {
+    let stableHandler = useStableCallback(handler ?? (() => { }));
+    if (handler == null)
+        stableHandler = null;
+    useEffect(() => {
+        if (stableHandler) {
+            target.addEventListener(type, stableHandler, options);
+            return () => target.removeEventListener(type, stableHandler, options);
+        }
+    }, [target, type, stableHandler]);
+}
+
+/**
+ * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}` or `void`.
+ *
+ * **Does nothing at runtime -- type checking only.**
+ *
+ * Use this to ensure that your spread operators work correctly and cover all cases.
+ *
+ * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
+ */
+function assertEmptyObject(_a) { }
+
+// eslint-disable-next-line no-restricted-globals
+function getWindow(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument?.defaultView ?? globalThis ?? {}); }
+// eslint-disable-next-line no-restricted-globals
+function getDocument(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument ?? getWindow()?.document) ?? undefined; }
+
 // Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
 // (i.e. in a way that doesn't throw an error)
 globalThis["process"] ??= {};
@@ -389,181 +556,6 @@ function hideCallCount(hook) {
     if (hook != "all")
         filters.add(hook.name);
 }
-
-const Unset$1 = Symbol("unset");
-/**
- * Given an input value, returns a constant getter function that can be used
- * inside of `useEffect` and friends without including it in the dependency array.
- *
- * @remarks This uses `options.diffed` in order to run before everything, even
- * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
- */
-function useStableGetter(value) {
-    return useMonitoring(function useStableGetter() {
-        const ref = useRef(Unset$1);
-        useInsertionEffect((() => { ref.current = value; }), [value]);
-        return useCallback(() => {
-            if (ref.current === Unset$1) {
-                throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-            }
-            return ref.current;
-        }, []);
-    });
-}
-/**
- * Like useMemo, but checks objects (shallowly)
- *
- * @param t
- * @returns
- */
-function useMemoObject(t) {
-    return useMemo(() => { return t; }, Object.values(t));
-}
-
-function isStableGetter(obj) {
-    return false;
-}
-function setIsStableGetter(obj) {
-    return obj;
-}
-/**
- * Alternate useCallback() which always returns the same (wrapped) function reference
- * so that it can be excluded from the dependency arrays of `useEffect` and friends.
- *
- * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
- * so be careful!).  Alternatively, if you need a stable callback that **can** be used
- * during render, pass an empty dependency array and it'll act like `useCallback` with an
- * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
- * truly has no dependencies/only stable dependencies!!
- */
-function useStableCallback(fn, noDeps) {
-    return useMonitoring(function useStableCallback() {
-        useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
-        if (isStableGetter())
-            return fn;
-        if (noDeps == null) {
-            const currentCallbackGetter = useStableGetter(fn);
-            return setIsStableGetter(useCallback(((...args) => {
-                return currentCallbackGetter()(...args);
-            }), []));
-        }
-        else {
-            console.assert(noDeps.length === 0);
-            return setIsStableGetter(useCallback(fn, []));
-        }
-    });
-}
-/**
- * #__NO_SIDE_EFFECTS__
- */
-function useStableMergedCallback(...fns) {
-    return useMonitoring(function useStableMergedCallback() {
-        return useStableCallback((...args) => {
-            for (let i = 0; i < fns.length; ++i) {
-                fns[i]?.(...args);
-            }
-        });
-    });
-}
-
-/**
- * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
- *
- * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
- *
- * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
- *
- * @param target - A *non-Preact* node to attach the event to.
- */
-function useGlobalHandler(target, type, handler, options, mode) {
-    return useMonitoring(function useGlobalHandler() {
-        mode ||= "grouped";
-        useEnsureStability("useGlobalHandler", target, mode);
-        if (!target)
-            return;
-        if (mode === "grouped") {
-            // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-            // No matter what, it seems impossible to get the handler's event object typed perfectly.
-            // It seems like it's guaranteed to always be a union of all available types.
-            // Again, no matter what combination of sub- or sub-sub-functions used.
-            useGlobalHandlerGrouped(target, type, handler, options);
-        }
-        else {
-            useGlobalHandlerSingle(target, type, handler, options);
-        }
-    });
-}
-let mapThing = new Map();
-function doMapThing(op, target, type, handler, options) {
-    if (handler) {
-        const optionsKey = JSON.stringify(options);
-        const byType = mapThing.get(target) || new Map();
-        const byOptions = (byType.get(type) || new Map());
-        const info = byOptions.get(optionsKey) || { listener: null, listeners: new Set() };
-        op(info, handler);
-        byOptions.set(optionsKey, info);
-        byType.set(type, byOptions);
-        mapThing.set(target, byType);
-    }
-}
-function addToMapThing(target, type, handler, options) {
-    doMapThing((info, h) => {
-        info.listeners.add(h);
-        if (info.listener == null)
-            target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
-    }, target, type, handler, options);
-}
-function removeFromMapThing(target, type, handler, options) {
-    doMapThing((info, h) => {
-        info.listeners.delete(h);
-        if (info.listener == null)
-            target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
-    }, target, type, handler, options);
-}
-/**
- * This is way faster for large numbers of event handlers.
- *
- * For example, if every button listens for a global click, or something,
- * it would be nice if it was efficient at least.
- */
-function useGlobalHandlerGrouped(target, type, handler, options) {
-    let stableHandler = useStableCallback(handler ?? (() => { }));
-    if (handler == null)
-        stableHandler = null;
-    useEffect(() => {
-        if (stableHandler) {
-            addToMapThing(target, type, stableHandler, options);
-            return () => removeFromMapThing(target, type, stableHandler, options);
-        }
-    }, [target, type, stableHandler]);
-}
-function useGlobalHandlerSingle(target, type, handler, options) {
-    let stableHandler = useStableCallback(handler ?? (() => { }));
-    if (handler == null)
-        stableHandler = null;
-    useEffect(() => {
-        if (stableHandler) {
-            target.addEventListener(type, stableHandler, options);
-            return () => target.removeEventListener(type, stableHandler, options);
-        }
-    }, [target, type, stableHandler]);
-}
-
-/**
- * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}` or `void`.
- *
- * **Does nothing at runtime -- type checking only.**
- *
- * Use this to ensure that your spread operators work correctly and cover all cases.
- *
- * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
- */
-function assertEmptyObject(_a) { }
-
-// eslint-disable-next-line no-restricted-globals
-function getWindow(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument?.defaultView ?? globalThis ?? {}); }
-// eslint-disable-next-line no-restricted-globals
-function getDocument(element) { return (typeof window == "undefined") ? undefined : (element?.ownerDocument ?? getWindow()?.document) ?? undefined; }
 
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
@@ -1068,36 +1060,34 @@ function findBackupFocus(unmountingElement) {
  * {@include } {@link UseTimeoutParameters}
  */
 function useTimeout({ timeout, callback, triggerIndex }) {
-    return useMonitoring(function useTimeout() {
-        const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
-        const getTimeout = useStableGetter(timeout);
-        // Set any time we start timeout.
-        // Unset any time the timeout completes
-        const startTimeRef = useRef(null);
-        const disabled = (timeout == null);
-        // Any time the triggerIndex changes (including on mount)
-        // restart the timeout.  The timeout does NOT reset
-        // when the duration or callback changes, only triggerIndex.
-        useEffect(() => {
-            if (!disabled) {
-                const timeout = getTimeout();
-                console.assert(disabled == (timeout == null));
-                if (timeout != null) {
-                    startTimeRef.current = +(new Date());
-                    const handle = setTimeout(stableCallback, timeout);
-                    return () => clearTimeout(handle);
-                }
-            }
-        }, [triggerIndex, disabled]);
-        const getElapsedTime = useCallback(() => {
-            return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
-        }, []);
-        const getRemainingTime = useCallback(() => {
+    const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
+    const getTimeout = useStableGetter(timeout);
+    // Set any time we start timeout.
+    // Unset any time the timeout completes
+    const startTimeRef = useRef(null);
+    const disabled = (timeout == null);
+    // Any time the triggerIndex changes (including on mount)
+    // restart the timeout.  The timeout does NOT reset
+    // when the duration or callback changes, only triggerIndex.
+    useEffect(() => {
+        if (!disabled) {
             const timeout = getTimeout();
-            return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-        }, []);
-        return { getElapsedTime, getRemainingTime };
-    });
+            console.assert(disabled == (timeout == null));
+            if (timeout != null) {
+                startTimeRef.current = +(new Date());
+                const handle = setTimeout(stableCallback, timeout);
+                return () => clearTimeout(handle);
+            }
+        }
+    }, [triggerIndex, disabled]);
+    const getElapsedTime = useCallback(() => {
+        return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
+    }, []);
+    const getRemainingTime = useCallback(() => {
+        const timeout = getTimeout();
+        return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+    }, []);
+    return { getElapsedTime, getRemainingTime };
 }
 
 let idIndex = 0;
@@ -3781,41 +3771,39 @@ function useSelectionChildDeclarative(args) {
  * @compositeParams
  */
 function useRefElement(args) {
-    return useMonitoring(function useRefElement() {
-        const nonElementWarn = useRef(false);
-        if (nonElementWarn.current) {
-            nonElementWarn.current = false;
-            // There are two of these to catch the problem in the two most useful areas --
-            // when it initially happens, and also in the component stack.
-            console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+    const nonElementWarn = useRef(false);
+    if (nonElementWarn.current) {
+        nonElementWarn.current = false;
+        // There are two of these to catch the problem in the two most useful areas --
+        // when it initially happens, and also in the component stack.
+        console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+    }
+    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
+    useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
+    // Called (indirectly) by the ref that the element receives.
+    const handler = useCallback((e, prevValue) => {
+        if (!(e == null || e instanceof Element)) {
+            console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+            nonElementWarn.current = true;
         }
-        const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
-        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
-        // Called (indirectly) by the ref that the element receives.
-        const handler = useCallback((e, prevValue) => {
-            if (!(e == null || e instanceof Element)) {
-                console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-                nonElementWarn.current = true;
-            }
-            const cleanup = onElementChange?.(e, prevValue);
-            if (prevValue)
-                onUnmount?.(prevValue);
-            if (e)
-                onMount?.(e);
-            return cleanup;
-        }, []);
-        // Let us store the actual (reference to) the element we capture
-        const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const propsStable = useRef({ ref: setElement });
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        return {
-            propsStable: propsStable.current,
-            refElementReturn: {
-                getElement,
-            }
-        };
-    });
+        const cleanup = onElementChange?.(e, prevValue);
+        if (prevValue)
+            onUnmount?.(prevValue);
+        if (e)
+            onMount?.(e);
+        return cleanup;
+    }, []);
+    // Let us store the actual (reference to) the element we capture
+    const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const propsStable = useRef({ ref: setElement });
+    // Return both the element and the hook that modifies 
+    // the props and allows us to actually find the element
+    return {
+        propsStable: propsStable.current,
+        refElementReturn: {
+            getElement,
+        }
+    };
 }
 
 function add(map, key, value) {
@@ -4022,53 +4010,51 @@ function blockingElements() { return be; }
  * @param target
  */
 function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
-    return useMonitoring(function useBlockingElement() {
-        const stableGetTarget = useStableCallback(getTarget);
-        //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
-        useActiveElement({
-            activeElementParameters: {
-                getDocument,
-                onActiveElementChange,
-                onWindowFocusedChange,
-                onLastActiveElementChange: useStableCallback((e, prev, reason) => {
-                    onLastActiveElementChange?.(e, prev, reason);
-                    if (e) {
-                        if (enabled)
-                            setLastActiveWhenOpen(e, reason);
-                        else
-                            setLastActiveWhenClosed(e, reason);
-                    }
-                })
-            }
-        });
-        const [getTop, setTop] = usePassiveState(null, returnNull);
-        const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState(null, returnNull);
-        const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState(null, returnNull);
-        /**
-         * Push/pop the element from the blockingElements stack.
-         */
-        useLayoutEffect(() => {
-            const target = stableGetTarget();
-            if (enabled) {
-                // Sometimes blockingElements will fail if, for example,
-                // the target element isn't connected to document.body.
-                // This is rare, but it's better to fail silently with weird tabbing behavior
-                // than to crash the entire application.
-                try {
-                    blockingElements().push(target);
-                    setTop(target);
-                    return () => {
-                        blockingElements().remove(target);
-                    };
+    const stableGetTarget = useStableCallback(getTarget);
+    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+    useActiveElement({
+        activeElementParameters: {
+            getDocument,
+            onActiveElementChange,
+            onWindowFocusedChange,
+            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+                onLastActiveElementChange?.(e, prev, reason);
+                if (e) {
+                    if (enabled)
+                        setLastActiveWhenOpen(e, reason);
+                    else
+                        setLastActiveWhenClosed(e, reason);
                 }
-                catch (ex) {
-                    // Well, semi-silently.
-                    console.error(ex);
-                }
-            }
-        }, [enabled]);
-        return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen };
+            })
+        }
     });
+    const [getTop, setTop] = usePassiveState(null, returnNull);
+    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState(null, returnNull);
+    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState(null, returnNull);
+    /**
+     * Push/pop the element from the blockingElements stack.
+     */
+    useLayoutEffect(() => {
+        const target = stableGetTarget();
+        if (enabled) {
+            // Sometimes blockingElements will fail if, for example,
+            // the target element isn't connected to document.body.
+            // This is rare, but it's better to fail silently with weird tabbing behavior
+            // than to crash the entire application.
+            try {
+                blockingElements().push(target);
+                setTop(target);
+                return () => {
+                    blockingElements().remove(target);
+                };
+            }
+            catch (ex) {
+                // Well, semi-silently.
+                console.error(ex);
+            }
+        }
+    }, [enabled]);
+    return { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen };
 }
 function getTopElement() {
     return blockingElements().top;
@@ -5254,75 +5240,73 @@ function identityCapture(...t) { return t; }
  * @param options - @see {@link UseAsyncParameters}
  */
 function useAsync(asyncHandler, options) {
-    return useMonitoring(function useAsync() {
-        const AsyncFunction = ((async function () { }).constructor);
-        // Things related to current execution
-        // Because we can both return and throw undefined, 
-        // we need separate state to track their existence too.
-        //
-        // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
-        // when we start/stop an async action.
-        const [pending, setPending, _getPending] = useState(false);
-        const [result, setResult, _getResult] = useState(undefined);
-        const [error, setError, _getError] = useState(undefined);
-        const [hasError, setHasError, _getHasError] = useState(false);
-        const [hasResult, setHasResult, _getHasResult] = useState(false);
-        const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-        const [syncDebouncing, setSyncDebouncing] = useState(false);
-        const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
-        // Keep track of this for the caller's sake -- we don't really care.
-        const [runCount, setRunCount] = useState(0);
-        const [settleCount, setSettleCount] = useState(0);
-        const [resolveCount, setResolveCount] = useState(0);
-        const [rejectCount, setRejectCount] = useState(0);
-        const incrementCallCount = useCallback(() => { setRunCount(c => c + 1); }, []);
-        const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1); }, []);
-        const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
-        const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
-        /* eslint-disable prefer-const */
-        let { throttle, debounce, capture: captureUnstable } = (options ?? {});
-        const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-        const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
-        const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
-            return asyncToSync({
-                asyncInput: asyncHandlerStable,
-                capture: captureStable,
-                onAsyncDebounce: setAsyncDebouncing,
-                onError: setError,
-                onPending: setPending,
-                onReturnValue: setResult,
-                onSyncDebounce: setSyncDebouncing,
-                onHasError: setHasError,
-                onHasResult: setHasResult,
-                onInvoked: setInvocationResult,
-                onInvoke: incrementCallCount,
-                onFinally: incrementFinallyCount,
-                onReject: incrementRejectCount,
-                onResolve: incrementResolveCount,
-                throttle: options?.throttle ?? undefined,
-                debounce: options?.debounce ?? undefined
-            });
-        }, [throttle, debounce]);
-        useEffect(() => {
-            return () => cancelSyncDebounce();
-        }, [cancelSyncDebounce]);
-        return {
-            syncHandler: syncOutput,
-            pending,
-            result,
-            error,
-            hasError: hasError || false,
-            hasResult: hasResult || false,
-            resolveCount,
-            rejectCount,
-            settleCount,
-            debouncingAsync: asyncDebouncing,
-            debouncingSync: syncDebouncing,
-            invocationResult,
-            callCount: runCount,
-            flushDebouncedPromise: flushSyncDebounce
-        };
-    });
+    const AsyncFunction = ((async function () { }).constructor);
+    // Things related to current execution
+    // Because we can both return and throw undefined, 
+    // we need separate state to track their existence too.
+    //
+    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState(undefined);
+    const [error, setError, _getError] = useState(undefined);
+    const [hasError, setHasError, _getHasError] = useState(false);
+    const [hasResult, setHasResult, _getHasResult] = useState(false);
+    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+    const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
+    // Keep track of this for the caller's sake -- we don't really care.
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
+    const incrementCallCount = useCallback(() => { setRunCount(c => c + 1); }, []);
+    const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1); }, []);
+    const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
+    const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
+    /* eslint-disable prefer-const */
+    let { throttle, debounce, capture: captureUnstable } = (options ?? {});
+    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
+    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
+    const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
+        return asyncToSync({
+            asyncInput: asyncHandlerStable,
+            capture: captureStable,
+            onAsyncDebounce: setAsyncDebouncing,
+            onError: setError,
+            onPending: setPending,
+            onReturnValue: setResult,
+            onSyncDebounce: setSyncDebouncing,
+            onHasError: setHasError,
+            onHasResult: setHasResult,
+            onInvoked: setInvocationResult,
+            onInvoke: incrementCallCount,
+            onFinally: incrementFinallyCount,
+            onReject: incrementRejectCount,
+            onResolve: incrementResolveCount,
+            throttle: options?.throttle ?? undefined,
+            debounce: options?.debounce ?? undefined
+        });
+    }, [throttle, debounce]);
+    useEffect(() => {
+        return () => cancelSyncDebounce();
+    }, [cancelSyncDebounce]);
+    return {
+        syncHandler: syncOutput,
+        pending,
+        result,
+        error,
+        hasError: hasError || false,
+        hasResult: hasResult || false,
+        resolveCount,
+        rejectCount,
+        settleCount,
+        debouncingAsync: asyncDebouncing,
+        debouncingSync: syncDebouncing,
+        invocationResult,
+        callCount: runCount,
+        flushDebouncedPromise: flushSyncDebounce
+    };
 }
 
 /**
@@ -5391,30 +5375,28 @@ function useAsync(asyncHandler, options) {
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
 function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
-    return useMonitoring(function useAsyncHandler() {
-        // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-        const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-        const [hasCapture, setHasCapture] = useState(false);
-        // Wrap around the normal `useAsync` `capture` function to also
-        // keep track of the last value the user actually input.
-        // 
-        // Without this there's no way to re-render the control with
-        // it being both controlled and also having the "correct" value,
-        // and at any rate also protects against sudden exceptions reverting
-        // your change out from under you.
-        const capture = useStableCallback((e) => {
-            const captured = originalCapture(e);
-            setCurrentCapture(captured);
-            setHasCapture(true);
-            return [captured, e];
-        });
-        return {
-            getCurrentCapture,
-            currentCapture,
-            hasCapture,
-            ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
-        };
+    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+    const [hasCapture, setHasCapture] = useState(false);
+    // Wrap around the normal `useAsync` `capture` function to also
+    // keep track of the last value the user actually input.
+    // 
+    // Without this there's no way to re-render the control with
+    // it being both controlled and also having the "correct" value,
+    // and at any rate also protects against sudden exceptions reverting
+    // your change out from under you.
+    const capture = useStableCallback((e) => {
+        const captured = originalCapture(e);
+        setCurrentCapture(captured);
+        setHasCapture(true);
+        return [captured, e];
     });
+    return {
+        getCurrentCapture,
+        currentCapture,
+        hasCapture,
+        ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+    };
 }
 
 function pressLog(...args) {
@@ -5873,18 +5855,16 @@ function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, })
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
 function useDocumentClass(className, active, element) {
-    return useMonitoring(function useDocumentClass() {
-        element ??= getDocument()?.documentElement;
-        className = clsx(className);
-        useEffect(() => {
-            if (element) {
-                if (active !== false) {
-                    element.classList.add(className);
-                    return () => element.classList.remove(className);
-                }
+    element ??= getDocument()?.documentElement;
+    className = clsx(className);
+    useEffect(() => {
+        if (element) {
+            if (active !== false) {
+                element.classList.add(className);
+                return () => element.classList.remove(className);
             }
-        }, [className, active, element]);
-    });
+        }
+    }, [className, active, element]);
 }
 
 /**
@@ -6104,64 +6084,62 @@ function useDroppable({ effect }) {
  * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
  */
 function useHideScroll(hideScroll) {
-    return useMonitoring(function useHideScroll() {
-        const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
-        const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
-        useEffect(() => {
-            const document = getDocument();
-            if (hideScroll && document) {
-                // When scrolling is resumed, we'll need to restore the original scroll positions
-                // so we need to keep this information around
-                const originalScrollTop = document.documentElement.scrollTop;
-                const originalScrollLeft = document.documentElement.scrollLeft;
-                // Measure the width of the page (minus the scrollbar)
-                const widthWithScrollBar = document.documentElement.scrollWidth;
-                const heightWithScrollBar = document.documentElement.scrollHeight;
-                // Apply a class that hides the scrollbar.
-                document.documentElement.classList.add("document-scroll-hidden");
-                // In case multiple things are locking scroll, keep track of how many are doing that
-                // (just add 1 on enable, subtract 1 on disable)
-                document.documentElement.dataset["scrollHiders"] = (+(document.documentElement.dataset["scrollHiders"] || "0") + 1).toString();
-                // Measure the new width without a scrollbar 
-                // so we can take the difference as the scrollbar width.
-                const widthWithoutScrollBar = document.documentElement.scrollWidth;
-                const heightWithoutScrollBar = document.documentElement.scrollHeight;
-                let scrollbarWidth = (widthWithoutScrollBar - widthWithScrollBar);
-                let scrollbarHeight = (heightWithoutScrollBar - heightWithScrollBar);
-                // Failsafe -- if this measuring trick does something unexpected, just ignore it
-                if (scrollbarWidth > 80)
-                    scrollbarWidth = 0;
-                if (scrollbarHeight > 80)
-                    scrollbarHeight = 0;
-                // Make our measurements available as CSS properties for general use
-                document.documentElement.style.setProperty("--root-scrollbar-width", `${scrollbarWidth}px`);
-                document.documentElement.style.setProperty("--root-scrollbar-height", `${scrollbarHeight}px`);
-                document.documentElement.style.setProperty("--root-scrollstop-top", `${originalScrollTop}px`);
-                document.documentElement.style.setProperty("--root-scrollstop-left", `${originalScrollLeft}px`);
-                setScrollbarWidth(scrollbarWidth);
-                setScrollbarHeight(scrollbarHeight);
-                return () => {
-                    // Undo all the things we just did
-                    document.documentElement.dataset["scrollHiders"] = (+(document.documentElement.dataset["scrollHiders"] || "0") - 1).toString();
-                    if (document.documentElement.dataset["scrollHiders"] == "0") {
-                        // If we were the last scroll-locking thing to stop, then remove the class that stops scrolling.
-                        document.documentElement.removeAttribute("data-scroll-hiders");
-                        document.documentElement.classList.remove("document-scroll-hidden");
-                        // Also, restore the original scroll position
-                        // We do this by forcing the scroll behavior to not be smooth
-                        // (it's instant if nothing is set to smooth, https://www.w3.org/TR/cssom-view/#scrolling),
-                        // scrolling, then restoring the original scroll behavior 
-                        // (which was probably already auto anyway, but just to be safe)
-                        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-                        document.documentElement.style.scrollBehavior = "auto";
-                        document.documentElement.scrollTo({ top: originalScrollTop, left: originalScrollLeft, behavior: "auto" });
-                        document.documentElement.style.scrollBehavior = originalScrollBehavior;
-                    }
-                };
-            }
-        }, [hideScroll]);
-        return { getScrollbarWidth, getScrollbarHeight };
-    });
+    const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
+    const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
+    useEffect(() => {
+        const document = getDocument();
+        if (hideScroll && document) {
+            // When scrolling is resumed, we'll need to restore the original scroll positions
+            // so we need to keep this information around
+            const originalScrollTop = document.documentElement.scrollTop;
+            const originalScrollLeft = document.documentElement.scrollLeft;
+            // Measure the width of the page (minus the scrollbar)
+            const widthWithScrollBar = document.documentElement.scrollWidth;
+            const heightWithScrollBar = document.documentElement.scrollHeight;
+            // Apply a class that hides the scrollbar.
+            document.documentElement.classList.add("document-scroll-hidden");
+            // In case multiple things are locking scroll, keep track of how many are doing that
+            // (just add 1 on enable, subtract 1 on disable)
+            document.documentElement.dataset["scrollHiders"] = (+(document.documentElement.dataset["scrollHiders"] || "0") + 1).toString();
+            // Measure the new width without a scrollbar 
+            // so we can take the difference as the scrollbar width.
+            const widthWithoutScrollBar = document.documentElement.scrollWidth;
+            const heightWithoutScrollBar = document.documentElement.scrollHeight;
+            let scrollbarWidth = (widthWithoutScrollBar - widthWithScrollBar);
+            let scrollbarHeight = (heightWithoutScrollBar - heightWithScrollBar);
+            // Failsafe -- if this measuring trick does something unexpected, just ignore it
+            if (scrollbarWidth > 80)
+                scrollbarWidth = 0;
+            if (scrollbarHeight > 80)
+                scrollbarHeight = 0;
+            // Make our measurements available as CSS properties for general use
+            document.documentElement.style.setProperty("--root-scrollbar-width", `${scrollbarWidth}px`);
+            document.documentElement.style.setProperty("--root-scrollbar-height", `${scrollbarHeight}px`);
+            document.documentElement.style.setProperty("--root-scrollstop-top", `${originalScrollTop}px`);
+            document.documentElement.style.setProperty("--root-scrollstop-left", `${originalScrollLeft}px`);
+            setScrollbarWidth(scrollbarWidth);
+            setScrollbarHeight(scrollbarHeight);
+            return () => {
+                // Undo all the things we just did
+                document.documentElement.dataset["scrollHiders"] = (+(document.documentElement.dataset["scrollHiders"] || "0") - 1).toString();
+                if (document.documentElement.dataset["scrollHiders"] == "0") {
+                    // If we were the last scroll-locking thing to stop, then remove the class that stops scrolling.
+                    document.documentElement.removeAttribute("data-scroll-hiders");
+                    document.documentElement.classList.remove("document-scroll-hidden");
+                    // Also, restore the original scroll position
+                    // We do this by forcing the scroll behavior to not be smooth
+                    // (it's instant if nothing is set to smooth, https://www.w3.org/TR/cssom-view/#scrolling),
+                    // scrolling, then restoring the original scroll behavior 
+                    // (which was probably already auto anyway, but just to be safe)
+                    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+                    document.documentElement.style.scrollBehavior = "auto";
+                    document.documentElement.scrollTo({ top: originalScrollTop, left: originalScrollLeft, behavior: "auto" });
+                    document.documentElement.style.scrollBehavior = originalScrollBehavior;
+                }
+            };
+        }
+    }, [hideScroll]);
+    return { getScrollbarWidth, getScrollbarHeight };
 }
 
 let templateElement = null;
@@ -6189,109 +6167,107 @@ const ImperativeElement = /* @__PURE__ */ memo(/* @__PURE__ */ forwardRef(Impera
  * @compositeParams
  */
 function useImperativeProps({ refElementReturn: { getElement } }) {
-    return useMonitoring(function useImperativeProps() {
-        const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
-        const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
-        const setClass = useCallback((cls, enabled) => {
-            if (hasClass(cls) == !enabled) {
-                getElement()?.classList[enabled ? "add" : "remove"](cls);
-                currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
-            }
-        }, []);
-        const setStyle = useCallback((prop, value) => {
-            const element = getElement();
-            if (element) {
-                if (currentImperativeProps.current.style[prop] != value) {
-                    currentImperativeProps.current.style[prop] = value;
-                    if (prop.startsWith("--")) {
-                        if (value != null)
-                            element.style.setProperty(prop, `${value}`);
-                        else
-                            element.style.removeProperty(prop);
-                    }
-                    else {
-                        element.style[prop] = value ?? "";
-                    }
+    const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
+    const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
+    const setClass = useCallback((cls, enabled) => {
+        if (hasClass(cls) == !enabled) {
+            getElement()?.classList[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+        }
+    }, []);
+    const setStyle = useCallback((prop, value) => {
+        const element = getElement();
+        if (element) {
+            if (currentImperativeProps.current.style[prop] != value) {
+                currentImperativeProps.current.style[prop] = value;
+                if (prop.startsWith("--")) {
+                    if (value != null)
+                        element.style.setProperty(prop, `${value}`);
+                    else
+                        element.style.removeProperty(prop);
+                }
+                else {
+                    element.style[prop] = value ?? "";
                 }
             }
-        }, []);
-        const setChildren = useCallback((children) => {
-            let e = getElement();
-            if (e && currentImperativeProps.current.children != children) {
-                currentImperativeProps.current.children = children;
-                currentImperativeProps.current.html = null;
-                e.textContent = children;
-            }
-        }, []);
-        const dangerouslySetInnerHTML = useCallback((children) => {
-            let e = getElement();
-            if (e && currentImperativeProps.current.html != children) {
+        }
+    }, []);
+    const setChildren = useCallback((children) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.children != children) {
+            currentImperativeProps.current.children = children;
+            currentImperativeProps.current.html = null;
+            e.textContent = children;
+        }
+    }, []);
+    const dangerouslySetInnerHTML = useCallback((children) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.html != children) {
+            currentImperativeProps.current.children = null;
+            currentImperativeProps.current.html = children;
+            e.innerHTML = children;
+        }
+    }, []);
+    const dangerouslyAppendHTML = useCallback((children) => {
+        let e = getElement();
+        if (e && children) {
+            const newChild = htmlToElement(e, children);
+            console.assert((newChild && newChild instanceof Node));
+            if (newChild && newChild instanceof Node) {
                 currentImperativeProps.current.children = null;
-                currentImperativeProps.current.html = children;
-                e.innerHTML = children;
+                currentImperativeProps.current.html ||= "";
+                currentImperativeProps.current.html += children;
+                e.appendChild(newChild);
+                return newChild;
             }
-        }, []);
-        const dangerouslyAppendHTML = useCallback((children) => {
-            let e = getElement();
-            if (e && children) {
-                const newChild = htmlToElement(e, children);
-                console.assert((newChild && newChild instanceof Node));
-                if (newChild && newChild instanceof Node) {
-                    currentImperativeProps.current.children = null;
-                    currentImperativeProps.current.html ||= "";
-                    currentImperativeProps.current.html += children;
-                    e.appendChild(newChild);
-                    return newChild;
-                }
+        }
+        return null;
+    }, []);
+    const getAttribute = useCallback((prop) => {
+        return currentImperativeProps.current.others[prop];
+    }, []);
+    const setAttribute = useCallback((prop, value) => {
+        if (value != null) {
+            if (getAttribute(prop) != value) {
+                currentImperativeProps.current.others[prop] = value;
+                getElement()?.setAttribute(prop, value);
             }
-            return null;
-        }, []);
-        const getAttribute = useCallback((prop) => {
-            return currentImperativeProps.current.others[prop];
-        }, []);
-        const setAttribute = useCallback((prop, value) => {
-            if (value != null) {
-                if (getAttribute(prop) != value) {
-                    currentImperativeProps.current.others[prop] = value;
-                    getElement()?.setAttribute(prop, value);
-                }
+        }
+        else {
+            if (getAttribute(prop) != undefined) {
+                delete currentImperativeProps.current.others[prop];
+                getElement()?.removeAttribute(prop);
             }
-            else {
-                if (getAttribute(prop) != undefined) {
-                    delete currentImperativeProps.current.others[prop];
-                    getElement()?.removeAttribute(prop);
-                }
+        }
+    }, []);
+    const setEventHandler = useCallback((type, handler, options) => {
+        const element = getElement();
+        const mappedKey = EventMapping[type];
+        if (element) {
+            if (handler) {
+                element.addEventListener(type, handler, options);
+                currentImperativeProps.current.others[mappedKey] = handler;
             }
-        }, []);
-        const setEventHandler = useCallback((type, handler, options) => {
-            const element = getElement();
-            const mappedKey = EventMapping[type];
-            if (element) {
-                if (handler) {
-                    element.addEventListener(type, handler, options);
-                    currentImperativeProps.current.others[mappedKey] = handler;
-                }
-                else if (currentImperativeProps.current.others[mappedKey]) {
-                    element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
-                    currentImperativeProps.current.others[mappedKey] = undefined;
-                }
+            else if (currentImperativeProps.current.others[mappedKey]) {
+                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+                currentImperativeProps.current.others[mappedKey] = undefined;
             }
-        }, []);
-        return {
-            imperativePropsReturn: useRef({
-                hasClass,
-                setClass,
-                setStyle,
-                getAttribute,
-                setAttribute,
-                setEventHandler,
-                setChildren,
-                dangerouslySetInnerHTML,
-                dangerouslyAppendHTML
-            }).current,
-            props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
-        };
-    });
+        }
+    }, []);
+    return {
+        imperativePropsReturn: useRef({
+            hasClass,
+            setClass,
+            setStyle,
+            getAttribute,
+            setAttribute,
+            setEventHandler,
+            setChildren,
+            dangerouslySetInnerHTML,
+            dangerouslyAppendHTML
+        }).current,
+        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
+    };
 }
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
@@ -6333,29 +6309,27 @@ function generateRandomId(prefix) {
  * {@include } {@link UsePortalChildrenParameters}
  */
 function usePortalChildren({ target }) {
-    return useMonitoring(function usePortalChildren() {
-        const [pushChild, setPushChild] = useState(null);
-        const [updateChild, setUpdateChild] = useState(null);
-        const [removeChild, setRemoveChild] = useState(null);
-        const pushChildStable = useStableCallback((child) => {
-            return pushChild?.(child) ?? -1;
-        });
-        const updateChildStable = useStableCallback((index, child) => {
-            return updateChild?.(index, child);
-        });
-        const removeChildStable = useStableCallback((index) => {
-            return removeChild?.(index);
-        });
-        const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
-        const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
-        return {
-            children: children,
-            pushChild: pushChildStable,
-            updateChild: updateChildStable,
-            removeChild: removeChildStable,
-            portalElement: element ?? null
-        };
+    const [pushChild, setPushChild] = useState(null);
+    const [updateChild, setUpdateChild] = useState(null);
+    const [removeChild, setRemoveChild] = useState(null);
+    const pushChildStable = useStableCallback((child) => {
+        return pushChild?.(child) ?? -1;
     });
+    const updateChildStable = useStableCallback((index, child) => {
+        return updateChild?.(index, child);
+    });
+    const removeChildStable = useStableCallback((index) => {
+        return removeChild?.(index);
+    });
+    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? getDocument()?.getElementById(target) : target; }, [target]);
+    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
+    return {
+        children: children,
+        pushChild: pushChildStable,
+        updateChild: updateChildStable,
+        removeChild: removeChildStable,
+        portalElement: element ?? null
+    };
 }
 /**
  * Implementation
@@ -6765,40 +6739,38 @@ function getWritingModes() {
  * @returns `UseMediaQueryReturnType`.
  */
 function useMediaQuery(query, defaultGuess) {
-    return useMonitoring(function useMediaQuery() {
-        if (typeof window === "undefined") {
-            const matches = defaultGuess || false;
-            return {
-                matches,
-                getMatches: useCallback(() => matches, [matches])
+    if (typeof window === "undefined") {
+        const matches = defaultGuess || false;
+        return {
+            matches,
+            getMatches: useCallback(() => matches, [matches])
+        };
+    }
+    else {
+        const queryList = useRef();
+        // queryList.current ??= (query == null ? null : matchMedia(query))
+        // This ^^^ is not done because it seems to cause reflows at inopportune moments.
+        // Specifically on iOS Safari (tested on 12).
+        // It's always iOS Safari.
+        // At any rate it botches transitions that happen on a just-mounted component, somehow.
+        const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
+        console.assert(!query || query.startsWith("("));
+        useLayoutEffect(() => {
+            if (!query)
+                return;
+            queryList.current = matchMedia(query);
+            setMatches(queryList.current.matches || false);
+            const handler = (e) => {
+                setMatches(e.matches);
             };
-        }
-        else {
-            const queryList = useRef();
-            // queryList.current ??= (query == null ? null : matchMedia(query))
-            // This ^^^ is not done because it seems to cause reflows at inopportune moments.
-            // Specifically on iOS Safari (tested on 12).
-            // It's always iOS Safari.
-            // At any rate it botches transitions that happen on a just-mounted component, somehow.
-            const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
-            console.assert(!query || query.startsWith("("));
-            useLayoutEffect(() => {
-                if (!query)
-                    return;
-                queryList.current = matchMedia(query);
-                setMatches(queryList.current.matches || false);
-                const handler = (e) => {
-                    setMatches(e.matches);
-                };
-                queryList.current.addEventListener("change", handler, { passive: true });
-                return () => queryList.current?.removeEventListener("change", handler);
-            }, [query]);
-            return {
-                matches,
-                getMatches
-            };
-        }
-    });
+            queryList.current.addEventListener("change", handler, { passive: true });
+            return () => queryList.current?.removeEventListener("change", handler);
+        }, [query]);
+        return {
+            matches,
+            getMatches
+        };
+    }
 }
 
 /**
@@ -6886,34 +6858,32 @@ function useMutationObserver({ refElementParameters, mutationObserverParameters:
  * entire URL.
  */
 function useUrl(onUrlChange) {
-    return useMonitoring(function useUrl() {
-        const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
-        useGlobalHandler(getWindow(), "hashchange", (e) => {
-            setUrl(globalThis.location.toString(), e);
-        });
-        useGlobalHandler(getWindow(), "popstate", (e) => {
-            // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
-            // TODO: If this assert never fires, it's *probably* fine??
-            console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
-            setUrl(globalThis.location.toString(), e);
-        });
-        return [getUrl, useCallback((newUrlOrSetter, action) => {
-                const document = getDocument();
-                if (document) {
-                    if (typeof newUrlOrSetter == "function") {
-                        setUrl(prev => {
-                            let newUrl = newUrlOrSetter(prev);
-                            history[`${action ?? "replace"}State`]({}, document.title, newUrl);
-                            return newUrl;
-                        }, undefined);
-                    }
-                    else {
-                        history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
-                        setUrl(newUrlOrSetter, undefined);
-                    }
-                }
-            }, [])];
+    const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
+    useGlobalHandler(getWindow(), "hashchange", (e) => {
+        setUrl(globalThis.location.toString(), e);
     });
+    useGlobalHandler(getWindow(), "popstate", (e) => {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
+        // TODO: If this assert never fires, it's *probably* fine??
+        console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
+        setUrl(globalThis.location.toString(), e);
+    });
+    return [getUrl, useCallback((newUrlOrSetter, action) => {
+            const document = getDocument();
+            if (document) {
+                if (typeof newUrlOrSetter == "function") {
+                    setUrl(prev => {
+                        let newUrl = newUrlOrSetter(prev);
+                        history[`${action ?? "replace"}State`]({}, document.title, newUrl);
+                        return newUrl;
+                    }, undefined);
+                }
+                else {
+                    history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+                    setUrl(newUrlOrSetter, undefined);
+                }
+            }
+        }, [])];
 }
 
 /**
@@ -6927,11 +6897,9 @@ function useUrl(onUrlChange) {
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
 function useAsyncEffect(effect, inputs, options) {
-    useMonitoring(function useAsyncEffect() {
-        const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
-        useEffect(syncHandler, inputs);
-        return rest;
-    });
+    const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
+    useEffect(syncHandler, inputs);
+    return rest;
 }
 
 /**
@@ -6945,22 +6913,20 @@ function useAsyncEffect(effect, inputs, options) {
  * passing one of them as this argument. By default, it's `useEffect`.
  */
 function useEffectDebug(effect, inputs, impl = useEffect) {
-    return useMonitoring(function useEffectDebug() {
-        const prevInputs = useRef(undefined);
-        const effect2 = () => {
-            const changes = [];
-            if (inputs && prevInputs.current) {
-                for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
-                    if (prevInputs.current[i] != inputs[i])
-                        changes[i] = { from: prevInputs.current[i], to: inputs[i] };
-                }
+    const prevInputs = useRef(undefined);
+    const effect2 = () => {
+        const changes = [];
+        if (inputs && prevInputs.current) {
+            for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
+                if (prevInputs.current[i] != inputs[i])
+                    changes[i] = { from: prevInputs.current[i], to: inputs[i] };
             }
-            const ret = effect(prevInputs.current, changes);
-            prevInputs.current = inputs;
-            return ret;
-        };
-        impl(effect2, inputs);
-    });
+        }
+        const ret = effect(prevInputs.current, changes);
+        prevInputs.current = inputs;
+        return ret;
+    };
+    impl(effect2, inputs);
 }
 
 /**
@@ -6970,10 +6936,8 @@ function useEffectDebug(effect, inputs, impl = useEffect) {
  * @remarks It's a bit smelly, so best to use sparingly.
  */
 function useForceUpdate() {
-    return useMonitoring(function useForceUpdate() {
-        const [, set] = useState$1(0);
-        return useRef(() => set(i => ++i)).current;
-    });
+    const [, set] = useState$1(0);
+    return useRef(() => set(i => ++i)).current;
 }
 
 /**
@@ -6985,9 +6949,7 @@ function useForceUpdate() {
  * @param inputs - Same as the built-in's
  */
 function useLayoutEffectDebug(effect, inputs) {
-    return useMonitoring(function useLayoutEffectDebug() {
-        return useEffectDebug(effect, inputs, useLayoutEffect);
-    });
+    return useEffectDebug(effect, inputs, useLayoutEffect);
 }
 
 const PersistentStates = undefined; // Needed for the isolatedModules flag?
@@ -7325,34 +7287,32 @@ function ProvideBatchedAnimationFrames({ children }) {
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
 function useAnimationFrame({ callback }) {
-    return useMonitoring(function useAnimationFrame() {
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback ?? noop);
-        const hasCallback = (callback != null);
-        const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
-        useEffect(() => {
-            if (sharedAnimationFrameContext) {
-                if (hasCallback) {
-                    sharedAnimationFrameContext.addCallback(stableCallback);
-                }
-                else {
-                    sharedAnimationFrameContext.removeCallback(stableCallback);
-                }
+    // Get a wrapper around the given callback that's stable
+    const stableCallback = useStableCallback(callback ?? noop);
+    const hasCallback = (callback != null);
+    const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
+    useEffect(() => {
+        if (sharedAnimationFrameContext) {
+            if (hasCallback) {
+                sharedAnimationFrameContext.addCallback(stableCallback);
             }
             else {
-                if (hasCallback) {
-                    // Get a wrapper around the wrapper around the callback
-                    // that also calls `requestAnimationFrame` again.
-                    const rafCallback = (ms) => {
-                        handle = requestAnimationFrame(rafCallback);
-                        stableCallback(ms);
-                    };
-                    let handle = requestAnimationFrame(rafCallback);
-                    return () => cancelAnimationFrame(handle);
-                }
+                sharedAnimationFrameContext.removeCallback(stableCallback);
             }
-        }, [sharedAnimationFrameContext, hasCallback]);
-    });
+        }
+        else {
+            if (hasCallback) {
+                // Get a wrapper around the wrapper around the callback
+                // that also calls `requestAnimationFrame` again.
+                const rafCallback = (ms) => {
+                    handle = requestAnimationFrame(rafCallback);
+                    stableCallback(ms);
+                };
+                let handle = requestAnimationFrame(rafCallback);
+                return () => cancelAnimationFrame(handle);
+            }
+        }
+    }, [sharedAnimationFrameContext, hasCallback]);
 }
 
 /**
@@ -7362,33 +7322,31 @@ function useAnimationFrame({ callback }) {
  * {@include } {@link UseIntervalParameters}
  */
 function useInterval({ interval, callback, noRisingEdge }) {
-    return useMonitoring(function useInterval() {
-        const enabled = (interval != null);
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback);
-        const getInterval = useStableGetter(interval);
-        useEffect(() => {
-            const interval = getInterval();
-            let lastDelayUsed = interval;
-            if (!enabled)
-                return;
-            // Get a wrapper around the wrapper around the callback
-            // that clears and resets the interval if it changes.
-            const adjustableCallback = () => {
-                stableCallback();
-                const currentInterval = getInterval();
-                if (currentInterval != lastDelayUsed) {
-                    clearInterval(handle);
-                    if (currentInterval != null)
-                        handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
-                }
-            };
-            if (!noRisingEdge)
-                adjustableCallback();
-            let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
-            return () => clearInterval(handle);
-        }, [enabled]);
-    });
+    const enabled = (interval != null);
+    // Get a wrapper around the given callback that's stable
+    const stableCallback = useStableCallback(callback);
+    const getInterval = useStableGetter(interval);
+    useEffect(() => {
+        const interval = getInterval();
+        let lastDelayUsed = interval;
+        if (!enabled)
+            return;
+        // Get a wrapper around the wrapper around the callback
+        // that clears and resets the interval if it changes.
+        const adjustableCallback = () => {
+            stableCallback();
+            const currentInterval = getInterval();
+            if (currentInterval != lastDelayUsed) {
+                clearInterval(handle);
+                if (currentInterval != null)
+                    handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
+            }
+        };
+        if (!noRisingEdge)
+            adjustableCallback();
+        let handle = setInterval(adjustableCallback, interval); // Interval is guaranteed non-null if enabled is true
+        return () => clearInterval(handle);
+    }, [enabled]);
 }
 
 !function(){function r(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||false,r.configurable=true,"value"in r&&(r.writable=true),Object.defineProperty(e,r.key,r);}}

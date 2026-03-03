@@ -1,7 +1,6 @@
 import { clsx } from "clsx";
 import { getDocument } from "../util/get-window.js";
 import { useEffect } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 
 type P = Parameters<typeof clsx>;
 
@@ -13,18 +12,16 @@ type P = Parameters<typeof clsx>;
  * @param element - The element to affect. By default, it's the root `<html>` element
  */
 export function useDocumentClass(className: P[0], active?: boolean, element?: HTMLElement) {
-    return useMonitoring(function useDocumentClass(): void {
-        element ??= getDocument()?.documentElement;
-        className = clsx(className);
+    element ??= getDocument()?.documentElement;
+    className = clsx(className);
 
-        useEffect(() => {
-            if (element) {
-                if (active !== false) {
-                    element.classList.add(className as string);
-                    return () => element!.classList.remove(className as string);
-                }
+    useEffect(() => {
+        if (element) {
+            if (active !== false) {
+                element.classList.add(className as string);
+                return () => element!.classList.remove(className as string);
             }
+        }
 
-        }, [className, active, element]);
-    });
+    }, [className, active, element]);
 }

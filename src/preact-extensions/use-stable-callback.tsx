@@ -1,5 +1,4 @@
 import { useCallback as useCallbackNative } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
 
@@ -38,36 +37,32 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * truly has no dependencies/only stable dependencies!!
  */
 export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
-    return useMonitoring(function useStableCallback() {
-        type U = (NonNullable<T> & ((...args: any) => any));
-        useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
-        if (isStableGetter(fn))
-            return fn;
+    type U = (NonNullable<T> & ((...args: any) => any));
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
+    if (isStableGetter(fn))
+        return fn;
 
-        if (noDeps == null) {
-            const currentCallbackGetter = useStableGetter<U>(fn);
-            return setIsStableGetter(useCallbackNative<U>(((...args) => {
-                return currentCallbackGetter()(...args);
-            }) as U, []));
+    if (noDeps == null) {
+        const currentCallbackGetter = useStableGetter<U>(fn);
+        return setIsStableGetter(useCallbackNative<U>(((...args) => {
+            return currentCallbackGetter()(...args);
+        }) as U, []));
 
-        }
-        else {
-            console.assert(noDeps.length === 0);
-            return setIsStableGetter(useCallbackNative<U>(fn, []));
-        }
-    });
+    }
+    else {
+        console.assert(noDeps.length === 0);
+        return setIsStableGetter(useCallbackNative<U>(fn, []));
+    }
 }
 
 /**
  * #__NO_SIDE_EFFECTS__
  */
 export function useStableMergedCallback<T extends (Function | null | undefined)[]>(...fns: T) {
-    return useMonitoring(function useStableMergedCallback() {
-        return useStableCallback<T[number]>((...args: any[]) => {
-            for (let i = 0; i < fns.length; ++i) {
-                fns[i]?.(...args);
-            }
-        });
+    return useStableCallback<T[number]>((...args: any[]) => {
+        for (let i = 0; i < fns.length; ++i) {
+            fns[i]?.(...args);
+        }
     });
 };
 

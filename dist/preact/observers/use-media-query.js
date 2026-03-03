@@ -1,6 +1,5 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 /**
  * Allows a component to use the boolean result of a media query as part of its render.
  *
@@ -17,39 +16,37 @@ import { useMonitoring } from "../util/use-call-count.js";
  * @returns `UseMediaQueryReturnType`.
  */
 export function useMediaQuery(query, defaultGuess) {
-    return useMonitoring(function useMediaQuery() {
-        if (typeof window === "undefined") {
-            const matches = defaultGuess || false;
-            return {
-                matches,
-                getMatches: useCallback(() => matches, [matches])
+    if (typeof window === "undefined") {
+        const matches = defaultGuess || false;
+        return {
+            matches,
+            getMatches: useCallback(() => matches, [matches])
+        };
+    }
+    else {
+        const queryList = useRef();
+        // queryList.current ??= (query == null ? null : matchMedia(query))
+        // This ^^^ is not done because it seems to cause reflows at inopportune moments.
+        // Specifically on iOS Safari (tested on 12).
+        // It's always iOS Safari.
+        // At any rate it botches transitions that happen on a just-mounted component, somehow.
+        const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
+        console.assert(!query || query.startsWith("("));
+        useLayoutEffect(() => {
+            if (!query)
+                return;
+            queryList.current = matchMedia(query);
+            setMatches(queryList.current.matches || false);
+            const handler = (e) => {
+                setMatches(e.matches);
             };
-        }
-        else {
-            const queryList = useRef();
-            // queryList.current ??= (query == null ? null : matchMedia(query))
-            // This ^^^ is not done because it seems to cause reflows at inopportune moments.
-            // Specifically on iOS Safari (tested on 12).
-            // It's always iOS Safari.
-            // At any rate it botches transitions that happen on a just-mounted component, somehow.
-            const [matches, setMatches, getMatches] = useState(defaultGuess ?? null);
-            console.assert(!query || query.startsWith("("));
-            useLayoutEffect(() => {
-                if (!query)
-                    return;
-                queryList.current = matchMedia(query);
-                setMatches(queryList.current.matches || false);
-                const handler = (e) => {
-                    setMatches(e.matches);
-                };
-                queryList.current.addEventListener("change", handler, { passive: true });
-                return () => queryList.current?.removeEventListener("change", handler);
-            }, [query]);
-            return {
-                matches,
-                getMatches
-            };
-        }
-    });
+            queryList.current.addEventListener("change", handler, { passive: true });
+            return () => queryList.current?.removeEventListener("change", handler);
+        }, [query]);
+        return {
+            matches,
+            getMatches
+        };
+    }
 }
 //# sourceMappingURL=use-media-query.js.map

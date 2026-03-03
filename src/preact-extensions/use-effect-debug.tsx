@@ -1,5 +1,4 @@
 import { Inputs, useEffect as useEffectNative, useRef } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 
 /**
  * Wrap the native `useEffect` to add arguments 
@@ -12,23 +11,21 @@ import { useMonitoring } from "../util/use-call-count.js";
  * passing one of them as this argument. By default, it's `useEffect`.
  */
 export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
-    return useMonitoring(function useEffectDebug() {
-        const prevInputs = useRef<undefined | I>(undefined);
-        const effect2 = () => {
-            const changes: { from: any, to: any }[] = [];
-            if (inputs && prevInputs.current) {
-                for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
-                    if (prevInputs.current[i] != inputs[i])
-                        changes[i] = { from: prevInputs.current[i], to: inputs[i] }
-                }
+    const prevInputs = useRef<undefined | I>(undefined);
+    const effect2 = () => {
+        const changes: { from: any, to: any }[] = [];
+        if (inputs && prevInputs.current) {
+            for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
+                if (prevInputs.current[i] != inputs[i])
+                    changes[i] = { from: prevInputs.current[i], to: inputs[i] }
             }
-            const ret = effect(prevInputs.current, changes);
-            prevInputs.current = inputs;
-            return ret;
-        };
+        }
+        const ret = effect(prevInputs.current, changes);
+        prevInputs.current = inputs;
+        return ret;
+    };
 
-        impl(effect2, inputs);
-    });
+    impl(effect2, inputs);
 }
 
 export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] }

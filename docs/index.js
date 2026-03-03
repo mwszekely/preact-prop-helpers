@@ -961,43 +961,6 @@ function returnZero() {
 function runImmediately(f) {
   f();
 }
-
-// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
-// (i.e. in a way that doesn't throw an error)
-globalThis["process"] ??= {};
-globalThis["process"]["env"] ??= {};
-globalThis["process"]["env"]["NODE_ENV"] = "production";
-// The above statement looks redundant, but it ensures that manual
-// reads to `"production"` work regardless of if the bundler 
-// replaces `"production"` with the string `"development"` or not.
-
-// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
-// And it's extremely small anyway and basically does nothing.
-globalThis.requestIdleCallback ??= callback => {
-  return setTimeout(() => {
-    callback({
-      didTimeout: false,
-      timeRemaining: () => {
-        return 0;
-      }
-    });
-  }, 5);
-};
-/**
- * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if "production" is "development").
- *
- * @remarks Some of the more basic hooks, like `setState`, do not call `useMonitoring` at all.
- * They are so small that their duration generally rounds down to 0 (or epsilon), so using
- * this function usually makes no sense on them. The performance monitoring takes more time
- * than the function itself.
- */
-const useMonitoring = dontUseMonitoringImpl;
-/**
- *
- */
-function dontUseMonitoringImpl(t) {
-  return t();
-}
 const Unset$1 = Symbol("unset");
 /**
  * Given an input value, returns a constant getter function that can be used
@@ -1007,18 +970,16 @@ const Unset$1 = Symbol("unset");
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
 function useStableGetter(value) {
-  return useMonitoring(function useStableGetter() {
-    const ref = A(Unset$1);
-    useBeforeLayoutEffect(() => {
-      ref.current = value;
-    }, [value]);
-    return useCallback(() => {
-      if (ref.current === Unset$1) {
-        throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-      }
-      return ref.current;
-    }, []);
-  });
+  const ref = A(Unset$1);
+  useBeforeLayoutEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return useCallback(() => {
+    if (ref.current === Unset$1) {
+      throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+    }
+    return ref.current;
+  }, []);
 }
 /**
  * Like useMemo, but checks objects (shallowly)
@@ -1048,30 +1009,26 @@ function setIsStableGetter(obj) {
  * truly has no dependencies/only stable dependencies!!
  */
 function useStableCallback(fn, noDeps) {
-  return useMonitoring(function useStableCallback() {
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
-    if (isStableGetter()) return fn;
-    if (noDeps == null) {
-      const currentCallbackGetter = useStableGetter(fn);
-      return setIsStableGetter(useCallback((...args) => {
-        return currentCallbackGetter()(...args);
-      }, []));
-    } else {
-      console.assert(noDeps.length === 0);
-      return setIsStableGetter(useCallback(fn, []));
-    }
-  });
+  useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter());
+  if (isStableGetter()) return fn;
+  if (noDeps == null) {
+    const currentCallbackGetter = useStableGetter(fn);
+    return setIsStableGetter(useCallback((...args) => {
+      return currentCallbackGetter()(...args);
+    }, []));
+  } else {
+    console.assert(noDeps.length === 0);
+    return setIsStableGetter(useCallback(fn, []));
+  }
 }
 /**
  * #__NO_SIDE_EFFECTS__
  */
 function useStableMergedCallback(...fns) {
-  return useMonitoring(function useStableMergedCallback() {
-    return useStableCallback((...args) => {
-      for (let i = 0; i < fns.length; ++i) {
-        fns[i]?.(...args);
-      }
-    });
+  return useStableCallback((...args) => {
+    for (let i = 0; i < fns.length; ++i) {
+      fns[i]?.(...args);
+    }
   });
 }
 
@@ -1085,19 +1042,17 @@ function useStableMergedCallback(...fns) {
  * @param target - A *non-Preact* node to attach the event to.
  */
 function useGlobalHandler(target, type, handler, options, mode) {
-  return useMonitoring(function useGlobalHandler() {
-    mode ||= "grouped";
-    if (!target) return;
-    if (mode === "grouped") {
-      // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-      // No matter what, it seems impossible to get the handler's event object typed perfectly.
-      // It seems like it's guaranteed to always be a union of all available types.
-      // Again, no matter what combination of sub- or sub-sub-functions used.
-      useGlobalHandlerGrouped(target, type, handler, options);
-    } else {
-      useGlobalHandlerSingle(target, type, handler, options);
-    }
-  });
+  mode ||= "grouped";
+  if (!target) return;
+  if (mode === "grouped") {
+    // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+    // No matter what, it seems impossible to get the handler's event object typed perfectly.
+    // It seems like it's guaranteed to always be a union of all available types.
+    // Again, no matter what combination of sub- or sub-sub-functions used.
+    useGlobalHandlerGrouped(target, type, handler, options);
+  } else {
+    useGlobalHandlerSingle(target, type, handler, options);
+  }
 }
 let mapThing = new Map();
 function doMapThing(op, target, type, handler, options) {
@@ -1161,6 +1116,43 @@ function getWindow(element) {
 // eslint-disable-next-line no-restricted-globals
 function getDocument$1(element) {
   return typeof window == "undefined" ? undefined : element?.ownerDocument ?? getWindow()?.document ?? undefined;
+}
+
+// Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error)
+globalThis["process"] ??= {};
+globalThis["process"]["env"] ??= {};
+globalThis["process"]["env"]["NODE_ENV"] = "production";
+// The above statement looks redundant, but it ensures that manual
+// reads to `"production"` work regardless of if the bundler 
+// replaces `"production"` with the string `"development"` or not.
+
+// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+// And it's extremely small anyway and basically does nothing.
+globalThis.requestIdleCallback ??= callback => {
+  return setTimeout(() => {
+    callback({
+      didTimeout: false,
+      timeRemaining: () => {
+        return 0;
+      }
+    });
+  }, 5);
+};
+/**
+ * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if "production" is "development").
+ *
+ * @remarks Some of the more basic hooks, like `setState`, do not call `useMonitoring` at all.
+ * They are so small that their duration generally rounds down to 0 (or epsilon), so using
+ * this function usually makes no sense on them. The performance monitoring takes more time
+ * than the function itself.
+ */
+const useMonitoring = dontUseMonitoringImpl;
+/**
+ *
+ */
+function dontUseMonitoringImpl(t) {
+  return t();
 }
 
 /**
@@ -2664,42 +2656,40 @@ function useTimeout({
   callback,
   triggerIndex
 }) {
-  return useMonitoring(function useTimeout() {
-    const stableCallback = useStableCallback(() => {
-      startTimeRef.current = null;
-      callback();
-    });
-    const getTimeout = useStableGetter(timeout);
-    // Set any time we start timeout.
-    // Unset any time the timeout completes
-    const startTimeRef = A(null);
-    const disabled = timeout == null;
-    // Any time the triggerIndex changes (including on mount)
-    // restart the timeout.  The timeout does NOT reset
-    // when the duration or callback changes, only triggerIndex.
-    y(() => {
-      if (!disabled) {
-        const timeout = getTimeout();
-        console.assert(disabled == (timeout == null));
-        if (timeout != null) {
-          startTimeRef.current = +new Date();
-          const handle = setTimeout(stableCallback, timeout);
-          return () => clearTimeout(handle);
-        }
-      }
-    }, [triggerIndex, disabled]);
-    const getElapsedTime = useCallback(() => {
-      return +new Date() - +(startTimeRef.current ?? new Date());
-    }, []);
-    const getRemainingTime = useCallback(() => {
-      const timeout = getTimeout();
-      return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-    }, []);
-    return {
-      getElapsedTime,
-      getRemainingTime
-    };
+  const stableCallback = useStableCallback(() => {
+    startTimeRef.current = null;
+    callback();
   });
+  const getTimeout = useStableGetter(timeout);
+  // Set any time we start timeout.
+  // Unset any time the timeout completes
+  const startTimeRef = A(null);
+  const disabled = timeout == null;
+  // Any time the triggerIndex changes (including on mount)
+  // restart the timeout.  The timeout does NOT reset
+  // when the duration or callback changes, only triggerIndex.
+  y(() => {
+    if (!disabled) {
+      const timeout = getTimeout();
+      console.assert(disabled == (timeout == null));
+      if (timeout != null) {
+        startTimeRef.current = +new Date();
+        const handle = setTimeout(stableCallback, timeout);
+        return () => clearTimeout(handle);
+      }
+    }
+  }, [triggerIndex, disabled]);
+  const getElapsedTime = useCallback(() => {
+    return +new Date() - +(startTimeRef.current ?? new Date());
+  }, []);
+  const getRemainingTime = useCallback(() => {
+    const timeout = getTimeout();
+    return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+  }, []);
+  return {
+    getElapsedTime,
+    getRemainingTime
+  };
 }
 
 /**
@@ -5823,47 +5813,45 @@ function useSelectionChildDeclarative(args) {
  * @compositeParams
  */
 function useRefElement(args) {
-  return useMonitoring(function useRefElement() {
-    const nonElementWarn = A(false);
-    if (nonElementWarn.current) {
-      nonElementWarn.current = false;
-      // There are two of these to catch the problem in the two most useful areas --
-      // when it initially happens, and also in the component stack.
-      console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+  const nonElementWarn = A(false);
+  if (nonElementWarn.current) {
+    nonElementWarn.current = false;
+    // There are two of these to catch the problem in the two most useful areas --
+    // when it initially happens, and also in the component stack.
+    console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+  }
+  const {
+    onElementChange,
+    onMount,
+    onUnmount
+  } = args.refElementParameters || {};
+  // Called (indirectly) by the ref that the element receives.
+  const handler = useCallback((e, prevValue) => {
+    if (!(e == null || e instanceof Element)) {
+      console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+      nonElementWarn.current = true;
     }
-    const {
-      onElementChange,
-      onMount,
-      onUnmount
-    } = args.refElementParameters || {};
-    // Called (indirectly) by the ref that the element receives.
-    const handler = useCallback((e, prevValue) => {
-      if (!(e == null || e instanceof Element)) {
-        console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
-        nonElementWarn.current = true;
-      }
-      const cleanup = onElementChange?.(e, prevValue);
-      if (prevValue) onUnmount?.(prevValue);
-      if (e) onMount?.(e);
-      return cleanup;
-    }, []);
-    // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState(handler, returnNull, {
-      debounceRendering: runImmediately,
-      skipMountInitialization: true
-    });
-    const propsStable = A({
-      ref: setElement
-    });
-    // Return both the element and the hook that modifies 
-    // the props and allows us to actually find the element
-    return {
-      propsStable: propsStable.current,
-      refElementReturn: {
-        getElement
-      }
-    };
+    const cleanup = onElementChange?.(e, prevValue);
+    if (prevValue) onUnmount?.(prevValue);
+    if (e) onMount?.(e);
+    return cleanup;
+  }, []);
+  // Let us store the actual (reference to) the element we capture
+  const [getElement, setElement] = usePassiveState(handler, returnNull, {
+    debounceRendering: runImmediately,
+    skipMountInitialization: true
   });
+  const propsStable = A({
+    ref: setElement
+  });
+  // Return both the element and the hook that modifies 
+  // the props and allows us to actually find the element
+  return {
+    propsStable: propsStable.current,
+    refElementReturn: {
+      getElement
+    }
+  };
 }
 function add(map, key, value) {
   var _a;
@@ -6060,53 +6048,51 @@ function useBlockingElement({
   },
   ...void2
 }) {
-  return useMonitoring(function useBlockingElement() {
-    const stableGetTarget = useStableCallback(getTarget);
-    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
-    useActiveElement({
-      activeElementParameters: {
-        getDocument,
-        onActiveElementChange,
-        onWindowFocusedChange,
-        onLastActiveElementChange: useStableCallback((e, prev, reason) => {
-          onLastActiveElementChange?.(e, prev, reason);
-          if (e) {
-            if (enabled) setLastActiveWhenOpen(e, reason);else setLastActiveWhenClosed(e, reason);
-          }
-        })
-      }
-    });
-    const [getTop, setTop] = usePassiveState(null, returnNull);
-    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState(null, returnNull);
-    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState(null, returnNull);
-    /**
-     * Push/pop the element from the blockingElements stack.
-     */
-    _(() => {
-      const target = stableGetTarget();
-      if (enabled) {
-        // Sometimes blockingElements will fail if, for example,
-        // the target element isn't connected to document.body.
-        // This is rare, but it's better to fail silently with weird tabbing behavior
-        // than to crash the entire application.
-        try {
-          blockingElements().push(target);
-          setTop(target);
-          return () => {
-            blockingElements().remove(target);
-          };
-        } catch (ex) {
-          // Well, semi-silently.
-          console.error(ex);
+  const stableGetTarget = useStableCallback(getTarget);
+  //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+  useActiveElement({
+    activeElementParameters: {
+      getDocument,
+      onActiveElementChange,
+      onWindowFocusedChange,
+      onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+        onLastActiveElementChange?.(e, prev, reason);
+        if (e) {
+          if (enabled) setLastActiveWhenOpen(e, reason);else setLastActiveWhenClosed(e, reason);
         }
-      }
-    }, [enabled]);
-    return {
-      getTop,
-      getLastActiveWhenClosed,
-      getLastActiveWhenOpen
-    };
+      })
+    }
   });
+  const [getTop, setTop] = usePassiveState(null, returnNull);
+  const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState(null, returnNull);
+  const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState(null, returnNull);
+  /**
+   * Push/pop the element from the blockingElements stack.
+   */
+  _(() => {
+    const target = stableGetTarget();
+    if (enabled) {
+      // Sometimes blockingElements will fail if, for example,
+      // the target element isn't connected to document.body.
+      // This is rare, but it's better to fail silently with weird tabbing behavior
+      // than to crash the entire application.
+      try {
+        blockingElements().push(target);
+        setTop(target);
+        return () => {
+          blockingElements().remove(target);
+        };
+      } catch (ex) {
+        // Well, semi-silently.
+        console.error(ex);
+      }
+    }
+  }, [enabled]);
+  return {
+    getTop,
+    getLastActiveWhenClosed,
+    getLastActiveWhenOpen
+  };
 }
 
 /**
@@ -7323,91 +7309,89 @@ function identityCapture(...t) {
  * @param options - @see {@link UseAsyncParameters}
  */
 function useAsync(asyncHandler, options) {
-  return useMonitoring(function useAsync() {
-    const AsyncFunction = async function () {}.constructor;
-    // Things related to current execution
-    // Because we can both return and throw undefined, 
-    // we need separate state to track their existence too.
-    //
-    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    const [pending, setPending, _getPending] = useState(false);
-    const [result, setResult, _getResult] = useState(undefined);
-    const [error, setError, _getError] = useState(undefined);
-    const [hasError, setHasError, _getHasError] = useState(false);
-    const [hasResult, setHasResult, _getHasResult] = useState(false);
-    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-    const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
-    // Keep track of this for the caller's sake -- we don't really care.
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
-    const incrementCallCount = useCallback(() => {
-      setRunCount(c => c + 1);
-    }, []);
-    const incrementResolveCount = useCallback(() => {
-      setResolveCount(c => c + 1);
-    }, []);
-    const incrementRejectCount = useCallback(() => {
-      setRejectCount(c => c + 1);
-    }, []);
-    const incrementFinallyCount = useCallback(() => {
-      setSettleCount(c => c + 1);
-    }, []);
-    /* eslint-disable prefer-const */
-    let {
-      throttle,
-      debounce,
-      capture: captureUnstable
-    } = options ?? {};
-    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
-    const {
-      flushSyncDebounce,
-      syncOutput,
-      cancelSyncDebounce
-    } = T$1(() => {
-      return asyncToSync({
-        asyncInput: asyncHandlerStable,
-        capture: captureStable,
-        onAsyncDebounce: setAsyncDebouncing,
-        onError: setError,
-        onPending: setPending,
-        onReturnValue: setResult,
-        onSyncDebounce: setSyncDebouncing,
-        onHasError: setHasError,
-        onHasResult: setHasResult,
-        onInvoked: setInvocationResult,
-        onInvoke: incrementCallCount,
-        onFinally: incrementFinallyCount,
-        onReject: incrementRejectCount,
-        onResolve: incrementResolveCount,
-        throttle: options?.throttle ?? undefined,
-        debounce: options?.debounce ?? undefined
-      });
-    }, [throttle, debounce]);
-    y(() => {
-      return () => cancelSyncDebounce();
-    }, [cancelSyncDebounce]);
-    return {
-      syncHandler: syncOutput,
-      pending,
-      result,
-      error,
-      hasError: hasError || false,
-      hasResult: hasResult || false,
-      resolveCount,
-      rejectCount,
-      settleCount,
-      debouncingAsync: asyncDebouncing,
-      debouncingSync: syncDebouncing,
-      invocationResult,
-      callCount: runCount,
-      flushDebouncedPromise: flushSyncDebounce
-    };
-  });
+  const AsyncFunction = async function () {}.constructor;
+  // Things related to current execution
+  // Because we can both return and throw undefined, 
+  // we need separate state to track their existence too.
+  //
+  // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+  // when we start/stop an async action.
+  const [pending, setPending, _getPending] = useState(false);
+  const [result, setResult, _getResult] = useState(undefined);
+  const [error, setError, _getError] = useState(undefined);
+  const [hasError, setHasError, _getHasError] = useState(false);
+  const [hasResult, setHasResult, _getHasResult] = useState(false);
+  const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+  const [syncDebouncing, setSyncDebouncing] = useState(false);
+  const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
+  // Keep track of this for the caller's sake -- we don't really care.
+  const [runCount, setRunCount] = useState(0);
+  const [settleCount, setSettleCount] = useState(0);
+  const [resolveCount, setResolveCount] = useState(0);
+  const [rejectCount, setRejectCount] = useState(0);
+  const incrementCallCount = useCallback(() => {
+    setRunCount(c => c + 1);
+  }, []);
+  const incrementResolveCount = useCallback(() => {
+    setResolveCount(c => c + 1);
+  }, []);
+  const incrementRejectCount = useCallback(() => {
+    setRejectCount(c => c + 1);
+  }, []);
+  const incrementFinallyCount = useCallback(() => {
+    setSettleCount(c => c + 1);
+  }, []);
+  /* eslint-disable prefer-const */
+  let {
+    throttle,
+    debounce,
+    capture: captureUnstable
+  } = options ?? {};
+  const captureStable = useStableCallback(captureUnstable ?? identityCapture);
+  const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
+  const {
+    flushSyncDebounce,
+    syncOutput,
+    cancelSyncDebounce
+  } = T$1(() => {
+    return asyncToSync({
+      asyncInput: asyncHandlerStable,
+      capture: captureStable,
+      onAsyncDebounce: setAsyncDebouncing,
+      onError: setError,
+      onPending: setPending,
+      onReturnValue: setResult,
+      onSyncDebounce: setSyncDebouncing,
+      onHasError: setHasError,
+      onHasResult: setHasResult,
+      onInvoked: setInvocationResult,
+      onInvoke: incrementCallCount,
+      onFinally: incrementFinallyCount,
+      onReject: incrementRejectCount,
+      onResolve: incrementResolveCount,
+      throttle: options?.throttle ?? undefined,
+      debounce: options?.debounce ?? undefined
+    });
+  }, [throttle, debounce]);
+  y(() => {
+    return () => cancelSyncDebounce();
+  }, [cancelSyncDebounce]);
+  return {
+    syncHandler: syncOutput,
+    pending,
+    result,
+    error,
+    hasError: hasError || false,
+    hasResult: hasResult || false,
+    resolveCount,
+    rejectCount,
+    settleCount,
+    debouncingAsync: asyncDebouncing,
+    debouncingSync: syncDebouncing,
+    invocationResult,
+    callCount: runCount,
+    flushDebouncedPromise: flushSyncDebounce
+  };
 }
 
 /**
@@ -7480,33 +7464,31 @@ function useAsyncHandler({
   capture: originalCapture,
   ...restAsyncOptions
 }) {
-  return useMonitoring(function useAsyncHandler() {
-    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-    const [hasCapture, setHasCapture] = useState(false);
-    // Wrap around the normal `useAsync` `capture` function to also
-    // keep track of the last value the user actually input.
-    // 
-    // Without this there's no way to re-render the control with
-    // it being both controlled and also having the "correct" value,
-    // and at any rate also protects against sudden exceptions reverting
-    // your change out from under you.
-    const capture = useStableCallback(e => {
-      const captured = originalCapture(e);
-      setCurrentCapture(captured);
-      setHasCapture(true);
-      return [captured, e];
-    });
-    return {
-      getCurrentCapture,
-      currentCapture,
-      hasCapture,
-      ...useAsync(asyncHandler, {
-        capture,
-        ...restAsyncOptions
-      })
-    };
+  // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+  const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+  const [hasCapture, setHasCapture] = useState(false);
+  // Wrap around the normal `useAsync` `capture` function to also
+  // keep track of the last value the user actually input.
+  // 
+  // Without this there's no way to re-render the control with
+  // it being both controlled and also having the "correct" value,
+  // and at any rate also protects against sudden exceptions reverting
+  // your change out from under you.
+  const capture = useStableCallback(e => {
+    const captured = originalCapture(e);
+    setCurrentCapture(captured);
+    setHasCapture(true);
+    return [captured, e];
   });
+  return {
+    getCurrentCapture,
+    currentCapture,
+    hasCapture,
+    ...useAsync(asyncHandler, {
+      capture,
+      ...restAsyncOptions
+    })
+  };
 }
 function pressLog(...args) {
   if (globalThis.__log_press_events) console.log(...args);

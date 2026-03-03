@@ -1,5 +1,4 @@
 import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 
 const Unset = Symbol("unset");
@@ -13,17 +12,16 @@ const Unset = Symbol("unset");
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  */
 export function useStableGetter<T>(value: T) {
-    return useMonitoring(function useStableGetter() {
-        const ref = useRef<T>(Unset as unknown as T);
-        useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
 
-        return useCallback(() => {
-            if (ref.current as unknown === Unset) {
-                throw new Error('Value retrieved from useStableGetter() cannot be called during render.')
-            }
-            return ref.current;
-        }, []);
-    });
+    const ref = useRef<T>(Unset as unknown as T);
+    useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
+
+    return useCallback(() => {
+        if (ref.current as unknown === Unset) {
+            throw new Error('Value retrieved from useStableGetter() cannot be called during render.')
+        }
+        return ref.current;
+    }, []);
 }
 
 

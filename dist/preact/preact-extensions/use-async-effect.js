@@ -1,5 +1,4 @@
 import { useEffect } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 import { useAsync } from "./use-async.js";
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
@@ -12,10 +11,8 @@ import { useAsync } from "./use-async.js";
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
 export function useAsyncEffect(effect, inputs, options) {
-    useMonitoring(function useAsyncEffect() {
-        const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
-        useEffect(syncHandler, inputs);
-        return rest;
-    });
+    const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
+    useEffect(syncHandler, inputs);
+    return rest;
 }
 //# sourceMappingURL=use-async-effect.js.map

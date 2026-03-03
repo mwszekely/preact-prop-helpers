@@ -4,7 +4,6 @@ import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument, getWindow } from "../util/get-window.js";
 import { useCallback } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 
 /**
  * Allows you to inspect when the entire URL changes, 
@@ -21,36 +20,33 @@ import { useMonitoring } from "../util/use-call-count.js";
  * entire URL.
  */
 export function useUrl(onUrlChange: (url: string) => void) {
+    const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
 
-    return useMonitoring(function useUrl() {
-        const [getUrl, setUrl] = usePassiveState<string, Event | undefined>(useStableCallback(onUrlChange), useCallback(() => getWindow()?.location?.toString() || "", []));
-
-        useGlobalHandler(getWindow(), "hashchange", (e) => {
-            setUrl(globalThis.location.toString(), e);
-        });
-
-        useGlobalHandler(getWindow(), "popstate", (e: PopStateEvent) => {
-            // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
-            // TODO: If this assert never fires, it's *probably* fine??
-            console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
-            setUrl(globalThis.location.toString(), e);
-        });
-
-        return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => {
-            const document = getDocument();
-            if (document) {
-                if (typeof newUrlOrSetter == "function") {
-                    setUrl(prev => {
-                        let newUrl = newUrlOrSetter(prev);
-                        history[`${action ?? "replace"}State`]({}, document.title, newUrl);
-                        return newUrl;
-                    }, undefined)
-                }
-                else {
-                    history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
-                    setUrl(newUrlOrSetter, undefined);
-                }
-            }
-        }, [])] as const;
+    useGlobalHandler(getWindow(), "hashchange", (e) => {
+        setUrl(globalThis.location.toString(), e);
     });
+
+    useGlobalHandler(getWindow(), "popstate", (e: PopStateEvent) => {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
+        // TODO: If this assert never fires, it's *probably* fine??
+        console.assert(getWindow()?.location?.toString() === getDocument()?.location?.toString());
+        setUrl(globalThis.location.toString(), e);
+    });
+
+    return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => {
+        const document = getDocument();
+        if (document) {
+            if (typeof newUrlOrSetter == "function") {
+                setUrl(prev => {
+                    let newUrl = newUrlOrSetter(prev);
+                    history[`${action ?? "replace"}State`]({}, document.title, newUrl);
+                    return newUrl;
+                }, undefined)
+            }
+            else {
+                history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+                setUrl(newUrlOrSetter, undefined);
+            }
+        }
+    }, [])] as const;
 }

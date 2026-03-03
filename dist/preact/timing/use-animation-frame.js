@@ -1,7 +1,6 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 const SharedAnimationFrameContext = createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
@@ -39,33 +38,31 @@ export function ProvideBatchedAnimationFrames({ children }) {
  * {@include } {@link ProvideBatchedAnimationFrames}
  */
 export function useAnimationFrame({ callback }) {
-    return useMonitoring(function useAnimationFrame() {
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback ?? noop);
-        const hasCallback = (callback != null);
-        const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
-        useEffect(() => {
-            if (sharedAnimationFrameContext) {
-                if (hasCallback) {
-                    sharedAnimationFrameContext.addCallback(stableCallback);
-                }
-                else {
-                    sharedAnimationFrameContext.removeCallback(stableCallback);
-                }
+    // Get a wrapper around the given callback that's stable
+    const stableCallback = useStableCallback(callback ?? noop);
+    const hasCallback = (callback != null);
+    const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
+    useEffect(() => {
+        if (sharedAnimationFrameContext) {
+            if (hasCallback) {
+                sharedAnimationFrameContext.addCallback(stableCallback);
             }
             else {
-                if (hasCallback) {
-                    // Get a wrapper around the wrapper around the callback
-                    // that also calls `requestAnimationFrame` again.
-                    const rafCallback = (ms) => {
-                        handle = requestAnimationFrame(rafCallback);
-                        stableCallback(ms);
-                    };
-                    let handle = requestAnimationFrame(rafCallback);
-                    return () => cancelAnimationFrame(handle);
-                }
+                sharedAnimationFrameContext.removeCallback(stableCallback);
             }
-        }, [sharedAnimationFrameContext, hasCallback]);
-    });
+        }
+        else {
+            if (hasCallback) {
+                // Get a wrapper around the wrapper around the callback
+                // that also calls `requestAnimationFrame` again.
+                const rafCallback = (ms) => {
+                    handle = requestAnimationFrame(rafCallback);
+                    stableCallback(ms);
+                };
+                let handle = requestAnimationFrame(rafCallback);
+                return () => cancelAnimationFrame(handle);
+            }
+        }
+    }, [sharedAnimationFrameContext, hasCallback]);
 }
 //# sourceMappingURL=use-animation-frame.js.map

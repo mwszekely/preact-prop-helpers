@@ -1,7 +1,6 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
-import { useMonitoring } from "../util/use-call-count.js";
 
 /**
  * This is used to select *just* the typed addEventListener 
@@ -54,24 +53,22 @@ type TypedEventHandlerEvent<E extends EventTarget, _T extends TypedEventListener
  * @param target - A *non-Preact* node to attach the event to.
  */
 export function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T | null | undefined, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void {
-    return useMonitoring(function useGlobalHandler(): void {
-        mode ||= "grouped";
-        useEnsureStability("useGlobalHandler", target, mode);
+    mode ||= "grouped";
+    useEnsureStability("useGlobalHandler", target, mode);
 
-        if (!target)
-            return;
+    if (!target)
+        return;
 
-        if (mode === "grouped") {
-            // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-            // No matter what, it seems impossible to get the handler's event object typed perfectly.
-            // It seems like it's guaranteed to always be a union of all available types.
-            // Again, no matter what combination of sub- or sub-sub-functions used.
-            useGlobalHandlerGrouped<T, EventType, H>(target, type, handler, options);
-        }
-        else {
-            useGlobalHandlerSingle<T, EventType, H>(target, type, handler, options);
-        }
-    });
+    if (mode === "grouped") {
+        // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+        // No matter what, it seems impossible to get the handler's event object typed perfectly.
+        // It seems like it's guaranteed to always be a union of all available types.
+        // Again, no matter what combination of sub- or sub-sub-functions used.
+        useGlobalHandlerGrouped<T, EventType, H>(target, type, handler, options);
+    }
+    else {
+        useGlobalHandlerSingle<T, EventType, H>(target, type, handler, options);
+    }
 }
 
 type GlobalHandlerInfo = { listener: EventListener; listeners: Set<EventListener>; };
