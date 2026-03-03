@@ -1,7 +1,6 @@
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useRef } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
-import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
@@ -63,7 +62,7 @@ export function useRefElement(args) {
         }, []);
         // Let us store the actual (reference to) the element we capture
         const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const propsStable = useRef(useTagProps({ ref: setElement }, "data-use-ref-element"));
+        const propsStable = useRef({ ref: setElement });
         // Return both the element and the hook that modifies 
         // the props and allows us to actually find the element
         return {

@@ -86,7 +86,7 @@ function I(n, l, u, t, i, o, r, e, f, c, s) {
     _,
     m = t && t.__k || v$1,
     b = l.length;
-  for (f = P$1(u, l, m, f, b), a = 0; a < b; a++) null != (y = u.__k[a]) && (h = -1 == y.__i ? p$1 : m[y.__i] || p$1, y.__i = a, g = O(n, y, h, i, o, r, e, f, c, s), d = y.__e, y.ref && h.ref != y.ref && (h.ref && B$2(h.ref, null, y), s.push(y.ref, y.__c || d, y)), null == w && null != d && (w = d), (_ = !!(4 & y.__u)) || h.__k === y.__k ? f = A$2(y, f, n, _) : "function" == typeof y.type && void 0 !== g ? f = g : d && (f = d.nextSibling), y.__u &= -7);
+  for (f = P$1(u, l, m, f, b), a = 0; a < b; a++) null != (y = u.__k[a]) && (h = -1 == y.__i ? p$1 : m[y.__i] || p$1, y.__i = a, g = O(n, y, h, i, o, r, e, f, c, s), d = y.__e, y.ref && h.ref != y.ref && (h.ref && B$2(h.ref, null, y), s.push(y.ref, y.__c || d, y)), null == w && null != d && (w = d), (_ = !!(4 & y.__u)) || h.__k === y.__k ? f = A$1(y, f, n, _) : "function" == typeof y.type && void 0 !== g ? f = g : d && (f = d.nextSibling), y.__u &= -7);
   return u.__e = w, f;
 }
 function P$1(n, l, u, t, i) {
@@ -101,13 +101,13 @@ function P$1(n, l, u, t, i) {
   for (n.__k = new Array(i), o = 0; o < i; o++) null != (r = l[o]) && "boolean" != typeof r && "function" != typeof r ? ("string" == typeof r || "number" == typeof r || "bigint" == typeof r || r.constructor == String ? r = n.__k[o] = m$1(null, r, null, null, null) : d$1(r) ? r = n.__k[o] = m$1(k$1, {
     children: r
   }, null, null, null) : void 0 === r.constructor && r.__b > 0 ? r = n.__k[o] = m$1(r.type, r.props, r.key, r.ref ? r.ref : null, r.__v) : n.__k[o] = r, f = o + h, r.__ = n, r.__b = n.__b + 1, e = null, -1 != (c = r.__i = L(r, u, f, a)) && (a--, (e = u[c]) && (e.__u |= 2)), null == e || null == e.__v ? (-1 == c && (i > s ? h-- : i < s && h++), "function" != typeof r.type && (r.__u |= 4)) : c != f && (c == f - 1 ? h-- : c == f + 1 ? h++ : (c > f ? h-- : h++, r.__u |= 4))) : n.__k[o] = null;
-  if (a) for (o = 0; o < s; o++) null != (e = u[o]) && 0 == (2 & e.__u) && (e.__e == t && (t = S(e)), D$2(e, e));
+  if (a) for (o = 0; o < s; o++) null != (e = u[o]) && 0 == (2 & e.__u) && (e.__e == t && (t = S(e)), D$1(e, e));
   return t;
 }
-function A$2(n, l, u, t) {
+function A$1(n, l, u, t) {
   var i, o;
   if ("function" == typeof n.type) {
-    for (i = n.__k, o = 0; i && o < i.length; o++) i[o] && (i[o].__ = n, l = A$2(i[o], l, u, t));
+    for (i = n.__k, o = 0; i && o < i.length; o++) i[o] && (i[o].__ = n, l = A$1(i[o], l, u, t));
     return l;
   }
   n.__e != l && (t && (l && n.type && !l.parentNode && (l = S(n)), u.insertBefore(n.__e, l || null)), l = n.__e);
@@ -151,7 +151,7 @@ function j$2(n, l, u, t, i) {
     "function" == typeof u || (null == u || !1 === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
   }
 }
-function F$2(n) {
+function F$1(n) {
   return function (u) {
     if (this.l) {
       var t = this.l[u.type + n];
@@ -274,7 +274,7 @@ function B$2(n, u, t) {
     l$1.__e(n, t);
   }
 }
-function D$2(n, u, t) {
+function D$1(n, u, t) {
   var i, o;
   if (l$1.unmount && l$1.unmount(n), (i = n.ref) && (i.current && i.current != n.__e || B$2(i, null, u)), null != (i = n.__c)) {
     if (i.componentWillUnmount) try {
@@ -284,7 +284,7 @@ function D$2(n, u, t) {
     }
     i.base = i.__P = null;
   }
-  if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && D$2(i[o], u, t || "function" != typeof n.type);
+  if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && D$1(i[o], u, t || "function" != typeof n.type);
   t || g$1(n.__e), n.__c = n.__ = n.__e = void 0;
 }
 function E$1(n, l, u) {
@@ -333,7 +333,7 @@ n = v$1.slice, l$1 = {
   this.__v && (this.__e = !0, n && this.__h.push(n), M$1(this));
 }, x$1.prototype.render = k$1, i$1 = [], r$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function (n, l) {
   return n.__v.__b - l.__v.__b;
-}, $.__r = 0, f$2 = /(PointerCapture)$|Capture$/i, c$1 = 0, s$1 = F$2(!1), a$1 = F$2(!0), h$1 = 0;
+}, $.__r = 0, f$2 = /(PointerCapture)$|Capture$/i, c$1 = 0, s$1 = F$1(!1), a$1 = F$1(!0), h$1 = 0;
 var f$1 = 0;
 function u$1(e, t, n, o, i, u) {
   t || (t = {});
@@ -383,11 +383,11 @@ function p(n, t) {
   return n >= u.__.length && u.__.push({}), u.__[n];
 }
 function d(n) {
-  return o = 1, h(D$1, n);
+  return o = 1, h(D, n);
 }
 function h(n, u, i) {
   var o = p(t++, 2);
-  if (o.t = n, !o.__c && (o.__ = [i ? i(u) : D$1(void 0, u), function (n) {
+  if (o.t = n, !o.__c && (o.__ = [i ? i(u) : D(void 0, u), function (n) {
     var t = o.__N ? o.__N[0] : o.__[0],
       r = o.t(t, n);
     t !== r && (o.__N = [r, o.__[1]], o.__c.setState({}));
@@ -429,25 +429,12 @@ function _(n, u) {
   var i = p(t++, 4);
   !c.__s && C(i.__H, u) && (i.__ = n, i.u = u, r.__h.push(i));
 }
-function A$1(n) {
+function A(n) {
   return o = 5, T$1(function () {
     return {
       current: n
     };
   }, []);
-}
-function F$1(n, t, r) {
-  o = 6, _(function () {
-    if ("function" == typeof n) {
-      var r = n(t());
-      return function () {
-        n(null), r && "function" == typeof r && r();
-      };
-    }
-    if (n) return n.current = t(), function () {
-      return n.current = null;
-    };
-  }, null == r ? r : r.concat(n));
 }
 function T$1(n, r) {
   var u = p(t++, 7);
@@ -533,7 +520,7 @@ function C(n, t) {
     return t !== n[r];
   });
 }
-function D$1(n, t) {
+function D(n, t) {
   return "function" == typeof t ? t(n) : t;
 }
 function g(n, t) {
@@ -566,14 +553,6 @@ var T = l$1.__b;
 l$1.__b = function (n) {
   n.type && n.type.__f && n.ref && (n.props.ref = n.ref, n.ref = null), T && T(n);
 };
-var A = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
-function D(n) {
-  function t(t) {
-    var e = g({}, t);
-    return delete e.ref, n(e, t.ref || null);
-  }
-  return t.$$typeof = A, t.render = n, t.prototype.isReactComponent = t.__f = !0, t.displayName = "ForwardRef(" + (n.displayName || n.name) + ")", t;
-}
 var U = l$1.__e;
 l$1.__e = function (n, t, e, r) {
   if (n.then) for (var u, o = t; o = o.__;) if ((u = o.__c) && u.__c) return null == t.__e && (t.__e = e.__e, t.__k = e.__k), u.__c(n, t);
@@ -749,107 +728,6 @@ l$1.diffed = function (n) {
     e = n.__e;
   null != e && "textarea" === n.type && "value" in t && t.value !== e.value && (e.value = null == t.value ? "" : t.value);
 };
-
-/** These are all the event mappings that are shared between Preact/React */
-const EventMapping$1 = {
-  abort: "onAbort",
-  animationend: "onAnimationEnd",
-  animationstart: "onAnimationStart",
-  animationiteration: "onAnimationIteration",
-  beforeinput: "onBeforeInput",
-  blur: "onBlur",
-  canplay: "onCanPlay",
-  canplaythrough: "onCanPlayThrough",
-  change: "onChange",
-  click: "onClick",
-  compositionend: "onCompositionEnd",
-  compositionstart: "onCompositionStart",
-  compositionupdate: "onCompositionUpdate",
-  contextmenu: "onContextMenu",
-  cut: "onCut",
-  drag: "onDrag",
-  dragend: "onDragEnd",
-  dragenter: "onDragEnter",
-  dragleave: "onDragLeave",
-  dragover: "onDragOver",
-  dragstart: "onDragStart",
-  drop: "onDrop",
-  durationchange: "onDurationChange",
-  emptied: "onEmptied",
-  ended: "onEnded",
-  error: "onError",
-  focus: "onFocus",
-  gotpointercapture: "onGotPointerCapture",
-  input: "onInput",
-  invalid: "onInvalid",
-  keydown: "onKeyDown",
-  keypress: "onKeyPress",
-  keyup: "onKeyUp",
-  load: "onLoad",
-  loadeddata: "onLoadedData",
-  loadedmetadata: "onLoadedMetadata",
-  loadstart: "onLoadStart",
-  lostpointercapture: "onLostPointerCapture",
-  mousedown: "onMouseDown",
-  mouseenter: "onMouseEnter",
-  mouseleave: "onMouseLeave",
-  mousemove: "onMouseMove",
-  mouseout: "onMouseOut",
-  mouseover: "onMouseOver",
-  mouseup: "onMouseUp",
-  paste: "onPaste",
-  pause: "onPause",
-  play: "onPlay",
-  playing: "onPlaying",
-  pointercancel: "onPointerCancel",
-  pointerdown: "onPointerDown",
-  pointerenter: "onPointerEnter",
-  pointerleave: "onPointerLeave",
-  pointermove: "onPointerMove",
-  pointerout: "onPointerOut",
-  pointerover: "onPointerOver",
-  pointerup: "onPointerUp",
-  progress: "onProgress",
-  reset: "onReset",
-  scroll: "onScroll",
-  seeked: "onSeeked",
-  seeking: "onSeeking",
-  select: "onSelect",
-  stalled: "onStalled",
-  submit: "onSubmit",
-  suspend: "onSuspend",
-  timeupdate: "onTimeUpdate",
-  touchcancel: "onTouchCancel",
-  touchend: "onTouchEnd",
-  touchmove: "onTouchMove",
-  touchstart: "onTouchStart",
-  transitionend: "onTransitionEnd",
-  volumechange: "onVolumeChange",
-  waiting: "onWaiting",
-  wheel: "onWheel",
-  fullscreenchange: null,
-  animationcancel: null,
-  auxclick: null,
-  cancel: null,
-  close: null,
-  copy: null,
-  cuechange: null,
-  fullscreenerror: null,
-  ratechange: null,
-  resize: null,
-  scrollend: null,
-  securitypolicyviolation: null,
-  selectionchange: null,
-  selectstart: null,
-  slotchange: null,
-  transitioncancel: null,
-  transitionrun: null,
-  transitionstart: null,
-  webkitanimationend: null,
-  webkitanimationiteration: null,
-  webkitanimationstart: null,
-  webkittransitionend: null
-};
 const toRun = new Map();
 // TODO: Whether this goes in options.diffed or options._commit
 // is a post-suspense question.
@@ -901,7 +779,7 @@ function nextId() {
 const useBeforeLayoutEffect = function useBeforeLayoutEffect(effect, inputs) {
   // Note to self: This is by far the most called hook by sheer volume of dependencies.
   // So it should ideally be as quick as possible.
-  const ref = A$1(null);
+  const ref = A(null);
   ref.current ??= nextId();
   const id = ref.current;
   if (effect) toRun.set(id, {
@@ -930,17 +808,6 @@ function debounceRendering(f) {
 const onfocusin = "onfocusin";
 // @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 const onfocusout = "onfocusout";
-const EventMapping = {
-  beforetoggle: null,
-  dblclick: "onDblClick",
-  focusin: "onFocusIn",
-  focusout: "onFocusOut",
-  formdata: "onFormData",
-  toggle: "onToggle",
-  contextlost: null,
-  contextrestored: null,
-  ...EventMapping$1
-};
 
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
@@ -980,11 +847,11 @@ function usePassiveState(onChange, getInitialValue, {
 }) {
   skipMountInitialization ??= false;
   //let [id, ,getId] = useState(() => generateRandomId());
-  const valueRef = A$1(Unset$2);
-  const reasonRef = A$1(Unset$2);
-  const warningRef = A$1(false);
-  const dependencyToCompareAgainst = A$1(Unset$2);
-  const cleanupCallbackRef = A$1(undefined);
+  const valueRef = A(Unset$2);
+  const reasonRef = A(Unset$2);
+  const warningRef = A(false);
+  const dependencyToCompareAgainst = A(Unset$2);
+  const cleanupCallbackRef = A(undefined);
   // Shared between "dependency changed" and "component unmounted".
   const onShouldCleanUp = useCallback(() => {
     const cleanupCallback = cleanupCallbackRef.current;
@@ -1141,7 +1008,7 @@ const Unset$1 = Symbol("unset");
  */
 function useStableGetter(value) {
   return useMonitoring(function useStableGetter() {
-    const ref = A$1(Unset$1);
+    const ref = A(Unset$1);
     useBeforeLayoutEffect(() => {
       ref.current = value;
     }, [value]);
@@ -2805,7 +2672,7 @@ function useTimeout({
     const getTimeout = useStableGetter(timeout);
     // Set any time we start timeout.
     // Unset any time the timeout completes
-    const startTimeRef = A$1(null);
+    const startTimeRef = A(null);
     const disabled = timeout == null;
     // Any time the triggerIndex changes (including on mount)
     // restart the timeout.  The timeout does NOT reset
@@ -2977,7 +2844,7 @@ function useLinearNavigation({
     //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
     //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
     //const getPageNavigationSize = useStableGetter(pageNavigationSize);
-    const stableProps = A$1(useTagProps({
+    const stableProps = A(useTagProps({
       onKeyDown: useStableCallback(e => {
         // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
         // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
@@ -3181,7 +3048,7 @@ function useManagedChildren(parentParameters) {
     }, []);
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = A$1({
+    const managedChildrenArray = A({
       arr: [],
       rec: {},
       highestIndex: 0,
@@ -3208,7 +3075,7 @@ function useManagedChildren(parentParameters) {
     const getManagedChildInfo = useCallback(index => {
       if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
     }, []);
-    const shrinkwrapHandle = A$1(null);
+    const shrinkwrapHandle = A(null);
     // When we unmount children, we'd like to reduce the array length accordingly.
     // We do this a tick after useEffect to wait for all the child dust to settle, 
     // because this is not critical work; it's just for memory optimization.
@@ -3244,7 +3111,7 @@ function useManagedChildren(parentParameters) {
     // the microtask (by checking hasRemoteULE first) so that the "effect" only
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
-    const hasRemoteULEChildMounted = A$1(null);
+    const hasRemoteULEChildMounted = A(null);
     const remoteULEChildMounted = useCallback((index, mounted) => {
       if (!hasRemoteULEChildMounted.current) {
         hasRemoteULEChildMounted.current = {
@@ -3454,7 +3321,7 @@ function useChildrenFlag({
       }
     }
   });
-  const reasonRef = A$1(undefined);
+  const reasonRef = A(undefined);
   const changeIndex = useCallback((arg, reason) => {
     const children = getChildren();
     const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
@@ -3518,10 +3385,10 @@ function useChildrenFlag({
 function useState(initialState) {
   // We keep both, but override the `setState` functionality
   const [state, setStateP] = d(initialState);
-  const ref = A$1(state);
+  const ref = A(state);
   // Hijack the normal setter function 
   // to also set our ref to the new value
-  const setState = A$1(value => {
+  const setState = A(value => {
     if (typeof value === "function") {
       const callback = value;
       setStateP(prevValue => {
@@ -3589,7 +3456,7 @@ function useRovingTabIndex({
   return useMonitoring(function useRovingTabIndex() {
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     untabbableBehavior ||= "focus-parent";
-    const lastFocused = A$1(null);
+    const lastFocused = A(null);
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -3663,7 +3530,7 @@ function useRovingTabIndex({
     }, [untabbable]);
     // TODO: This is jank, but necessary for onClosestFit.
     // There just needs to be a better focus management strategy in general to fix this.
-    let avoidFocusingSelfOnMount = A$1(false);
+    let avoidFocusingSelfOnMount = A(false);
     y(() => {
       let handle = setTimeout(() => {
         handle = setTimeout(() => {
@@ -3813,8 +3680,8 @@ function useRovingTabIndexChild({
     const [tabbable, st, getTabbable] = useState(() => {
       return getInitiallyTabbedIndex() === index;
     });
-    const HACK = A$1(iAmUntabbable);
-    const HACK2 = A$1(index);
+    const HACK = A(iAmUntabbable);
+    const HACK2 = A(index);
     HACK.current = iAmUntabbable;
     HACK2.current = index;
     const setTabbable = useCallback(t => {
@@ -3907,7 +3774,7 @@ function useTypeaheadNavigation({
       return () => clearTimeout(handle);
     }));
     //useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
-    const sortedTypeaheadInfo = A$1([]);
+    const sortedTypeaheadInfo = A([]);
     const [typeaheadStatus, setTypeaheadStatus] = useState("none");
     // Handle typeahead for input method editors as well
     // Essentially, when active, ignore further keys 
@@ -3947,7 +3814,7 @@ function useTypeaheadNavigation({
       return lhs - rhs;
     });
     const isDisabled = useStableGetter(noTypeahead);
-    const propsStable = A$1(useTagProps({
+    const propsStable = A(useTagProps({
       onKeyDown: useStableCallback(e => {
         if (isDisabled()) return;
         const imeActive = getImeActive();
@@ -4322,7 +4189,7 @@ function usePaginatedChildren({
 }) {
   return useMonitoring(function usePaginatedChildren() {
     const parentIsPaginated = paginationMin != null || paginationMax != null;
-    const lastPagination = A$1({
+    const lastPagination = A({
       paginationMax: null,
       paginationMin: null
     });
@@ -4358,8 +4225,8 @@ function usePaginatedChildren({
       lastPagination.current.paginationMax = paginationMax ?? null;
       lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
-    const pmin = A$1(paginationMin);
-    const pmax = A$1(paginationMax);
+    const pmin = A(paginationMin);
+    const pmax = A(paginationMax);
     pmin.current = paginationMin;
     pmax.current = paginationMax;
     const getDefaultPaginationVisible = useCallback(i => {
@@ -4474,7 +4341,7 @@ function useRearrangeableChildren({
   }
 }) {
   return useMonitoring(function useRearrangeableChildren() {
-    const allChildPositions = A$1([]);
+    const allChildPositions = A([]);
     const [refreshIndex, setRefreshIndex] = d(0);
     const childrenOut = T$1(() => {
       const rearrangedChildren = mangler.setChildren(childrenIn);
@@ -4549,7 +4416,7 @@ function useRearrangeableChild({
     // TODO: This ref doesn't work correctly? Or info.updateFLIPAnimation isn't update right? Not sure.
     // Either way, doing something like reversing twice results in it working right the first time,
     // but incorrect the second time around, because the position is from the wrong index.
-    const flipStartPosition = A$1(undefined);
+    const flipStartPosition = A(undefined);
     const [animationIndex, setAnimationIndex] = d(0);
     _(() => {
       if (animate) {
@@ -4632,7 +4499,7 @@ function useStaggeredChildren({
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
-    const timeoutHandle = A$1(-1);
+    const timeoutHandle = A(-1);
     const resetEmergencyTimeout = useCallback(() => {
       if (timeoutHandle.current != -1) clearTimeout(timeoutHandle.current);
       // We've gone this long without hearing the next child mount itself...
@@ -4706,7 +4573,7 @@ function useStaggeredChildren({
     }, []);
     // TODO: Modification during render (but it's really, really hard to avoid here,
     // but also probably fine because parents render before children? Does that include suspense?)
-    const s = A$1(parentIsStaggered);
+    const s = A(parentIsStaggered);
     s.current = parentIsStaggered;
     const getDefaultStaggeredVisible = useCallback(i => {
       if (s.current) {
@@ -4717,8 +4584,8 @@ function useStaggeredChildren({
         return true;
       }
     }, []);
-    const intersectionObserver = A$1(null);
-    const elementToIndex = A$1(new Map());
+    const intersectionObserver = A(null);
+    const elementToIndex = A(new Map());
     const setElementToIndexMap = useCallback((index, element) => {
       elementToIndex.current.set(element, index);
     }, []);
@@ -4787,7 +4654,7 @@ function useStaggeredChild({
     // Controls whether we ask the parent to start mounting children after us.
     // (We don't ask when the child becomes visible due to screen-scrolling,
     // only when it becomes visible because we were next in line to do so)
-    const becauseScreen = A$1(false);
+    const becauseScreen = A(false);
     /*
     const [_getOnScreen, _setOnScreen] = usePassiveState<boolean, any>(useStableCallback((next, _prev, _reason) => {
          if (staggeredVisible)
@@ -4814,7 +4681,7 @@ function useStaggeredChild({
       }
     }, [index, parentIsStaggered && staggeredVisible]);
     // This is the element that the IntersectionObserver will watch.
-    const e = A$1(null);
+    const e = A(null);
     return {
       props: useTagProps(!parentIsStaggered ? {} : {
         "aria-busy": (!staggeredVisible).toString()
@@ -5273,14 +5140,14 @@ function useMultiSelection({
   return useMonitoring(function useMultiSelection() {
     // By having both we get the total number of children for free, even if there are holes in the array.
     // TODO: useManagedChildren should do that by default??
-    const selectedIndices = A$1(new Set());
-    const unselectedIndices = A$1(new Set());
-    const startOfShiftSelect = A$1(null);
+    const selectedIndices = A(new Set());
+    const unselectedIndices = A(new Set());
+    const startOfShiftSelect = A(null);
     // Why these are needed:
     // When in focus mode, there's no way to determine whether these keys are held down during the focus event.
     // That's all. Wow.
-    let shiftKeyHeld = A$1(false);
-    let ctrlKeyHeld = A$1(false);
+    let shiftKeyHeld = A(false);
+    let ctrlKeyHeld = A(false);
     // When a child changes selection state, it calls this function.
     const notifyParentOfChildSelectChange = useStableCallback((event, index, selected, previous) => {
       console.assert(selected != previous);
@@ -5358,7 +5225,7 @@ function useMultiSelection({
         ctrlKeyHeld.current = shiftKeyHeld.current = false;
       }
     });
-    let nextCtrlAIsUndo = A$1(false);
+    let nextCtrlAIsUndo = A(false);
     useGlobalHandler(getDocument$1(), "keydown", useStableCallback(e => {
       shiftKeyHeld.current = e.shiftKey || e.key == 'Shift';
       ctrlKeyHeld.current = e.ctrlKey || e.key == 'Control';
@@ -5444,7 +5311,7 @@ function useMultiSelectionChild({
     // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
     // The exception is press events, because a click can come from anywhere, focusing a child even if focus is elsewhere (or the window doesn't even have focus!)
     // So when a press event happens during focus-selection mode, we disable the disabling with this flag.
-    const pressFreebie = A$1(false);
+    const pressFreebie = A(false);
     const firePressSelectionEvent = e => {
       if (!multiSelectionDisabled) {
         if (multiSelectionMode == "activation") {
@@ -5560,7 +5427,7 @@ function useMultiSelectionChildDeclarative({
   },
   ...void1
 }) {
-  let reasonRef = A$1(undefined);
+  let reasonRef = A(undefined);
   _(() => {
     if (multiSelected != null) changeMultiSelected(reasonRef.current, multiSelected);
   }, [multiSelected]);
@@ -5752,7 +5619,7 @@ function useSingleSelectionDeclarative({
   }
 }) {
   let s = singleSelectedIndex ?? null;
-  let reasonRef = A$1(undefined);
+  let reasonRef = A(undefined);
   _(() => {
     changeSingleSelectedIndex(s, reasonRef.current);
   }, [s]);
@@ -5957,7 +5824,7 @@ function useSelectionChildDeclarative(args) {
  */
 function useRefElement(args) {
   return useMonitoring(function useRefElement() {
-    const nonElementWarn = A$1(false);
+    const nonElementWarn = A(false);
     if (nonElementWarn.current) {
       nonElementWarn.current = false;
       // There are two of these to catch the problem in the two most useful areas --
@@ -5985,9 +5852,9 @@ function useRefElement(args) {
       debounceRendering: runImmediately,
       skipMountInitialization: true
     });
-    const propsStable = A$1(useTagProps({
+    const propsStable = A({
       ref: setElement
-    }));
+    });
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
@@ -6616,7 +6483,7 @@ function useHasCurrentFocus(args) {
         setFocusedInner(false, undefined);
       };
     }, []);
-    const propsStable = A$1({
+    const propsStable = A({
       [onfocusin]: onFocusIn,
       [onfocusout]: onFocusOut
     });
@@ -6762,7 +6629,7 @@ function useCompleteListNavigation({
       setTabbableIndex,
       getAnyFocused
     });
-    const refreshRows = A$1(() => {});
+    const refreshRows = A(() => {});
     const {
       getSortValueAt,
       compare,
@@ -8024,173 +7891,6 @@ function usePress(args) {
 function pulse() {
   if ("navigator" in globalThis && "vibrate" in navigator && navigator.vibrate instanceof Function) navigator.vibrate(10);
 }
-let templateElement = null;
-function htmlToElement(parent, html) {
-  const document = parent.ownerDocument;
-  templateElement ??= document.createElement("template");
-  templateElement.innerHTML = html.trim(); // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
-  return templateElement.content.firstChild;
-}
-/**
- * Easy access to an HTMLElement that can be controlled imperatively.
- *
- * The HTMLElement rendered is controlled by the `tag` prop (e.g. "span", "div").
- *
- * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
- */
-/* @__PURE__ */
-M(D(ImperativeElementU));
-/**
- * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
- *
- * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
- *
- * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
- *
- * @compositeParams
- */
-function useImperativeProps({
-  refElementReturn: {
-    getElement
-  }
-}) {
-  return useMonitoring(function useImperativeProps() {
-    const currentImperativeProps = A$1({
-      className: new Set(),
-      style: {},
-      children: null,
-      html: null,
-      others: {}
-    });
-    const hasClass = useCallback(cls => {
-      return currentImperativeProps.current.className.has(cls);
-    }, []);
-    const setClass = useCallback((cls, enabled) => {
-      if (hasClass(cls) == !enabled) {
-        getElement()?.classList[enabled ? "add" : "remove"](cls);
-        currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
-      }
-    }, []);
-    const setStyle = useCallback((prop, value) => {
-      const element = getElement();
-      if (element) {
-        if (currentImperativeProps.current.style[prop] != value) {
-          currentImperativeProps.current.style[prop] = value;
-          if (prop.startsWith("--")) {
-            if (value != null) element.style.setProperty(prop, `${value}`);else element.style.removeProperty(prop);
-          } else {
-            element.style[prop] = value ?? "";
-          }
-        }
-      }
-    }, []);
-    const setChildren = useCallback(children => {
-      let e = getElement();
-      if (e && currentImperativeProps.current.children != children) {
-        currentImperativeProps.current.children = children;
-        currentImperativeProps.current.html = null;
-        e.textContent = children;
-      }
-    }, []);
-    const dangerouslySetInnerHTML = useCallback(children => {
-      let e = getElement();
-      if (e && currentImperativeProps.current.html != children) {
-        currentImperativeProps.current.children = null;
-        currentImperativeProps.current.html = children;
-        e.innerHTML = children;
-      }
-    }, []);
-    const dangerouslyAppendHTML = useCallback(children => {
-      let e = getElement();
-      if (e && children) {
-        const newChild = htmlToElement(e, children);
-        console.assert(newChild && newChild instanceof Node);
-        if (newChild && newChild instanceof Node) {
-          currentImperativeProps.current.children = null;
-          currentImperativeProps.current.html ||= "";
-          currentImperativeProps.current.html += children;
-          e.appendChild(newChild);
-          return newChild;
-        }
-      }
-      return null;
-    }, []);
-    const getAttribute = useCallback(prop => {
-      return currentImperativeProps.current.others[prop];
-    }, []);
-    const setAttribute = useCallback((prop, value) => {
-      if (value != null) {
-        if (getAttribute(prop) != value) {
-          currentImperativeProps.current.others[prop] = value;
-          getElement()?.setAttribute(prop, value);
-        }
-      } else {
-        if (getAttribute(prop) != undefined) {
-          delete currentImperativeProps.current.others[prop];
-          getElement()?.removeAttribute(prop);
-        }
-      }
-    }, []);
-    const setEventHandler = useCallback((type, handler, options) => {
-      const element = getElement();
-      const mappedKey = EventMapping[type];
-      if (element) {
-        if (handler) {
-          element.addEventListener(type, handler, options);
-          currentImperativeProps.current.others[mappedKey] = handler;
-        } else if (currentImperativeProps.current.others[mappedKey]) {
-          element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
-          currentImperativeProps.current.others[mappedKey] = undefined;
-        }
-      }
-    }, []);
-    return {
-      imperativePropsReturn: A$1({
-        hasClass,
-        setClass,
-        setStyle,
-        getAttribute,
-        setAttribute,
-        setEventHandler,
-        setChildren,
-        dangerouslySetInnerHTML,
-        dangerouslyAppendHTML
-      }).current,
-      props: useMergedProps({
-        className: [...currentImperativeProps.current.className].join(" "),
-        style: currentImperativeProps.current.style
-      }, currentImperativeProps.current.html ? {
-        dangerouslySetInnerHTML: {
-          __html: currentImperativeProps.current.html
-        }
-      } : {}, {
-        children: currentImperativeProps.current.children
-      }, currentImperativeProps.current.others)
-    };
-  });
-}
-function ImperativeElementU({
-  tag: Tag,
-  handle,
-  ...props
-}, ref) {
-  const {
-    propsStable,
-    refElementReturn
-  } = useRefElement({
-    refElementParameters: {}
-  });
-  const {
-    props: imperativeProps,
-    imperativePropsReturn: imperativeHandle
-  } = useImperativeProps({
-    refElementReturn
-  });
-  F$1(handle, () => imperativeHandle);
-  return _$1(Tag, useMergedProps(propsStable, imperativeProps, props, {
-    ref
-  }));
-}
 
 /**
  * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
@@ -8285,7 +7985,7 @@ const DemoUseRovingTabIndex = M(function DemoUseRovingTabIndex() {
     sortValues.current = reverse(sortValues.current);
     refreshRows();
   }, []);
-  let sortValues = A$1([]);
+  let sortValues = A([]);
   const r = useCompleteListNavigationDeclarative({
     rovingTabIndexParameters: {
       onTabbableIndexChange: null,

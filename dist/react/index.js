@@ -1,4 +1,4 @@
-import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
+import { useRef, useCallback, useLayoutEffect, useMemo, useInsertionEffect, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
 export { createPortal } from 'react-dom';
@@ -3806,7 +3806,7 @@ function useRefElement(args) {
         }, []);
         // Let us store the actual (reference to) the element we capture
         const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const propsStable = useRef(useTagProps({ ref: setElement }, "data-use-ref-element"));
+        const propsStable = useRef({ ref: setElement });
         // Return both the element and the hook that modifies 
         // the props and allows us to actually find the element
         return {
@@ -6178,7 +6178,7 @@ function htmlToElement(parent, html) {
  *
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-const ImperativeElement = /* @__PURE__ */ memo(forwardRef(ImperativeElementU));
+const ImperativeElement = /* @__PURE__ */ memo(/* @__PURE__ */ forwardRef(ImperativeElementU));
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
  *
