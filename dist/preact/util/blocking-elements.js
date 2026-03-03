@@ -4,8 +4,7 @@ let be;
         let d = !!globalThis.document;
         globalThis.document ??= {};
         /// @ts-expect-error
-        await import("wicg-inert");
-        await import("blocking-elements");
+        await import("blocking-elements/dist/blocking-elements.min.js");
         be = document.$blockingElements;
         if (!d)
             delete globalThis.document;

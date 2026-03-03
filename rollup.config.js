@@ -27,6 +27,7 @@ export default {
         format: "es",
         name: "index.react",
         sourcemap: true,
+        inlineDynamicImports: true,
         globals: {
             "react": "React",
             "react-dom": "ReactDOM"

@@ -11,8 +11,7 @@ let be: DocumentWithBlockingElements["$blockingElements"];
         globalThis.document ??= {} as any;
 
         /// @ts-expect-error
-        await import("wicg-inert");
-        await import("blocking-elements");
+        await import("blocking-elements/dist/blocking-elements.min.js");
         be = (document as DocumentWithBlockingElements).$blockingElements;
         if (!d)
             delete (globalThis as any).document;
