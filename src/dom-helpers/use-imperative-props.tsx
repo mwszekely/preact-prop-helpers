@@ -70,7 +70,7 @@ function htmlToElement(parent: Element, html: string) {
  * 
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as typeof ImperativeElementU;
+export const ImperativeElement = /* @__PURE__ */ memo(forwardRef(ImperativeElementU)) as any as typeof ImperativeElementU;
 
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.

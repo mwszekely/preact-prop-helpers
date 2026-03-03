@@ -5,11 +5,12 @@ import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
 export const PersistentStates = undefined; // Needed for the isolatedModules flag?
-const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage);
+function getDefaultStorage() { return (typeof window === 'undefined' ? undefined : window.localStorage); }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStorage) {
+export function getFromLocalStorage(key, converter = JSON.parse, storage) {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             const item = storage.getItem(key);
@@ -25,7 +26,8 @@ export function getFromLocalStorage(key, converter = JSON.parse, storage = defau
     }
     return null;
 }
-export function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
+export function storeToLocalStorage(key, value, converter = JSON.stringify, storage) {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             if (value == null)
@@ -60,7 +62,8 @@ const AllListeners = new Set();
  * @param toString -
  * @returns
  */
-export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = defaultStorage) {
+export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage) {
+    storage ??= getDefaultStorage();
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     const getKey = useStableGetter(key);

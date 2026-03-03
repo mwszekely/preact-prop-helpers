@@ -5225,7 +5225,6 @@ function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny,
 }
 
 function identityCapture(...t) { return t; }
-const AsyncFunction = ((async function () { }).constructor);
 /**
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.
@@ -5256,6 +5255,7 @@ const AsyncFunction = ((async function () { }).constructor);
  */
 function useAsync(asyncHandler, options) {
     return useMonitoring(function useAsync() {
+        const AsyncFunction = ((async function () { }).constructor);
         // Things related to current execution
         // Because we can both return and throw undefined, 
         // we need separate state to track their existence too.
@@ -5424,51 +5424,42 @@ function pressLog(...args) {
 function supportsPointerEvents() {
     return ("onpointerup" in globalThis);
 }
-// All our checking for pointerdown and up doesn't mean anything if it's
-// a programmatic onClick event, which could come from any non-user source.
-// We want to handle those just like GUI clicks, but we don't want to double-up on press events.
-// So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
-//
-// Also, this is global to handle the following situation:
-// A button is tapped
-// Some heavy rendering-logic is done and the page jumps around
-// Now there's a new button underneath the user's finger
-// And it receives a click event just cause.
-// ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
-// But TODO because it doesn't work well it this library is used multiple times on the same page.
 let justHandledManualClickEvent = false;
-let manualClickTimeout1 = null;
-let manualClickTimeout2 = null;
-function onHandledManualClickEvent() {
-    pressLog("manual-click");
-    justHandledManualClickEvent = true;
-    if (manualClickTimeout1 != null)
-        clearTimeout(manualClickTimeout1);
-    if (manualClickTimeout2 != null)
-        clearTimeout(manualClickTimeout2);
-    // The timeout is somewhat generous here because when the "emulated" click event finally comes along
-    // (i.e. after all the pointer events have finished) it will also clear this. 
-    // This is mostly as a backup safety net.
-    manualClickTimeout1 = setTimeout(() => {
-        pressLog("manual-click halfway");
-        // This is split into two halves for task-ordering reasons.
-        // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
-        // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
-        manualClickTimeout2 = setTimeout(() => {
-            pressLog("manual-click clear");
+let onHandledManualClickEvent;
+function ensureManualClickHandlersInstalled() {
+    let manualClickTimeout1 = null;
+    let manualClickTimeout2 = null;
+    onHandledManualClickEvent = function onHandledManualClickEvent() {
+        pressLog("manual-click");
+        justHandledManualClickEvent = true;
+        if (manualClickTimeout1 != null)
+            clearTimeout(manualClickTimeout1);
+        if (manualClickTimeout2 != null)
+            clearTimeout(manualClickTimeout2);
+        // The timeout is somewhat generous here because when the "emulated" click event finally comes along
+        // (i.e. after all the pointer events have finished) it will also clear this. 
+        // This is mostly as a backup safety net.
+        manualClickTimeout1 = setTimeout(() => {
+            pressLog("manual-click halfway");
+            // This is split into two halves for task-ordering reasons.
+            // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
+            // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
+            manualClickTimeout2 = setTimeout(() => {
+                pressLog("manual-click clear");
+                justHandledManualClickEvent = false;
+            }, 50);
+        }, 200);
+    };
+    getDocument()?.addEventListener?.("click", (e) => {
+        if (justHandledManualClickEvent) {
             justHandledManualClickEvent = false;
-        }, 50);
-    }, 200);
+            manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
+            manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, { capture: true });
 }
-getDocument()?.addEventListener?.("click", (e) => {
-    if (justHandledManualClickEvent) {
-        justHandledManualClickEvent = false;
-        manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
-        manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
-        e.preventDefault();
-        e.stopPropagation();
-    }
-}, { capture: true });
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
@@ -5495,6 +5486,7 @@ getDocument()?.addEventListener?.("click", (e) => {
  */
 function usePress(args) {
     return useMonitoring(function usePress() {
+        ensureManualClickHandlersInstalled();
         const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
         const excludeEnter = useStableCallback(ee ?? returnFalse);
         const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -5816,15 +5808,21 @@ function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHand
         props
     };
 }
-let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)) ? (() => navigator.vibrate(10)) : (() => { });
+let pulseOverride = null;
+function pulse() {
+    if (pulseOverride != null)
+        pulseOverride();
+    else if (("navigator" in globalThis) && ("vibrate" in navigator) && (navigator.vibrate instanceof Function))
+        navigator.vibrate(10);
+}
 /**
- * This function can be used to enable/disable button vibration pulses on an app-wide scale.
+ * This function can be used to enable/disable button vibration pulses on an app-wide scale. `null` enables the default browser behavior; pass a noop (e.g. `() => {}`) to disable.
  *
  *
  * @param func - The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
 function setPressVibrate(func) {
-    pulse = func;
+    pulseOverride = func;
 }
 
 /**
@@ -6180,7 +6178,7 @@ function htmlToElement(parent, html) {
  *
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-const ImperativeElement = memo(forwardRef(ImperativeElementU));
+const ImperativeElement = /* @__PURE__ */ memo(forwardRef(ImperativeElementU));
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
  *
@@ -6519,6 +6517,13 @@ function capitalize(str) {
  */
 function useLogicalDirection({ ...void1 }) {
     return useMonitoring(function useLogicalDirection() {
+        // Helper for extracting info from "ltr", "ttb", etc.
+        const M = {
+            t: "top",
+            b: "bottom",
+            l: "left",
+            r: "right"
+        };
         //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
         //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
         // TODO: There's no way to refresh which writing mode we have once mounted.
@@ -6539,6 +6544,7 @@ function useLogicalDirection({ ...void1 }) {
                 const t = computedStyles.textOrientation;
                 if (t == "upright")
                     d = "ltr";
+                const WritingModes = getWritingModes();
                 return ({ ...WritingModes[w || "horizontal-tb"][d || "ltr"] });
             }
             return null;
@@ -6664,88 +6670,84 @@ function getPhysicalLeftTop(dir) { if (dir === "ltr" || dir == "rtl")
 function getPhysicalRightBottom(dir) { if (dir === "rtl")
     return "width"; if (dir === "btt")
     return "height"; return null; }
-// Helper for extracting info from "ltr", "ttb", etc.
-const M = {
-    t: "top",
-    b: "bottom",
-    l: "left",
-    r: "right"
-};
-const HorizontalTbLtr = {
-    inlineDirection: "ltr",
-    blockDirection: "ttb",
-    inlineOrientation: "horizontal",
-    blockOrientation: "vertical",
-    inlineSize: "width",
-    blockSize: "height",
-    leftRightDirection: "ltr",
-    overUnderDirection: "ttb"
-};
-const HorizontalTbRtl = {
-    ...HorizontalTbLtr,
-    inlineDirection: "rtl",
-};
-const VerticalRlLtr = {
-    inlineDirection: "ttb",
-    blockDirection: "rtl",
-    inlineOrientation: "vertical",
-    blockOrientation: "horizontal",
-    inlineSize: "height",
-    blockSize: "width",
-    leftRightDirection: "ttb",
-    overUnderDirection: "rtl"
-};
-const VerticalRlRtl = {
-    ...VerticalRlLtr,
-    inlineDirection: "btt"
-};
-const SidewaysRlLtr = { ...VerticalRlLtr };
-const SidewaysRlRtl = { ...VerticalRlRtl };
-const VerticalLrLtr = {
-    ...VerticalRlLtr,
-    blockDirection: "ltr",
-};
-const VerticalLrRtl = {
-    ...VerticalRlRtl,
-    blockDirection: "ltr",
-};
-const SidewaysLtLtr = {
-    ...VerticalLrLtr,
-    inlineDirection: "btt",
-    leftRightDirection: "btt",
-    overUnderDirection: "ltr"
-};
-const SidewaysLtRtl = {
-    ...SidewaysLtLtr,
-    inlineDirection: "ttb"
-};
-const HorizontalTb = {
-    ltr: HorizontalTbLtr,
-    rtl: HorizontalTbRtl
-};
-const VerticalRl = {
-    ltr: VerticalRlLtr,
-    rtl: VerticalRlRtl
-};
-const VerticalLr = {
-    ltr: VerticalLrLtr,
-    rtl: VerticalLrRtl
-};
-const SidewaysRl = {
-    ltr: SidewaysRlLtr,
-    rtl: SidewaysRlRtl
-};
-const SidewaysLr = {
-    ltr: SidewaysLtLtr,
-    rtl: SidewaysLtRtl
-};
-const WritingModes = {
-    "horizontal-tb": HorizontalTb,
-    "vertical-lr": VerticalLr,
-    "vertical-rl": VerticalRl,
-    "sideways-lr": SidewaysLr,
-    "sideways-rl": SidewaysRl
-};
+function getWritingModes() {
+    const HorizontalTbLtr = {
+        inlineDirection: "ltr",
+        blockDirection: "ttb",
+        inlineOrientation: "horizontal",
+        blockOrientation: "vertical",
+        inlineSize: "width",
+        blockSize: "height",
+        leftRightDirection: "ltr",
+        overUnderDirection: "ttb"
+    };
+    const HorizontalTbRtl = {
+        ...HorizontalTbLtr,
+        inlineDirection: "rtl",
+    };
+    const VerticalRlLtr = {
+        inlineDirection: "ttb",
+        blockDirection: "rtl",
+        inlineOrientation: "vertical",
+        blockOrientation: "horizontal",
+        inlineSize: "height",
+        blockSize: "width",
+        leftRightDirection: "ttb",
+        overUnderDirection: "rtl"
+    };
+    const VerticalRlRtl = {
+        ...VerticalRlLtr,
+        inlineDirection: "btt"
+    };
+    const SidewaysRlLtr = { ...VerticalRlLtr };
+    const SidewaysRlRtl = { ...VerticalRlRtl };
+    const VerticalLrLtr = {
+        ...VerticalRlLtr,
+        blockDirection: "ltr",
+    };
+    const VerticalLrRtl = {
+        ...VerticalRlRtl,
+        blockDirection: "ltr",
+    };
+    const SidewaysLtLtr = {
+        ...VerticalLrLtr,
+        inlineDirection: "btt",
+        leftRightDirection: "btt",
+        overUnderDirection: "ltr"
+    };
+    const SidewaysLtRtl = {
+        ...SidewaysLtLtr,
+        inlineDirection: "ttb"
+    };
+    const HorizontalTb = {
+        ltr: HorizontalTbLtr,
+        rtl: HorizontalTbRtl
+    };
+    const VerticalRl = {
+        ltr: VerticalRlLtr,
+        rtl: VerticalRlRtl
+    };
+    const VerticalLr = {
+        ltr: VerticalLrLtr,
+        rtl: VerticalLrRtl
+    };
+    const SidewaysRl = {
+        ltr: SidewaysRlLtr,
+        rtl: SidewaysRlRtl
+    };
+    const SidewaysLr = {
+        ltr: SidewaysLtLtr,
+        rtl: SidewaysLtRtl
+    };
+    const WritingModes = {
+        "horizontal-tb": HorizontalTb,
+        "vertical-lr": VerticalLr,
+        "vertical-rl": VerticalRl,
+        "sideways-lr": SidewaysLr,
+        "sideways-rl": SidewaysRl
+    };
+    return WritingModes;
+}
 
 /**
  * Allows a component to use the boolean result of a media query as part of its render.
@@ -6989,11 +6991,12 @@ function useLayoutEffectDebug(effect, inputs) {
 }
 
 const PersistentStates = undefined; // Needed for the isolatedModules flag?
-const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage);
+function getDefaultStorage() { return (typeof window === 'undefined' ? undefined : window.localStorage); }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStorage) {
+function getFromLocalStorage(key, converter = JSON.parse, storage) {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             const item = storage.getItem(key);
@@ -7009,7 +7012,8 @@ function getFromLocalStorage(key, converter = JSON.parse, storage = defaultStora
     }
     return null;
 }
-function storeToLocalStorage(key, value, converter = JSON.stringify, storage = defaultStorage) {
+function storeToLocalStorage(key, value, converter = JSON.stringify, storage) {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             if (value == null)
@@ -7044,7 +7048,8 @@ const AllListeners = new Set();
  * @param toString -
  * @returns
  */
-function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = defaultStorage) {
+function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage) {
+    storage ??= getDefaultStorage();
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     const getKey = useStableGetter(key);

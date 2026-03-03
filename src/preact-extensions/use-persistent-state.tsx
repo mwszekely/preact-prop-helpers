@@ -23,12 +23,13 @@ import { useState } from "./use-state.js";
 export interface PersistentStates { }
 export const PersistentStates: PersistentStates = undefined!; // Needed for the isolatedModules flag?
 
-const defaultStorage = (typeof window === 'undefined' ? undefined : window.localStorage) as Storage;
+function getDefaultStorage(): Storage { return (typeof window === 'undefined' ? undefined! : window.localStorage) as Storage; }
 
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage: Storage = defaultStorage): PersistentStates[Key] | null {
+export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage?: Storage): PersistentStates[Key] | null {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             const item = storage.getItem(key);
@@ -45,7 +46,8 @@ export function getFromLocalStorage<Key extends (keyof PersistentStates) & strin
     return null;
 }
 
-export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage: Storage = defaultStorage): void {
+export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage?: Storage): void {
+    storage ??= getDefaultStorage();
     if (storage != null) {
         try {
             if (value == null)
@@ -82,8 +84,8 @@ const AllListeners = new Set<() => void>();
  * @param toString -  
  * @returns 
  */
-export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = defaultStorage): [T, StateUpdater<T>, () => T] {
-
+export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage?: Storage): [T, StateUpdater<T>, () => T] {
+    storage ??= getDefaultStorage();
     const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
 

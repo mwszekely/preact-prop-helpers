@@ -99,10 +99,10 @@ export interface UsePressAsyncReturnType<E extends Element> extends UsePressRetu
 }
 export declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
 /**
- * This function can be used to enable/disable button vibration pulses on an app-wide scale.
+ * This function can be used to enable/disable button vibration pulses on an app-wide scale. `null` enables the default browser behavior; pass a noop (e.g. `() => {}`) to disable.
  *
  *
  * @param func - The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
-export declare function setPressVibrate(func: () => void): void;
+export declare function setPressVibrate(func: (() => void) | null): void;
 //# sourceMappingURL=use-press.d.ts.map

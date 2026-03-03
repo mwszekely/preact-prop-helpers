@@ -170,8 +170,6 @@ function identityCapture<AP extends unknown[], SP extends unknown[]>(...t: SP) {
 
 
 
-const AsyncFunction = ((async function () { }).constructor)
-
 /**
  * Given an async function, returns a function that's suitable for non-async APIs, 
  * along with other information about the current run's status.
@@ -203,6 +201,8 @@ const AsyncFunction = ((async function () { }).constructor)
 export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
 
     return useMonitoring(function useAsync(): UseAsyncReturnType<SP, R> {
+    const AsyncFunction = ((async function () { }).constructor);
+
         // Things related to current execution
         // Because we can both return and throw undefined, 
         // we need separate state to track their existence too.

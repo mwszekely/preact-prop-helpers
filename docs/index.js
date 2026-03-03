@@ -7427,7 +7427,6 @@ function asyncToSync({
 function identityCapture(...t) {
   return t;
 }
-const AsyncFunction = async function () {}.constructor;
 /**
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.
@@ -7458,6 +7457,7 @@ const AsyncFunction = async function () {}.constructor;
  */
 function useAsync(asyncHandler, options) {
   return useMonitoring(function useAsync() {
+    const AsyncFunction = async function () {}.constructor;
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existence too.
@@ -7647,51 +7647,42 @@ function pressLog(...args) {
 function supportsPointerEvents() {
   return "onpointerup" in globalThis;
 }
-// All our checking for pointerdown and up doesn't mean anything if it's
-// a programmatic onClick event, which could come from any non-user source.
-// We want to handle those just like GUI clicks, but we don't want to double-up on press events.
-// So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
-//
-// Also, this is global to handle the following situation:
-// A button is tapped
-// Some heavy rendering-logic is done and the page jumps around
-// Now there's a new button underneath the user's finger
-// And it receives a click event just cause.
-// ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
-// But TODO because it doesn't work well it this library is used multiple times on the same page.
 let justHandledManualClickEvent = false;
-let manualClickTimeout1 = null;
-let manualClickTimeout2 = null;
-function onHandledManualClickEvent() {
-  pressLog("manual-click");
-  justHandledManualClickEvent = true;
-  if (manualClickTimeout1 != null) clearTimeout(manualClickTimeout1);
-  if (manualClickTimeout2 != null) clearTimeout(manualClickTimeout2);
-  // The timeout is somewhat generous here because when the "emulated" click event finally comes along
-  // (i.e. after all the pointer events have finished) it will also clear this. 
-  // This is mostly as a backup safety net.
-  manualClickTimeout1 = setTimeout(() => {
-    pressLog("manual-click halfway");
-    // This is split into two halves for task-ordering reasons.
-    // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
-    // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
-    manualClickTimeout2 = setTimeout(() => {
-      pressLog("manual-click clear");
+let onHandledManualClickEvent;
+function ensureManualClickHandlersInstalled() {
+  let manualClickTimeout1 = null;
+  let manualClickTimeout2 = null;
+  onHandledManualClickEvent = function onHandledManualClickEvent() {
+    pressLog("manual-click");
+    justHandledManualClickEvent = true;
+    if (manualClickTimeout1 != null) clearTimeout(manualClickTimeout1);
+    if (manualClickTimeout2 != null) clearTimeout(manualClickTimeout2);
+    // The timeout is somewhat generous here because when the "emulated" click event finally comes along
+    // (i.e. after all the pointer events have finished) it will also clear this. 
+    // This is mostly as a backup safety net.
+    manualClickTimeout1 = setTimeout(() => {
+      pressLog("manual-click halfway");
+      // This is split into two halves for task-ordering reasons.
+      // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
+      // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
+      manualClickTimeout2 = setTimeout(() => {
+        pressLog("manual-click clear");
+        justHandledManualClickEvent = false;
+      }, 50);
+    }, 200);
+  };
+  getDocument$1()?.addEventListener?.("click", e => {
+    if (justHandledManualClickEvent) {
       justHandledManualClickEvent = false;
-    }, 50);
-  }, 200);
+      manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
+      manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, {
+    capture: true
+  });
 }
-getDocument$1()?.addEventListener?.("click", e => {
-  if (justHandledManualClickEvent) {
-    justHandledManualClickEvent = false;
-    manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
-    manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}, {
-  capture: true
-});
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
@@ -7718,6 +7709,7 @@ getDocument$1()?.addEventListener?.("click", e => {
  */
 function usePress(args) {
   return useMonitoring(function usePress() {
+    ensureManualClickHandlersInstalled();
     const {
       refElementReturn: {
         getElement
@@ -8029,7 +8021,9 @@ function usePress(args) {
     };
   });
 }
-let pulse = "vibrate" in navigator && navigator.vibrate instanceof Function ? () => navigator.vibrate(10) : () => {};
+function pulse() {
+  if ("navigator" in globalThis && "vibrate" in navigator && navigator.vibrate instanceof Function) navigator.vibrate(10);
+}
 let templateElement = null;
 function htmlToElement(parent, html) {
   const document = parent.ownerDocument;
@@ -8044,6 +8038,7 @@ function htmlToElement(parent, html) {
  *
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
+/* @__PURE__ */
 M(D(ImperativeElementU));
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.

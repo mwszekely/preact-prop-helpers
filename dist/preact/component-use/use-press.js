@@ -26,39 +26,45 @@ function supportsPointerEvents() {
 // And it receives a click event just cause.
 // ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
 // But TODO because it doesn't work well it this library is used multiple times on the same page.
+let installedManualClickHandlers = false;
 let justHandledManualClickEvent = false;
-let manualClickTimeout1 = null;
-let manualClickTimeout2 = null;
-function onHandledManualClickEvent() {
-    pressLog("manual-click");
-    justHandledManualClickEvent = true;
-    if (manualClickTimeout1 != null)
-        clearTimeout(manualClickTimeout1);
-    if (manualClickTimeout2 != null)
-        clearTimeout(manualClickTimeout2);
-    // The timeout is somewhat generous here because when the "emulated" click event finally comes along
-    // (i.e. after all the pointer events have finished) it will also clear this. 
-    // This is mostly as a backup safety net.
-    manualClickTimeout1 = setTimeout(() => {
-        pressLog("manual-click halfway");
-        // This is split into two halves for task-ordering reasons.
-        // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
-        // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
-        manualClickTimeout2 = setTimeout(() => {
-            pressLog("manual-click clear");
+let onHandledManualClickEvent;
+function ensureManualClickHandlersInstalled() {
+    if (installedManualClickHandlers)
+        return;
+    let manualClickTimeout1 = null;
+    let manualClickTimeout2 = null;
+    onHandledManualClickEvent = function onHandledManualClickEvent() {
+        pressLog("manual-click");
+        justHandledManualClickEvent = true;
+        if (manualClickTimeout1 != null)
+            clearTimeout(manualClickTimeout1);
+        if (manualClickTimeout2 != null)
+            clearTimeout(manualClickTimeout2);
+        // The timeout is somewhat generous here because when the "emulated" click event finally comes along
+        // (i.e. after all the pointer events have finished) it will also clear this. 
+        // This is mostly as a backup safety net.
+        manualClickTimeout1 = setTimeout(() => {
+            pressLog("manual-click halfway");
+            // This is split into two halves for task-ordering reasons.
+            // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
+            // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
+            manualClickTimeout2 = setTimeout(() => {
+                pressLog("manual-click clear");
+                justHandledManualClickEvent = false;
+            }, 50);
+        }, 200);
+    };
+    getDocument()?.addEventListener?.("click", (e) => {
+        if (justHandledManualClickEvent) {
             justHandledManualClickEvent = false;
-        }, 50);
-    }, 200);
+            manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
+            manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, { capture: true });
 }
-getDocument()?.addEventListener?.("click", (e) => {
-    if (justHandledManualClickEvent) {
-        justHandledManualClickEvent = false;
-        manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
-        manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
-        e.preventDefault();
-        e.stopPropagation();
-    }
-}, { capture: true });
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
@@ -85,6 +91,7 @@ getDocument()?.addEventListener?.("click", (e) => {
  */
 export function usePress(args) {
     return useMonitoring(function usePress() {
+        ensureManualClickHandlersInstalled();
         const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
         const excludeEnter = useStableCallback(ee ?? returnFalse);
         const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -434,14 +441,20 @@ function _nodeSelectedTextLength(element) {
     }
     return 0;
 }
-let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)) ? (() => navigator.vibrate(10)) : (() => { });
+let pulseOverride = null;
+function pulse() {
+    if (pulseOverride != null)
+        pulseOverride();
+    else if (("navigator" in globalThis) && ("vibrate" in navigator) && (navigator.vibrate instanceof Function))
+        navigator.vibrate(10);
+}
 /**
- * This function can be used to enable/disable button vibration pulses on an app-wide scale.
+ * This function can be used to enable/disable button vibration pulses on an app-wide scale. `null` enables the default browser behavior; pass a noop (e.g. `() => {}`) to disable.
  *
  *
  * @param func - The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
 export function setPressVibrate(func) {
-    pulse = func;
+    pulseOverride = func;
 }
 //# sourceMappingURL=use-press.js.map

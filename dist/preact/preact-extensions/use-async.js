@@ -5,7 +5,6 @@ import { useMonitoring } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 function identityCapture(...t) { return t; }
-const AsyncFunction = ((async function () { }).constructor);
 /**
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.
@@ -36,6 +35,7 @@ const AsyncFunction = ((async function () { }).constructor);
  */
 export function useAsync(asyncHandler, options) {
     return useMonitoring(function useAsync() {
+        const AsyncFunction = ((async function () { }).constructor);
         // Things related to current execution
         // Because we can both return and throw undefined, 
         // we need separate state to track their existence too.

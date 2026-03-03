@@ -57,6 +57,15 @@ export interface LogicalElementSize {
 export function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
     return useMonitoring(function useLogicalDirection(): UseLogicalDirectionReturnType {
         assertEmptyObject(void1);
+        
+        // Helper for extracting info from "ltr", "ttb", etc.
+        const M = {
+            t: "top",
+            b: "bottom",
+            l: "left",
+            r: "right"
+        } as const;
+
         //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
         //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
@@ -82,6 +91,7 @@ export function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters)
                 if (t == "upright")
                     d = "ltr";
 
+                const WritingModes = getWritingModes();
                 return ({ ...WritingModes[w || "horizontal-tb"][d || "ltr"] });
             }
 
@@ -237,14 +247,6 @@ export function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters)
 function getPhysicalLeftTop(dir: PhysicalDirection) { if (dir === "ltr" || dir == "rtl") return "left"; return "top"; }
 function getPhysicalRightBottom(dir: PhysicalDirection) { if (dir === "rtl") return "width"; if (dir === "btt") return "height"; return null; }
 
-// Helper for extracting info from "ltr", "ttb", etc.
-const M = {
-    t: "top",
-    b: "bottom",
-    l: "left",
-    r: "right"
-} as const;
-
 
 export interface UseLogicalDirectionReturnType {
 
@@ -368,102 +370,108 @@ export interface LogicalDirectionInfo {
     leftRightDirection: PhysicalDirection;
 }
 
-const HorizontalTbLtr: LogicalDirectionInfo = {
-    inlineDirection: "ltr",
-    blockDirection: "ttb",
-
-    inlineOrientation: "horizontal",
-    blockOrientation: "vertical",
-
-    inlineSize: "width",
-    blockSize: "height",
-
-    leftRightDirection: "ltr",
-    overUnderDirection: "ttb"
-};
-
-const HorizontalTbRtl: LogicalDirectionInfo = {
-    ...HorizontalTbLtr,
-    inlineDirection: "rtl",
-};
-
-const VerticalRlLtr: LogicalDirectionInfo = {
-    inlineDirection: "ttb",
-    blockDirection: "rtl",
-
-    inlineOrientation: "vertical",
-    blockOrientation: "horizontal",
-
-    inlineSize: "height",
-    blockSize: "width",
-
-    leftRightDirection: "ttb",
-    overUnderDirection: "rtl"
-};
-
-const VerticalRlRtl: LogicalDirectionInfo = {
-    ...VerticalRlLtr,
-    inlineDirection: "btt"
-};
+function getWritingModes() {
 
 
-const SidewaysRlLtr: LogicalDirectionInfo = { ...VerticalRlLtr };
-const SidewaysRlRtl: LogicalDirectionInfo = { ...VerticalRlRtl };
+    const HorizontalTbLtr: LogicalDirectionInfo = {
+        inlineDirection: "ltr",
+        blockDirection: "ttb",
 
-const VerticalLrLtr: LogicalDirectionInfo = {
-    ...VerticalRlLtr,
-    blockDirection: "ltr",
-};
+        inlineOrientation: "horizontal",
+        blockOrientation: "vertical",
 
-const VerticalLrRtl: LogicalDirectionInfo = {
-    ...VerticalRlRtl,
-    blockDirection: "ltr",
-};
+        inlineSize: "width",
+        blockSize: "height",
 
-const SidewaysLtLtr: LogicalDirectionInfo = {
-    ...VerticalLrLtr,
-    inlineDirection: "btt",
+        leftRightDirection: "ltr",
+        overUnderDirection: "ttb"
+    };
 
-    leftRightDirection: "btt",
-    overUnderDirection: "ltr"
-};
+    const HorizontalTbRtl: LogicalDirectionInfo = {
+        ...HorizontalTbLtr,
+        inlineDirection: "rtl",
+    };
 
-const SidewaysLtRtl: LogicalDirectionInfo = {
-    ...SidewaysLtLtr,
-    inlineDirection: "ttb"
-};
+    const VerticalRlLtr: LogicalDirectionInfo = {
+        inlineDirection: "ttb",
+        blockDirection: "rtl",
+
+        inlineOrientation: "vertical",
+        blockOrientation: "horizontal",
+
+        inlineSize: "height",
+        blockSize: "width",
+
+        leftRightDirection: "ttb",
+        overUnderDirection: "rtl"
+    };
+
+    const VerticalRlRtl: LogicalDirectionInfo = {
+        ...VerticalRlLtr,
+        inlineDirection: "btt"
+    };
+
+
+    const SidewaysRlLtr: LogicalDirectionInfo = { ...VerticalRlLtr };
+    const SidewaysRlRtl: LogicalDirectionInfo = { ...VerticalRlRtl };
+
+    const VerticalLrLtr: LogicalDirectionInfo = {
+        ...VerticalRlLtr,
+        blockDirection: "ltr",
+    };
+
+    const VerticalLrRtl: LogicalDirectionInfo = {
+        ...VerticalRlRtl,
+        blockDirection: "ltr",
+    };
+
+    const SidewaysLtLtr: LogicalDirectionInfo = {
+        ...VerticalLrLtr,
+        inlineDirection: "btt",
+
+        leftRightDirection: "btt",
+        overUnderDirection: "ltr"
+    };
+
+    const SidewaysLtRtl: LogicalDirectionInfo = {
+        ...SidewaysLtLtr,
+        inlineDirection: "ttb"
+    };
 
 
 
-const HorizontalTb = {
-    ltr: HorizontalTbLtr,
-    rtl: HorizontalTbRtl
-} as const;
+    const HorizontalTb = {
+        ltr: HorizontalTbLtr,
+        rtl: HorizontalTbRtl
+    } as const;
 
-const VerticalRl = {
-    ltr: VerticalRlLtr,
-    rtl: VerticalRlRtl
-} as const;
+    const VerticalRl = {
+        ltr: VerticalRlLtr,
+        rtl: VerticalRlRtl
+    } as const;
 
-const VerticalLr = {
-    ltr: VerticalLrLtr,
-    rtl: VerticalLrRtl
-} as const;
+    const VerticalLr = {
+        ltr: VerticalLrLtr,
+        rtl: VerticalLrRtl
+    } as const;
 
-const SidewaysRl = {
-    ltr: SidewaysRlLtr,
-    rtl: SidewaysRlRtl
-} as const;
+    const SidewaysRl = {
+        ltr: SidewaysRlLtr,
+        rtl: SidewaysRlRtl
+    } as const;
 
-const SidewaysLr = {
-    ltr: SidewaysLtLtr,
-    rtl: SidewaysLtRtl
-} as const;
+    const SidewaysLr = {
+        ltr: SidewaysLtLtr,
+        rtl: SidewaysLtRtl
+    } as const;
 
-const WritingModes = {
-    "horizontal-tb": HorizontalTb,
-    "vertical-lr": VerticalLr,
-    "vertical-rl": VerticalRl,
-    "sideways-lr": SidewaysLr,
-    "sideways-rl": SidewaysRl
-} as const;
+    const WritingModes = {
+        "horizontal-tb": HorizontalTb,
+        "vertical-lr": VerticalLr,
+        "vertical-rl": VerticalRl,
+        "sideways-lr": SidewaysLr,
+        "sideways-rl": SidewaysRl
+    } as const;
+
+    return WritingModes;
+}
