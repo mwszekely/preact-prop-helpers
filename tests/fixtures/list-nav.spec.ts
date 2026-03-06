@@ -107,7 +107,7 @@ test("Focus is preserved when the focused child is unmounted", async ({ page, li
     // it doesn't seem to happen in practice at all,
     // but it fails at the body focus test otherwise.
     // Again, only in Chrome, and only in the test environment
-    await new Promise(resolve => setTimeout(resolve, 20));
+    await new Promise(resolve => setTimeout(resolve, 50));
 
 
     // Ensure that as we decrease the # of children,

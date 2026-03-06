@@ -191,9 +191,12 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             dangerouslyAppendHTML
         }).current,
         props: useMergedProps<E>(
-            { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
+            { 
+                className: [...currentImperativeProps.current.className].join(" "), 
+                style: { ...currentImperativeProps.current.style }, // React freezes any style object it sees (I don't know why), so we copy it each time.
+                children: currentImperativeProps.current.children
+            },
             currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {},
-            { children: currentImperativeProps.current.children },
             currentImperativeProps.current.others
         )
 

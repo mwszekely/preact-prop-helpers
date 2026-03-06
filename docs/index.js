@@ -292,7 +292,7 @@ function E$1(n, l, u) {
 }
 function G$1(u, t, i) {
   var o, r, e, f;
-  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), r = (o = "function" == typeof i) ? null : i && i.__k || t.__k, e = [], f = [], O(t, u = (!o && i || t).__k = _$1(k$1, null, [u]), r || p$1, p$1, t.namespaceURI, !o && i ? [i] : r ? null : t.firstChild ? n.call(t.childNodes) : null, e, !o && i ? i : r ? r.__e : t.firstChild, o, f), N$1(e, u, f);
+  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), r = (o = "function" == typeof i) ? null : t.__k, e = [], f = [], O(t, u = (!o && i || t).__k = _$1(k$1, null, [u]), r || p$1, p$1, t.namespaceURI, !o && i ? [i] : r ? null : t.firstChild ? n.call(t.childNodes) : null, e, !o && i ? i : r ? r.__e : t.firstChild, o, f), N$1(e, u, f);
 }
 function Q$1(n) {
   function l(n) {
@@ -794,7 +794,6 @@ const useBeforeLayoutEffect = function useBeforeLayoutEffect(effect, inputs) {
       }
   }, [id])*/
 };
-
 function argsChanged(oldArgs, newArgs) {
   return !!(!oldArgs || oldArgs.length !== newArgs?.length || newArgs?.some((arg, index) => arg !== oldArgs[index]));
 }
@@ -1797,7 +1796,7 @@ function arrayLikeKeys(value, inherited) {
     result = skipIndexes ? baseTimes(value.length, String) : [],
     length = result.length;
   for (var key in value) {
-    if ((inherited || hasOwnProperty$1.call(value, key)) && !(skipIndexes && (
+    if (hasOwnProperty$1.call(value, key) && !(skipIndexes && (
     // Safari 9 has enumerable `arguments.length` in strict mode.
     key == 'length' ||
     // Node.js 0.10 has enumerable non-index properties on buffers.
@@ -4836,7 +4835,6 @@ function useProcessedChildren({
       }
       //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
-
     return {
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
@@ -4998,7 +4996,6 @@ class ProcessedIndexMangler {
             //case 'processed': return this._demangledToProcessed.get(index);
           }
         }
-
       case 'mangled':
         {
           switch (to) {
@@ -5011,7 +5008,6 @@ class ProcessedIndexMangler {
         }
     }
   }
-
   _originalChildren = [];
   sortedChildren = [];
   _mangledToDemangled = new Map();
@@ -6018,7 +6014,7 @@ let be;
     let d = !!globalThis.document;
     globalThis.document ??= {};
     /// @ts-expect-error
-    await import('./blocking-elements.min-l3NgQkuj.js');
+    await import('./blocking-elements.min-OTCcoWW8.js');
     be = document.$blockingElements;
     if (!d) delete globalThis.document;
   }

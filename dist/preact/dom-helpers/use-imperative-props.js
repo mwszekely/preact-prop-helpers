@@ -125,7 +125,11 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             dangerouslySetInnerHTML,
             dangerouslyAppendHTML
         }).current,
-        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
+        props: useMergedProps({
+            className: [...currentImperativeProps.current.className].join(" "),
+            style: { ...currentImperativeProps.current.style }, // React freezes any style object it sees (I don't know why), so we copy it each time.
+            children: currentImperativeProps.current.children
+        }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, currentImperativeProps.current.others)
     };
 }
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
