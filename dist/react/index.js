@@ -6165,6 +6165,7 @@ function scheduleUpdate(f) {
         queueMicrotask(() => {
             updatesToRunOnNextTick.forEach(f => f());
             updatesToRunOnNextTick.clear();
+            hasScheduledUpdate = false;
         });
     }
 }

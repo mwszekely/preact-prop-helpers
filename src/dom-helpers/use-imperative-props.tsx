@@ -73,6 +73,7 @@ function scheduleUpdate(f: () => void) {
         queueMicrotask(() => {
             updatesToRunOnNextTick.forEach(f => f());
             updatesToRunOnNextTick.clear();
+            hasScheduledUpdate = false;
         });
     }
 }
