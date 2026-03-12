@@ -15,13 +15,13 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
     /** @stable Applies or removes the given CSS class to the element and its props */
-    setClass(cls: string, enabled: boolean): void;
+    setClass(cls: string, enabled: boolean, delay?: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
+    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null, delay?: boolean): void;
     /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */
-    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
+    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null, delay?: boolean): void;
     /** @stable Sets the element's `textContent` and `props.children` */
     setChildren(children: string | null): void;
     /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */

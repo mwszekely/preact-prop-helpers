@@ -8,6 +8,24 @@ function htmlToElement(parent, html) {
     templateElement.innerHTML = html.trim(); // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
     return templateElement.content.firstChild;
 }
+let updatesToRunOnNextTick = new Set();
+let hasScheduledUpdate = false;
+function scheduleUpdate(f) {
+    updatesToRunOnNextTick.add(f);
+    if (!hasScheduledUpdate) {
+        hasScheduledUpdate = true;
+        queueMicrotask(() => {
+            updatesToRunOnNextTick.forEach(f => f());
+            updatesToRunOnNextTick.clear();
+        });
+    }
+}
+function scheduleOrRun(immediate, func) {
+    if (immediate)
+        func();
+    else
+        scheduleUpdate(func);
+}
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  *
@@ -28,28 +46,32 @@ export const ImperativeElement = /* @__PURE__ */ memo(/* @__PURE__ */ forwardRef
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
-    const setClass = useCallback((cls, enabled) => {
-        if (hasClass(cls) == !enabled) {
-            getElement()?.classList[enabled ? "add" : "remove"](cls);
-            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
-        }
+    const setClass = useCallback((cls, enabled, immediate) => {
+        scheduleOrRun(immediate, () => {
+            if (hasClass(cls) == !enabled) {
+                getElement()?.classList[enabled ? "add" : "remove"](cls);
+                currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+            }
+        });
     }, []);
-    const setStyle = useCallback((prop, value) => {
-        const element = getElement();
-        if (element) {
-            if (currentImperativeProps.current.style[prop] != value) {
-                currentImperativeProps.current.style[prop] = value;
-                if (prop.startsWith("--")) {
-                    if (value != null)
-                        element.style.setProperty(prop, `${value}`);
-                    else
-                        element.style.removeProperty(prop);
-                }
-                else {
-                    element.style[prop] = value ?? "";
+    const setStyle = useCallback((prop, value, immediate) => {
+        scheduleOrRun(immediate, () => {
+            const element = getElement();
+            if (element) {
+                if (currentImperativeProps.current.style[prop] != value) {
+                    currentImperativeProps.current.style[prop] = value;
+                    if (prop.startsWith("--")) {
+                        if (value != null)
+                            element.style.setProperty(prop, `${value}`);
+                        else
+                            element.style.removeProperty(prop);
+                    }
+                    else {
+                        element.style[prop] = value ?? "";
+                    }
                 }
             }
-        }
+        });
     }, []);
     const setChildren = useCallback((children) => {
         let e = getElement();
@@ -85,19 +107,21 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     const getAttribute = useCallback((prop) => {
         return currentImperativeProps.current.others[prop];
     }, []);
-    const setAttribute = useCallback((prop, value) => {
-        if (value != null) {
-            if (getAttribute(prop) != value) {
-                currentImperativeProps.current.others[prop] = value;
-                getElement()?.setAttribute(prop, value);
+    const setAttribute = useCallback((prop, value, immediate) => {
+        scheduleOrRun(immediate, () => {
+            if (value != null) {
+                if (getAttribute(prop) != value) {
+                    currentImperativeProps.current.others[prop] = value;
+                    getElement()?.setAttribute(prop, value);
+                }
             }
-        }
-        else {
-            if (getAttribute(prop) != undefined) {
-                delete currentImperativeProps.current.others[prop];
-                getElement()?.removeAttribute(prop);
+            else {
+                if (getAttribute(prop) != undefined) {
+                    delete currentImperativeProps.current.others[prop];
+                    getElement()?.removeAttribute(prop);
+                }
             }
-        }
+        });
     }, []);
     const setEventHandler = useCallback((type, handler, options) => {
         const element = getElement();

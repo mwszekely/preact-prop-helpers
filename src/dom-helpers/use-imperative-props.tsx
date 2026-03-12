@@ -19,13 +19,13 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
     /** @stable Applies or removes the given CSS class to the element and its props */
-    setClass(cls: string, enabled: boolean): void;
+    setClass(cls: string, enabled: boolean, delay?: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
+    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null, delay?: boolean): void;
     /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */
-    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
+    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null, delay?: boolean): void;
     /** @stable Sets the element's `textContent` and `props.children` */
     setChildren(children: string | null): void;
     /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */
@@ -62,6 +62,28 @@ function htmlToElement(parent: Element, html: string) {
     return templateElement.content.firstChild! as Element;
 }
 
+let updatesToRunOnNextTick = new Set<() => void>();
+let hasScheduledUpdate = false;
+
+function scheduleUpdate(f: () => void) {
+    updatesToRunOnNextTick.add(f);
+
+    if (!hasScheduledUpdate) {
+        hasScheduledUpdate = true;
+        queueMicrotask(() => {
+            updatesToRunOnNextTick.forEach(f => f());
+            updatesToRunOnNextTick.clear();
+        });
+    }
+}
+
+function scheduleOrRun(immediate: boolean | undefined, func: () => void) {
+    if (immediate)
+        func();
+    else
+        scheduleUpdate(func);
+}
+
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  * 
@@ -85,29 +107,33 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
 
 
     const hasClass = useCallback<HasClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
-    const setClass = useCallback<SetClass>((cls, enabled) => {
-        if (hasClass(cls) == !enabled) {
-            getElement()?.classList[enabled ? "add" : "remove"](cls);
-            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
-        }
+    const setClass = useCallback<SetClass>((cls, enabled, immediate) => {
+        scheduleOrRun(immediate, () => {
+            if (hasClass(cls) == !enabled) {
+                getElement()?.classList[enabled ? "add" : "remove"](cls);
+                currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+            }
+        });
     }, []);
 
-    const setStyle = useCallback<SetStyle>((prop, value) => {
-        const element = (getElement() as Element as HTMLElement | undefined);
-        if (element) {
-            if (currentImperativeProps.current.style[prop] != value) {
-                currentImperativeProps.current.style[prop as never] = value as never;
-                if ((prop as string).startsWith("--")) {
-                    if (value != null)
-                        element.style.setProperty(prop, `${value}`);
-                    else
-                        element.style.removeProperty(prop);
-                }
-                else {
-                    element.style[prop] = value ?? ("" as any);
+    const setStyle = useCallback<SetStyle>((prop, value, immediate) => {
+        scheduleOrRun(immediate, () => {
+            const element = (getElement() as Element as HTMLElement | undefined);
+            if (element) {
+                if (currentImperativeProps.current.style[prop] != value) {
+                    currentImperativeProps.current.style[prop as never] = value as never;
+                    if ((prop as string).startsWith("--")) {
+                        if (value != null)
+                            element.style.setProperty(prop, `${value}`);
+                        else
+                            element.style.removeProperty(prop);
+                    }
+                    else {
+                        element.style[prop] = value ?? ("" as any);
+                    }
                 }
             }
-        }
+        });
     }, []);
 
     const setChildren = useCallback<SetChildren>((children: string | null) => {
@@ -148,19 +174,21 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         return currentImperativeProps.current.others[prop];
     }, []);
 
-    const setAttribute = useCallback<SetAttribute<E>>((prop, value) => {
-        if (value != null) {
-            if (getAttribute(prop) != value) {
-                currentImperativeProps.current.others[prop] = value;
-                getElement()?.setAttribute(prop, value);
+    const setAttribute = useCallback<SetAttribute<E>>((prop, value, immediate) => {
+        scheduleOrRun(immediate, () => {
+            if (value != null) {
+                if (getAttribute(prop) != value) {
+                    currentImperativeProps.current.others[prop] = value;
+                    getElement()?.setAttribute(prop, value);
+                }
             }
-        }
-        else {
-            if (getAttribute(prop) != undefined) {
-                delete currentImperativeProps.current.others[prop];
-                getElement()?.removeAttribute(prop);
+            else {
+                if (getAttribute(prop) != undefined) {
+                    delete currentImperativeProps.current.others[prop];
+                    getElement()?.removeAttribute(prop);
+                }
             }
-        }
+        });
     }, []);
 
     const setEventHandler = useCallback<SetEventHandler>((type, handler, options) => {
@@ -191,8 +219,8 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             dangerouslyAppendHTML
         }).current,
         props: useMergedProps<E>(
-            { 
-                className: [...currentImperativeProps.current.className].join(" "), 
+            {
+                className: [...currentImperativeProps.current.className].join(" "),
                 style: { ...currentImperativeProps.current.style }, // React freezes any style object it sees (I don't know why), so we copy it each time.
                 children: currentImperativeProps.current.children
             },
