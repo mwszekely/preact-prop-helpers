@@ -7479,14 +7479,16 @@ function useAsyncHandler({
     setHasCapture(true);
     return [captured, e];
   });
+  const useAsyncRet = useAsync(asyncHandler, {
+    capture,
+    ...restAsyncOptions
+  });
   return {
     getCurrentCapture,
     currentCapture,
     hasCapture,
-    ...useAsync(asyncHandler, {
-      capture,
-      ...restAsyncOptions
-    })
+    shouldShowCapture: hasCapture && (useAsyncRet.pending || useAsyncRet.debouncingAsync || useAsyncRet.debouncingSync),
+    ...useAsyncRet
   };
 }
 function pressLog(...args) {

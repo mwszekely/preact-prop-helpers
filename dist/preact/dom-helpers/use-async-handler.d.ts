@@ -40,6 +40,13 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      * you might need this.
      */
     hasCapture: boolean;
+    /**
+     * A derived property of pending, the various debounce states, and hasCapture.
+     *
+     * When this is true, the capture should be shown for the state of the current
+     * control this async handler is used in.
+     */
+    shouldShowCapture: boolean;
 }
 /**
  * Given an asynchronous event handler, returns a synchronous one that works on the DOM,

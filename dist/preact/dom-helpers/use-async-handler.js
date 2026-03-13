@@ -83,11 +83,13 @@ export function useAsyncHandler({ asyncHandler, capture: originalCapture, ...res
         setHasCapture(true);
         return [captured, e];
     });
+    const useAsyncRet = useAsync(asyncHandler, { capture, ...restAsyncOptions });
     return {
         getCurrentCapture,
         currentCapture,
         hasCapture,
-        ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+        shouldShowCapture: hasCapture && (useAsyncRet.pending || useAsyncRet.debouncingAsync || useAsyncRet.debouncingSync),
+        ...useAsyncRet
     };
 }
 //# sourceMappingURL=use-async-handler.js.map

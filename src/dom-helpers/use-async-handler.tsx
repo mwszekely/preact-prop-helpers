@@ -51,6 +51,14 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      */
     hasCapture: boolean;
 
+    /**
+     * A derived property of pending, the various debounce states, and hasCapture.
+     * 
+     * When this is true, the capture should be shown for the state of the current
+     * control this async handler is used in.
+     */
+    shouldShowCapture: boolean;
+
 }
 
 /**
@@ -137,11 +145,13 @@ export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture:
         return [captured, e];
     });
 
+    const useAsyncRet = useAsync(asyncHandler, { capture, ...restAsyncOptions });
 
     return {
         getCurrentCapture,
         currentCapture,
         hasCapture,
-        ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+        shouldShowCapture: hasCapture && (useAsyncRet.pending || useAsyncRet.debouncingAsync || useAsyncRet.debouncingSync),
+        ...useAsyncRet
     };
 }
