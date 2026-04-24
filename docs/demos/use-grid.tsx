@@ -1,6 +1,5 @@
-import { createContext } from "preact";
-import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/preact/index.js";
+import { createContext, memo, useCallback, useContext } from "react";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/react/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -176,7 +175,7 @@ export const DemoUseGrid = memo(() => {
 
 
     return (
-        <div class="demo">
+        <div className="demo">
             <h2>useGridNavigationComplete</h2>
             <p>Like <code>useCompleteListNavigation</code> but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged.</p>
             {<div>Current row: {tabbableRow}</div>}

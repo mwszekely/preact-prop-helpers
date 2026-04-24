@@ -3,7 +3,7 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { getWindow } from "../../util/get-window.js";
-import { MouseEventType, Nullable, useCallback } from "../../util/lib.js";
+import { Nullable, useCallback } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
@@ -18,7 +18,7 @@ export interface UseBackdropDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
+    onDismissBackdrop: Nullable<(e: PointerEvent) => void>;
 }
 
 export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> {
@@ -39,7 +39,7 @@ export function useBackdropDismiss<PopupElement extends Element, B extends boole
         const getOpen = useStableGetter(open);
         const onClose = useStableGetter(onCloseUnstable);
 
-        const onBackdropClick = useCallback(function onBackdropClick(e: MouseEventType<any>) {
+        const onBackdropClick = useCallback(function onBackdropClick(e: PointerEvent) {
             if (!getOpen())
                 return;
 

@@ -8,23 +8,30 @@
     "packageManager": "pnpm@8.6.11",
     "browserslist": "defaults",
     "scripts": {
-        "build": "npx rollup -c",
-        "watch": "npx rollup -c --watch",
+        "build-preact": "npx rollup -c rollup-p.config.mjs",
+        "build-react": "npx rollup -c rollup-r.config.mjs",
+        "watch-preact": "npx rollup -c rollup-p.config.mjs --watch",
+        "watch-react": "npx rollup -c rollup-r.config.mjs --watch",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@rollup/plugin-alias": "^6.0.0",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-commonjs": "^28.0.1",
         "@rollup/plugin-node-resolve": "^15.3.0",
         "@rollup/plugin-replace": "^6.0.1",
         "@rollup/plugin-typescript": "^12.1.1",
+        "@types/lodash-es": "^4.17.12",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
         "rollup": "^4.28.1",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "serve": "^14.2.4"
     },
     "dependencies": {
+        "lodash-es": "^4.18.1",
         "tslib": "^2.8.1"
     }
 }

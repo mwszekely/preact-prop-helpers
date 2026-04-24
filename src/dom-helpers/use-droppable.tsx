@@ -1,6 +1,6 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { DragEventType, useEffect, useRef } from "../util/lib.js";
+import { DragEventType, ElementPropsAll, useEffect, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
@@ -240,7 +240,7 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
             }));
         })
 
-        const propsStable = useRef<ElementProps<E>>({ onDragEnter, onDragLeave, onDragOver, onDrop });
+        const propsStable = useRef<ElementPropsAll<E>>({ onDragEnter, onDragLeave, onDragOver, onDrop });
 
         return {
             propsStable: propsStable.current,

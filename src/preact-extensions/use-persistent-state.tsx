@@ -105,7 +105,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
 
     useEffect(() => {
         AllListeners.add(updateFromOtherSource);
-        return () => AllListeners.delete(updateFromOtherSource);
+        return () => { AllListeners.delete(updateFromOtherSource); }
     }, [updateFromOtherSource])
 
     // Listen for changes to this storage in other browser tabs

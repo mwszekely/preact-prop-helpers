@@ -1,6 +1,6 @@
 
+import { Dispatch, SetStateAction, useCallback, useRef, useState as useStateP } from "../util/lib.js";
 
-import { StateUpdater, useCallback, useRef, useState as useStateP } from "../util/lib.js";
 import { useStack } from "../util/stack.js";
 
 /**
@@ -13,7 +13,7 @@ import { useStack } from "../util/stack.js";
  * 
  * @param initialState - Same as the built-in `setState`'s
  */
-export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
+export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: (action: T | ((prevState: T) => T)) => void /* TODO: Types get messed up if using Dispatch<SetStateAction<>>???? */, getValue: () => T] {
     const getStack = useStack();
 
     // We keep both, but override the `setState` functionality
@@ -22,7 +22,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
 
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useRef<StateUpdater<T>>(value => {
+    const setState = useRef<Dispatch<SetStateAction<T>>>(value => {
         if (process.env.NODE_ENV === 'development') {
             (globalThis as any)._setState_stack = getStack();
         }

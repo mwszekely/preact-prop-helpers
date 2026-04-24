@@ -1,9 +1,6 @@
 import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
-import { useFocusTrap, UseFocusTrapParameters } from "../component-detail/use-focus-trap.js";
-import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, OmitStrong } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseModalParametersSelf {
@@ -14,13 +11,12 @@ export interface UseModalParametersSelf {
 }
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends
     UseDismissParameters<Listeners>,
-    UseRefElementParameters<any>,
-    OmitStrong<UseFocusTrapParameters<any, any>, "refElementReturn"> {
+    UseRefElementParameters<any> {
     modalParameters: UseModalParametersSelf;
 }
 
 export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
-    propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
+    //propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
 }
 
 /**
@@ -29,14 +25,13 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  * 
  * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself. 
  * 
- * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
+ * TODO: HTML dialogs and popovers FINALLY make this 100% obsolete. It's no longer being maintained. Remove ASAP.
  * 
  * @compositeParams
  */
 export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters: { dismissActive, onDismiss, ...void2 },
     escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 },
-    focusTrapParameters: { trapActive, ...focusTrapParameters },
     activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 },
     backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 },
     lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 },
@@ -52,12 +47,6 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
             backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
             lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
         });
-        const { propsStable, refElementReturn } = useRefElement<NonNullable<FocusContainerElement>>({ refElementParameters: { onElementChange, onMount, onUnmount } })
-        const { props } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
-            focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
-            activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
-            refElementReturn
-        });
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
@@ -68,7 +57,6 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
         assertEmptyObject(void8);
 
         return {
-            propsFocusContainer: useMergedProps(propsStable, props),
             refElementPopupReturn,
             refElementSourceReturn,
             propsStablePopup,

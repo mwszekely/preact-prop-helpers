@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/preact",
+  },
+  "include": ["./src"],
+  "exclude": ["./node_modules", "./src/util/lib-react.tsx"]
+}

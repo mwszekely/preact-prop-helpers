@@ -1,6 +1,7 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { DragEventType, ElementProps, Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
+import { useMergedProps } from "./use-merged-props.js";
 
 /*
 export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
@@ -100,11 +101,11 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
         // Return both the element and the hook that modifies 
         // the props and allows us to actually find the element
         const ret: UseDraggableReturnType<E> = {
-            propsUnstable: {
+            propsUnstable: useMergedProps({
                 draggable: true,
                 onDragStart,
                 onDragEnd
-            },
+            }),
             dragging,
             getDragging,
             lastDropEffect,

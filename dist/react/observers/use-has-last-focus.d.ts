@@ -1,9 +1,9 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick } from "../util/lib.js";
+import { FocusEventType, TargetedPick } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
-export interface UseHasLastFocusParametersSelf {
+export interface UseHasLastFocusParametersSelf<T extends Node> {
     /**
      * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
      *
@@ -11,16 +11,16 @@ export interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
+    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | FocusEventType<T> | undefined>>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
+    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | FocusEventType<T> | undefined>>;
 }
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasLastFocusParameters: UseHasLastFocusParametersSelf;
+    hasLastFocusParameters: UseHasLastFocusParametersSelf<T>;
 }
 export interface HasLastFocusReturnTypeSelf {
     /** @stable */

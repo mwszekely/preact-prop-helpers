@@ -1,5 +1,5 @@
-import { render } from "preact";
-import { useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
+import { options, render } from "preact";
+import { preactAddUseInsertionEffectHook, useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
 import { useEffect, useRef } from "preact/hooks";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
@@ -184,7 +184,7 @@ function TestsContainer() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
+    preactAddUseInsertionEffectHook(options);
     render(<TestsContainer />, document.body);
 })
 

@@ -335,6 +335,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                         const element = nextChild.getElement();
                         if (element) {
                             if (document.activeElement == document.body || document.activeElement == null || !element.contains(document.activeElement)) {
+                                console.log("1a");
                                 nextChild.focusSelf(element);
                             }
                         }
@@ -408,6 +409,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 // This is liable to break, probably with blockingElements or something.
                 if (avoidFocusingSelfOnMount.current && document && (document.activeElement == null || document.activeElement == document.body)) {
                     let childElement = index == null ? null : getChildren().getAt(index)?.getElement();
+                                console.log("1c");
                     if (index == null || childElement == null)
                         focus(findBackupFocus(getElement()!));
                     else
@@ -434,6 +436,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 }
             }
             else if (!untabbable && index != null) {
+                                console.log("1d");
                 const element = children.getAt(index)?.getElement();
                 children.getAt(index)?.focusSelf?.(element!);
             }

@@ -1,11 +1,11 @@
 
-import { useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, focus, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
 
 function getDocument(): Document { return globalThis.document; }
 
 export function DemoUseModal(props: { parentDepth?: number }) {
 
+    return <div />;
+    /*
     const parentDepth = (props.parentDepth ?? 0);
     const depth = parentDepth + 1;
 
@@ -49,7 +49,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
     return (
         <div style={{ border: `${depth}px solid black` }}>
             <div>useModal demo:</div>
-            <div style="display: flex; flex-direction: column">
+            <div style={{ display: "flex", flexDirection: "column" }}>
                 <label><input type="checkbox" disabled={true} checked={true} /> Close by setting open to false</label>
                 <label><input type="checkbox" checked={closeOnBackdrop} onInput={e => setCloseOnBackdrop(e.currentTarget.checked)} /> Close on backdrop click</label>
                 <label><input type="checkbox" checked={closeOnEscape} onInput={e => setCloseOnEscape(e.currentTarget.checked)} /> Close on Escape key press</label>
@@ -59,7 +59,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             </div>
             <div>Last reason for closing: {closeReason ?? "(hasn't been closed yet)"}</div>
             <button {...propsStableSource} onClick={() => setOpen(true)}>Open Modal</button>
-            <div {...useMergedProps(propsFocusContainer, propsStablePopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
+            <div {...useMergedProps(propsFocusContainer, propsStablePopup)} style={{border: `${depth}px dotted red`, background: `#ccc`}}>
                 <div style={{ display: open ? "flex" : "none", flexDirection: "column" }}>
                     <div>Modal element at depth {depth} with {hasChild ? "a" : "no"} child</div>
                     <label><input type="checkbox" checked={hasChild} onInput={e => setHasChild(e.currentTarget.checked)} ref={buttonRef} /> Add a child modal</label>
@@ -68,5 +68,5 @@ export function DemoUseModal(props: { parentDepth?: number }) {
                 </div>
             </div>
         </div>
-    )
+    )*/
 }

@@ -2,7 +2,7 @@
 
 import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument } from "./get-window.js";
-import { useMemo, useState } from "./lib.js";
+import { ElementProps, ElementPropsAll, useMemo, useState } from "./lib.js";
 import "./mode.js";
 import { useStack } from "./stack.js";
 
@@ -39,7 +39,7 @@ export type TagPropPrefices =
  * @param tag - Should be unique
  * @returns A modified copy of the given props
  */
-export function useTagProps<P>(props: P, tag: `data-${TagPropPrefices}`): P {
+export function useTagProps<E extends EventTarget>(props: ElementPropsAll<E>, tag: `data-${TagPropPrefices}`): ElementProps<E> {
     if (process.env.NODE_ENV === 'development' && (globalThis as any)._generate_useTagProps_tags) {
         const [id] = useState(() => ++idIndex);
 

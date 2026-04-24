@@ -1,10 +1,8 @@
-import { identity } from "lodash-es";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
 import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-export { identity };
 export interface LinearNavigationResult {
     valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end";

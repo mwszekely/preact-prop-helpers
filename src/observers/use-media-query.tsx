@@ -26,13 +26,17 @@ export function useMediaQuery(query: string | null | undefined, defaultGuess?: b
     }
     else {
 
-        const queryList = useRef<MediaQueryList | null>();
+        const queryList = useRef<MediaQueryList | null>(null);
 
         // queryList.current ??= (query == null ? null : matchMedia(query))
         // This ^^^ is not done because it seems to cause reflows at inopportune moments.
         // Specifically on iOS Safari (tested on 12).
         // It's always iOS Safari.
         // At any rate it botches transitions that happen on a just-mounted component, somehow.
+        //
+        // ...uh, hey, TODO, is this still necessary? Does iOS still do this?
+        // *Surely* I'll get around to testing it eventually.
+        //
         const [matches, setMatches, getMatches] = useState<null | boolean>(defaultGuess ?? null);
 
         console.assert(!query || query.startsWith("("));

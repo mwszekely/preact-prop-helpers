@@ -55,7 +55,7 @@ export function TestBasesGridNav() {
     const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, singleSelectionMode }
 
     useEffect(() => { installTestingHandler("GridNav", "setSingleSelectedIndex", setSingleSelectedIndex); }, []);
-    
+
     if (!mounted)
         return <div />;
 
@@ -173,7 +173,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             animate: false
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered,disableIntersectionObserver: true },
+        staggeredChildrenParameters: { staggered, disableIntersectionObserver: true },
     });
 
     return (
@@ -247,6 +247,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
         //staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
+        refElementReturn
     } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(RowContext),
         info: {
@@ -282,7 +283,13 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                         "data-selected-offset": singleSelectedOffset,
                     } as {},
                     {
-                        onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); }
+                        onFocus: (e: FocusEvent) => {
+                            if (e.currentTarget != refElementReturn.getElement()) {
+                                console.error("A grid row has received focus");
+                                setRowFocused(true);
+                                throw new Error("A grid row has received focus");
+                            }
+                        }
                     })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {

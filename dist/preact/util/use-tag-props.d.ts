@@ -1,3 +1,4 @@
+import { ElementProps, ElementPropsAll } from "./lib.js";
 import "./mode.js";
 export type TagPropPrefices = "use-ref-element" | "staggered-children-child" | "paginated-children-child" | "focus-trap" | "dismiss-props-stable-group" | "dismiss-props-stable-popup" | "dismiss-props-stable-source" | "typeahead-navigation" | "single-selection-child" | "roving-tab-index-child" | "roving-tab-index" | "list-navigation-single-selection-child-tabbable" | "list-navigation-single-selection-child-child" | "list-navigation-single-selection-stable-parent" | "list-navigation-single-selection-stable-parent-or-child" | "list-navigation-stable-parent" | "list-navigation-stable-parent-or-child" | "linear-navigation" | "use-grid-navigation-partial-row";
 /**
@@ -9,5 +10,5 @@ export type TagPropPrefices = "use-ref-element" | "staggered-children-child" | "
  * @param tag - Should be unique
  * @returns A modified copy of the given props
  */
-export declare function useTagProps<P>(props: P, tag: `data-${TagPropPrefices}`): P;
+export declare function useTagProps<E extends EventTarget>(props: ElementPropsAll<E>, tag: `data-${TagPropPrefices}`): ElementProps<E>;
 //# sourceMappingURL=use-tag-props.d.ts.map

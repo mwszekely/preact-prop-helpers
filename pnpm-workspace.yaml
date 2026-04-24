@@ -1,0 +1,4 @@
+minimumReleaseAge: 1440
+auto-install-peers: true
+block-exotic-subdeps: true
+minimum-release-age: 1440

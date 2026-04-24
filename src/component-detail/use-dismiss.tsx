@@ -38,7 +38,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      * 
      * @nonstable
      */
-    onDismiss: (e: EventType<any, any>, reason: Listeners) => void;
+    onDismiss: (e: PointerEvent | KeyboardEvent | EventType<any, any>, reason: Listeners) => void;
 
     /**
      * If `true`, then this component closes when a click is detected anywhere not within the component

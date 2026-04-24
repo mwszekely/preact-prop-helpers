@@ -3,7 +3,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
-import { KeyboardEventType, Nullable, useEffect } from "../../util/lib.js";
+import { Nullable, useEffect } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 
@@ -14,7 +14,7 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    onDismissEscape: Nullable<(e: KeyboardEventType<any>) => void>;
+    onDismissEscape: Nullable<(e: KeyboardEvent) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.

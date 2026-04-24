@@ -70,9 +70,7 @@ export interface UseSelectionChildDeclarativeParameters<ChildElement extends Ele
  */
 export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): {
     singleSelectionParameters: {
-        onSingleSelectedIndexChange: (e: import("../../index.js").TargetedEnhancedEvent<Event, {
-            selectedIndex: number;
-        }>) => void | undefined;
+        onSingleSelectedIndexChange: import("./use-single-selection.js").SingleSelectionChangeHandler;
     };
 };
 /**

@@ -1,5 +1,5 @@
-import { identity } from "../component-detail/keyboard-navigation/use-linear-navigation.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { identity } from "../util/lib-shared.js";
 import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";

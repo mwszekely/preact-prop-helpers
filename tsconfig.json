@@ -3,13 +3,14 @@
     "target": "ESNext",                       /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
     "module": "NodeNext",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     "jsx": "react-jsx",                       /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
-    "jsxImportSource": "preact",
+    "jsxImportSource": "react",
     "declaration": true,                      /* Generates corresponding '.d.ts' file. */
     "declarationMap": true,                   /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "sourceMap": true,                        /* Generates corresponding '.map' file. */
-    "outDir": "./dist/preact",
+    "outDir": "./dist",
     "rootDir": "./src/",
     "isolatedModules": true,
+    //"emitDeclarationOnly": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable", "ES2021", "ES2021.String"],
     "exactOptionalPropertyTypes": false,    
     "strict": true,                            /* Enable all strict type-checking options. */
@@ -20,5 +21,5 @@
     "types": []
   },
   "include": ["./src"],
-  "exclude": ["./node_modules", "./src/util/lib-react.tsx"]
+  "exclude": ["./node_modules"]
 }

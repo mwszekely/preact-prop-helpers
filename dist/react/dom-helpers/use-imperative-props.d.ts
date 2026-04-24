@@ -1,5 +1,5 @@
-import { TargetedPick, type RenderableProps } from "../util/lib.js";
-import { CSSProperties, ElementProps, Ref } from "../util/types.js";
+import { ElementProps, ElementPropsAll, TargetedPick, type RenderableProps } from "../util/lib.js";
+import { CSSProperties, Ref } from "../util/types.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 export type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 export type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
@@ -19,9 +19,9 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Applies the given CSS style to the element and its props */
     setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null, delay?: boolean): void;
     /** @stable Returns the current value of the attribute on the element */
-    getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
+    getAttribute<K extends keyof ElementPropsAll<T>>(prop: K): ElementPropsAll<T>[K];
     /** @stable Applies the given attribute to the element and its props */
-    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null, delay?: boolean): void;
+    setAttribute<K extends keyof ElementPropsAll<T>>(prop: K, value: ElementPropsAll<T>[K] | null, delay?: boolean): void;
     /** @stable Sets the element's `textContent` and `props.children` */
     setChildren(children: string | null): void;
     /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */
@@ -33,7 +33,7 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
 }
 export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
 }
-interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
+interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementPropsAll<HTMLElementTagNameMap[T]> {
     tag: T;
     handle: Ref<UseImperativePropsReturnTypeSelf<HTMLElementTagNameMap[T]>>;
 }
@@ -64,6 +64,6 @@ export declare const ImperativeElement: typeof ImperativeElementU;
  * @compositeParams
  */
 export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E>;
-declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<import("preact").ClassAttributes<HTMLElementTagNameMap[T]> & ElementProps<HTMLElementTagNameMap[T]>>;
+declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("react").DetailedReactHTMLElement<import("react").HTMLAttributes<HTMLElementTagNameMap[T]>, HTMLElementTagNameMap[T]>;
 export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

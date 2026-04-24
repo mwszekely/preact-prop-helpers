@@ -5,11 +5,16 @@
     "module": "NodeNext",                       /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     "jsx": "react-jsx",                       /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     "sourceMap": true,
-    "jsxImportSource": "preact",
+    "jsxImportSource": "react",
     "exactOptionalPropertyTypes": false,      /* TODO: Need better DOM types (e.g. need <div className={undefined} />) */
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "noEmit": true,
-    
+    //"paths": {
+    //  "react": ["./node_modules/preact/compat/"],
+    //  "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
+    //  "react-dom": ["./node_modules/preact/compat/"],
+    //  "react-dom/*": ["./node_modules/preact/compat/*"]
+    //},
     "strict": true,                           /* Enable all strict type-checking options. */
     "moduleResolution": "NodeNext",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */

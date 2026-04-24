@@ -1,7 +1,7 @@
 
 import { CaptureFunctionType, asyncToSync } from "async-to-sync";
-import { identity } from "lodash-es";
 
+import { identity } from "../util/lib-shared.js";
 import { Nullable, useCallback, useEffect, useMemo } from "../util/lib.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";

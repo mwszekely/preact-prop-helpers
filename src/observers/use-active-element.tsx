@@ -2,7 +2,7 @@
 import { MapOfSets } from "map-and-set-extensions";
 
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
+import { FocusEventType, Nullable, StateUpdater, useEffect } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 
@@ -43,22 +43,22 @@ import { useMonitoring } from "../util/use-call-count.js";
  */
 const _dummy = 0;
 
-interface Foo<T> {
+interface FocusUpdateInfo<T> {
     lastSent: T | undefined;
-    send: (e: T, r: FocusEvent) => void;
+    send: (e: T, r: FocusEventType<any>) => void;
 }
 
 
-const activeElementUpdaters: Map<Window | null | undefined, Set<Foo<Node | null>>> = new Map();
-const lastActiveElementUpdaters: Map<Window | null | undefined, Set<Foo<Node>>> = new Map();
-const windowFocusedUpdaters: Map<Window | null | undefined, Set<Foo<boolean>>> = new Map();
+const activeElementUpdaters: Map<Window | null | undefined, Set<FocusUpdateInfo<Node | null>>> = new Map();
+const lastActiveElementUpdaters: Map<Window | null | undefined, Set<FocusUpdateInfo<Node>>> = new Map();
+const windowFocusedUpdaters: Map<Window | null | undefined, Set<FocusUpdateInfo<boolean>>> = new Map();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
 
 // The focusin and focusout events often fire synchronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
-function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T, reason: any) {
+function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<FocusUpdateInfo<T>>>, value: T, reason: any) {
     const updaters = map.get(window);
 
     if (updaters) {
@@ -110,21 +110,21 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEventType<any>>>;
 
     /**
      * Called any time the active element changes and is not null.
      * 
      * @stable
      */
-    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEventType<any>>>;
 
     /**
      * Called any time the window gains/loses focus.
      * 
      * @stable
      */
-    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEventType<any>>>;
 
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -220,9 +220,9 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
             }
         }, [])
 
-        const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEventType<any>>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEventType<any>>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEventType<any>>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
 
         return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
     });

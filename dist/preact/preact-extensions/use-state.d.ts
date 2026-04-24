@@ -1,4 +1,3 @@
-import { StateUpdater } from "../util/lib.js";
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
  * (i.e. you can use it in `useEffect` and friends without it being a dependency).
@@ -9,5 +8,5 @@ import { StateUpdater } from "../util/lib.js";
  *
  * @param initialState - Same as the built-in `setState`'s
  */
-export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
+export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: (action: T | ((prevState: T) => T)) => void, getValue: () => T];
 //# sourceMappingURL=use-state.d.ts.map

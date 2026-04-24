@@ -1,4 +1,4 @@
-import { ElementProps } from "../util/types.js";
+import { ElementProps, ElementPropsAll } from "../util/types.js";
 /**
  * When `useMergedProps` encounters a conflict, the function passed here will be called.
  *
@@ -23,7 +23,7 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
  *
  * @returns A single object with all the provided props merged into one.
  */
-export declare function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]): ElementProps<E>;
+export declare function useMergedProps<E extends EventTarget>(...allProps: ElementPropsAll<E>[]): ElementProps<E>;
 /**
  * #__NO_SIDE_EFFECTS__
  */

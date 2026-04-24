@@ -4,6 +4,8 @@
 *.d.ts.map
 package-lock.json
 !rollup.config.js
+!rollup-r.config.js
+!rollup-p.config.js
 !true.js
 !docs/index.js
 !docs/index.js.map

@@ -1,4 +1,5 @@
-import { ElementProps, Nullable } from "../util/types.js";
+import { ElementPropsAll } from "../util/lib.js";
+import { Nullable } from "../util/types.js";
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 interface ContextType {
     addCallback: (callback: RafCallbackType, tag?: any) => void;
@@ -9,11 +10,8 @@ interface ContextType {
  * yes, this actually is faster. I wish it wasn't. It's lame.
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
-    children: ElementProps<EventTarget>["children"];
-}): import("preact").VNode<{
-    value: ContextType | null;
-    children?: import("preact").ComponentChildren;
-}>;
+    children: ElementPropsAll<EventTarget>["children"];
+}): import("react").FunctionComponentElement<import("react").ProviderProps<ContextType | null>>;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`

@@ -1,4 +1,4 @@
-import { Nullable, createElement } from "../../util/lib.js";
+import { Nullable } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 type RCMT = 'mangled' | 'demangled';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
@@ -51,11 +51,11 @@ export declare class ProcessedIndexMangler {
     sortedChildren: (VNode | null)[];
     private _mangledToDemangled;
     private _demangledToMangled;
-    setChildren(children: (VNode | null)[]): (createElement.JSX.Element | null)[];
+    setChildren(children: (VNode | null)[]): (import("react/jsx-runtime").JSX.Element | null)[];
 }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
+export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 1 | -1 | 0;
 export {};
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

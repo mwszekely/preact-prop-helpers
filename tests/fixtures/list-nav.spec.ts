@@ -126,13 +126,13 @@ test("Focus is preserved when the focused child is unmounted", async ({ page, li
         //await expect(page.locator("li").nth(c), `After setting the child count to ${c}, the ${c}-th child should no longer be focused.`).not.toBeFocused();
 
         //await new Promise(resolve => setTimeout(resolve, 100));
-        await expect(page.locator("body"), `Unmounting the focused child child should not focus the body`).not.toBeFocused();
+        await expect.soft(page.locator("body"), `Unmounting the focused child child should not focus the body`).not.toBeFocused();
         //await new Promise(resolve => setTimeout(resolve, 100));
 
         if (next == -1)
             await expect.soft(focusableLast).toBeFocused();
         else
-            await expect(page.locator("li").nth(next), `After setting the child count to ${c}, the ${next}-th child should be focused.`).toBeFocused();
+            await expect.soft(page.locator("li").nth(next), `After setting the child count to ${c}, the ${next}-th child should be focused.`).toBeFocused();
     }
 });
 

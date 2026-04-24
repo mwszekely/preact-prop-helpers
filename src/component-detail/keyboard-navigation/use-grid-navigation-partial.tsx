@@ -1,4 +1,3 @@
-import { identity } from "lodash-es";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
@@ -6,7 +5,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
-import { EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { identity } from "../../util/lib-shared.js";
+import { ElementPropsAll, EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
@@ -245,6 +245,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
                 }
                 if (child) {
                     const e = child.getElement()!;
+                    console.log("1b");
                     child.focusSelf(e);
                 }
                 else {
@@ -318,12 +319,12 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             getTabbableColumn,
             setTabbableColumn,
             setTabbableCell: setTabbableIndex
-        })
+        });
 
 
         // These will often have conflicting values, but we always use -1 for rows no matter what,
         // so instead of negotiating a resolution we can just give a straight answer.
-        propsLN.tabIndex = propsLNC.tabIndex = -1;
+        (propsLN as ElementPropsAll<RowElement>).tabIndex = (propsLNC as ElementPropsAll<RowElement>).tabIndex = -1;
         const props = useMergedProps<RowElement>(propsLN, propsLNC, {
             // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
             onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))

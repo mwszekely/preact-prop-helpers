@@ -1,24 +1,24 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { Nullable } from "../util/lib.js";
+import { FocusEventType, Nullable } from "../util/lib.js";
 export interface UseActiveElementParametersSelf {
     /**
      * Called any time the active element changes.
      *
      * @stable
      */
-    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEventType<any>>>;
     /**
      * Called any time the active element changes and is not null.
      *
      * @stable
      */
-    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEventType<any>>>;
     /**
      * Called any time the window gains/loses focus.
      *
      * @stable
      */
-    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEventType<any>>>;
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
      *

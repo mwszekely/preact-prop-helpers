@@ -1,7 +1,7 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { ElementProps, JSX, Ref, VNode, createElement } from "../util/lib.js";
+import { ElementProps, ElementPropsAll, JSX, VNode, createElement } from "../util/lib.js";
 
-function childrenIsVnode(children: ElementProps<any>["children"] | null | undefined): children is VNode {
+function childrenIsVnode(children: ElementPropsAll<any>["children"] | null | undefined): children is VNode {
     if (children && (children as VNode).type && (children as VNode).props)
         return true;
     return false;
@@ -19,7 +19,7 @@ function childrenIsVnode(children: ElementProps<any>["children"] | null | undefi
  * @param Tag 
  * @returns 
  */
-export function usePropsOnChildren(children: ElementProps<any>["children"] | undefined | null, props: ElementProps<any>, ref: Ref<any> | null | undefined, Tag: keyof JSX.IntrinsicElements = 'span') {
-    const c = (childrenIsVnode(children) ? children : <Tag>{children}</Tag>) as any as VNode;
-    return createElement(c.type as any, useMergedProps(c.props, { ref: c.ref }, props, { ref }));
+export function usePropsOnChildren(children: ElementPropsAll<any>["children"] | undefined | null, props: ElementProps<any>, Tag: keyof JSX.IntrinsicElements = 'span') {
+    const c = (childrenIsVnode(children) ? children : <Tag>{children}</Tag>) as VNode;
+    return createElement(c.type as any, useMergedProps(c.props, props));
 }

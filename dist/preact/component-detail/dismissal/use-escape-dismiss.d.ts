@@ -1,12 +1,12 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { KeyboardEventType, Nullable } from "../../util/lib.js";
+import { Nullable } from "../../util/lib.js";
 export interface UseEscapeDismissParametersSelf<B extends boolean> {
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
      *
      * @nonstable
      */
-    onDismissEscape: Nullable<(e: KeyboardEventType<any>) => void>;
+    onDismissEscape: Nullable<(e: KeyboardEvent) => void>;
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */

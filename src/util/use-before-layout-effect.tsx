@@ -1,9 +1,9 @@
 
-import { options } from "preact";
-import { EffectCallback, Inputs, useRef } from "preact/hooks";
 import { Nullable } from "../util/types.js";
+import { Inputs as DependencyList, EffectCallback, useInsertionEffect, useLayoutEffect, useRef } from "./lib.js";
 
-const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: Nullable<void | (() => void)> }>();
+const thisIsPreactSoWeNeedAPolyfill = (useInsertionEffect === useLayoutEffect);
+
 
 
 // TODO: Whether this goes in options.diffed or options._commit
@@ -23,25 +23,36 @@ const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | un
 // Also, in theory this could be replaced with `useInsertionEffect`,
 // but that probably won't be available in Preact for awhile.
 const commitName = "diffed";
-
-const newCommit: typeof originalCommit = (vnode, ...args) => {
-    for (const [_id, effectInfo] of toRun) {
-        const oldInputs = effectInfo.prevInputs;
-        if (argsChanged(oldInputs, effectInfo.inputs)) {
-            effectInfo.cleanup?.();
-            effectInfo.cleanup = effectInfo.effect();
-            effectInfo.prevInputs = effectInfo.inputs;
-        }
-    }
-    toRun.clear();
-    originalCommit?.(vnode, ...args);
-}
-
-
-const originalCommit = options[commitName];
-options[commitName] = newCommit as never
-
 let incrementingId = 0;
+const toRun = new Map<number, { effect: EffectCallback, prevInputs?: DependencyList | undefined, inputs?: DependencyList, cleanup: Nullable<void | (() => void)> }>();
+let insertionEffectHookInstalled = false;
+
+/**
+ * Preact builds must call this before rendering anything. It installs the Option Hook callbacks
+ * that enable `useInsertionEffect`, which is needed by this library.
+ * 
+ * @param options The Options object; i.e. `import("preact").options`.
+ */
+export function preactAddUseInsertionEffectHook(options: typeof import("preact")["options"]) {
+    const newCommit: typeof originalCommit = (vnode, ...args) => {
+        for (const [_id, effectInfo] of toRun) {
+            const oldInputs = effectInfo.prevInputs;
+            if (argsChanged(oldInputs, effectInfo.inputs)) {
+                effectInfo.cleanup?.();
+                effectInfo.cleanup = effectInfo.effect();
+                effectInfo.prevInputs = effectInfo.inputs;
+            }
+        }
+        toRun.clear();
+        originalCommit?.(vnode, ...args);
+    }
+
+
+    const originalCommit = options[commitName];
+    options[commitName] = newCommit as never
+
+    insertionEffectHookInstalled = true;
+}
 
 function nextId() {
     let next = ++incrementingId;
@@ -51,16 +62,10 @@ function nextId() {
     return next;
 }
 
-/**
- * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
- * 
- * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
- * which happens before.
- * 
- * @param effect 
- * @param inputs 
- */
-export const useBeforeLayoutEffect = (function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
+const useBeforeLayoutEffectPreact = (function useBeforeLayoutEffectPreact(effect: EffectCallback | null, inputs?: DependencyList) {
+    if (!insertionEffectHookInstalled) {
+        throw new Error("Preact requires preactAddUseInsertionEffectHook to be called before rendering any nodes.");
+    }
 
     // Note to self: This is by far the most called hook by sheer volume of dependencies.
     // So it should ideally be as quick as possible.
@@ -82,10 +87,24 @@ export const useBeforeLayoutEffect = (function useBeforeLayoutEffect(effect: Eff
     }, [id])*/
 })
 
-function argsChanged(oldArgs?: Inputs, newArgs?: Inputs): boolean {
+function argsChanged(oldArgs?: DependencyList, newArgs?: DependencyList): boolean {
     return !!(
         !oldArgs ||
         oldArgs.length !== newArgs?.length ||
         newArgs?.some((arg, index) => arg !== oldArgs[index])
     );
 }
+
+
+
+
+/**
+ * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
+ * 
+ * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
+ * which happens before.
+ * 
+ * @param effect 
+ * @param inputs 
+ */
+export const useBeforeLayoutEffect = (thisIsPreactSoWeNeedAPolyfill? useBeforeLayoutEffectPreact : useInsertionEffect);

@@ -1,6 +1,6 @@
 
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { useId, useRef } from "../util/lib.js";
+import { ElementPropsAll, useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
@@ -41,8 +41,8 @@ export function useRandomId<S extends Element, T extends Element>({ randomIdPara
         const id = (prefix + useId());
         useEnsureStability("useRandomId", prefix, id);
 
-        const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-        const sourceElementProps = useRef<ElementProps<S>>({ id });
+        const referencerElementProps = useRef<ElementPropsAll<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id } as {});
+        const sourceElementProps = useRef<ElementPropsAll<S>>({ id });
         useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
 
 

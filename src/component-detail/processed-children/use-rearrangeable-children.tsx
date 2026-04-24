@@ -8,8 +8,6 @@ import { Nullable, TargetedPick, VNode } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 
-// TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
-
 
 
 
@@ -87,8 +85,10 @@ export interface UseRearrangeableChildrenParametersSelf {
     /**
      * If true, moving children around will visually translate 
      * them to their new position via CSS transforms.
+     * 
+     * TODO: Disabled for now for performance reasons
      */
-    animate: boolean;
+    animate: false;
 }
 
 /**

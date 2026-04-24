@@ -1,5 +1,5 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { MouseEventType, Nullable } from "../../util/lib.js";
+import { Nullable } from "../../util/lib.js";
 export interface UseBackdropDismissParametersSelf<B extends boolean> {
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
@@ -10,7 +10,7 @@ export interface UseBackdropDismissParametersSelf<B extends boolean> {
      *
      * @nonstable
      */
-    onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
+    onDismissBackdrop: Nullable<(e: PointerEvent) => void>;
 }
 export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> {
     backdropDismissParameters: UseBackdropDismissParametersSelf<B>;

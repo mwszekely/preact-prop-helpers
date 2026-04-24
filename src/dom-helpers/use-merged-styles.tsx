@@ -1,5 +1,5 @@
 
-import { CSSProperties, ElementProps } from "../util/types.js";
+import { CSSProperties, ElementPropsAll } from "../util/types.js";
 
 function styleStringToObject(style: string): CSSProperties {
     // TODO: This sucks D:
@@ -13,7 +13,7 @@ function styleStringToObject(style: string): CSSProperties {
  * @param obj - The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
+export function useMergedStyles(lhs: ElementPropsAll<EventTarget>["style"], rhs: ElementPropsAll<EventTarget>["style"]): ElementPropsAll<EventTarget>["style"] {
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;
@@ -41,7 +41,7 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
 
     // They're both strings, just concatenate them.
     if (typeof lhs == "string") {
-        return `${lhs};${rhs ?? ""}` as unknown as ElementProps<EventTarget>["style"];
+        return `${lhs};${rhs ?? ""}` as unknown as ElementPropsAll<EventTarget>["style"];
     }
 
     // They're both objects, just merge them.

@@ -1,5 +1,5 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, ElementPropsAll } from "../util/types.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
@@ -35,9 +35,15 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * 
  * @returns A single object with all the provided props merged into one.
  */
-export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
+export function useMergedProps<E extends EventTarget>(...allProps: ElementPropsAll<E>[]): ElementProps<E> {
     useEnsureStability("useMergedProps", allProps.length);
     let ret: ElementProps<E> = {};
+
+    if (allProps.length == 0)
+        return {};
+    if (allProps.length == 1)
+        return allProps[0];
+
     for (let nextProps of allProps) {
         useMergedPropsHelper<E>(ret, nextProps);
     }
@@ -89,12 +95,12 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
+function useMergedPropsHelper<E extends EventTarget>(target: ElementPropsAll<E>, mods: ElementPropsAll<E>): void {
 
 
     target.ref = useMergedRefs<E>(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
-    target.className = useMergedClasses(target["class" as keyof ElementProps<E>], target.className, mods["class" as keyof ElementProps<E>], mods.className);
+    target.className = useMergedClasses(target["class" as keyof ElementPropsAll<E>], target.className, mods["class" as keyof ElementPropsAll<E>], mods.className);
     target.children = useMergedChildren(target.children, mods.children);
 
 

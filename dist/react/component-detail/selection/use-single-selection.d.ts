@@ -170,9 +170,7 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  */
 export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): {
     singleSelectionParameters: {
-        onSingleSelectedIndexChange: (e: TargetedEnhancedEvent<Event, {
-            selectedIndex: number;
-        }>) => void | undefined;
+        onSingleSelectedIndexChange: SingleSelectionChangeHandler;
     };
 };
 //# sourceMappingURL=use-single-selection.d.ts.map

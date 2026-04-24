@@ -256,7 +256,6 @@
  * {@include } {@link useBackdropDismiss}
  * {@include } {@link useEscapeDismiss}
  * {@include } {@link useLostFocusDismiss}
- * {@include } {@link useFocusTrap}
  * {@include } {@link useAsync}
  * {@include } {@link useUrl}
  * {@include } {@link useMergedRefs}
@@ -315,7 +314,7 @@ export { useBackdropDismiss } from "./component-detail/dismissal/use-backdrop-di
 export { useEscapeDismiss } from "./component-detail/dismissal/use-escape-dismiss.js";
 export { useLostFocusDismiss } from "./component-detail/dismissal/use-lost-focus-dismiss.js";
 export { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-export { identity, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
+export { tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
 export { useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
 export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
@@ -328,7 +327,6 @@ export { useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclar
 export { useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/selection/use-selection.js";
 export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/selection/use-single-selection.js";
 export { useDismiss } from "./component-detail/use-dismiss.js";
-export { findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "./component-detail/use-grid-navigation-selection.js";
 export { useListNavigationSelection, useListNavigationSelectionChild } from "./component-detail/use-list-navigation-selection.js";
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows } from "./component-use/use-grid-navigation-complete.js";
@@ -338,7 +336,6 @@ export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-pr
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
-export { getTopElement, useBlockingElement } from "./dom-helpers/use-blocking-element.js";
 export { useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable } from "./dom-helpers/use-draggable.js";
 export { useDroppable } from "./dom-helpers/use-droppable.js";
@@ -387,5 +384,6 @@ export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
-export { cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, Fragment, getEventMapping, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
+export { cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, Fragment, getEventMapping, identity, memo, noop, onfocusin, onfocusout, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
+export { preactAddUseInsertionEffectHook, useBeforeLayoutEffect } from "./util/use-before-layout-effect.js";
 //# sourceMappingURL=index.js.map

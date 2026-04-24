@@ -1,4 +1,5 @@
-import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
+import { useCallback, useMemo, useRef } from "../util/lib.js";
+import { useBeforeLayoutEffect } from "../util/use-before-layout-effect.js";
 import { useEnsureStability } from "./use-passive-state.js";
 
 const Unset = Symbol("unset");

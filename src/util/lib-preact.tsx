@@ -6,10 +6,11 @@ import { getEventMapping as gem } from "./lib-shared.js";
 
 export { cloneElement, createContext, createElement, Fragment, type ComponentChildren, type ComponentType, type Context } from "preact";
 export type { Ref, RefCallback, RenderableProps } from "preact";
-export { createPortal, forwardRef, memo } from "preact/compat";
+export { createPortal, forwardRef, memo, useInsertionEffect } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 export type { EffectCallback, Inputs, MutableRef, Reducer } from "preact/hooks";
 export type { JSX } from "preact/jsx-runtime";
+export { identity, noop } from "./lib-shared.js";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 
 
@@ -18,9 +19,6 @@ export const useCallback = ucb as <T extends Function | null | undefined>(callba
 
 
 export type StateUpdater<T> = Dispatch<SU<T>>;
-
-// In React, this is useInsertionEffect
-export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 
 export function debounceRendering(f: () => void) {
     (options.debounceRendering ?? queueMicrotask)(f);

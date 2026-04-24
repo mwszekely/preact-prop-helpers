@@ -1,5 +1,4 @@
-import { createElement, Fragment } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { createElement, ElementPropsAll, Fragment } from "../util/lib.js";
 
 /**
  * Combines two `children`.
@@ -8,7 +7,7 @@ import { ElementProps } from "../util/types.js";
  * 
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-export function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"] {
+export function useMergedChildren(lhs: ElementPropsAll<EventTarget>["children"], rhs: ElementPropsAll<EventTarget>["children"]): ElementPropsAll<EventTarget>["children"] {
     if (lhs == null && rhs == null) {
         return undefined;
     }

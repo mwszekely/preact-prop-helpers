@@ -1,11 +1,12 @@
-import { noop } from "lodash-es";
 import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument, getWindow } from "../util/get-window.js";
+import { noop } from "../util/lib-shared.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
@@ -518,7 +519,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 getIsPressing,
                 longPress
             },
-            props: {
+            props: useMergedProps({
                 onKeyDown,
                 onKeyUp,
 
@@ -534,7 +535,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
                 [onfocusout as never]: onFocusOut,
                 onClick
-            },
+            }),
         };
     });
 }

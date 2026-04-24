@@ -20,7 +20,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      *
      * @nonstable
      */
-    onDismiss: (e: EventType<any, any>, reason: Listeners) => void;
+    onDismiss: (e: PointerEvent | KeyboardEvent | EventType<any, any>, reason: Listeners) => void;
 }
 export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedOmit<UseEscapeDismissParameters<any, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "getDocument">, TargetedOmit<UseBackdropDismissParameters<any, Listeners extends "backdrop" ? true : false>, "backdropDismissParameters", never>, TargetedOmit<UseLostFocusDismissParameters<any, any, Listeners extends "lost-focus" ? true : false>, "lostFocusDismissParameters", never>, UseActiveElementParameters {
     dismissParameters: UseDismissParametersSelf<Listeners>;

@@ -1,7 +1,6 @@
 
 import { reverse, shuffle } from "lodash-es";
-import { createContext } from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { createContext, useCallback, useContext, useEffect, useRef } from "react";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -24,7 +23,7 @@ import {
     usePress,
     useStableCallback,
     useState
-} from "../../dist/preact/index.js";
+} from "../../dist/react/index.js";
 
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -149,7 +148,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
-            <label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>
+            {/*<label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>*/}
             <label>Single-Selection mode:
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setSingleSelectionMode("disabled"); }} /> Off</label>
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setSingleSelectionMode("focus"); }} /> On focus</label>
@@ -184,11 +183,11 @@ export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndex
     } = useCompleteListNavigationChildren({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
-            animate,
+            animate: false,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     if (i == 1)
-                        yield <li><span>(Item {i} is a <strong>hole in the array</strong> and does not exist)</span></li>;
+                        yield <li><span>(Item {i} is a <strong>hole in the array</strong>; this &lt;li&gt; just decided to hang out where #1 would be.)</span></li>;
                     else
                         yield <DemoUseRovingTabIndexChildOuter index={i} word={RandomWords2[i]} key={i} />
                 }

@@ -33,8 +33,10 @@ export interface UseRearrangeableChildrenParametersSelf {
     /**
      * If true, moving children around will visually translate
      * them to their new position via CSS transforms.
+     *
+     * TODO: Disabled for now for performance reasons
      */
-    animate: boolean;
+    animate: false;
 }
 /**
  * All of these functions **MUST** be stable across renders.

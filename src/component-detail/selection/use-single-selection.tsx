@@ -1,5 +1,4 @@
 
-import { noop } from "lodash-es";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
@@ -9,7 +8,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
-import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
+import { RequiredN, TargetedOmit, noop } from "../../util/lib-shared.js";
 import { EventType, TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
@@ -377,7 +376,7 @@ export function useSingleSelectionDeclarative<ParentOrChildElement extends Eleme
 
     return {
         singleSelectionParameters: {
-            onSingleSelectedIndexChange: useCallback((e) => {
+            onSingleSelectedIndexChange: useCallback<SingleSelectionChangeHandler>((e) => {
                 reasonRef.current = e;
                 return onSingleSelectedIndexChange?.(e);
             }, [onSingleSelectedIndexChange])

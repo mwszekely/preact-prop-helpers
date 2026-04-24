@@ -30,8 +30,8 @@ import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-ta
 const DUMMY = 0;
 
 
-export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
-export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event> | Event, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event> | Event, { multiSelected: boolean; }>;
 
 export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, { selectedPercent: number; selectedIndices: Set<number>; }>;
 
@@ -42,7 +42,7 @@ export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionPara
      * all the items since the last selected item are toggled,
      * so the child in question needs to be able to track that.
      */
-    doContiguousSelection(event: EventType<any, any>, endIndex: number): void;
+    doContiguousSelection(event: Event | EventType<any, any>, endIndex: number): void;
 
     /**
      * Mostly used for when focus-mode selects something (because by default it deselects everything else)
@@ -71,7 +71,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
      * But that propagates all the way to linear navigation, which is sync... 
      * (and for good reasons, cause navigation shouldn't be slowed down by sending data to a server or something)
      */
-    setSelectedFromParent(event: EventType<any, any>, selected: boolean): void;
+    setSelectedFromParent(event: KeyboardEvent | EventType<any, any>, selected: boolean): void;
 
     getMultiSelected(): boolean;
 
@@ -171,7 +171,7 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
     /**
      * @stable
      */
-    changeMultiSelected(event: EventType<any, any>, selected: boolean): void;
+    changeMultiSelected(event: Event | EventType<any, any>, selected: boolean): void;
 
     /**
      * Indicates that this child is selected, according to itself.
@@ -283,7 +283,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
         });
 
-        const changeAllChildren = useStableCallback((event: EventType<any, any>, shouldBeSelected: (index: number) => boolean) => {
+        const changeAllChildren = useStableCallback((event: KeyboardEvent | EventType<any, any>, shouldBeSelected: (index: number) => boolean) => {
             getChildren().forEach(child => {
                 if (!child.getMultiSelectionDisabled()) {
                     child.setSelectedFromParent(event, shouldBeSelected(child.index));
@@ -424,12 +424,12 @@ export function useMultiSelectionChild<E extends Element>({
                         doContiguousSelection(e, index);
                     }
                     else {
-                        onMultiSelectChange?.(enhanceEvent(e as any, { multiSelected: !getLocalSelected() }));
+                        onMultiSelectChange?.(enhanceEvent(e, { multiSelected: !getLocalSelected() }));
                     }
                 }
                 else {
                     if ((e as KeyboardEvent).ctrlKey) {
-                        onMultiSelectChange?.(enhanceEvent(e as any, { multiSelected: !getLocalSelected() }));
+                        onMultiSelectChange?.(enhanceEvent(e, { multiSelected: !getLocalSelected() }));
                     }
                     else {
                         pressFreebie.current = true;

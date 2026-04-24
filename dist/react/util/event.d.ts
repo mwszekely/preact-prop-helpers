@@ -8,7 +8,7 @@
 import { EventType, Nullable } from "./lib.js";
 export declare const EventDetail: unique symbol;
 export type EventDetail = typeof EventDetail;
-export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
+export type EnhancedEventHandler<E extends (Event | EventType<any, any>), Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
 export type TargetedEnhancedEvent<E extends Event | TargetedEnhancedEvent<any, any>, Detail> = E & {
     [EventDetail]: Detail & (E extends TargetedEnhancedEvent<any, infer D> ? D : {});
 };

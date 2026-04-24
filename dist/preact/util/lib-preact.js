@@ -2,12 +2,11 @@ import { options } from "preact";
 import { useCallback as ucb } from "preact/hooks";
 import { getEventMapping as gem } from "./lib-shared.js";
 export { cloneElement, createContext, createElement, Fragment } from "preact";
-export { createPortal, forwardRef, memo } from "preact/compat";
+export { createPortal, forwardRef, memo, useInsertionEffect } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
+export { identity, noop } from "./lib-shared.js";
 // Patch the type (only the type) of useCallback to allow for nullable functions
 export const useCallback = ucb;
-// In React, this is useInsertionEffect
-export { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 export function debounceRendering(f) {
     (options.debounceRendering ?? queueMicrotask)(f);
 }

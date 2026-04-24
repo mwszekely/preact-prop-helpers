@@ -4,10 +4,10 @@ import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../p
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 import { ElementProps, EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
-export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, {
+export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event> | Event, {
     multiSelected: boolean;
 }>;
-export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, {
+export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event> | Event, {
     multiSelected: boolean;
 }>;
 export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, {
@@ -21,7 +21,7 @@ export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionPara
      * all the items since the last selected item are toggled,
      * so the child in question needs to be able to track that.
      */
-    doContiguousSelection(event: EventType<any, any>, endIndex: number): void;
+    doContiguousSelection(event: Event | EventType<any, any>, endIndex: number): void;
     /**
      * Mostly used for when focus-mode selects something (because by default it deselects everything else)
      */
@@ -46,7 +46,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
      * But that propagates all the way to linear navigation, which is sync...
      * (and for good reasons, cause navigation shouldn't be slowed down by sending data to a server or something)
      */
-    setSelectedFromParent(event: EventType<any, any>, selected: boolean): void;
+    setSelectedFromParent(event: KeyboardEvent | EventType<any, any>, selected: boolean): void;
     getMultiSelected(): boolean;
     getMultiSelectionDisabled(): boolean;
 }
@@ -123,7 +123,7 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
     /**
      * @stable
      */
-    changeMultiSelected(event: EventType<any, any>, selected: boolean): void;
+    changeMultiSelected(event: Event | EventType<any, any>, selected: boolean): void;
     /**
      * Indicates that this child is selected, according to itself.
      */
