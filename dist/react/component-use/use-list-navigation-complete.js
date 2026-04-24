@@ -62,7 +62,6 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
         const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
         const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
         const { getAnyFocused } = childrenHaveFocusReturn;
-        // => <= <=>
         const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused });
         const refreshRows = useRef(() => { });
         const { getSortValueAt, compare, getIndex } = processedIndexManglerParameters;

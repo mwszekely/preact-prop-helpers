@@ -218,7 +218,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         const { context: { managedChildContext: managedChildRTIContext }, managedChildrenReturn } = mcr;
         const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
         const { getAnyFocused } = childrenHaveFocusReturn;
-        // => <= <=>
+        
         const processedChildrenContext = useMemoObject<UseProcessedChildrenContextSelf>({ getTabbableIndex, setTabbableIndex, getAnyFocused });
 
         const refreshRows = useRef(() => { });
