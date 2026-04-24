@@ -41,7 +41,7 @@ export interface UseTextContentReturnType {
  */
 export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
     return useMonitoring(function useTextContent(): UseTextContentReturnType {
-        const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
         useEffect(() => {
             const element = getElement();
             if (element) {

@@ -11,21 +11,53 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  */
 export declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
 export interface UsePassiveStateOptions {
-    /** **Must be stable** (i.e. the value must not change as long as the component is rendered) */
-    skipMountInitialization: boolean;
+    /**
+     * Controls when value initialization and the first effect callback runs.
+     *
+     * When this hook mounts, the value returned by `getValue` is uninitialized. This parameter
+     * controls when that initialization happens.
+     *
+     * "initialization" refers to using the `getInitialValue` you supplied to populate `getValue`'s returned value.
+     *
+     * * `delay` (default): The value is initialized the first time it is referenced or changed, and the first callback is called then. Ideal for most use-cases.
+     * * `on-mount`: The value is initialized during `useLayoutEffect` and the first callback is called then. Less common but useful when it's important that the change handler would otherwise be called too late the first time.
+     * * `off`: The value is initialized the first time it is referenced or changed. The first callback is called the first time it changes from a non-initialized state. Largely a performance optimization and rather niche.
+     *
+     * Note that there is no combination of `off` and `on-mount` (one that is initialized on mount but whose callback is not fired) because the only purpose `on-mount` has is firing the change handler representing the initial value as soon as possible.
+     */
+    initialization: "on-mount" | "delay" | "off";
+    /**
+     * By default, state changes via usePassiveState wait a microtick
+     * before resolving everything that happened all at once.
+     *
+     * If you would prefer to wait longer (or run immediately instead),
+     * pass a different function here.
+     *
+     * @see runImmediately
+     *
+     * @stable
+     */
     debounceRendering: typeof debounceRendering;
 }
 /**
- * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
+ * Similar to `useState`, but for values that aren't "render-important" &ndash;
+ * updates don't cause a re-render and so the value shouldn't be used during
+ * render (though it certainly can, at least by re-rendering again).
  *
- * @remarks To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
+ * @remarks To compensate for this, you should pass a `useEffect`-esque callback
+ * that is run whenever the value changes.  Just like `useEffect`, this callback
+ * can return a cleanup function that's run before the value changes.  If you
+ * would like to re-render when the value changes (or, say, when the value meets
+ * some criteria), this is where you'll want to put in a call to a `setState` function.
  *
  * To summarize, it's like a `useState`-`useEffect` mashup:
  *
- * 1. It's like `useState`, except this version of `setState` doesn't re-render the whole component
- * 2. It's like `useState`, except you can run a function when the value changes that optionally returns a cleanup function
- * 3. It's like `useEffect`, except you trigger the effect function "remotely" instead of it running after rendering
- * 4. It's like `useEffect`, except the single "dependency" is based on your calls to `setState`
+ * * It's like `useState`, except:
+ *     * Calling `setState` doesn't re-render the whole component
+ *     * You can run a function when the value changes that optionally returns a cleanup function
+ * * It's like `useEffect`, except:
+ *     * You trigger the effect function "remotely" instead of it running after rendering
+ *     * The single "dependency" is based on your calls to `setState`
  *
  * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
  *
@@ -36,7 +68,7 @@ export interface UsePassiveStateOptions {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, { debounceRendering: customDebounceRendering, skipMountInitialization }?: Partial<UsePassiveStateOptions>): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
+export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, { debounceRendering: customDebounceRendering, initialization }?: Partial<UsePassiveStateOptions>): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
 export declare function returnTrue(): boolean;
 export declare function returnFalse(): boolean;
 export declare function returnNull(): null;

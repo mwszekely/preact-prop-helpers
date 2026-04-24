@@ -66,7 +66,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
         useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 
-        const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
 
         const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 

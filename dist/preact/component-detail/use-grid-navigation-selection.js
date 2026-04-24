@@ -78,7 +78,7 @@ export function useGridNavigationSelectionRow({ info: mcp1, linearNavigationPara
         assertEmptyObject(void7);
         assertEmptyObject(void8);
         assertEmptyObject(void9);
-        return {
+        let ret = {
             context: contextGridNavigation,
             linearNavigationReturn,
             info: {
@@ -104,6 +104,7 @@ export function useGridNavigationSelectionRow({ info: mcp1, linearNavigationPara
             textContentParameters,
             typeaheadNavigationReturn
         };
+        return ret;
     });
 }
 /**

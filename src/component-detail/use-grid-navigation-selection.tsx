@@ -168,7 +168,7 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
         assertEmptyObject(void8);
         assertEmptyObject(void9);
 
-        return {
+        let ret: UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>> = {
             context: contextGridNavigation,
             linearNavigationReturn,
             info: {
@@ -194,6 +194,8 @@ export function useGridNavigationSelectionRow<RowElement extends Element, CellEl
             textContentParameters,
             typeaheadNavigationReturn
         }
+
+        return ret;
     });
 }
 

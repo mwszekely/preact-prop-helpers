@@ -7,7 +7,7 @@ import { JSX } from "react/jsx-runtime";
 import { getEventMapping as gem } from "./lib-shared.js";
 //// @ts-expect-error
 export { createPortal } from "react-dom";
-export { identity, noop } from "./lib-shared.js";
+export { debugLog, identity, noop } from "./lib-shared.js";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 
 
@@ -59,10 +59,6 @@ export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JS
         focusout: "onBlur",
         formdata: null!,
         toggle: "onToggle",
-        contextlost: null!,
-        contextrestored: null!,
-        beforematch: null!,
-        pointerrawupdate: null!,
         ...gem(),
     }
 }

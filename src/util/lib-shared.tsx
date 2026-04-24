@@ -23,6 +23,23 @@ export type ExtendMerge<A, B> = { [K in (keyof A) | (keyof B)]: K extends keyof 
 export function identity<T>(value: T): T { return value; }
 export function noop(): void {}
 
+/*@__NO_SIDE_EFFECTS__*/
+function debugLog(...args: any[]) {
+    ((process.env.NODE_ENV == 'production')? noop : (...args: any) => {
+        if (typeof args[0] === 'function') {
+            let trueArgs = args[0]();
+            if (Array.isArray(trueArgs))
+                console.log(...trueArgs);
+            else
+                console.log(trueArgs);
+        }
+        else
+            console.log(...args);
+    })(...args);
+}
+
+export { debugLog };
+
 /** These are all the event mappings that are shared between Preact/React */
 export function getEventMapping() {
     return {
@@ -125,5 +142,11 @@ export function getEventMapping() {
         webkitanimationiteration: null!,
         webkitanimationstart: null!,
         webkittransitionend: null!,
+        
+        contextlost: null!,
+        contextrestored: null!,
+
+        beforematch: null!,
+        pointerrawupdate: null!,
     } as const;
 }

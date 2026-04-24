@@ -5,14 +5,13 @@
   "description": "A small set of hooks and other functions related to modifying Preact props.",
   "source": "src/index.tsx",
   "module": "/dist/index.js",
-  "types": "/dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
+  "types": "/dist/preact/index.d.ts",
   "packageManager": "pnpm@10.33.1+sha512.05ba3c1d5d1c18f68df06470d74055e62d41fc110a0c660db1b2dfb2785327f04cf0f68345d4609bc52089e7fa0343c31593b2f9594e2c5d5da426230acc9820",
   "exports": {
     ".": {
       "types": "./dist/preact/index.d.ts",
-      "browser": "./dist/preact/index.js",
-      "import": "./dist/preact/index.js"
+      "browser": "./dist/index.js",
+      "import": "./dist/index.js"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
@@ -32,6 +31,7 @@
     "postbuild": "node ./post-build.mjs",
     "build:preact": "npx tsc -p ./tsconfig.preact.json",
     "build:react": "npx tsc -p ./tsconfig.react.json",
+    "build:preact-bundle": "npx rollup -c rollup-p.config.js",
     "test": "playwright test",
     "test-ui": "playwright test --ui",
     "lint": "npx eslint ./src",

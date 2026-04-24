@@ -5,7 +5,7 @@ import { Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
-import { useMemoObject } from "./use-stable-getter.js";
+import { useMemoObject, useStableGetter } from "./use-stable-getter.js";
 
 /**
  * Reminder of order of execution:
@@ -557,10 +557,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
 
     indexDemangler ??= identity;
 
-    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange, undefined);
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange, useStableGetter(initialIndex ?? null));
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null, undefined, { skipMountInitialization: true });
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null, undefined, { initialization: "delay" });
 
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.

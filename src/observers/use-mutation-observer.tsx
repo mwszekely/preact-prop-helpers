@@ -65,7 +65,7 @@ export function useMutationObserver<E extends Element>({
 
                 return () => observer.disconnect();
             }
-        }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true })
+        }), returnNull, { debounceRendering: runImmediately, initialization: "delay" })
 
         const onNeedMutationObserverReset = useCallback((element: E | null) => {
             if (element) {

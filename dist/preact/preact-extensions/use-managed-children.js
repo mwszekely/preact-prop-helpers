@@ -4,7 +4,7 @@ import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } fr
 import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
-import { useMemoObject } from "./use-stable-getter.js";
+import { useMemoObject, useStableGetter } from "./use-stable-getter.js";
 /**
  * Reminder of order of execution:
  *
@@ -248,9 +248,8 @@ export function useManagedChild({ context, info }) {
 export function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);
     indexDemangler ??= identity;
-    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, undefined);
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { skipMountInitialization: true });
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useStableGetter(initialIndex ?? null));
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { initialization: "delay" });
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
     const getClosestFit = useCallback((requestedIndex) => {

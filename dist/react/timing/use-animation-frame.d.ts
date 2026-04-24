@@ -11,7 +11,10 @@ interface ContextType {
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementPropsAll<EventTarget>["children"];
-}): import("react").FunctionComponentElement<import("react").ProviderProps<ContextType | null>>;
+}): import("preact").VNode<{
+    value: ContextType | null;
+    children?: import("preact").ComponentChildren;
+}>;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`

@@ -28,16 +28,24 @@ export function useEnsureStability(parentHookName, ...values) {
     }
 }
 /**
- * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
+ * Similar to `useState`, but for values that aren't "render-important" &ndash;
+ * updates don't cause a re-render and so the value shouldn't be used during
+ * render (though it certainly can, at least by re-rendering again).
  *
- * @remarks To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
+ * @remarks To compensate for this, you should pass a `useEffect`-esque callback
+ * that is run whenever the value changes.  Just like `useEffect`, this callback
+ * can return a cleanup function that's run before the value changes.  If you
+ * would like to re-render when the value changes (or, say, when the value meets
+ * some criteria), this is where you'll want to put in a call to a `setState` function.
  *
  * To summarize, it's like a `useState`-`useEffect` mashup:
  *
- * 1. It's like `useState`, except this version of `setState` doesn't re-render the whole component
- * 2. It's like `useState`, except you can run a function when the value changes that optionally returns a cleanup function
- * 3. It's like `useEffect`, except you trigger the effect function "remotely" instead of it running after rendering
- * 4. It's like `useEffect`, except the single "dependency" is based on your calls to `setState`
+ * * It's like `useState`, except:
+ *     * Calling `setState` doesn't re-render the whole component
+ *     * You can run a function when the value changes that optionally returns a cleanup function
+ * * It's like `useEffect`, except:
+ *     * You trigger the effect function "remotely" instead of it running after rendering
+ *     * The single "dependency" is based on your calls to `setState`
  *
  * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
  *
@@ -48,17 +56,15 @@ export function useEnsureStability(parentHookName, ...values) {
  * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export function usePassiveState(onChange, getInitialValue, { debounceRendering: customDebounceRendering, skipMountInitialization } = { debounceRendering, skipMountInitialization: false }) {
-    skipMountInitialization ??= false;
-    useEnsureStability("usePassiveState", skipMountInitialization);
-    //let [id, ,getId] = useState(() => generateRandomId());
+export function usePassiveState(onChange, getInitialValue, { debounceRendering: customDebounceRendering, initialization } = { debounceRendering, initialization: "delay" }) {
+    initialization ??= "off";
     const valueRef = useRef(Unset);
     const reasonRef = useRef(Unset);
     const warningRef = useRef(false);
     const dependencyToCompareAgainst = useRef(Unset);
     const cleanupCallbackRef = useRef(undefined);
     // Make sure that the provided functions are perfectly stable across renders
-    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
+    useEnsureStability("usePassiveState", initialization, onChange, getInitialValue, customDebounceRendering);
     // Shared between "dependency changed" and "component unmounted".
     const onShouldCleanUp = useCallback(() => {
         const cleanupCallback = cleanupCallbackRef.current;
@@ -74,13 +80,14 @@ export function usePassiveState(onChange, getInitialValue, { debounceRendering: 
             try {
                 const initialValue = getInitialValue();
                 valueRef.current = initialValue;
-                cleanupCallbackRef.current = (onChange?.(initialValue, undefined, undefined) ?? undefined);
+                if (initialization !== 'off')
+                    cleanupCallbackRef.current = (onChange?.(initialValue, undefined, undefined) ?? undefined);
             }
             catch (ex) {
                 // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
             }
         }
-    }, [ /* getInitialValue and onChange intentionally omitted */]);
+    }, [ /* getInitialValue, onChange, and initialization intentionally omitted */]);
     const getValue = useCallback(() => {
         if (warningRef.current)
             console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
@@ -91,13 +98,13 @@ export function usePassiveState(onChange, getInitialValue, { debounceRendering: 
             tryEnsureValue();
         return (valueRef.current === Unset ? undefined : valueRef.current);
     }, []);
-    if (!skipMountInitialization) {
+    if (initialization === 'on-mount') {
         // TODO: Very, very few instances require initializing on mount.
         // Grid navigation needs it (for reasons I haven't investigated and do not recall, but is related to a row's 0th cell sometimes erroneously entering the tab order)
         // so it's the default until all use cases are thoroughly exhausted.
         // But in general, we probably don't need so many invocations of `use(Layout!!)Effect`.
         // Also it is safe to wrap this hook in an `if` because 
-        // `skipMountInitialization` can't change throughout the lifetime of the component, 
+        // `initialization` can't change throughout the lifetime of the component, 
         // so the RoH aren't violated.
         useLayoutEffect(() => {
             // Make sure we've run our effect at least once on mount.

@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias';
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from '@rollup/plugin-node-resolve';
@@ -30,15 +29,6 @@ export default {
             allowAllFormats: true,                  // Needed because we output in iife for this demo
             configFile: path.resolve("stage/.babelrc"),   // getBabelOutputPlugin doesn't use the default config file                  
         }),
-        
-		alias({
-			entries: [
-				{ find: 'react', replacement: 'preact/compat' },
-				{ find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
-				{ find: 'react-dom', replacement: 'preact/compat' },
-				{ find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' }
-			]
-		}),
         terser({
             format: { semicolons: false },
             mangle: {

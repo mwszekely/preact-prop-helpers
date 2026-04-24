@@ -10,7 +10,7 @@ export { createPortal, forwardRef, memo, useInsertionEffect } from "preact/compa
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 export type { EffectCallback, Inputs, MutableRef, Reducer } from "preact/hooks";
 export type { JSX } from "preact/jsx-runtime";
-export { identity, noop } from "./lib-shared.js";
+export { debugLog, identity, noop } from "./lib-shared.js";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 
 
@@ -30,7 +30,11 @@ export const onfocusin = "onfocusin" satisfies keyof ElementProps<any>;
 // @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
 export const onfocusout = "onfocusout" satisfies keyof ElementProps<any>;
 
-export type ElementProps<E extends EventTarget> = preact.HTMLAttributes<E>;
+export type ElementProps0<E extends EventTarget> = preact.HTMLAttributes<E>;
+export type ElementPropsAll<E extends EventTarget> = ElementProps0<E>;//, "autoCapitalize" | "dir" | "draggable" | "popover" | "style" | "translate" | "role" | `aria-${string}`>;
+
+export type ElementProps<E extends EventTarget> = Pick<ElementPropsAll<E>, "ref">;
+
 export type EventType<T extends EventTarget, E extends Event> = preact.TargetedEvent<T, E>;
 export type FocusEventType<E extends EventTarget> = preact.TargetedFocusEvent<E>;
 export type KeyboardEventType<E extends EventTarget> = preact.TargetedKeyboardEvent<E>;
@@ -52,8 +56,6 @@ export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JS
         focusout: "onFocusOut",
         formdata: "onFormData",
         toggle: "onToggle",
-        contextlost: null!,
-        contextrestored: null!,
         ...gem()
     };
 }

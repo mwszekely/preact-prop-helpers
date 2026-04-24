@@ -15,8 +15,8 @@ export function useHasLastFocus(args) {
         const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 } } = args;
         assertEmptyObject(void1);
         useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
-        const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, initialization: "off" });
+        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, initialization: "off" });
         const { activeElementReturn } = useActiveElement({
             activeElementParameters: {
                 onLastActiveElementChange: useCallback((lastActiveElement, prevLastActiveElement, e) => {

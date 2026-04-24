@@ -1,5 +1,20 @@
 export function identity(value) { return value; }
 export function noop() { }
+/*@__NO_SIDE_EFFECTS__*/
+function debugLog(...args) {
+    ((process.env.NODE_ENV == 'production') ? noop : (...args) => {
+        if (typeof args[0] === 'function') {
+            let trueArgs = args[0]();
+            if (Array.isArray(trueArgs))
+                console.log(...trueArgs);
+            else
+                console.log(trueArgs);
+        }
+        else
+            console.log(...args);
+    })(...args);
+}
+export { debugLog };
 /** These are all the event mappings that are shared between Preact/React */
 export function getEventMapping() {
     return {
@@ -100,6 +115,10 @@ export function getEventMapping() {
         webkitanimationiteration: null,
         webkitanimationstart: null,
         webkittransitionend: null,
+        contextlost: null,
+        contextrestored: null,
+        beforematch: null,
+        pointerrawupdate: null,
     };
 }
 //# sourceMappingURL=lib-shared.js.map

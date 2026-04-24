@@ -11,5 +11,5 @@ import { ElementProps, ElementPropsAll, JSX } from "../util/lib.js";
  * @param Tag
  * @returns
  */
-export declare function usePropsOnChildren(children: ElementPropsAll<any>["children"] | undefined | null, props: ElementProps<any>, Tag?: keyof JSX.IntrinsicElements): import("react").DetailedReactHTMLElement<import("react").InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+export declare function usePropsOnChildren(children: ElementPropsAll<any>["children"] | undefined | null, props: ElementProps<any>, Tag?: keyof JSX.IntrinsicElements): import("preact").VNode<import("preact").DOMAttributes<HTMLInputElement> & import("preact").ClassAttributes<HTMLInputElement>>;
 //# sourceMappingURL=use-props-on-children.d.ts.map

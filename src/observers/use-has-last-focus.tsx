@@ -62,8 +62,8 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
         useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
 
-        const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | FocusEventType<T> | undefined>(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | FocusEventType<T> | undefined>(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | FocusEventType<T> | undefined>(onLastFocusedChanged, returnFalse, { debounceRendering: runImmediately, initialization: "off" });
+        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | FocusEventType<T> | undefined>(onLastFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, initialization: "off" });
 
         const { activeElementReturn } = useActiveElement({
             activeElementParameters: {

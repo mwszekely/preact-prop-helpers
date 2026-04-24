@@ -4,7 +4,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
-import { identity } from "../../util/lib-shared.js";
+import { debugLog, identity } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
@@ -82,11 +82,13 @@ refElementReturn, ...void1 }) {
         const whenThisRowIsFocused = useStableCallback((e) => {
             const { getChildren } = managedChildrenReturn;
             if (contextFromParent.rovingTabIndexContext.untabbable) {
+                debugLog(`useGridNavigationRow.whenThisRowIsFocused A`);
                 // If the parent is untabbable, and this row was requested to focus itself (as part of parentFocusSelf),
                 // then we focus the parent grid instead of the child cell.
                 contextFromParent.rovingTabIndexContext.parentFocusSelf(true);
             }
             else {
+                debugLog(`useGridNavigationRow.whenThisRowIsFocused B`);
                 // If the parent is tabbable (normal behavior), 
                 // then we focus the cell that should be focused in this row.
                 let { ideal, actual: _actual } = (getTabbableColumn());
@@ -127,12 +129,14 @@ refElementReturn, ...void1 }) {
                 untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
                 initiallyTabbedIndex,
                 onTabbableIndexChange: useStableCallback((v, p, r) => {
+                    debugLog(`useGridNavigationRow.useListNavigation.onTabbableIndexChange`);
                     setTabbableColumn(p => ({ ideal: p?.ideal ?? null, actual: p?.actual ?? null }), r);
                     onTabbableIndexChange?.(v, p, r);
                 })
             },
             linearNavigationParameters: {
                 onNavigateLinear: useStableCallback((next, event) => {
+                    debugLog(`useGridNavigationRow.useListNavigation.onNavigateLinear`);
                     setTabbableColumn(prev => ({ ideal: next, actual: next }), event);
                 }),
                 disableHomeEndKeys: true,
@@ -207,6 +211,7 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
             info: infoLs,
             props: useMergedProps(props, {
                 onClick: (e) => {
+                    debugLog(`useGridNavigationCell.onClick`);
                     setTabbableColumn(prev => {
                         return ({ ideal: index, actual: index });
                     }, e);
@@ -219,16 +224,23 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
                 onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
                     ocfic1?.(focused, prev, e);
                     if (focused) {
+                        debugLog(() => `Grid cell at { row: ${getRowIndex()}, col: ${index} } has received focus`);
+                        debugLog("      Setting tabbable row");
                         setTabbableRow(getRowIndex(), e, false);
+                        debugLog("      Setting tabbable column");
                         setTabbableColumn(prev => {
                             return { actual: index ?? null, ideal: prev?.ideal ?? null };
                         }, e);
+                        debugLog("      Setting tabbable cell");
                         setTabbableCell((prev) => {
                             if (prev != null && (prev < index || prev > index + (colSpan))) {
                                 return prev;
                             }
                             return index;
                         }, e, false);
+                    }
+                    else {
+                        debugLog(() => `Grid cell at { row: ${getRowIndex()}, col: ${index} } has lost focus.`);
                     }
                 })
             },

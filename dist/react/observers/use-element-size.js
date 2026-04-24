@@ -12,7 +12,7 @@ export function useElementSize({ elementSizeParameters: { getObserveBox, onSizeC
     return useMonitoring(function useElementSize() {
         const { onElementChange, onMount, onUnmount } = (refElementParameters || {});
         useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
-        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
         const currentObserveBox = useRef(undefined);
         const needANewObserver = useCallback((element, observeBox) => {
             if (element) {

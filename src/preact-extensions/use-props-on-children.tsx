@@ -20,6 +20,6 @@ function childrenIsVnode(children: ElementPropsAll<any>["children"] | null | und
  * @returns 
  */
 export function usePropsOnChildren(children: ElementPropsAll<any>["children"] | undefined | null, props: ElementProps<any>, Tag: keyof JSX.IntrinsicElements = 'span') {
-    const c = (childrenIsVnode(children) ? children : <Tag>{children}</Tag>) as VNode;
+    const c = (childrenIsVnode(children) ? children : createElement(Tag, null, children)) as VNode;
     return createElement(c.type as any, useMergedProps(c.props, props));
 }

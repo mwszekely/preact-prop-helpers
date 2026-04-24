@@ -1,8 +1,8 @@
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import sourcemaps from "rollup-plugin-sourcemaps";
 //import ts from 'rollup-plugin-ts'; // Used because the default TS plugin doesn't generate .d.ts files D:
-import replace from "@rollup/plugin-replace";
 import ts from "@rollup/plugin-typescript";
 
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
@@ -23,9 +23,9 @@ const extensions = [".js", ".jsx", ".ts", ".tsx"];
 export default {
     input: "src/index.tsx",
     output: {
-        file: "./dist/preact/index.js",
+        file: "./dist/index.js",
         format: "es",
-        name: "index.preact",
+        name: "index",
         sourcemap: true,
         inlineDynamicImports: true
     },
@@ -40,18 +40,18 @@ export default {
         "tabbable",
         "wicg-inert",
     ],
-    treeshake: "recommended",
+    treeshake: "smallest",
     plugins: [
         replace({
             values: {
-                "./lib-react.js": "./lib-preact.js",
+                "process.env.NODE_ENV": "\"production\"",
             },
             delimiters: ['', ''],
             preventAssignment: false
         }),
         ts({
             noEmitOnError: false,
-            tsconfig: "tsconfig.preact.json",
+            tsconfig: "tsconfig.preact-t.json",
             module: "NodeNext"
         }),
         commonjs({ extensions, sourceMap: true }),

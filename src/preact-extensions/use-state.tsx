@@ -1,7 +1,11 @@
 
-import { Dispatch, SetStateAction, useCallback, useRef, useState as useStateP } from "../util/lib.js";
+import { useCallback, useRef, useState as useStateP } from "../util/lib.js";
 
 import { useStack } from "../util/stack.js";
+
+// For some reason, the types get messed up if we use Dispatch<SetStateAction<T>>.
+// Dunno why.
+export type SetState<T> = (valueOrSetter: T | ((prevValue: T) => T)) => void;
 
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
@@ -22,7 +26,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
 
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const setState = useRef<Dispatch<SetStateAction<T>>>(value => {
+    const setState = useRef<SetState<T>>(value => {
         if (process.env.NODE_ENV === 'development') {
             (globalThis as any)._setState_stack = getStack();
         }

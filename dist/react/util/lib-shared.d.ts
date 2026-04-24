@@ -24,6 +24,8 @@ export type ExtendMerge<A, B> = {
 };
 export declare function identity<T>(value: T): T;
 export declare function noop(): void;
+declare function debugLog(...args: any[]): void;
+export { debugLog };
 /** These are all the event mappings that are shared between Preact/React */
 export declare function getEventMapping(): {
     readonly abort: "onAbort";
@@ -123,5 +125,9 @@ export declare function getEventMapping(): {
     readonly webkitanimationiteration: never;
     readonly webkitanimationstart: never;
     readonly webkittransitionend: never;
+    readonly contextlost: never;
+    readonly contextrestored: never;
+    readonly beforematch: never;
+    readonly pointerrawupdate: never;
 };
 //# sourceMappingURL=lib-shared.d.ts.map

@@ -2,7 +2,7 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { useCallback, useRef } from "../../util/lib.js";
+import { debugLog, useCallback, useRef } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 /**
@@ -25,6 +25,7 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
         assertEmptyObject(void5);
         useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
         const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
+            debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
             const highestChildIndex = getHighestIndex();
             const lowestChildIndex = getLowestIndex();
             const _original = (getTabbableIndex() ?? 0);

@@ -1,4 +1,3 @@
-import { jsx as _jsx } from "react/jsx-runtime";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { createElement } from "../util/lib.js";
 function childrenIsVnode(children) {
@@ -19,7 +18,7 @@ function childrenIsVnode(children) {
  * @returns
  */
 export function usePropsOnChildren(children, props, Tag = 'span') {
-    const c = (childrenIsVnode(children) ? children : _jsx(Tag, { children: children }));
+    const c = (childrenIsVnode(children) ? children : createElement(Tag, null, children));
     return createElement(c.type, useMergedProps(c.props, props));
 }
 //# sourceMappingURL=use-props-on-children.js.map

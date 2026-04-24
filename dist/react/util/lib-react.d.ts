@@ -2,7 +2,7 @@ export { cloneElement, createContext, createElement, forwardRef, Fragment, memo,
 export type { ReactNode as ComponentChildren, Context, Dispatch, EffectCallback, DependencyList as Inputs, JSX, MutableRefObject as MutableRef, PropsWithChildren, PropsWithRef, Reducer, Ref, RefCallback, SetStateAction } from "react";
 import { JSX } from "react/jsx-runtime";
 export { createPortal } from "react-dom";
-export { identity, noop } from "./lib-shared.js";
+export { debugLog, identity, noop } from "./lib-shared.js";
 export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 export type RenderableProps<P> = PropsWithChildren<PropsWithRef<P>>;
 export type StateUpdater<T> = Dispatch<SetStateAction<T>>;

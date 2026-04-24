@@ -59,7 +59,7 @@ export function useRefElement(args) {
         return cleanup;
     }, []);
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getElement, setElement] = usePassiveState(handler, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
     const propsStable = useRef({ ref: setElement });
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

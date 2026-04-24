@@ -34,7 +34,7 @@ export function useMutationObserver({ refElementParameters, mutationObserverPara
                 });
                 return () => observer.disconnect();
             }
-        }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        }), returnNull, { debounceRendering: runImmediately, initialization: "delay" });
         const onNeedMutationObserverReset = useCallback((element) => {
             if (element) {
                 queueMicrotask(() => {

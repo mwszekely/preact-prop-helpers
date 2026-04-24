@@ -105,7 +105,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     }, []);
 
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+    const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
     const propsStable = useRef<ElementProps<T>>({ ref: setElement as never });
 
     // Return both the element and the hook that modifies 

@@ -220,9 +220,9 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
             }
         }, [])
 
-        const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEventType<any>>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEventType<any>>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEventType<any>>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEventType<any>>(onActiveElementChange, returnNull, { debounceRendering: runImmediately, initialization: "off" });
+        const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEventType<any>>(onLastActiveElementChange, returnNull as () => never, { debounceRendering: runImmediately, initialization: "off" });
+        const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEventType<any>>(onWindowFocusedChange, returnTrue, { debounceRendering: runImmediately, initialization: "off" });
 
         return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
     });

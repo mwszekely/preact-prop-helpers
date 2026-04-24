@@ -16,11 +16,11 @@ import { useMonitoring } from "../util/use-call-count.js";
 export function useChildrenHaveFocus(args) {
     return useMonitoring(function useChildrenHaveFocus() {
         const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
-        const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, initialization: "delay" });
         const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
             console.assert(anyFocused >= 0 && anyFocused <= 1);
             setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
-        }), returnZero, { debounceRendering: setTimeout, skipMountInitialization: true }); // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
+        }), returnZero, { debounceRendering: setTimeout, initialization: "delay" }); // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
         return {
             childrenHaveFocusReturn: { getAnyFocused },
             context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),

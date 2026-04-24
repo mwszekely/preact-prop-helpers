@@ -1,5 +1,5 @@
 // @ts-check
-import { readFile, rm, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 /**
  * This file is how we ensure that 
@@ -15,14 +15,14 @@ import { readFile, rm, writeFile } from "node:fs/promises";
     await replace("./dist/react/util/lib.d.ts", /lib-preact/g, "lib-react");
     await replace("./dist/preact/util/lib.js", /lib-react/g, "lib-preact");
     await replace("./dist/preact/util/lib.d.ts", /lib-react/g, "lib-preact");
-    await rm("./dist/preact/util/lib-react.js");
-    await rm("./dist/preact/util/lib-react.d.ts");
-    await rm("./dist/preact/util/lib-react.js.map");
-    await rm("./dist/preact/util/lib-react.d.ts.map");
-    await rm("./dist/react/util/lib-preact.js");
-    await rm("./dist/react/util/lib-preact.d.ts");
-    await rm("./dist/react/util/lib-preact.js.map");
-    await rm("./dist/react/util/lib-preact.d.ts.map");
+    //await rm("./dist/preact/util/lib-react.js");
+    //await rm("./dist/preact/util/lib-react.d.ts");
+    //await rm("./dist/preact/util/lib-react.js.map");
+    //await rm("./dist/preact/util/lib-react.d.ts.map");
+    //await rm("./dist/react/util/lib-preact.js");
+    //await rm("./dist/react/util/lib-preact.d.ts");
+    //await rm("./dist/react/util/lib-preact.js.map");
+    //await rm("./dist/react/util/lib-preact.d.ts.map");
 })()
 
 /**

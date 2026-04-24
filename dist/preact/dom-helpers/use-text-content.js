@@ -8,7 +8,7 @@ import { useMonitoring } from "../util/use-call-count.js";
  */
 export function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     return useMonitoring(function useTextContent() {
-        const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, { debounceRendering: runImmediately, initialization: "delay" });
         useEffect(() => {
             const element = getElement();
             if (element) {

@@ -5,11 +5,13 @@
     },
     // english never got the vowels it needed so now we're all stuck with spellcheck yay
     "cSpell.words": [
+        "beforematch",
         "clsx",
         "demangle",
         "demangled",
         "demangler",
         "flaggable",
+        "pointerrawupdate",
         "preact",
         "rearrangeable",
         "referencer",

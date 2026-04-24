@@ -5,7 +5,7 @@ import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensio
 import { EventType, StateUpdater, TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, shouldAlsoFocus: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> {
     /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
@@ -45,8 +45,11 @@ export interface UseRovingTabIndexReturnTypeSelf {
     /**
      * Can be used to programmatically change which child is the currently tabbable one.
      *
-     * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
-     * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
+     * Note that the index sent to be the tabbable child may not be used if the requested
+     * child is hidden or missing, in which case the closest candidate will be used.
+     *
+     * If `shouldAlsoFocus` is set, then whatever child is set as tabbable is also focused
+     * in the same step.
      *
      * @stable
      */
