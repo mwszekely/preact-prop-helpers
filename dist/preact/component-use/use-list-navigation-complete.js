@@ -39,7 +39,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             return true;
         }, []);
         const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexDemangler, indexMangler, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters });
+        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters });
         const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
             managedChildrenReturn: { getChildren },
             linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -50,7 +50,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             paginatedChildrenParameters,
             refElementReturn,
             childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const mcr = useManagedChildren({

@@ -124,7 +124,7 @@ export function useStaggeredChildren({
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
     return useMonitoring(function useStaggeredChildren(): UseStaggeredChildrenReturnType {
 
-        // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
+        // TODO: Right now, staggering doesn't take into consideration reordering via index mangling.
         // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
         // until they fill in.
 

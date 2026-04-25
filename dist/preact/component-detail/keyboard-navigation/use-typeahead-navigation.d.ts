@@ -3,6 +3,7 @@ import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js"
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
+import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
@@ -70,7 +71,7 @@ export interface UseTypeaheadNavigationContext {
 }
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
 }
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
@@ -82,7 +83,7 @@ export interface UseTypeaheadNavigationChildReturnType extends TargetedPick<UseT
 }
 interface TypeaheadInfo {
     text: string | null;
-    unsortedIndex: number;
+    indexReordered: number;
 }
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
@@ -93,7 +94,7 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 /**
  *
  * @compositeParams

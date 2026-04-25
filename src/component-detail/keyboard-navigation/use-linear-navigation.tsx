@@ -11,7 +11,7 @@ import { UseProcessedIndexManglerReturnType } from "../processed-children/use-pr
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface LinearNavigationResult {
-    valueDemangled: number | null;
+    valueRepositioned: number | null;
     status: "normal" | "past-start" | "past-end"
 }
 
@@ -28,7 +28,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
-    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexMangler" | "indexDemangler">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned">,
     TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
@@ -95,24 +95,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     disableHomeEndKeys: boolean;
 
     /**
-     * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.
-     * 
-     * @remarks This is provided by {@link useRearrangeableChildren}.
-     * If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this. 
-     * Otherwise, it's recommended to simply use {@link lodash-es#identity} here.
-     * 
-     * @stable
-     */
-    //indexMangler: (n: number) => number;
-
-    /**
-     * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
-     * 
-     * @stable
-     */
-    //indexDemangler: (n: number) => number;
-
-    /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      * 
      * @returns [0, n], not [0, n)
@@ -145,7 +127,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
-    processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 },
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 },
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     return useMonitoring(function useLinearNavigation(): UseLinearNavigationReturnType<ParentOrChildElement> {
@@ -160,7 +142,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         assertEmptyObject(void5);
 
 
-        useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
+        useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
 
         const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
             debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
@@ -169,8 +151,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             const lowestChildIndex = getLowestIndex();
             const _original = (getTabbableIndex() ?? 0);
 
-            const targetDemangled = indexDemangler(requestedIndexMangled);
-            const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+            const targetDemangled = indexFromOriginalToRepositioned(requestedIndexMangled);
+            const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled });
             if (status == "past-end") {
                 if (navigatePastEnd == "wrap") {
                     if (mode == "single")
@@ -182,7 +164,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                         // It works fine, the problem isn't that -- the problem is it just feels wrong. 
                         // Page Up/Down don't feel like they should wrap, even if normally requested. 
                         // That's the arrow keys' domain.
-                        if (false && (valueDemangled == getTabbableIndex()))
+                        if (false && (valueRepositioned == getTabbableIndex()))
                             navigateToFirst(e, fromUserInteraction);
                         else
                             navigateToLast(e, fromUserInteraction);
@@ -205,7 +187,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     else {
                         /* eslint-disable no-constant-condition */
                         // See above. It works fine but just feels wrong to wrap on Page Up/Down.
-                        if (false && valueDemangled == getTabbableIndex())
+                        if (false && valueRepositioned == getTabbableIndex())
                             navigateToLast(e, fromUserInteraction);
                         else
                             navigateToFirst(e, fromUserInteraction);
@@ -221,8 +203,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 }
             }
             else {
-                setTabbableIndex(valueDemangled, e, fromUserInteraction);
-                onNavigateLinear?.(valueDemangled!, e as KeyboardEventType<ChildElement>);
+                setTabbableIndex(valueRepositioned, e, fromUserInteraction);
+                onNavigateLinear?.(valueRepositioned!, e as KeyboardEventType<ChildElement>);
                 return "stop";
             }
         }, []);
@@ -239,7 +221,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
              * We mangle the index to get its "visual" position, add our offset,
              * and then demangle it to get the child that corresponds to the next child "visually".
              */
-            const targetMangled = indexMangler(original) + offset;
+            const targetMangled = indexFromRepositionedToOriginal(original) + offset;
             return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
         })
         const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
@@ -348,60 +330,60 @@ export interface TryNavigateToIndexParameters {
     //default: number;
     targetDemangled: number;
     searchDirection: 1 | -1;
-    indexMangler: (n: number) => number;
-    indexDemangler: (n: number) => number;
+    indexFromRepositionedToOriginal: (n: number) => number;
+    indexFromOriginalToRepositioned: (n: number) => number;
 
 }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult {
+export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult {
 
     if (searchDirection === -1) {
         let bestUpResult: LinearNavigationResult | undefined = undefined;
-        bestUpResult = tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
-        bestUpResult ??= tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
-        return bestUpResult || { valueDemangled: targetDemangled, status: "normal" };
+        bestUpResult = tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
+        bestUpResult ??= tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
+        return bestUpResult || { valueRepositioned: targetDemangled, status: "normal" };
     }
     else {
         let bestDownResult: LinearNavigationResult | undefined = undefined;
-        bestDownResult = tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
-        bestDownResult ??= tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
-        return bestDownResult || { valueDemangled: targetDemangled, status: "normal" };
+        bestDownResult = tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
+        bestDownResult ??= tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
+        return bestDownResult || { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
 
-function tryNavigateUp({ isValid, indexDemangler, indexMangler, lowestChildIndex: lower, targetDemangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
+function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, lowestChildIndex: lower, targetDemangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
-        targetDemangled = indexDemangler(indexMangler(targetDemangled) - 1);
+        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) - 1);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled < lower) {
-        return { valueDemangled: indexDemangler(lower), status: "past-start" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(lower), status: "past-start" };
     }
     else {
-        return { valueDemangled: targetDemangled, status: "normal" };
+        return { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
 
-function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "lowestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
+function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "lowestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
-        targetDemangled = indexDemangler(indexMangler(targetDemangled) + 1);
+        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) + 1);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled > upper) {
-        return { valueDemangled: indexDemangler(upper), status: "past-end" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(upper), status: "past-end" };
     }
     else {
-        return { valueDemangled: targetDemangled, status: "normal" };
+        return { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
 

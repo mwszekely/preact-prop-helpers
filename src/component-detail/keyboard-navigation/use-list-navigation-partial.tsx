@@ -57,7 +57,7 @@ export interface UseListNavigationParameters<ParentOrChildElement extends Elemen
     OmitStrong<UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>, "processedIndexManglerReturn">,
     OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
     OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">,
-    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler"> { }
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> { }
 
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends
     OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">,
@@ -107,7 +107,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
     return useMonitoring(function useListNavigation(): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
         const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
-        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, processedIndexManglerReturn });
         const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
 
         assertEmptyObject(void1);

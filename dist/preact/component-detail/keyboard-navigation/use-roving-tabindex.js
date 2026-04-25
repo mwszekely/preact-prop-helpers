@@ -28,7 +28,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexDemangler }, ...void1 }) {
+export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexFromOriginalToRepositioned }, ...void1 }) {
     return useMonitoring(function useRovingTabIndex() {
         const focusSelfParent = useStableCallback(focusSelfParentUnstable);
         untabbableBehavior ||= "focus-parent";
@@ -147,7 +147,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             getAt: getTabbableAt,
             isValid: isTabbableValid,
             setAt: setTabbableAt,
-            indexDemangler,
+            indexFromOriginalToRepositioned,
             onClosestFit: (index) => {
                 const document = getDocument();
                 // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body

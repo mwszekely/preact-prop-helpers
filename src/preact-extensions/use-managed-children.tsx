@@ -5,7 +5,7 @@ import { Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "./use-stable-getter.js";
+import { useMemoObject } from "./use-stable-getter.js";
 
 /**
  * Reminder of order of execution:
@@ -512,7 +512,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     getAt(index: M): boolean;
 
     /** Only needed when `closestFit` is true */
-    indexDemangler: Nullable<(index: M["index"]) => M["index"]>;
+    indexFromOriginalToRepositioned: Nullable<(index: M["index"]) => M["index"]>;
 
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
     isValid(index: M): boolean;
@@ -552,12 +552,14 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * 
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);
+export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
+    initialIndex ??= null;
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromOriginalToRepositioned);
 
-    indexDemangler ??= identity;
+    indexFromOriginalToRepositioned ??= identity;
 
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange, useStableGetter(initialIndex ?? null));
+    // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange, useCallback(() => initialIndex, []));
 
     const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null, undefined, { initialization: "delay" });
 
@@ -591,8 +593,8 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason: R | undefined) => {
         const children = getChildren();
-        const requestedIndex = indexDemangler(getRequestedIndex()!);
-        const currentIndex = indexDemangler(getCurrentIndex()!);
+        const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex()!);
+        const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex()!);
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {

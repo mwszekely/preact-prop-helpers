@@ -214,7 +214,7 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex?: number, demangledIndex?: number }) {
+const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, indexOriginal, indexRepositioned }: { index: number, word: string, indexOriginal?: number, indexRepositioned?: number }) {
     
     const { 
         hide, 
@@ -230,14 +230,14 @@ const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChild
         rearrangeableChildParameters: { cssProperty: 'translate', duration: '666ms' }
     });
 
-    //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />, [mangledIndex, demangledIndex, index]);
-    const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} mangledIndex={mangledIndex} demangledIndex={demangledIndex} />;
+    //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />, [indexOriginal, indexRepositioned, index]);
+    const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />;
     return (
         <li {...props}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
 });
 
-const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, mangledIndex, demangledIndex, childUseEffect }: { index: number, word: string, mangledIndex: number | undefined, demangledIndex: number | undefined, childUseEffect: () => void }) {
+const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, indexOriginal, indexRepositioned, childUseEffect }: { index: number, word: string, indexOriginal: number | undefined, indexRepositioned: number | undefined, childUseEffect: () => void }) {
     useEffect(childUseEffect, [childUseEffect]);
     let disabled = (index == 6);
     let hidden = (index == 7);
@@ -280,7 +280,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
-    const text = `${randomWord} This is item #${index} (#${demangledIndex} to #${mangledIndex}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+    const text = `${randomWord} This is item #${index} (#${indexOriginal} to #${indexRepositioned}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
         <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<HTMLInputElement>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>

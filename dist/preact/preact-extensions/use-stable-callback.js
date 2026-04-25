@@ -48,9 +48,23 @@ export function useStableCallback(fn, noDeps) {
  */
 export function useStableMergedCallback(...fns) {
     return useStableCallback((...args) => {
+        let allFuncsReturned = new Set();
+        let allPromisesReturned = new Set();
         for (let i = 0; i < fns.length; ++i) {
-            fns[i]?.(...args);
+            let ret = fns[i]?.(...args);
+            if (ret) {
+                if (typeof ret == 'function')
+                    allFuncsReturned.add(ret);
+                else if ("then" in ret)
+                    allPromisesReturned.add(ret);
+            }
         }
+        if (allPromisesReturned.size > 0)
+            return async (...args) => { await Promise.all([...[...allFuncsReturned].map(f => f(...args)), ...allPromisesReturned]); };
+        else if (allFuncsReturned.size > 0)
+            return (...args) => { allFuncsReturned.forEach(f => f(...args)); };
+        else
+            return;
     });
 }
 ;

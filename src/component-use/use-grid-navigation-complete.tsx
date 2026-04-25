@@ -237,12 +237,12 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
             }
         });
 
-        const { indexDemangler, indexMangler } = processedIndexManglerReturn;
+        const { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } = processedIndexManglerReturn;
 
         // Grab the information from the array of children we may or may not render.
         // (see useProcessedChildren -- it send this information to us if it's used.)
         // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-        //const { context: { rearrangeableChildrenContext, ...void4 }, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+        //const { context: { rearrangeableChildrenContext, ...void4 }, indexFromOriginalToRepositioned, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
         const getAnyFocused = useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused());
         const {
             childrenHaveFocusParameters,
@@ -266,7 +266,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
 
 

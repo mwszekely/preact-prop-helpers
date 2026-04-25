@@ -133,7 +133,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
             refreshPagination(paginationMin, paginationMax);
         })
 
-        const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
+        const { processedIndexManglerContext: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } } = context;
 
         const {
             rearrangeableChildrenReturn,
@@ -154,7 +154,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
             rovingTabIndexReturn: context.processedChildrenContext,
             childrenHaveFocusReturn: context.processedChildrenContext,
             paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
 
         const {

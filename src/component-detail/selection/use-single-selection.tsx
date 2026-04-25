@@ -253,7 +253,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             isValid: isSelectedValid,
             closestFit: false,
             onClosestFit: null,
-            indexDemangler: null
+            indexFromOriginalToRepositioned: null
         });
         return {
             singleSelectionReturn: useMemoObject({

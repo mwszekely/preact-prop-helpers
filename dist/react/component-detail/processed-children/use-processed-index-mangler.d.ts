@@ -1,6 +1,6 @@
 import { Nullable, createElement } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
-type RCMT = 'mangled' | 'demangled';
+type RCMT = 'original' | 'repositioned';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 export type GetIndex = (row: VNode) => (number | undefined);
 export interface UseProcessedIndexManglerParametersSelf {
@@ -27,13 +27,17 @@ export interface UseProcessedIndexManglerContextSelf {
      */
     mangler: ProcessedIndexMangler;
     /**
-     * A common shortcut function that transforms a sorted index to an unsorted index.
+     * Takes a child's "programmatic" index and turns it into its "visual" index.
+     *
+     * Shortcut for `mangler.map(n, "original", "repositioned")`
      */
-    indexDemangler: (index: number) => number;
+    indexFromOriginalToRepositioned: (index: number) => number;
     /**
-     * A common shortcut function that transforms an unsorted index to a sorted index.
+     * Takes a child's "visual" index and turns it into its ""programmatic index.
+     *
+     * Shortcut for `mangler.map(n, "repositioned", "original")`
      */
-    indexMangler: (index: number) => number;
+    indexFromRepositionedToOriginal: (index: number) => number;
 }
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf {
 }
@@ -46,11 +50,22 @@ export declare class ProcessedIndexMangler {
     private getSortValue;
     private compare;
     constructor(getIndex: (vnode: VNode) => (number | undefined), getSortValue: (index: number) => unknown, compare: Compare<unknown>);
+    /**
+     * Converts between index types.
+     *
+     * An "original" index represents a child's "programmatic" index; the one it thinks it has no matter where it is.
+     * A "repositioned" index represents a child's "visual" position in a re-ordered list. The child usually doesn't care about this, unless it is interacting with other elements and depends on their visual order.
+     *
+     * @param index
+     * @param from
+     * @param to
+     * @returns
+     */
     map(index: number | undefined, from: RCMT, to: RCMT): number | undefined;
     private _originalChildren;
     sortedChildren: (VNode | null)[];
-    private _mangledToDemangled;
-    private _demangledToMangled;
+    private _originalToRepositioned;
+    private _repositionedToOriginal;
     setChildren(children: (VNode | null)[]): (createElement.JSX.Element | null)[];
 }
 /**

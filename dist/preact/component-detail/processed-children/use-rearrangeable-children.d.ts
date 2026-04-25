@@ -9,11 +9,6 @@ export interface UseRearrangedChildrenContextSelf {
  */
 export interface UseRearrangedChildrenContext extends UseProcessedIndexManglerContext {
 }
-/**
- * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
- *
- * @returns
- */
 type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "width" | "height">;
 export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
     getElement(): ChildElement | null;
@@ -59,33 +54,6 @@ export interface UseRearrangeableChildrenContextSelf {
 export interface UseRearrangeableChildrenReturnTypeSelf {
     refresh(): void;
     /**
-     * Pass an array of not-sorted child information to this function
-     * and the children will re-arrange themselves to match.
-     *
-     * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
-     *
-     * @stable
-     */
-    /**
-     * Arranges the children in a random order.
-     *
-     * @stable
-     */
-    /**
-     * Reverses the order of the children
-     *
-     * @stable
-     */
-    /**
-     * @stable
-     *
-     * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
-     * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
-     *
-     * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
-     */
-    /** @stable */
-    /**
      * The transformed (i.e. rearranged) children to render.
      */
     children: (VNode | null)[];
@@ -104,7 +72,7 @@ export interface UseRearrangeableChildParametersSelf {
  *
  * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same index mangling
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
  * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
  *

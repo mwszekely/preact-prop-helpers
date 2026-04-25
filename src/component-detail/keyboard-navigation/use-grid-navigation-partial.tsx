@@ -283,7 +283,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
-            processedIndexManglerReturn: { indexDemangler: identity, indexMangler: identity },
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity, indexFromRepositionedToOriginal: identity },
             rovingTabIndexParameters: {
                 untabbableBehavior: "leave-child-focused",
                 focusSelfParent: whenThisRowIsFocused,

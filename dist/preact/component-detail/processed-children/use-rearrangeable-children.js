@@ -8,7 +8,7 @@ import { useMonitoring } from "../../util/use-call-count.js";
  *
  * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same index mangling
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
  * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
  *
@@ -33,21 +33,23 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ch
         const [refreshIndex, setRefreshIndex] = useState(0);
         const childrenOut = useMemo(() => {
             const rearrangedChildren = mangler.setChildren(childrenIn);
-            for (const ch of rearrangedChildren) {
-                const index = ch == null ? null : getIndex(ch);
-                const mangledIndex = index == null ? null : mangler.map(index, "demangled", "mangled");
-                const demangledIndex = index == null ? null : mangler.map(index, "mangled", "demangled");
-                if (index != null && mangledIndex != null) {
-                    const info = getManagedChildren().getAt(index);
-                    const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2 && animate) {
-                        const element = info2.getElement();
-                        const rect = element?.getBoundingClientRect();
-                        if (rect) {
-                            // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed.
-                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
-                            info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+            if (animate) {
+                for (const ch of rearrangedChildren) {
+                    const index = ch == null ? null : getIndex(ch);
+                    const mangledIndex = index == null ? null : mangler.map(index, "repositioned", "original");
+                    const demangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
+                    if (index != null && mangledIndex != null) {
+                        const info = getManagedChildren().getAt(index);
+                        const info2 = getManagedChildren().getAt(mangledIndex);
+                        if (info && info2 && animate) {
+                            const element = info2.getElement();
+                            const rect = element?.getBoundingClientRect();
+                            if (rect) {
+                                // TODO: This still fires even if the index hasn't changed for this child.
+                                // Find a way to bail out if this child's position hasn't changed.
+                                // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
+                                info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+                            }
                         }
                     }
                 }

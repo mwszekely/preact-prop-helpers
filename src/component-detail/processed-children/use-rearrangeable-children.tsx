@@ -26,38 +26,6 @@ export interface UseRearrangedChildrenContext extends UseProcessedIndexManglerCo
 }
 
 
-/**
- * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
- * 
- * @returns 
- */
-/*export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & { context: UseRearrangedChildrenContext } {
-    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["sort"]>(null);
-    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
-    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
-    const rearrangeRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["rearrange"]>(null);
-    const indexManglerRef = useRef<null | ((n: number) => number)>(null);
-    const indexDemanglerRef = useRef<null | ((n: number) => number)>(null);
-    const indexMangler = useStableCallback((i: number) => { return (indexManglerRef.current ?? identity)(i)! }, []);
-    const indexDemangler = useStableCallback((i: number) => { return (indexDemanglerRef.current ?? identity)(i)! }, []);
-    const sort = useStableCallback<(typeof sortRef)["current"]>((i) => { return (sortRef.current ?? identity)(i)! }, []);
-    const shuffle = useStableCallback<(typeof shuffleRef)["current"]>(() => { return (shuffleRef.current ?? identity)()! }, []);
-    const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
-    const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);*/
-/*const manglerRef = useRef<null | ProcessedIndexMangler>(null);
-
-const provideManglers = useStableCallback<UseRearrangedChildrenContextSelf["provideManglers"]>((mangler) => { manglerRef.current = mangler; });
-
-const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({ provideManglers });
-const context = useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext });
-
-return {
-    context,
-    mangler: manglerRef.current
-}
-}*/
-
-
 type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "width" | "height">;
 
 
@@ -119,61 +87,11 @@ export interface UseRearrangeableChildrenReturnTypeSelf {
 
     refresh(): void;
 
-    /**
-     * Pass an array of not-sorted child information to this function
-     * and the children will re-arrange themselves to match.
-     * 
-     * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
-     *  
-     * @stable
-     */
-    //rearrange: (phase: 'render' | 'async', originalRows: M["index"][], rowsInOrder: M["index"][]) => void;
-
-    /** 
-     * Arranges the children in a random order.
-     * 
-     * @stable 
-     */
-    //shuffle: () => Promise<void> | void;
-
-    /** 
-     * Reverses the order of the children
-     * 
-     * @stable 
-     */
-    //reverse: () => Promise<void> | void;
-
-    /** 
-     * @stable
-     *
-     * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
-     * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
-     *  
-     * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
-     */
-    //indexMangler: (n: number) => number;
-    /** @stable */
-    //indexDemangler: (n: number) => number;
 
     /**
      * The transformed (i.e. rearranged) children to render.
      */
     children: (VNode | null)[];
-
-    /** 
-     * @stable
-     * 
-     * Call to rearrange the children in ascending or descending order according to `compare`.
-     * 
-     * Note: `descending` simply inverts the value returned by `compare`.
-     * 
-     */
-    //sort: (direction: "ascending" | "descending") => void;
-
-    /**
-     * Returns an array of each cell's `getSortValue()` result.
-     */
-    //toJsonArray(transform?: (info: M) => object): object;
 
 }
 
@@ -193,7 +111,7 @@ export interface UseRearrangeableChildParametersSelf {
  * 
  * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  * 
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` 
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same index mangling
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, 
  * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
  * 
@@ -227,23 +145,25 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
         const childrenOut = useMemo(() => {
             const rearrangedChildren = mangler.setChildren(childrenIn);
 
-            for (const ch of rearrangedChildren) {
-                const index = ch == null ? null : getIndex(ch);
-                const mangledIndex = index == null ? null : mangler.map(index, "demangled", "mangled");
-                const demangledIndex = index == null ? null : mangler.map(index, "mangled", "demangled");
-                if (index != null && mangledIndex != null) {
-                    const info = getManagedChildren().getAt(index);
-                    const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2 && animate) {
+            if (animate) {
+                for (const ch of rearrangedChildren) {
+                    const index = ch == null ? null : getIndex(ch);
+                    const mangledIndex = index == null ? null : mangler.map(index, "repositioned", "original");
+                    const demangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
+                    if (index != null && mangledIndex != null) {
+                        const info = getManagedChildren().getAt(index);
+                        const info2 = getManagedChildren().getAt(mangledIndex);
+                        if (info && info2 && animate) {
 
-                        const element = info2.getElement();
+                            const element = info2.getElement();
 
-                        const rect = element?.getBoundingClientRect();
-                        if (rect) {
-                            // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed.
-                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
-                            info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+                            const rect = element?.getBoundingClientRect();
+                            if (rect) {
+                                // TODO: This still fires even if the index hasn't changed for this child.
+                                // Find a way to bail out if this child's position hasn't changed.
+                                // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
+                                info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+                            }
                         }
                     }
                 }

@@ -1,7 +1,7 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseTextContentParameters, UseTextContentParametersSelf } from "../../dom-helpers/use-text-content.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
@@ -10,6 +10,7 @@ import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/l
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface UseTypeaheadNavigationReturnTypeSelf {
@@ -93,7 +94,9 @@ export interface UseTypeaheadNavigationContext {
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
 
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
@@ -112,7 +115,10 @@ export interface UseTypeaheadNavigationChildReturnType extends
     TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
 }
 
-interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
+interface TypeaheadInfo {
+    text: string | null;
+    indexReordered: number;
+}
 
 
 /**
@@ -127,12 +133,16 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 },
     ...void2
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
     return useMonitoring(function useTypeaheadNavigation(): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
+        assertEmptyObject(void4);
+
+        useEnsureStability("useTypeaheadNavigation", onNavigateTypeahead, isValidForTypeaheadNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
 
         // For typeahead, keep track of what our current "search" string is (if we have one)
         // and also clear it every 1000 ms since the last time it changed.
@@ -283,9 +293,14 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventType<any, any>) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
-                const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+                debugger;
 
-                if (sortedTypeaheadIndex < 0) {
+                // Note the important distinction between "sorted" and "reordered":
+                // "sorted" is used for fast searching, whereas "reordered" is the visual, processedChildren thing.
+                const typeaheadIndexIntoSortedChildren = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+                //const sortedTypeaheadIndex = indexFromOriginalToRepositioned(unsortedTypeaheadIndex);
+
+                if (typeaheadIndexIntoSortedChildren < 0) {
                     // The user has typed an entry that doesn't exist in the list
                     // (or more specifically "for which there is no entry that starts with that input")
                     setTypeaheadStatus("invalid");
@@ -302,7 +317,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                       In other words, the only way typeahead moves backwards relative to our current
                       position is if the only other option is behind us.
         
-                      It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                      It's not specified in WCAG what to do in that case.  I suppose wrap back to the start?
                       Though there's also a case for just going upwards to the nearest to prevent jumpiness.
                       But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
                       I dunno. Going back to the start is the simplest though.
@@ -322,44 +337,48 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
                     // These are used to keep track of the candidates' positions in both our sorted array and the unsorted DOM.
                     let lowestUnsortedIndexAll: number | null = null;
-                    let lowestSortedIndexAll = sortedTypeaheadIndex;
+                    let lowestSortedIndexAll = typeaheadIndexIntoSortedChildren;
 
                     // These two are only set for elements that are ahead of us, but the principle's the same otherwise
                     let lowestUnsortedIndexNext: number | null = null;
-                    let lowestSortedIndexNext = sortedTypeaheadIndex;
+                    let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
 
-                    const updateBestFit = (unsortedIndex: number) => {
-                        if (!isValidForTypeaheadNavigation(unsortedIndex))
+                    const updateBestFit = (indexReordered: number) => {
+                        const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
+                        if (!isValidForTypeaheadNavigation(indexOriginal))
                             return;
 
-                        if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
-                            lowestUnsortedIndexAll = unsortedIndex;
+                        if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
+                            lowestUnsortedIndexAll = indexOriginal;
                             lowestSortedIndexAll = i;
                         }
-                        if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
-                            lowestUnsortedIndexNext = unsortedIndex;
+                        if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
+                            lowestUnsortedIndexNext = indexOriginal;
                             lowestSortedIndexNext = i;
                         }
                     }
 
-                    let i = sortedTypeaheadIndex;
+                    let i = typeaheadIndexIntoSortedChildren;
                     while (i >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
+                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
                         --i;
                     }
 
-                    i = sortedTypeaheadIndex;
+                    i = typeaheadIndexIntoSortedChildren;
                     while (i < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
+                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
                         ++i;
                     }
 
                     let toSet: number | null = null;
 
                     if (lowestUnsortedIndexNext !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex;
+                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexReordered;
                     else if (lowestUnsortedIndexAll !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex;
+                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexReordered;
+
+                    if (toSet != null)
+                        toSet = indexFromRepositionedToOriginal(toSet);
 
                     if (toSet != null) {
                         setIndex(toSet, reason, true);
@@ -408,19 +427,19 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
                 // Or we need to be able to support columns here, within typeahead?
                 // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
                 const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
                 if (sortedIndex < 0) {
-                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, indexReordered: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, indexReordered: index });
                 }
 
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.splice(sortedIndex, 1);

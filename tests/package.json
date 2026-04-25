@@ -10,9 +10,9 @@
     "watch": "npx npm-run-all --npm-path npm -s build watch-impl",
     "watch-impl": "npx npm-run-all --npm-path npm -p watch:*",
     "build:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css",
-    "build:js": "rollup --config stage/rollup-p.config.js",
+    "build:js": "rollup --config stage/rollup-r.config.js",
     "watch:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css --watch",
-    "watch:js": "rollup --config stage/rollup-p.config.js --watch --no-watch.clearScreen",
+    "watch:js": "rollup --config stage/rollup-r.config.js --watch --no-watch.clearScreen",
     "serve": "npx serve .. -l 51082",
     "start": "npx npm-run-all --npm-path npm -s build serve"
   },

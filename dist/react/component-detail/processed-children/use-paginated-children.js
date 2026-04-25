@@ -12,7 +12,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexDemangler, indexMangler } }) {
+export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }) {
     return useMonitoring(function usePaginatedChildren() {
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
         const lastPagination = useRef({ paginationMax: null, paginationMin: null });
@@ -21,9 +21,9 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
             const childMin = (getChildren().getLowestIndex());
             for (let i = childMin; i <= childMax; ++i) {
                 const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
         }, [ /* Must be empty */]);
         useEffect(() => {

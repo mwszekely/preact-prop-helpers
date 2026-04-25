@@ -149,7 +149,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
 export interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends
     TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">,
     TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement">,
-    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler"> {
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned"> {
     /** When children mount/unmount, RTI needs access to all known children in case we unmounted the currently tabbable child */
 
     /** The only parameters RTI needs directly is the initial index to be tabbable */
@@ -269,7 +269,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     managedChildrenReturn: { getChildren },
     rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange },
     refElementReturn: { getElement },
-    processedIndexManglerReturn: { indexDemangler },
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned },
     ...void1
 }: UseRovingTabIndexParameters<ParentElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>): UseRovingTabIndexReturnType<ParentElement, ChildElement> {
     return useMonitoring(function useRovingTabIndex(): UseRovingTabIndexReturnType<ParentElement, ChildElement> {
@@ -410,7 +410,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             getAt: getTabbableAt,
             isValid: isTabbableValid,
             setAt: setTabbableAt,
-            indexDemangler,
+            indexFromOriginalToRepositioned,
             onClosestFit: (index) => {
                 const document = getDocument();
                 // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body

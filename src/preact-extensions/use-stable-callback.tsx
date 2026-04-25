@@ -60,9 +60,24 @@ export function useStableCallback<T extends Function | null | undefined>(fn: Non
  */
 export function useStableMergedCallback<T extends (Function | null | undefined)[]>(...fns: T) {
     return useStableCallback<T[number]>((...args: any[]) => {
+        let allFuncsReturned = new Set<(...args: unknown[]) => void>();
+        let allPromisesReturned = new Set<Promise<void>>();
         for (let i = 0; i < fns.length; ++i) {
-            fns[i]?.(...args);
+            let ret = fns[i]?.(...args);
+            if (ret) {
+                if (typeof ret == 'function')
+                    allFuncsReturned.add(ret);
+                else if ("then" in ret)
+                    allPromisesReturned.add(ret);
+            }
         }
+
+        if (allPromisesReturned.size > 0)
+            return async (...args: unknown[]) => { await Promise.all([...[...allFuncsReturned].map(f => f(...args)), ...allPromisesReturned]); }
+        else if (allFuncsReturned.size > 0)
+            return (...args: unknown[]) => { allFuncsReturned.forEach(f => f(...args)); };
+        else
+            return;
     });
 };
 

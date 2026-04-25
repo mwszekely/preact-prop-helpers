@@ -23,7 +23,7 @@ export interface UsePaginatedChildrenParametersSelf {
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
     extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
     TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
-    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">,
     TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
@@ -41,7 +41,7 @@ export interface UsePaginatedChildContext {
 export interface UsePaginatedChildrenReturnTypeSelf {
 
     /**
-     * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
+     * If the values returned by `indexFromOriginalToRepositioned` change (e.g. when sorting), then this must be called to re-sync everything.
      * 
      * @stable
      */
@@ -75,7 +75,7 @@ export function usePaginatedChildren<TabbableChildElement extends Element>({
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     childrenHaveFocusReturn: { getAnyFocused },
-    processedIndexManglerReturn: { indexDemangler, indexMangler }
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
 }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
     return useMonitoring(function usePaginatedChildren(): UsePaginatedChildrenReturnType {
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -86,9 +86,9 @@ export function usePaginatedChildren<TabbableChildElement extends Element>({
             const childMin = (getChildren().getLowestIndex());
             for (let i = childMin; i <= childMax; ++i) {
                 const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
 
         }, [/* Must be empty */])

@@ -180,7 +180,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
         const { propsStable: propsRef, refElementReturn } = useRefElement<ParentElement>({ refElementParameters });
 
-        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexDemangler, indexMangler, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters })
+        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters })
 
         const {
             childrenHaveFocusParameters,
@@ -204,7 +204,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             paginatedChildrenParameters,
             refElementReturn,
             childrenHaveFocusReturn: { getAnyFocused: useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
 
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });

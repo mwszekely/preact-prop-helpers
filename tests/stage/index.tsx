@@ -129,25 +129,30 @@ function TestsContainer() {
     const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", stringToValue: value => value });
 
     useGlobalHandler(document, "focusin", (e: FocusEvent) => {
-        ref.current!.innerHTML = `Focused: ${getCssSelectorShort(e.target as HTMLElement)}`;
+        if (ref.current)
+            ref.current.innerHTML = `Focused: ${getCssSelectorShort(e.target as HTMLElement)}`;
     }, { capture: true })
 
 
     useGlobalHandler(document, "focusout", (e: FocusEvent) => {
-        const ae = document.activeElement;
-        const aes = ae ? getCssSelectorShort(ae as HTMLElement) : '';
-        ref.current!.innerHTML = `Focused: None!${aes ? ` (${aes})` : ``}`;
+        if (ref.current) {
+            const ae = document.activeElement;
+            const aes = ae ? getCssSelectorShort(ae as HTMLElement) : '';
+            ref.current!.innerHTML = `Focused: None!${aes ? ` (${aes})` : ``}`;
+        }
     }, { capture: true })
 
     useInterval({
         interval: 100,
         callback: () => {
-            ref2.current!.innerHTML = (new Date().toISOString());
+            if (ref2.current)
+                ref2.current.innerHTML = (new Date().toISOString());
         }
     })
 
     useEffect(() => {
-        ref2.current!.innerHTML = (new Date().toISOString());
+        if (ref2.current)
+            ref2.current.innerHTML = (new Date().toISOString());
     }, [])
 
     useEffect(() => {

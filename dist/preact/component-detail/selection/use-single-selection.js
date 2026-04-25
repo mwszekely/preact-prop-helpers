@@ -64,7 +64,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
             isValid: isSelectedValid,
             closestFit: false,
             onClosestFit: null,
-            indexDemangler: null
+            indexFromOriginalToRepositioned: null
         });
         return {
             singleSelectionReturn: useMemoObject({

@@ -4,7 +4,7 @@ import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } fr
 import { useMonitoring } from "../util/use-call-count.js";
 import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "./use-stable-getter.js";
+import { useMemoObject } from "./use-stable-getter.js";
 /**
  * Reminder of order of execution:
  *
@@ -245,10 +245,12 @@ export function useManagedChild({ context, info }) {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);
-    indexDemangler ??= identity;
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useStableGetter(initialIndex ?? null));
+export function useChildrenFlag({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
+    initialIndex ??= null;
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromOriginalToRepositioned);
+    indexFromOriginalToRepositioned ??= identity;
+    // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useCallback(() => initialIndex, []));
     const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { initialization: "delay" });
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
@@ -277,8 +279,8 @@ export function useChildrenFlag({ getChildren, indexDemangler, initialIndex, clo
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
-        const requestedIndex = indexDemangler(getRequestedIndex());
-        const currentIndex = indexDemangler(getCurrentIndex());
+        const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex());
+        const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex());
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");

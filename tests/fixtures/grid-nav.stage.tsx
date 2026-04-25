@@ -113,7 +113,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         managedChildrenReturn: { getChildren },
         //paginatedChildrenReturn: { refreshPagination },
         props,
-        //rearrangeableChildrenReturn: { indexDemangler, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
+        //rearrangeableChildrenReturn: { indexFromOriginalToRepositioned, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
         rovingTabIndexReturn,
         singleSelectionReturn: { getSingleSelectedIndex },
         //sortableChildrenReturn: { sort },

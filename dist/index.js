@@ -438,9 +438,23 @@ function useStableCallback(fn, noDeps) {
  */
 function useStableMergedCallback(...fns) {
     return useStableCallback((...args) => {
+        let allFuncsReturned = new Set();
+        let allPromisesReturned = new Set();
         for (let i = 0; i < fns.length; ++i) {
-            fns[i]?.(...args);
+            let ret = fns[i]?.(...args);
+            if (ret) {
+                if (typeof ret == 'function')
+                    allFuncsReturned.add(ret);
+                else if ("then" in ret)
+                    allPromisesReturned.add(ret);
+            }
         }
+        if (allPromisesReturned.size > 0)
+            return async (...args) => { await Promise.all([...[...allFuncsReturned].map(f => f(...args)), ...allPromisesReturned]); };
+        else if (allFuncsReturned.size > 0)
+            return (...args) => { allFuncsReturned.forEach(f => f(...args)); };
+        else
+            return;
     });
 }
 
@@ -1112,15 +1126,15 @@ function useTagProps(props, tag) {
  *
  * @compositeParams
  */
-function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
+function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void1 }) {
     return useMonitoring(function useLinearNavigation() {
         let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
         const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
             const highestChildIndex = getHighestIndex();
             const lowestChildIndex = getLowestIndex();
             (getTabbableIndex() ?? 0);
-            const targetDemangled = indexDemangler(requestedIndexMangled);
-            const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+            const targetDemangled = indexFromOriginalToRepositioned(requestedIndexMangled);
+            const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled });
             if (status == "past-end") {
                 if (navigatePastEnd == "wrap") {
                     if (mode == "single")
@@ -1164,8 +1178,8 @@ function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, get
                 }
             }
             else {
-                setTabbableIndex(valueDemangled, e, fromUserInteraction);
-                onNavigateLinear?.(valueDemangled, e);
+                setTabbableIndex(valueRepositioned, e, fromUserInteraction);
+                onNavigateLinear?.(valueRepositioned, e);
                 return "stop";
             }
         }, []);
@@ -1182,7 +1196,7 @@ function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, get
              * We mangle the index to get its "visual" position, add our offset,
              * and then demangle it to get the child that corresponds to the next child "visually".
              */
-            const targetMangled = indexMangler(original) + offset;
+            const targetMangled = indexFromRepositionedToOriginal(original) + offset;
             return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
         });
         const navigateToNext = useStableCallback((e, fromUserInteraction) => {
@@ -1266,46 +1280,46 @@ function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, get
 /**
  * #__NO_SIDE_EFFECTS__
  */
-function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }) {
+function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled }) {
     if (searchDirection === -1) {
         let bestUpResult = undefined;
-        bestUpResult = tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
-        bestUpResult ??= tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
-        return bestUpResult || { valueDemangled: targetDemangled, status: "normal" };
+        bestUpResult = tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
+        bestUpResult ??= tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
+        return bestUpResult || { valueRepositioned: targetDemangled, status: "normal" };
     }
     else {
         let bestDownResult = undefined;
-        bestDownResult = tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
-        bestDownResult ??= tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
-        return bestDownResult || { valueDemangled: targetDemangled, status: "normal" };
+        bestDownResult = tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
+        bestDownResult ??= tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
+        return bestDownResult || { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
-function tryNavigateUp({ isValid, indexDemangler, indexMangler, lowestChildIndex: lower, targetDemangled }) {
+function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, lowestChildIndex: lower, targetDemangled }) {
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
-        targetDemangled = indexDemangler(indexMangler(targetDemangled) - 1);
+        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) - 1);
     }
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled < lower) {
-        return { valueDemangled: indexDemangler(lower), status: "past-start" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(lower), status: "past-start" };
     }
     else {
-        return { valueDemangled: targetDemangled, status: "normal" };
+        return { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
-function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex: upper }) {
+function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex: upper }) {
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
-        targetDemangled = indexDemangler(indexMangler(targetDemangled) + 1);
+        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) + 1);
     }
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled > upper) {
-        return { valueDemangled: indexDemangler(upper), status: "past-end" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(upper), status: "past-end" };
     }
     else {
-        return { valueDemangled: targetDemangled, status: "normal" };
+        return { valueRepositioned: targetDemangled, status: "normal" };
     }
 }
 
@@ -1525,9 +1539,11 @@ function useManagedChild({ context, info }) {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
-    indexDemangler ??= identity;
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useStableGetter(initialIndex ?? null));
+function useChildrenFlag({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
+    initialIndex ??= null;
+    indexFromOriginalToRepositioned ??= identity;
+    // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useCallback(() => initialIndex, []));
     const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { initialization: "delay" });
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
@@ -1556,8 +1572,8 @@ function useChildrenFlag({ getChildren, indexDemangler, initialIndex, closestFit
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
-        const requestedIndex = indexDemangler(getRequestedIndex());
-        const currentIndex = indexDemangler(getCurrentIndex());
+        const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex());
+        const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex());
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
@@ -1694,7 +1710,7 @@ function useState(initialState) {
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexDemangler }, ...void1 }) {
+function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, processedIndexManglerReturn: { indexFromOriginalToRepositioned }, ...void1 }) {
     return useMonitoring(function useRovingTabIndex() {
         const focusSelfParent = useStableCallback(focusSelfParentUnstable);
         untabbableBehavior ||= "focus-parent";
@@ -1810,7 +1826,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             getAt: getTabbableAt,
             isValid: isTabbableValid,
             setAt: setTabbableAt,
-            indexDemangler,
+            indexFromOriginalToRepositioned,
             onClosestFit: (index) => {
                 const document = getDocument();
                 // Whenever we change due to a closest-fit switch, make sure we don't lose focus to the body
@@ -1945,7 +1961,7 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
  *
  * @compositeParams
  */
-function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }) {
     return useMonitoring(function useTypeaheadNavigation() {
         // For typeahead, keep track of what our current "search" string is (if we have one)
         // and also clear it every 1000 ms since the last time it changed.
@@ -2057,8 +2073,12 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
         };
         function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
-                const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
-                if (sortedTypeaheadIndex < 0) {
+                debugger;
+                // Note the important distinction between "sorted" and "reordered":
+                // "sorted" is used for fast searching, whereas "reordered" is the visual, processedChildren thing.
+                const typeaheadIndexIntoSortedChildren = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+                //const sortedTypeaheadIndex = indexFromOriginalToRepositioned(unsortedTypeaheadIndex);
+                if (typeaheadIndexIntoSortedChildren < 0) {
                     // The user has typed an entry that doesn't exist in the list
                     // (or more specifically "for which there is no entry that starts with that input")
                     setTypeaheadStatus("invalid");
@@ -2074,7 +2094,7 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
                       In other words, the only way typeahead moves backwards relative to our current
                       position is if the only other option is behind us.
         
-                      It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                      It's not specified in WCAG what to do in that case.  I suppose wrap back to the start?
                       Though there's also a case for just going upwards to the nearest to prevent jumpiness.
                       But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
                       I dunno. Going back to the start is the simplest though.
@@ -2092,37 +2112,40 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
                     */
                     // These are used to keep track of the candidates' positions in both our sorted array and the unsorted DOM.
                     let lowestUnsortedIndexAll = null;
-                    let lowestSortedIndexAll = sortedTypeaheadIndex;
+                    let lowestSortedIndexAll = typeaheadIndexIntoSortedChildren;
                     // These two are only set for elements that are ahead of us, but the principle's the same otherwise
                     let lowestUnsortedIndexNext = null;
-                    let lowestSortedIndexNext = sortedTypeaheadIndex;
-                    const updateBestFit = (unsortedIndex) => {
-                        if (!isValidForTypeaheadNavigation(unsortedIndex))
+                    let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
+                    const updateBestFit = (indexReordered) => {
+                        const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
+                        if (!isValidForTypeaheadNavigation(indexOriginal))
                             return;
-                        if (lowestUnsortedIndexAll == null || unsortedIndex < lowestUnsortedIndexAll) {
-                            lowestUnsortedIndexAll = unsortedIndex;
+                        if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
+                            lowestUnsortedIndexAll = indexOriginal;
                             lowestSortedIndexAll = i;
                         }
-                        if ((lowestUnsortedIndexNext == null || unsortedIndex < lowestUnsortedIndexNext) && unsortedIndex > (getIndex() ?? -Infinity)) {
-                            lowestUnsortedIndexNext = unsortedIndex;
+                        if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
+                            lowestUnsortedIndexNext = indexOriginal;
                             lowestSortedIndexNext = i;
                         }
                     };
-                    let i = sortedTypeaheadIndex;
+                    let i = typeaheadIndexIntoSortedChildren;
                     while (i >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
+                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
                         --i;
                     }
-                    i = sortedTypeaheadIndex;
+                    i = typeaheadIndexIntoSortedChildren;
                     while (i < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
+                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
                         ++i;
                     }
                     let toSet = null;
                     if (lowestUnsortedIndexNext !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex;
+                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexReordered;
                     else if (lowestUnsortedIndexAll !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex;
+                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexReordered;
+                    if (toSet != null)
+                        toSet = indexFromRepositionedToOriginal(toSet);
                     if (toSet != null) {
                         setIndex(toSet, reason, true);
                         onNavigateTypeahead?.(toSet, reason);
@@ -2162,18 +2185,18 @@ context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparato
                 // Or we need to be able to support columns here, within typeahead?
                 // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
                 const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
                 if (sortedIndex < 0) {
-                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, indexReordered: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, unsortedIndex: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, indexReordered: index });
                 }
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.splice(sortedIndex, 1);
                     }
@@ -2230,7 +2253,7 @@ function binarySearch(array, wanted, comparator) {
 function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, ...void1 }) {
     return useMonitoring(function useListNavigation() {
         const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex} = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
-        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead} = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead} = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, processedIndexManglerReturn });
         const { propsStable: propsStableLN, linearNavigationReturn} = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
         // Merge the props while keeping them stable
         // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
@@ -2374,7 +2397,7 @@ refElementReturn, ...void1 }) {
             managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
-            processedIndexManglerReturn: { indexDemangler: identity, indexMangler: identity },
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity, indexFromRepositionedToOriginal: identity },
             rovingTabIndexParameters: {
                 untabbableBehavior: "leave-child-focused",
                 focusSelfParent: whenThisRowIsFocused,
@@ -2486,7 +2509,7 @@ function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowI
  *
  * @compositeParams
  */
-function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexDemangler, indexMangler } }) {
+function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }) {
     return useMonitoring(function usePaginatedChildren() {
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
         const lastPagination = useRef({ paginationMax: null, paginationMin: null });
@@ -2495,9 +2518,9 @@ function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginate
             const childMin = (getChildren().getLowestIndex());
             for (let i = childMin; i <= childMax; ++i) {
                 const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
         }, [ /* Must be empty */]);
         useEffect(() => {
@@ -2582,7 +2605,7 @@ function usePaginatedChild({ info: { index }, context: { paginatedChildContext: 
  *
  * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  *
- * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same index mangling
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
  * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
  *
@@ -2606,21 +2629,23 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { children:
         const [refreshIndex, setRefreshIndex] = useState$1(0);
         const childrenOut = useMemo(() => {
             const rearrangedChildren = mangler.setChildren(childrenIn);
-            for (const ch of rearrangedChildren) {
-                const index = ch == null ? null : getIndex(ch);
-                const mangledIndex = index == null ? null : mangler.map(index, "demangled", "mangled");
-                index == null ? null : mangler.map(index, "mangled", "demangled");
-                if (index != null && mangledIndex != null) {
-                    const info = getManagedChildren().getAt(index);
-                    const info2 = getManagedChildren().getAt(mangledIndex);
-                    if (info && info2 && animate) {
-                        const element = info2.getElement();
-                        const rect = element?.getBoundingClientRect();
-                        if (rect) {
-                            // TODO: This still fires even if the index hasn't changed for this child.
-                            // Find a way to bail out if this child's position hasn't changed.
-                            // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
-                            info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+            if (animate) {
+                for (const ch of rearrangedChildren) {
+                    const index = ch == null ? null : getIndex(ch);
+                    const mangledIndex = index == null ? null : mangler.map(index, "repositioned", "original");
+                    index == null ? null : mangler.map(index, "original", "repositioned");
+                    if (index != null && mangledIndex != null) {
+                        const info = getManagedChildren().getAt(index);
+                        const info2 = getManagedChildren().getAt(mangledIndex);
+                        if (info && info2 && animate) {
+                            const element = info2.getElement();
+                            const rect = element?.getBoundingClientRect();
+                            if (rect) {
+                                // TODO: This still fires even if the index hasn't changed for this child.
+                                // Find a way to bail out if this child's position hasn't changed.
+                                // This is important because otherwise, on mount, we call getBoundingClientRect for EVERY child.
+                                info2.updateFLIPAnimation(allChildPositions.current[mangledIndex] = { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+                            }
                         }
                     }
                 }
@@ -2723,7 +2748,7 @@ function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggere
 //refElementReturn: { getElement }
  }) {
     return useMonitoring(function useStaggeredChildren() {
-        // TODO: Right now, staggering doesn't take into consideration reordering via indexMangler and indexDemangler.
+        // TODO: Right now, staggering doesn't take into consideration reordering via index mangling.
         // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
         // until they fill in.
         const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
@@ -2985,7 +3010,7 @@ function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildr
         useStableCallback(() => {
             refreshPagination(paginationMin, paginationMax);
         });
-        const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
+        const { processedIndexManglerContext: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } } = context;
         const { rearrangeableChildrenReturn, context: { rearrangeableChildrenContext }, } = useRearrangeableChildren({
             context,
             processedIndexManglerParameters,
@@ -2997,7 +3022,7 @@ function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildr
             rovingTabIndexReturn: context.processedChildrenContext,
             childrenHaveFocusReturn: context.processedChildrenContext,
             paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
@@ -3060,20 +3085,20 @@ function useProcessedChild({ context, info: { index, getElement, ...uinfo }, rea
 function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }) {
     return useMonitoring(function useProcessedIndexMangler() {
         const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
-        const indexDemangler = useCallback((n) => (mangler.map(n, "mangled", "demangled") ?? n), []);
-        const indexMangler = useCallback((n) => (mangler.map(n, "demangled", "mangled") ?? n), []);
+        const indexFromOriginalToRepositioned = useCallback((n) => (mangler.map(n, "original", "repositioned") ?? n), []);
+        const indexFromRepositionedToOriginal = useCallback((n) => (mangler.map(n, "repositioned", "original") ?? n), []);
         const context = useMemoObject({
             processedIndexManglerContext: useMemoObject({
                 mangler,
-                indexDemangler,
-                indexMangler
+                indexFromOriginalToRepositioned,
+                indexFromRepositionedToOriginal
             })
         });
         return {
             processedIndexManglerReturn: {
                 mangler,
-                indexMangler,
-                indexDemangler
+                indexFromRepositionedToOriginal,
+                indexFromOriginalToRepositioned
             },
             context
         };
@@ -3088,109 +3113,103 @@ class ProcessedIndexMangler {
         this.getSortValue = getSortValue;
         this.compare = compare;
     }
+    /**
+     * Converts between index types.
+     *
+     * An "original" index represents a child's "programmatic" index; the one it thinks it has no matter where it is.
+     * A "repositioned" index represents a child's "visual" position in a re-ordered list. The child usually doesn't care about this, unless it is interacting with other elements and depends on their visual order.
+     *
+     * @param index
+     * @param from
+     * @param to
+     * @returns
+     */
     map(index, from, to) {
         if (index == undefined)
             return undefined;
         switch (from) {
-            /*case 'processed': {
-                //let unmangledIndex = this.getIndex(this._originalChildren[index]);
+            case 'repositioned': {
                 switch (to) {
-                    case 'processed': return index;
-                    case 'demangled': return this._processedToDemangled.get(index); //return unmangledIndex;
-                    case 'mangled': return this._processedToMangled.get(index); //return unmangledIndex == undefined ? undefined : this._unmangledToMangled.get(unmangledIndex);
-                }
-            }*/
-            case 'demangled': {
-                switch (to) {
-                    case 'demangled': return index;
-                    case 'mangled': return this._demangledToMangled.get(index);
-                    //case 'processed': return this._demangledToProcessed.get(index);
+                    case 'repositioned': return index;
+                    case 'original': return this._repositionedToOriginal.get(index);
                 }
             }
-            case 'mangled': {
+            case 'original': {
                 switch (to) {
-                    case 'mangled': return index;
-                    case 'demangled': return this._mangledToDemangled.get(index);
-                    //case 'processed': return this._mangledToProcessed.get(index);
+                    case 'original': return index;
+                    case 'repositioned': return this._originalToRepositioned.get(index);
                 }
             }
         }
     }
     _originalChildren = [];
     sortedChildren = [];
-    _mangledToDemangled = new Map();
-    _demangledToMangled = new Map();
-    //private _demangledToProcessed = new Map<number, number>();
-    //private _mangledToProcessed = new Map<number, number>();
-    //private _processedToDemangled = new Map<number, number>();
-    //private _processedToMangled = new Map<number, number>();
+    _originalToRepositioned = new Map();
+    _repositionedToOriginal = new Map();
     setChildren(children) {
-        this._mangledToDemangled.clear();
-        this._demangledToMangled.clear();
-        //this._processedToDemangled.clear();
-        //this._processedToMangled.clear();
-        //this._demangledToProcessed.clear();
-        //this._mangledToProcessed.clear();
+        this._originalToRepositioned.clear();
+        this._repositionedToOriginal.clear();
         this._originalChildren = children.slice();
         this.sortedChildren = [];
         let sortedChildrenWithoutNulls = this._originalChildren.slice().map((vnode, processedIndex) => {
-            const unmangledIndex = vnode == null ? undefined : this.getIndex(vnode);
-            const sortValue = unmangledIndex == null ? null : this.getSortValue(unmangledIndex);
+            const indexOriginal = vnode == null ? undefined : this.getIndex(vnode);
+            const sortValue = indexOriginal == null ? null : this.getSortValue(indexOriginal);
             return {
                 vnode,
-                unmangledIndex,
+                indexOriginal,
                 sortValue,
                 processedIndex
             };
         }).toSorted((lhs, rhs) => this.compare((lhs.sortValue), (rhs.sortValue)));
-        let i = 0; // processedOriginalIndex, also the index to the output array
-        let j = 0; // processedSortedIndex
+        let rawChildIndexIn = 0; // The index to the input and output
+        let sortedChildIndexIn = 0; // The index to the *sorted* (not repositioned) child array
         // This is a kind of, like, splice/zip of the two arrays, while setting the mappings between them.
         // It's kind of hard to follow--wish you could put, like, hand-drawn, diagrams in comments.
         while (true) {
-            if (i >= children.length)
+            if (rawChildIndexIn >= children.length)
                 break;
-            if (j >= sortedChildrenWithoutNulls.length)
+            if (sortedChildIndexIn >= sortedChildrenWithoutNulls.length)
                 break;
-            let processedOriginalIndex = i;
-            const originalChild = children[processedOriginalIndex];
-            const originalIndex = originalChild == null ? undefined : this.getIndex(originalChild);
-            if (originalIndex == null) {
+            // This value doesn't directly correspond to either an original or a repositioned index.
+            // We could have 2 children at indices [100, 101], remember.
+            const childOriginal = children[rawChildIndexIn];
+            const indexRepositioned = childOriginal == null ? undefined : this.getIndex(childOriginal);
+            if (indexRepositioned == null) {
                 // This was a hole in the original array, so just copy it over directly to its original spot.
-                this.sortedChildren[i] = originalChild;
+                this.sortedChildren[rawChildIndexIn] = childOriginal;
                 // Then move onto the next child.
-                ++i;
+                ++rawChildIndexIn;
             }
             else {
                 // This is a known, managed child. Find all its mappings and recreate it with a new key.
-                // To find the sortedChild this originalChild matches, first make sure we skip over holes in the sorted array
-                // (This should only happen once, the first time, because they're usually sorted to the front)
-                while (j < sortedChildrenWithoutNulls.length && sortedChildrenWithoutNulls[j].unmangledIndex == null) {
-                    ++j;
+                // Skip over all the nulls that get sorted to the front of the array
+                // (scary while-in-while only happens once because of this)
+                while (sortedChildIndexIn < sortedChildrenWithoutNulls.length && sortedChildrenWithoutNulls[sortedChildIndexIn].indexOriginal == null) {
+                    ++sortedChildIndexIn;
                 }
-                // This line should never happen
-                if (sortedChildrenWithoutNulls[j].unmangledIndex == null) {
+                // This line should never happen because the nulls get sorted to the front
+                // and for us to have gotten here in the first place there must have been at least one non-null child.
+                if (sortedChildrenWithoutNulls[sortedChildIndexIn].indexOriginal == null) {
                     /* eslint-disable no-debugger */
                     debugger;
                     break;
                 }
-                let processedSortedIndex = j;
-                const sortedChild = sortedChildrenWithoutNulls[processedSortedIndex];
-                const sortedIndex = sortedChild.unmangledIndex;
-                this._mangledToDemangled.set(originalIndex, sortedIndex);
-                this._demangledToMangled.set(sortedIndex, originalIndex);
-                //this._processedToMangled.set(processedOriginalIndex, sortedIndex);
-                //this._processedToDemangled.set(processedOriginalIndex, originalIndex);
-                //this._mangledToProcessed.set(sortedIndex, processedOriginalIndex);
-                //this._demangledToProcessed.set(originalIndex, processedOriginalIndex);
-                this.sortedChildren[i] = createElement(sortedChild.vnode.type, {
-                    ...sortedChild.vnode.props,
-                    mangledIndex: sortedIndex,
-                    demangledIndex: originalIndex,
-                    key: originalIndex
-                }); //sortedChild.vnode;
-                ++i;
-                ++j;
+                let rawChildIndexOut = sortedChildIndexIn;
+                const childAtRepositionedSpot = sortedChildrenWithoutNulls[rawChildIndexOut];
+                // This is indexOriginal, despite us getting it from childAtRepositionedSpot.indexOriginal.
+                // The reason is because we're writing to the OUTPUT array now, so our
+                // terminology is suddenly relevant to that.
+                const indexOriginal = childAtRepositionedSpot.indexOriginal;
+                this._originalToRepositioned.set(indexRepositioned, indexOriginal);
+                this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
+                this.sortedChildren[rawChildIndexIn] = createElement(childAtRepositionedSpot.vnode.type, {
+                    ...childAtRepositionedSpot.vnode.props,
+                    indexOriginal: indexOriginal,
+                    indexRepositioned: indexRepositioned,
+                    key: indexRepositioned
+                });
+                ++rawChildIndexIn;
+                ++sortedChildIndexIn;
             }
         }
         return this.sortedChildren;
@@ -3527,7 +3546,7 @@ function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, 
             isValid: isSelectedValid,
             closestFit: false,
             onClosestFit: null,
-            indexDemangler: null
+            indexFromOriginalToRepositioned: null
         });
         return {
             singleSelectionReturn: useMemoObject({
@@ -4242,11 +4261,11 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
                 getSortValueAt
             }
         });
-        const { indexDemangler, indexMangler } = processedIndexManglerReturn;
+        const { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } = processedIndexManglerReturn;
         // Grab the information from the array of children we may or may not render.
         // (see useProcessedChildren -- it send this information to us if it's used.)
         // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-        //const { context: { rearrangeableChildrenContext, ...void4 }, indexDemangler, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
+        //const { context: { rearrangeableChildrenContext, ...void4 }, indexFromOriginalToRepositioned, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
         const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
         const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn} = useGridNavigationSelection({
             gridNavigationParameters,
@@ -4259,7 +4278,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const refreshRows = useRef(() => { });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
@@ -4543,7 +4562,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             return true;
         }, []);
         const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexDemangler, indexMangler} } = useProcessedIndexMangler({ processedIndexManglerParameters });
+        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal} } = useProcessedIndexMangler({ processedIndexManglerParameters });
         const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props} = useListNavigationSelection({
             managedChildrenReturn: { getChildren },
             linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -4554,7 +4573,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             paginatedChildrenParameters,
             refElementReturn,
             childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const mcr = useManagedChildren({

@@ -62,7 +62,7 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
         const rp = useStableCallback(() => {
             refreshPagination(paginationMin, paginationMax);
         });
-        const { processedIndexManglerContext: { indexDemangler, indexMangler } } = context;
+        const { processedIndexManglerContext: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } } = context;
         const { rearrangeableChildrenReturn, context: { rearrangeableChildrenContext }, } = useRearrangeableChildren({
             context,
             processedIndexManglerParameters,
@@ -74,7 +74,7 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
             rovingTabIndexReturn: context.processedChildrenContext,
             childrenHaveFocusReturn: context.processedChildrenContext,
             paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
-            processedIndexManglerReturn: { indexDemangler, indexMangler }
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },

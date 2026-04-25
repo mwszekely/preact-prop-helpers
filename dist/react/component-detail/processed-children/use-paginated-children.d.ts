@@ -13,7 +13,7 @@ export interface UsePaginatedChildrenParametersSelf {
     paginationMax: Nullable<number>;
     childCount: Nullable<number>;
 }
-export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 export interface UsePaginatedChildContextSelf {
@@ -25,7 +25,7 @@ export interface UsePaginatedChildContext {
 }
 export interface UsePaginatedChildrenReturnTypeSelf {
     /**
-     * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
+     * If the values returned by `indexFromOriginalToRepositioned` change (e.g. when sorting), then this must be called to re-sync everything.
      *
      * @stable
      */
@@ -44,7 +44,7 @@ export interface UsePaginatedChildrenReturnType {
  *
  * @compositeParams
  */
-export declare function usePaginatedChildren<TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexDemangler, indexMangler } }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType;
+export declare function usePaginatedChildren<TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType;
 export interface UsePaginatedChildParameters {
     info: {
         index: number;
