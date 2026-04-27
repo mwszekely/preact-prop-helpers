@@ -13,13 +13,33 @@ export type OriginalIndex = number & { _original?: true };
 export type RepositionedIndex = number & { _repositioned?: true };
 
 export interface UseProcessedIndexManglerParametersSelf {
-    /**
-     * The sorted children to render.
-     */
-    //children: (VNode | null)[];
 
+    /**
+     * Returns the index of the given child's VNode.
+     * 
+     * Generally, this is just vnode.props.index, 
+     * but if you want the index prop to be called 
+     * something else, you can specify that here.
+     * 
+     * @stable 
+     */
     getIndex: GetIndex;
+    
+    /**
+     * Returns the sort value for the given child's index.
+     * 
+     * For an unsorted list, this could just be each child's index itself.
+     * 
+     * @stable
+     */
     getSortValueAt: (index: number) => unknown;
+
+    /**
+     * Compares the sort values returned by getSortValueAt.
+     * If unspecified, a sensible default for numbers/strings is used.
+     * 
+     * @stable
+     */
     compare: Nullable<Compare<unknown>>;
 }
 
@@ -60,6 +80,13 @@ export interface UseProcessedIndexManglerContextSelf {
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf { }
 
 /**
+ * Allows for tracking reordered children by their original index and repositioned index. This is referred to in various places as "index mangling" and "demangling".
+ * 
+ * The values returned by this hook are used by others like `useLinearNavigation` and `useTypeaheadNavigation` so that they can work even when children are out of order.
+ * 
+ * This hook, is separate from useRearrangeableChildren so that it can be included
+ * as part of a parent component, e.g. a table (instead of the tbody).
+ * 
  * @compositeParams
  */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType {
