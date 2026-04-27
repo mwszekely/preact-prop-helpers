@@ -40,7 +40,8 @@ export function useGridNavigationSelection({ gridNavigationParameters, linearNav
             rovingTabIndexReturn,
             singleSelectionParameters,
             multiSelectionParameters,
-            childrenHaveFocusReturn
+            childrenHaveFocusReturn,
+            processedIndexManglerReturn,
         });
         assertEmptyObject(void1);
         assertEmptyObject(void2);

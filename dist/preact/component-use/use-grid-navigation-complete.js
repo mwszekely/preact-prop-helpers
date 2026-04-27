@@ -50,7 +50,6 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
                 getSortValueAt
             }
         });
-        const { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } = processedIndexManglerReturn;
         // Grab the information from the array of children we may or may not render.
         // (see useProcessedChildren -- it send this information to us if it's used.)
         // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
@@ -67,7 +66,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
-            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
+            processedIndexManglerReturn
         });
         const refreshRows = useRef(() => { });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });

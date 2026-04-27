@@ -78,7 +78,7 @@ function P$1(n) {
   }), P$1(n);
 }
 function A$1(n) {
-  (!n.__d && (n.__d = !0) && i$2.push(n) && !H$1.__r++ || r$1 != l$1.debounceRendering) && ((r$1 = l$1.debounceRendering) || o$1)(H$1);
+  (!n.__d && (n.__d = true) && i$2.push(n) && !H$1.__r++ || r$1 != l$1.debounceRendering) && ((r$1 = l$1.debounceRendering) || o$1)(H$1);
 }
 function H$1() {
   try {
@@ -159,7 +159,7 @@ function N$1(n, l, u, t, i) {
       n[l] = null == u ? "" : u;
       break n;
     } catch (n) {}
-    "function" == typeof u || (null == u || !1 === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
+    "function" == typeof u || (null == u || false === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
   }
 }
 function V$1(n) {
@@ -221,7 +221,7 @@ function q$2(n, u, t, i, r, o, e, f, c, s) {
   return (a = l$1.diffed) && a(u), 128 & u.__u ? void 0 : f;
 }
 function B$2(n) {
-  n && (n.__c && (n.__c.__e = !0), n.__k && n.__k.some(B$2));
+  n && (n.__c && (n.__c.__e = true), n.__k && n.__k.some(B$2));
 }
 function D$1(n, u, t) {
   for (var i = 0; i < t.length; i++) J$1(t[i], t[++i], t[++i]);
@@ -255,7 +255,7 @@ function G$1(u, t, i, r, o, e, f, c, s) {
   }
   if (null == u) {
     if (null == x) return document.createTextNode(k);
-    u = document.createElementNS(o, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = !1), e = null;
+    u = document.createElementNS(o, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = false), e = null;
   }
   if (null == x) m === k || c && u.data == k || (u.data = k);else {
     if (e = e && n.call(u.childNodes), !c && null != e) for (m = {}, a = 0; a < u.attributes.length; a++) m[(y = u.attributes[a]).name] = y.value;
@@ -294,7 +294,7 @@ function Q$1(n, l, u) {
 }
 function R(u, t, i) {
   var r, o, e, f;
-  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), o = (r = "function" == typeof i) ? null : t.__k, e = [], f = [], q$2(t, u = (!r && i || t).__k = k$1(S, null, [u]), o || d$1, d$1, t.namespaceURI, !r && i ? [i] : o ? null : t.firstChild ? n.call(t.childNodes) : null, e, !r && i ? i : o ? o.__e : t.firstChild, r, f), D$1(e, u, f);
+  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), o = (r = "function" == "undefined") ? null : t.__k, e = [], f = [], q$2(t, u = t.__k = k$1(S, null, [u]), o || d$1, d$1, t.namespaceURI, o ? null : t.firstChild ? n.call(t.childNodes) : null, e, o ? o.__e : t.firstChild, r, f), D$1(e, u, f);
 }
 function X$1(n) {
   function l(n) {
@@ -305,7 +305,7 @@ function X$1(n) {
       u = null;
     }, this.shouldComponentUpdate = function (n) {
       this.props.value != n.value && u.forEach(function (n) {
-        n.__e = !0, A$1(n);
+        n.__e = true, A$1(n);
       });
     }, this.sub = function (n) {
       u.add(n);
@@ -332,10 +332,10 @@ n = w$1.slice, l$1 = {
   var u;
   u = null != this.__s && this.__s != this.state ? this.__s : this.__s = m$1({}, this.state), "function" == typeof n && (n = n(m$1({}, u), this.props)), n && m$1(u, n), null != n && this.__v && (l && this._sb.push(l), A$1(this));
 }, C$1.prototype.forceUpdate = function (n) {
-  this.__v && (this.__e = !0, n && this.__h.push(n), A$1(this));
+  this.__v && (this.__e = true, n && this.__h.push(n), A$1(this));
 }, C$1.prototype.render = S, i$2 = [], o$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function (n, l) {
   return n.__v.__b - l.__v.__b;
-}, H$1.__r = 0, f$2 = Math.random().toString(8), c$1 = "__d" + f$2, s$1 = "__a" + f$2, a$1 = /(PointerCapture)$|Capture$/i, h$1 = 0, p$1 = V$1(!1), v$1 = V$1(!0), y$1 = 0;
+}, H$1.__r = 0, f$2 = Math.random().toString(8), c$1 = "__d" + f$2, s$1 = "__a" + f$2, a$1 = /(PointerCapture)$|Capture$/i, h$1 = 0, p$1 = V$1(false), v$1 = V$1(true), y$1 = 0;
 var t,
   r,
   u$1,
@@ -368,7 +368,7 @@ function h(n, u, i) {
     t !== r && (o.__N = [r, o.__[1]], o.__c.setState({}));
   }], o.__c = r, !r.__f)) {
     var f = function (n, t, r) {
-      if (!o.__c.__H) return !0;
+      if (!o.__c.__H) return true;
       var u = o.__c.__H.__.filter(function (n) {
         return n.__c;
       });
@@ -379,11 +379,11 @@ function h(n, u, i) {
       return u.some(function (n) {
         if (n.__N) {
           var t = n.__[0];
-          n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
+          n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = true);
         }
       }), c && c.call(this, n, t, r) || i;
     };
-    r.__f = !0;
+    r.__f = true;
     var c = r.shouldComponentUpdate,
       e = r.componentWillUpdate;
     r.componentWillUpdate = function (n, t, r) {
@@ -423,7 +423,7 @@ function q$1(n, t) {
 function x(n) {
   var u = r.context[n.__c],
     i = p(t++, 9);
-  return i.c = n, u ? (null == i.__ && (i.__ = !0, u.sub(r)), u.props.value) : n.__;
+  return i.c = n, u ? (null == i.__ && (i.__ = true, u.sub(r)), u.props.value) : n.__;
 }
 function j$1() {
   for (var n; n = f$1.shift();) {
@@ -506,9 +506,9 @@ function g(n, t) {
   return n;
 }
 function E(n, t) {
-  for (var e in n) if ("__source" !== e && !(e in t)) return !0;
-  for (var r in t) if ("__source" !== r && n[r] !== t[r]) return !0;
-  return !1;
+  for (var e in n) if ("__source" !== e && !(e in t)) return true;
+  for (var r in t) if ("__source" !== r && n[r] !== t[r]) return true;
+  return false;
 }
 var I = _;
 function M(n, t) {
@@ -522,9 +522,9 @@ function N(n, e) {
   function u(e) {
     return this.shouldComponentUpdate = r, k$1(n, e);
   }
-  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.__f = u.prototype.isReactComponent = !0, u.type = n, u;
+  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.__f = u.prototype.isReactComponent = true, u.type = n, u;
 }
-(M.prototype = new C$1()).isPureReactComponent = !0, M.prototype.shouldComponentUpdate = function (n, t) {
+(M.prototype = new C$1()).isPureReactComponent = true, M.prototype.shouldComponentUpdate = function (n, t) {
   return E(this.props, n) || E(this.state, t);
 };
 var T = l$1.__b;
@@ -540,14 +540,14 @@ var U = l$1.unmount;
 function V(n, t, e) {
   return n && (n.__c && n.__c.__H && (n.__c.__H.__.forEach(function (n) {
     "function" == typeof n.__c && n.__c();
-  }), n.__c.__H = null), null != (n = g({}, n)).__c && (n.__c.__P === e && (n.__c.__P = t), n.__c.__e = !0, n.__c = null), n.__k = n.__k && n.__k.map(function (n) {
+  }), n.__c.__H = null), null != (n = g({}, n)).__c && (n.__c.__P === e && (n.__c.__P = t), n.__c.__e = true, n.__c = null), n.__k = n.__k && n.__k.map(function (n) {
     return V(n, t, e);
   })), n;
 }
 function W(n, t, e) {
   return n && e && (n.__v = null, n.__k = n.__k && n.__k.map(function (n) {
     return W(n, t, e);
-  }), n.__c && n.__c.__P === t && (n.__e && e.appendChild(n.__e), n.__c.__e = !0, n.__c.__P = e)), n;
+  }), n.__c && n.__c.__P === t && (n.__e && e.appendChild(n.__e), n.__c.__e = true, n.__c.__P = e)), n;
 }
 function P() {
   this.__u = 0, this.o = null, this.__b = null;
@@ -561,15 +561,15 @@ function B() {
 }
 l$1.unmount = function (n) {
   var t = n.__c;
-  t && (t.__z = !0), t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), U && U(n);
+  t && (t.__z = true), t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), U && U(n);
 }, (P.prototype = new C$1()).__c = function (n, t) {
   var e = t.__c,
     r = this;
   null == r.o && (r.o = []), r.o.push(e);
   var u = j(r.__v),
-    o = !1,
+    o = false,
     i = function () {
-      o || r.__z || (o = !0, e.__R = null, u ? u(c) : c());
+      o || r.__z || (o = true, e.__R = null, u ? u(c) : c());
     };
   e.__R = i;
   var l = e.__P;
@@ -643,16 +643,16 @@ var q = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element"
 function nn(n, t, e) {
   return null == t.__k && (t.textContent = ""), R(n, t), "function" == typeof e && e(), n ? n.__c : null;
 }
-C$1.prototype.isReactComponent = !0, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function (t) {
+C$1.prototype.isReactComponent = true, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function (t) {
   Object.defineProperty(C$1.prototype, t, {
-    configurable: !0,
+    configurable: true,
     get: function () {
       return this["UNSAFE_" + t];
     },
     set: function (n) {
       Object.defineProperty(this, t, {
-        configurable: !0,
-        writable: !0,
+        configurable: true,
+        writable: true,
         value: n
       });
     }
@@ -667,7 +667,7 @@ l$1.event = function (n) {
   }, n.nativeEvent = n;
 };
 var un = {
-    configurable: !0,
+    configurable: true,
     get: function () {
       return this.class;
     }
@@ -683,7 +683,7 @@ l$1.vnode = function (n) {
       var l = t[i];
       if (!("value" === i && "defaultValue" in t && null == l || Q && "children" === i && "noscript" === e || "class" === i || "className" === i)) {
         var c = i.toLowerCase();
-        "defaultValue" === i && "value" in t && null == t.value ? i = "value" : "download" === i && !0 === l ? l = "" : "translate" === c && "no" === l ? l = !1 : "o" === c[0] && "n" === c[1] ? "ondoubleclick" === c ? i = "ondblclick" : "onchange" !== c || "input" !== e && "textarea" !== e || X(t.type) ? "onfocus" === c ? i = "onfocusin" : "onblur" === c ? i = "onfocusout" : J.test(i) && (i = c) : c = i = "oninput" : o && G.test(i) ? i = i.replace(K, "-$&").toLowerCase() : null === l && (l = void 0), "oninput" === c && u[i = c] && (i = "oninputCapture"), u[i] = l;
+        "defaultValue" === i && "value" in t && null == t.value ? i = "value" : "download" === i && true === l ? l = "" : "translate" === c && "no" === l ? l = false : "o" === c[0] && "n" === c[1] ? "ondoubleclick" === c ? i = "ondblclick" : "onchange" !== c || "input" !== e && "textarea" !== e || X(t.type) ? "onfocus" === c ? i = "onfocusin" : "onblur" === c ? i = "onfocusout" : J.test(i) && (i = c) : c = i = "oninput" : o && G.test(i) ? i = i.replace(K, "-$&").toLowerCase() : null === l && (l = void 0), "oninput" === c && u[i = c] && (i = "oninputCapture"), u[i] = l;
       }
     }
     "select" == e && (u.multiple && Array.isArray(u.value) && (u.value = F(t.children).forEach(function (n) {
@@ -705,7 +705,7 @@ l$1.diffed = function (n) {
   null != e && "textarea" === n.type && "value" in t && t.value !== e.value && (e.value = null == t.value ? "" : t.value);
 };
 function pn(n) {
-  return !!n.__k && (R(null, n), !0);
+  return !!n.__k && (R(null, n), true);
 }
 var f = 0;
 function u(e, t, n, o, i, u) {
@@ -1183,11 +1183,11 @@ function useGlobalHandlerSingle(target, type, handler, options) {
 
 // eslint-disable-next-line no-restricted-globals
 function getWindow(element) {
-  return typeof window == "undefined" ? undefined : globalThis ?? {};
+  return typeof window == "undefined" ? undefined : element?.ownerDocument?.defaultView ?? globalThis ?? {};
 }
 // eslint-disable-next-line no-restricted-globals
 function getDocument$1(element) {
-  return typeof window == "undefined" ? undefined : getWindow()?.document ?? undefined;
+  return typeof window == "undefined" ? undefined : element?.ownerDocument ?? getWindow()?.document ?? undefined;
 }
 
 // Get/set the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
@@ -2072,7 +2072,7 @@ function useLinearNavigation({
       const highestChildIndex = getHighestIndex();
       const lowestChildIndex = getLowestIndex();
       getTabbableIndex() ?? 0;
-      const targetDemangled = indexFromOriginalToRepositioned(requestedIndexMangled);
+      const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
       const {
         status,
         valueRepositioned
@@ -2141,7 +2141,7 @@ function useLinearNavigation({
        * We mangle the index to get its "visual" position, add our offset,
        * and then demangle it to get the child that corresponds to the next child "visually".
        */
-      const targetMangled = indexFromRepositionedToOriginal(original) + offset;
+      const targetMangled = indexFromOriginalToRepositioned(original) + offset;
       return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
     });
     const navigateToNext = useStableCallback((e, fromUserInteraction) => {
@@ -2277,14 +2277,14 @@ function tryNavigateUp({
   targetDemangled
 }) {
   while (targetDemangled >= lower && !isValid(targetDemangled)) {
-    targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) - 1);
+    targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1);
   }
   if (!isValid(targetDemangled)) {
     return undefined;
   }
   if (targetDemangled < lower) {
     return {
-      valueRepositioned: indexFromOriginalToRepositioned(lower),
+      valueRepositioned: indexFromRepositionedToOriginal(lower),
       status: "past-start"
     };
   } else {
@@ -2302,14 +2302,14 @@ function tryNavigateDown({
   highestChildIndex: upper
 }) {
   while (targetDemangled <= upper && !isValid(targetDemangled)) {
-    targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) + 1);
+    targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1);
   }
   if (!isValid(targetDemangled)) {
     return undefined;
   }
   if (targetDemangled > upper) {
     return {
-      valueRepositioned: indexFromOriginalToRepositioned(upper),
+      valueRepositioned: indexFromRepositionedToOriginal(upper),
       status: "past-end"
     };
   } else {
@@ -2382,7 +2382,7 @@ function useManagedChildren(parentParameters) {
     }, []);
     // Retrieves the information associated with the child with the given index.
     // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = q$1(index => {
+    const getManagedChildInfo = q$1((index, indexType) => {
       if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
     }, []);
     const shrinkwrapHandle = A(null);
@@ -2569,6 +2569,7 @@ function useManagedChild({
  */
 function useChildrenFlag({
   getChildren,
+  indexFromRepositionedToOriginal,
   indexFromOriginalToRepositioned,
   initialIndex,
   closestFit,
@@ -2579,11 +2580,15 @@ function useChildrenFlag({
   isValid
 }) {
   initialIndex ??= null;
-  useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromOriginalToRepositioned);
+  useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned);
+  indexFromRepositionedToOriginal ??= identity;
   indexFromOriginalToRepositioned ??= identity;
   // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
-  const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => initialIndex, []));
+  const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => initialIndex, []), {
+    debounceRendering: runImmediately
+  });
   const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, {
+    debounceRendering: runImmediately,
     initialization: "delay"
   });
   // Shared between onChildrenMountChange and changeIndex, not public
@@ -2613,24 +2618,30 @@ function useChildrenFlag({
   // 2. A child mounted, and it mounts with the index we're looking for
   const reevaluateClosestFit = useStableCallback(reason => {
     const children = getChildren();
-    const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex());
-    const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex());
-    const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-    if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-      console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-      const closestFitIndex = getClosestFit(requestedIndex);
-      setCurrentIndex(closestFitIndex, reason);
+    // These indices are relative to the *original* child array.
+    const requestedIndexOriginal = getRequestedIndex();
+    const currentIndexOriginal = getCurrentIndex();
+    const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
+    const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
+    const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+    if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+      console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+      const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned);
+      const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+      setCurrentIndex(closestFitIndexOriginal, reason);
       if (currentChild) {
-        setAt(currentChild, false, closestFitIndex, currentIndex);
+        setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
       }
-      if (closestFitIndex != null) {
-        const closestFitChild = children.getAt(closestFitIndex);
+      if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
+        const closestFitChild = children.getAt(closestFitIndexRepositioned);
         console.assert(closestFitChild != null, "Internal logic???");
-        setAt(closestFitChild, true, closestFitIndex, currentIndex);
-        onClosestFit(closestFitIndex);
+        setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
+        onClosestFit(closestFitIndexOriginal);
       } else {
         onClosestFit(null);
       }
+    } else {
+      if (currentChild) setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
     }
   });
   const reasonRef = A(undefined);
@@ -2765,6 +2776,7 @@ function useRovingTabIndex({
     getElement
   },
   processedIndexManglerReturn: {
+    indexFromRepositionedToOriginal,
     indexFromOriginalToRepositioned
   },
   ...void1
@@ -2887,6 +2899,7 @@ function useRovingTabIndex({
       getAt: getTabbableAt,
       isValid: isTabbableValid,
       setAt: setTabbableAt,
+      indexFromRepositionedToOriginal,
       indexFromOriginalToRepositioned,
       onClosestFit: index => {
         const document = getDocument$1();
@@ -3519,8 +3532,8 @@ function usePaginatedChildren({
       const childMin = getChildren().getLowestIndex();
       for (let i = childMin; i <= childMax; ++i) {
         const visible = i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity);
-        getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
-        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     y(() => {
@@ -4280,8 +4293,8 @@ function useProcessedIndexMangler({
   return useMonitoring(function useProcessedIndexMangler() {
     useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
     const mangler = T$1(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
-    const indexFromOriginalToRepositioned = q$1(n => mangler.map(n, "original", "repositioned") ?? n, []);
-    const indexFromRepositionedToOriginal = q$1(n => mangler.map(n, "repositioned", "original") ?? n, []);
+    const indexFromOriginalToRepositioned = q$1(n => mangler.map(n, "original", "repositioned"), []);
+    const indexFromRepositionedToOriginal = q$1(n => mangler.map(n, "repositioned", "original"), []);
     const context = useMemoObject({
       processedIndexManglerContext: useMemoObject({
         mangler,
@@ -4308,17 +4321,6 @@ class ProcessedIndexMangler {
     this.getSortValue = getSortValue;
     this.compare = compare;
   }
-  /**
-   * Converts between index types.
-   *
-   * An "original" index represents a child's "programmatic" index; the one it thinks it has no matter where it is.
-   * A "repositioned" index represents a child's "visual" position in a re-ordered list. The child usually doesn't care about this, unless it is interacting with other elements and depends on their visual order.
-   *
-   * @param index
-   * @param from
-   * @param to
-   * @returns
-   */
   map(index, from, to) {
     if (index == undefined) return undefined;
     switch (from) {
@@ -4347,6 +4349,7 @@ class ProcessedIndexMangler {
   _originalToRepositioned = new Map();
   _repositionedToOriginal = new Map();
   setChildren(children) {
+    debugger;
     this._originalToRepositioned.clear();
     this._repositionedToOriginal.clear();
     this._originalChildren = children.slice();
@@ -4370,11 +4373,11 @@ class ProcessedIndexMangler {
       if (sortedChildIndexIn >= sortedChildrenWithoutNulls.length) break;
       // This value doesn't directly correspond to either an original or a repositioned index.
       // We could have 2 children at indices [100, 101], remember.
-      const childOriginal = children[rawChildIndexIn];
-      const indexRepositioned = childOriginal == null ? undefined : this.getIndex(childOriginal);
+      const childRepositioned = children[rawChildIndexIn];
+      const indexRepositioned = childRepositioned == null ? undefined : this.getIndex(childRepositioned);
       if (indexRepositioned == null) {
         // This was a hole in the original array, so just copy it over directly to its original spot.
-        this.sortedChildren[rawChildIndexIn] = childOriginal;
+        this.sortedChildren[rawChildIndexIn] = childRepositioned;
         // Then move onto the next child.
         ++rawChildIndexIn;
       } else {
@@ -4397,8 +4400,8 @@ class ProcessedIndexMangler {
         // The reason is because we're writing to the OUTPUT array now, so our
         // terminology is suddenly relevant to that.
         const indexOriginal = childAtRepositionedSpot.indexOriginal;
-        this._originalToRepositioned.set(indexRepositioned, indexOriginal);
-        this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
+        this._repositionedToOriginal.set(indexRepositioned, indexOriginal);
+        this._originalToRepositioned.set(indexOriginal, indexRepositioned);
         this.sortedChildren[rawChildIndexIn] = k$1(childAtRepositionedSpot.vnode.type, {
           ...childAtRepositionedSpot.vnode.props,
           indexOriginal: indexOriginal,
@@ -4789,6 +4792,11 @@ function useSingleSelection({
     singleSelectionMode,
     ...void3
   },
+  processedIndexManglerReturn: {
+    indexFromOriginalToRepositioned,
+    indexFromRepositionedToOriginal,
+    ...void5
+  },
   ...void4
 }) {
   return useMonitoring(function useSingleSelection() {
@@ -4821,7 +4829,8 @@ function useSingleSelection({
       isValid: isSelectedValid,
       closestFit: false,
       onClosestFit: null,
-      indexFromOriginalToRepositioned: null
+      indexFromRepositionedToOriginal,
+      indexFromOriginalToRepositioned
     });
     return {
       singleSelectionReturn: useMemoObject({
@@ -4974,7 +4983,8 @@ function useSelection({
   multiSelectionParameters,
   childrenHaveFocusReturn,
   rovingTabIndexReturn,
-  singleSelectionParameters
+  singleSelectionParameters,
+  processedIndexManglerReturn
 }) {
   const {
     childrenHaveFocusParameters: {
@@ -4987,7 +4997,8 @@ function useSelection({
   } = useSingleSelection({
     managedChildrenReturn,
     rovingTabIndexReturn,
-    singleSelectionParameters
+    singleSelectionParameters,
+    processedIndexManglerReturn
   });
   const {
     childrenHaveFocusParameters: {
@@ -5375,7 +5386,8 @@ function useListNavigationSelection({
       },
       managedChildrenReturn,
       singleSelectionParameters,
-      multiSelectionParameters
+      multiSelectionParameters,
+      processedIndexManglerReturn
     });
     const {
       context: contextLN,
@@ -5424,15 +5436,13 @@ function useListNavigationSelectionChild({
   return useMonitoring(function useListNavigationSelectionChild() {
     const {
       hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: ocfic2,
-        ...void3
+        onCurrentFocusedInnerChanged: ocfic2
       },
       info: infoSS,
       multiSelectionChildReturn,
       singleSelectionChildReturn,
       props: propsSS,
-      selectionChildReturn,
-      ...void9
+      selectionChildReturn
     } = useSelectionChild({
       info: {
         index,
@@ -5850,7 +5860,6 @@ function useCompleteListNavigationChildren({
       paginatedChildrenParameters,
       processedIndexManglerParameters: {
         getSortValueAt,
-        compare,
         getIndex
       },
       rearrangeableChildrenParameters,
@@ -5971,8 +5980,7 @@ function useCompleteListNavigationChild({
   return useMonitoring(function useCompleteListNavigationChild() {
     const {
       refElementReturn,
-      propsStable,
-      ...void6
+      propsStable
     } = useRefElement({
       refElementParameters
     });
@@ -6096,10 +6104,8 @@ function useCompleteListNavigationDeclarative({
   });
   const {
     singleSelectionParameters: {
-      onSingleSelectedIndexChange,
-      ...void3
-    },
-    ...void2
+      onSingleSelectedIndexChange
+    }
   } = useSelectionDeclarative({
     singleSelectionDeclarativeParameters,
     singleSelectionReturn: ret.singleSelectionReturn
@@ -6133,8 +6139,7 @@ function useCompleteListNavigationChildDeclarative({
     multiSelectionChildParameters: {
       onMultiSelectChange
     },
-    info: i2,
-    ...void2
+    info: i2
   } = useSelectionChildDeclarative({
     multiSelectionChildDeclarativeParameters: {
       onMultiSelectedChange,
@@ -6477,11 +6482,11 @@ function useAsync(asyncHandler, options) {
   //
   // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
   // when we start/stop an async action.
-  const [pending, setPending, _getPending] = useState(false);
-  const [result, setResult, _getResult] = useState(undefined);
-  const [error, setError, _getError] = useState(undefined);
-  const [hasError, setHasError, _getHasError] = useState(false);
-  const [hasResult, setHasResult, _getHasResult] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [result, setResult] = useState(undefined);
+  const [error, setError] = useState(undefined);
+  const [hasError, setHasError] = useState(false);
+  const [hasResult, setHasResult] = useState(false);
   const [asyncDebouncing, setAsyncDebouncing] = useState(false);
   const [syncDebouncing, setSyncDebouncing] = useState(false);
   const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
@@ -7969,6 +7974,11 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     sortValues.current = reverse(sortValues.current);
     refreshRows();
   }, []);
+  const causeProblems = q$1(() => {
+    const problemIndex = 7;
+    sortValues.current[problemIndex] = -1e5;
+    refreshRows();
+  }, []);
   let sortValues = A([]);
   const r = useCompleteListNavigationDeclarative({
     rovingTabIndexParameters: {
@@ -8041,7 +8051,7 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     }, secondsToHalve * 1000);
   }, []);
   const [staggering, setStaggering] = useState(false);
-  const [animate, setAnimate] = useState(true);
+  const [animate] = useState(true);
   return u("div", {
     className: "demo",
     children: [u("h2", {
@@ -8108,6 +8118,13 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     }), u("button", {
       onClick: () => reverse2(),
       children: "Reverse"
+    }), u("button", {
+      onClick: e => {
+        e.currentTarget.focus();
+        setSingleSelectedIndex(0);
+        causeProblems();
+      },
+      children: "Cause problems"
     }), u("button", {
       onClick: () => halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn(),
       children: ["Halve # of children in ", secondsToHalve, " seconds"]
@@ -8357,11 +8374,8 @@ const DemoUseRovingTabIndexChild = N(function DemoUseRovingTabIndexChild({
   }, []);
   useStableCallback(() => index);
   const {
-    hasCurrentFocusReturn,
-    managedChildReturn,
     propsChild,
     propsTabbable,
-    textContentReturn,
     rovingTabIndexChildReturn: {
       tabbable
     },

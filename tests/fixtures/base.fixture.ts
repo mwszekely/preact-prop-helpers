@@ -1,19 +1,8 @@
 import { Locator, Response, test as base, expect } from "@playwright/test";
-import { LoremIpsum } from "../lorem.js";
 import type { TestBases } from "../stage/index.js";
-import { TestingConstants, TestingConstantsParameter } from "../util.js";
+import { LoremIpsum } from "../stage/lorem.js";
+import { TestingConstants, TestingConstantsParameter } from "../stage/util.js";
 
-declare module globalThis {
-    let installTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) => void;
-    let _TestingConstants: TestingConstants;
-    let getTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2) => TestingConstants[K][K2];
-}
-
-declare global {
-    let installTestingHandler: (typeof globalThis)["installTestingHandler"];
-    let _TestingConstants: TestingConstants;
-    let getTestingHandler: (typeof globalThis)["getTestingHandler"];
-}
 
 export const test = base.extend<{ shared: SharedFixtures }>({
     shared: async ({ page }, use) => {

@@ -21,7 +21,8 @@ export function useListNavigationSelection({ linearNavigationParameters, rovingT
             rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a); }) },
             managedChildrenReturn,
             singleSelectionParameters,
-            multiSelectionParameters
+            multiSelectionParameters,
+            processedIndexManglerReturn,
         });
         const { context: contextLN, props, rovingTabIndexReturn, ...retLN } = useListNavigation({
             rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },

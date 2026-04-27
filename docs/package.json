@@ -5,7 +5,7 @@
     "description": "Demo page for preact-prop-helpers",
     "source": "index.tsx",
     "main": "bundle.js",
-    "packageManager": "pnpm@8.6.11",
+    "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8",
     "browserslist": "defaults",
     "scripts": {
         "build-preact": "npx rollup -c rollup-p.config.mjs",
@@ -26,7 +26,7 @@
         "@types/lodash-es": "^4.17.12",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "rollup": "^4.28.1",
+        "rollup": "^4.60.2",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "serve": "^14.2.4"
     },

@@ -1,9 +1,10 @@
+import { OriginalIndex, UseProcessedIndexManglerReturnTypeSelf } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { identity } from "../util/lib-shared.js";
 import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
-import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { OnPassiveStateChange, PassiveStateUpdater, runImmediately, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
 
@@ -174,11 +175,13 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** 
      * Returns the `info` of the child at the specified index.
      * 
+     * The index is into the array of **repositioned** children if using the relevant processedChildren hooks.
+     * 
      * @remarks This is the same as what's passed to `useManagedChild`.
      * 
      * @stable
      */
-    getAt(index: M["index"]): M | undefined;
+    getAt(repositionedIndex: M["index"]): M | undefined;
     /** 
      * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      * 
@@ -283,9 +286,10 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
         // Retrieves the information associated with the child with the given index.
         // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = useCallback<ManagedChildren<M>["getAt"]>((index: IndexType) => {
+        const getManagedChildInfo = useCallback<ManagedChildren<M>["getAt"]>((index: IndexType, indexType?: "original" | "repositioned") => {
             if (typeof index == "number")
                 return managedChildrenArray.current.arr[index as number]!;
+
             else
                 return managedChildrenArray.current.rec[index as IndexType]!;
         }, []);
@@ -471,7 +475,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>({ c
 }
 
 
-export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
+export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
 
     /**
      * Which child is considered active on mount.
@@ -511,9 +515,6 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /** @stable */
     getAt(index: M): boolean;
 
-    /** Only needed when `closestFit` is true */
-    indexFromOriginalToRepositioned: Nullable<(index: M["index"]) => M["index"]>;
-
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
     isValid(index: M): boolean;
 }
@@ -552,20 +553,21 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * 
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
+export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     initialIndex ??= null;
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromOriginalToRepositioned);
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned);
 
-    indexFromOriginalToRepositioned ??= identity;
+    indexFromRepositionedToOriginal ??= identity as any;
+    indexFromOriginalToRepositioned ??= identity as any;
 
     // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange, useCallback(() => initialIndex, []));
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | OriginalIndex, R>(onIndexChange, useCallback(() => initialIndex as OriginalIndex, []), { debounceRendering: runImmediately });
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null, undefined, { initialization: "delay" });
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | OriginalIndex, R>(null, undefined, { debounceRendering: runImmediately, initialization: "delay" });
 
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
-    const getClosestFit = useCallback((requestedIndex: number) => {
+    const getClosestFit = useCallback((requestedIndex: number): number => {
         const children = getChildren();
         let closestDistance = Infinity;
         let closestIndex: number | null = null;
@@ -580,7 +582,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
                 }
             }
         });
-        return closestIndex;
+        return closestIndex!;
     }, [/* Must remain stable! */]);
 
     if (closestFit) {
@@ -593,28 +595,38 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason: R | undefined) => {
         const children = getChildren();
-        const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex()!);
-        const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex()!);
-        const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
-        if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-            console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+        // These indices are relative to the *original* child array.
+        const requestedIndexOriginal = (getRequestedIndex()!);
+        const currentIndexOriginal = (getCurrentIndex()!);
 
-            const closestFitIndex = getClosestFit(requestedIndex as number);
-            setCurrentIndex(closestFitIndex, reason!);
+        const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
+        const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
+
+        const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+
+        if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+            console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+
+            const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned as number);
+            const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+            setCurrentIndex(closestFitIndexOriginal, reason!);
             if (currentChild) {
-                setAt(currentChild, false, closestFitIndex, currentIndex);
+                setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
             }
-            if (closestFitIndex != null) {
-                const closestFitChild = children.getAt(closestFitIndex)!;
+            if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
+                const closestFitChild = children.getAt(closestFitIndexRepositioned)!;
                 console.assert(closestFitChild != null, "Internal logic???");
-                setAt(closestFitChild, true, closestFitIndex, currentIndex);
-                onClosestFit!(closestFitIndex);
+                setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
+                onClosestFit!(closestFitIndexOriginal as number);
             }
             else {
                 onClosestFit!(null);
             }
-
+        }
+        else {
+            if (currentChild)
+                setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
         }
     });
 
@@ -623,7 +635,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
 
     const changeIndex = useCallback<PassiveStateUpdater<M["index"] | null, R>>((arg: Parameters<PassiveStateUpdater<M["index"] | null, R>>[0], reason: Parameters<PassiveStateUpdater<M["index"] | null, R>>[1]) => {
         const children = getChildren();
-        const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M["index"];
+        const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as OriginalIndex;
         reasonRef.current = reason;
         setRequestedIndex(requestedIndex, reason as never);
         const currentIndex = getCurrentIndex();

@@ -1,8 +1,13 @@
 import { Nullable, createElement } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
-type RCMT = 'original' | 'repositioned';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 export type GetIndex = (row: VNode) => (number | undefined);
+export type OriginalIndex = number & {
+    _original?: true;
+};
+export type RepositionedIndex = number & {
+    _repositioned?: true;
+};
 export interface UseProcessedIndexManglerParametersSelf {
     /**
      * The sorted children to render.
@@ -31,13 +36,13 @@ export interface UseProcessedIndexManglerContextSelf {
      *
      * Shortcut for `mangler.map(n, "original", "repositioned")`
      */
-    indexFromOriginalToRepositioned: (index: number) => number;
+    indexFromOriginalToRepositioned: (index: OriginalIndex) => RepositionedIndex;
     /**
      * Takes a child's "visual" index and turns it into its ""programmatic index.
      *
      * Shortcut for `mangler.map(n, "repositioned", "original")`
      */
-    indexFromRepositionedToOriginal: (index: number) => number;
+    indexFromRepositionedToOriginal: (index: RepositionedIndex) => OriginalIndex;
 }
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf {
 }
@@ -49,7 +54,7 @@ export declare class ProcessedIndexMangler {
     private getIndex;
     private getSortValue;
     private compare;
-    constructor(getIndex: (vnode: VNode) => (number | undefined), getSortValue: (index: number) => unknown, compare: Compare<unknown>);
+    constructor(getIndex: <N extends OriginalIndex | RepositionedIndex>(vnode: VNode) => (N | undefined), getSortValue: (index: number) => unknown, compare: Compare<unknown>);
     /**
      * Converts between index types.
      *
@@ -61,7 +66,10 @@ export declare class ProcessedIndexMangler {
      * @param to
      * @returns
      */
-    map(index: number | undefined, from: RCMT, to: RCMT): number | undefined;
+    map(index: OriginalIndex | undefined, from: "original", to: "repositioned"): RepositionedIndex | undefined;
+    map(index: RepositionedIndex | undefined, from: "repositioned", to: "original"): OriginalIndex | undefined;
+    map(index: OriginalIndex | undefined, from: "original", to: "original"): OriginalIndex | undefined;
+    map(index: RepositionedIndex | undefined, from: "repositioned", to: "repositioned"): RepositionedIndex | undefined;
     private _originalChildren;
     sortedChildren: (VNode | null)[];
     private _originalToRepositioned;
@@ -72,5 +80,4 @@ export declare class ProcessedIndexMangler {
  * #__NO_SIDE_EFFECTS__
  */
 export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
-export {};
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

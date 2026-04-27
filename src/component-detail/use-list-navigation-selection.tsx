@@ -62,7 +62,8 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
             rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a) }) },
             managedChildrenReturn,
             singleSelectionParameters,
-            multiSelectionParameters
+            multiSelectionParameters,
+            processedIndexManglerReturn,
         });
         const {
             context: contextLN,

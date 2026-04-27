@@ -151,7 +151,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             const lowestChildIndex = getLowestIndex();
             const _original = (getTabbableIndex() ?? 0);
 
-            const targetDemangled = indexFromOriginalToRepositioned(requestedIndexMangled);
+            const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
             const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled });
             if (status == "past-end") {
                 if (navigatePastEnd == "wrap") {
@@ -221,7 +221,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
              * We mangle the index to get its "visual" position, add our offset,
              * and then demangle it to get the child that corresponds to the next child "visually".
              */
-            const targetMangled = indexFromRepositionedToOriginal(original) + offset;
+            const targetMangled = indexFromOriginalToRepositioned(original) + offset;
             return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
         })
         const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
@@ -356,14 +356,14 @@ export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildInde
 function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, lowestChildIndex: lower, targetDemangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
-        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) - 1);
+        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled < lower) {
-        return { valueRepositioned: indexFromOriginalToRepositioned(lower), status: "past-start" };
+        return { valueRepositioned: indexFromRepositionedToOriginal(lower), status: "past-start" };
     }
     else {
         return { valueRepositioned: targetDemangled, status: "normal" };
@@ -373,14 +373,14 @@ function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepo
 function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "lowestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
-        targetDemangled = indexFromOriginalToRepositioned(indexFromRepositionedToOriginal(targetDemangled) + 1);
+        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled > upper) {
-        return { valueRepositioned: indexFromOriginalToRepositioned(upper), status: "past-end" };
+        return { valueRepositioned: indexFromRepositionedToOriginal(upper), status: "past-end" };
     }
     else {
         return { valueRepositioned: targetDemangled, status: "normal" };

@@ -71,7 +71,13 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
     const reverse2 = useCallback(() => {
         sortValues.current = reverse(sortValues.current);
         refreshRows();
-    }, [])
+    }, []);
+
+    const causeProblems = useCallback(() => {
+        const problemIndex = 7;
+        sortValues.current[problemIndex] = -100000;
+        refreshRows();
+    }, []);
 
     let sortValues = useRef<number[]>([]);
 
@@ -142,6 +148,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle2()}>Shuffle</button>
             <button onClick={() => reverse2()}>Reverse</button>
+            <button onClick={(e) => { e.currentTarget.focus(); setSingleSelectedIndex(0); causeProblems(); }}>Cause problems</button>
             <button onClick={() => halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn()}>Halve # of children in {secondsToHalve} seconds</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {singleSelectedIndex})</label>

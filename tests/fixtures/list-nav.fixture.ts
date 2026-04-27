@@ -15,6 +15,7 @@ export const test = base.extend<{listNav: ListNavFixtures}>({
         const list = locator.locator("[role=toolbar]");
         await focusableFirst.focus();
         await expect(list).toBeAttached();
+        await expect(focusableFirst).toBeFocused();
         const resetChildrenButton = page.locator("#reduce-child-count");
         const reduceChildrenButton = page.locator("#reset-child-order");
         const shuffleChildrenButton = page.locator("#shuffle-child-order");

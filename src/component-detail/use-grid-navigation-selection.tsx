@@ -114,7 +114,8 @@ export function useGridNavigationSelection<ParentOrRowElement extends Element, R
             rovingTabIndexReturn,
             singleSelectionParameters,
             multiSelectionParameters,
-            childrenHaveFocusReturn
+            childrenHaveFocusReturn,
+            processedIndexManglerReturn,
         });
 
         assertEmptyObject(void1);

@@ -1,8 +1,8 @@
 import { createContext } from "preact";
 import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowsInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
 import { useCallback, useContext, useEffect, useMemo, useState } from "preact/hooks";
-import { LoremIpsum } from "../lorem.js";
-import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
+import { LoremIpsum } from "../stage/lorem.js";
+import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../stage/util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
 
 

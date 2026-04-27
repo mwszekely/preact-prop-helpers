@@ -1,6 +1,6 @@
 import { useRefElement } from "preact-prop-helpers";
 import { useCallback, useState } from "preact/hooks";
-import { fromStringBoolean, useTestSyncState } from "../util.js";
+import { fromStringBoolean, useTestSyncState } from "../stage/util.js";
 
 export interface RefElementConstants {
     setSwapped(swapped: boolean): void;

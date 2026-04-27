@@ -2,7 +2,7 @@ import { assertEmptyObject } from "../util/assert.js";
 import { identity } from "../util/lib-shared.js";
 import { debounceRendering, useCallback, useEffect, useLayoutEffect, useRef } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
-import { useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { runImmediately, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useMemoObject } from "./use-stable-getter.js";
 /**
@@ -77,7 +77,7 @@ export function useManagedChildren(parentParameters) {
         }, []);
         // Retrieves the information associated with the child with the given index.
         // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = useCallback((index) => {
+        const getManagedChildInfo = useCallback((index, indexType) => {
             if (typeof index == "number")
                 return managedChildrenArray.current.arr[index];
             else
@@ -245,13 +245,14 @@ export function useManagedChild({ context, info }) {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export function useChildrenFlag({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
+export function useChildrenFlag({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     initialIndex ??= null;
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromOriginalToRepositioned);
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned);
+    indexFromRepositionedToOriginal ??= identity;
     indexFromOriginalToRepositioned ??= identity;
     // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useCallback(() => initialIndex, []));
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { initialization: "delay" });
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useCallback(() => initialIndex, []), { debounceRendering: runImmediately });
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, { debounceRendering: runImmediately, initialization: "delay" });
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
     const getClosestFit = useCallback((requestedIndex) => {
@@ -279,25 +280,33 @@ export function useChildrenFlag({ getChildren, indexFromOriginalToRepositioned, 
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
-        const requestedIndex = indexFromOriginalToRepositioned(getRequestedIndex());
-        const currentIndex = indexFromOriginalToRepositioned(getCurrentIndex());
-        const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-        if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-            console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-            const closestFitIndex = getClosestFit(requestedIndex);
-            setCurrentIndex(closestFitIndex, reason);
+        // These indices are relative to the *original* child array.
+        const requestedIndexOriginal = (getRequestedIndex());
+        const currentIndexOriginal = (getCurrentIndex());
+        const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
+        const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
+        const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+        if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+            console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+            const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned);
+            const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+            setCurrentIndex(closestFitIndexOriginal, reason);
             if (currentChild) {
-                setAt(currentChild, false, closestFitIndex, currentIndex);
+                setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
             }
-            if (closestFitIndex != null) {
-                const closestFitChild = children.getAt(closestFitIndex);
+            if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
+                const closestFitChild = children.getAt(closestFitIndexRepositioned);
                 console.assert(closestFitChild != null, "Internal logic???");
-                setAt(closestFitChild, true, closestFitIndex, currentIndex);
-                onClosestFit(closestFitIndex);
+                setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
+                onClosestFit(closestFitIndexOriginal);
             }
             else {
                 onClosestFit(null);
             }
+        }
+        else {
+            if (currentChild)
+                setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
         }
     });
     const reasonRef = useRef(undefined);

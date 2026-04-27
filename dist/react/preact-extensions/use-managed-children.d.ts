@@ -1,3 +1,4 @@
+import { UseProcessedIndexManglerReturnTypeSelf } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { Nullable } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
 export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
@@ -120,11 +121,13 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /**
      * Returns the `info` of the child at the specified index.
      *
+     * The index is into the array of **repositioned** children if using the relevant processedChildren hooks.
+     *
      * @remarks This is the same as what's passed to `useManagedChild`.
      *
      * @stable
      */
-    getAt(index: M["index"]): M | undefined;
+    getAt(repositionedIndex: M["index"]): M | undefined;
     /**
      * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      *
@@ -187,7 +190,7 @@ export declare function useManagedChildren<M extends ManagedChildInfo<string | n
  * @compositeParams
  */
 export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
-export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
+export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
     /**
      * Which child is considered active on mount.
      *
@@ -219,8 +222,6 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
     /** @stable */
     getAt(index: M): boolean;
-    /** Only needed when `closestFit` is true */
-    indexFromOriginalToRepositioned: Nullable<(index: M["index"]) => M["index"]>;
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
     isValid(index: M): boolean;
 }
@@ -257,6 +258,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
+export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};
 //# sourceMappingURL=use-managed-children.d.ts.map

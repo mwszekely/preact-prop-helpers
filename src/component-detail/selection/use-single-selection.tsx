@@ -14,6 +14,7 @@ import { ElementProps, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
+import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 
 /**
  * 
@@ -33,8 +34,17 @@ const DUMMY = 0;
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+
+    /**
+     * 
+     */
     singleSelected: boolean;
+
+    /**
+     * 
+     */
     getSingleSelected(): boolean;
+
     /**
      * The parent calls this to change the child's local state.
      * 
@@ -44,13 +54,6 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      * @param direction - How far to the `selectedIndex` this child is
      */
     setLocalSingleSelected(selected: boolean, direction: number | null): void;
-
-    /**
-     * This is similar to `untabbable` for `useRovingTabIndex`, but for selection.
-     * 
-     * Disables selecting this child. Being `untabbable` must imply being `unselectable`, but you can of course have something that's unselectable but not untabbable.
-     */
-    //unselectable: boolean;
 }
 
 export type SingleSelectionChangeHandler = EnhancedEventHandler<Event, { selectedIndex: number }>;
@@ -162,7 +165,8 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
 
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
     TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">,
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex">,
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
 }
 
@@ -214,6 +218,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
     managedChildrenReturn: { getChildren, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void5 },
     ...void4
 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement> {
     return useMonitoring(function useSingleSelection(): UseSingleSelectionReturnType<ChildElement> {
@@ -221,6 +226,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         assertEmptyObject(void2);
         assertEmptyObject(void3);
         assertEmptyObject(void4);
+        assertEmptyObject(void5);
 
         type R = Event;
         const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
@@ -253,7 +259,8 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             isValid: isSelectedValid,
             closestFit: false,
             onClosestFit: null,
-            indexFromOriginalToRepositioned: null
+            indexFromRepositionedToOriginal,
+            indexFromOriginalToRepositioned
         });
         return {
             singleSelectionReturn: useMemoObject({

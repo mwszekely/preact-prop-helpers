@@ -82,12 +82,14 @@ test.describe("Pressing and long pressing", () => {
             await install("Press", "onPress", (e) => { window.increment?.(); });
 
             const button = press[buttonType];
+            expect(getCounter()).toBe(0);
             await button.focus();
+            expect(getCounter()).toBe(0);
             await page.keyboard.down("Space");
             expect(getCounter()).toBe(0);
             await expect(button).toHaveAttribute("data-pressing", "true");
             await page.keyboard.up("Space");
-            expect(getCounter()).toBe(1);
+            expect.poll(() => getCounter()).toBe(1);
             await expect(button).not.toHaveAttribute("data-pressing", "true");
         });
 

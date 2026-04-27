@@ -1,26 +1,12 @@
 import { options, render } from "preact";
 import { preactAddUseInsertionEffectHook, useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
 import { useEffect, useRef } from "preact/hooks";
-import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
 import { TestBasesListNav } from "../fixtures/list-nav.stage.js";
 import { TestBasesButton } from "../fixtures/press.stage.js";
 import { TestBasesRefElement } from "../fixtures/ref-element.stage.js";
-import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
-
-
-declare module globalThis {
-    let installTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) => void;
-    let _TestingConstants: TestingConstants;
-    let getTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2) => TestingConstants[K][K2];
-
-    // TODO: Rename run, both here and in Playwright.
-    // This is here so that both sides can just call run and it just works,
-    // but it should have a different name in that case.
-    let run: SharedFixtures["run"];
-}
-
+import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "./util.js";
 
 //(globalThis as any).LOG_FOCUS_CHANGES = true;
 //(window as any)._generate_setState_stacks = true;
@@ -36,7 +22,53 @@ globalThis.getTestingHandler = function getTestingHandler<K extends keyof Testin
     (globalThis)._TestingConstants[key] ??= {} as any;
     return (globalThis)._TestingConstants[key][Key2] ?? undefined!; // || (noop as never);
 };
+globalThis.getFocusedElementSelector = function () {
+    let focusedElement = document.activeElement;
+    if (focusedElement) {
+        return getDomPath(focusedElement);
+    }
+    else {
+        return "<null>"
+    }
+}
 globalThis.run = (key, key2, ...args) => ((globalThis).getTestingHandler?.(key, key2) as Function | null)?.(...(args as any[]));
+
+// From https://stackoverflow.com/a/69104350
+function getDomPath(el: Element | ParentNode | null): string {
+    if (el == null)
+        return '';
+
+    let nodeName = el.nodeName.toLowerCase();
+
+    let nth = 0;
+    let siblingCount = 0;
+    let parentNode = el.parentNode;
+    if (parentNode?.children) {
+        siblingCount = parentNode.children.length;
+        for (let i = 0; i < parentNode.children.length; ++i) {
+            if (parentNode.children[i] == el) {
+                nth = i;
+                break;
+            }
+        }
+    }
+
+    let childIndex = ''
+
+    if (siblingCount > 2)
+        childIndex = `[${nth}]→`;
+    else
+        childIndex = `→`;
+
+    if (el === document.body)
+        return 'body';
+    if ("id" in el && el.id)
+        nodeName += '#' + el.id;
+    else if ("classList" in el && el.classList.length)
+        nodeName += '.' + [...el.classList].join('.');
+
+    return getDomPath(el.parentNode) + (childIndex || " ") + nodeName;
+};
 
 function noop() { }
 /*

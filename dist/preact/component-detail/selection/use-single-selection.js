@@ -34,12 +34,13 @@ const DUMMY = 0;
  *
  * @compositeParams
  */
-export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
+export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void5 }, ...void4 }) {
     return useMonitoring(function useSingleSelection() {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
         assertEmptyObject(void4);
+        assertEmptyObject(void5);
         const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
         const getSelectedAt = useCallback((m) => { return m.getSingleSelected(); }, []);
         const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
@@ -64,7 +65,8 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
             isValid: isSelectedValid,
             closestFit: false,
             onClosestFit: null,
-            indexFromOriginalToRepositioned: null
+            indexFromRepositionedToOriginal,
+            indexFromOriginalToRepositioned
         });
         return {
             singleSelectionReturn: useMemoObject({

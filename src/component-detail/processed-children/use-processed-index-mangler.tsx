@@ -9,6 +9,9 @@ type RCMT = 'original' | 'repositioned';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 export type GetIndex = (row: VNode) => (number | undefined);
 
+export type OriginalIndex = number & { _original?: true };
+export type RepositionedIndex = number & { _repositioned?: true };
+
 export interface UseProcessedIndexManglerParametersSelf {
     /**
      * The sorted children to render.
@@ -44,14 +47,14 @@ export interface UseProcessedIndexManglerContextSelf {
      * 
      * Shortcut for `mangler.map(n, "original", "repositioned")`
      */
-    indexFromOriginalToRepositioned: (index: number) => number;
+    indexFromOriginalToRepositioned: (index: OriginalIndex) => RepositionedIndex;
 
     /**
      * Takes a child's "visual" index and turns it into its ""programmatic index.
      * 
      * Shortcut for `mangler.map(n, "repositioned", "original")`
      */
-    indexFromRepositionedToOriginal: (index: number) => number;
+    indexFromRepositionedToOriginal: (index: RepositionedIndex) => OriginalIndex;
 }
 
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf { }
@@ -63,10 +66,10 @@ export function useProcessedIndexMangler({ processedIndexManglerParameters: { ge
     return useMonitoring(function useProcessedIndexMangler(): UseProcessedIndexManglerReturnType {
         useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
 
-        const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
+        const mangler = useMemo(() => new ProcessedIndexMangler(getIndex as any, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
 
-        const indexFromOriginalToRepositioned = useCallback((n: number) => (mangler.map(n, "original", "repositioned") ?? n), []);
-        const indexFromRepositionedToOriginal = useCallback((n: number) => (mangler.map(n, "repositioned", "original") ?? n), []);
+        const indexFromOriginalToRepositioned = useCallback((n: OriginalIndex): RepositionedIndex => (mangler.map(n, "original", "repositioned")!), []);
+        const indexFromRepositionedToOriginal = useCallback((n: RepositionedIndex): OriginalIndex => (mangler.map(n, "repositioned", "original")!), []);
 
         const context = useMemoObject<UseProcessedIndexManglerContext>({
             processedIndexManglerContext: useMemoObject<UseProcessedIndexManglerContextSelf>({
@@ -90,7 +93,7 @@ export function useProcessedIndexMangler({ processedIndexManglerParameters: { ge
 }
 
 export class ProcessedIndexMangler {
-    constructor(private getIndex: (vnode: VNode) => (number | undefined), private getSortValue: (index: number) => unknown, private compare: Compare<unknown>) { }
+    constructor(private getIndex: (vnode: VNode) => (OriginalIndex | undefined), private getSortValue: (index: number) => unknown, private compare: Compare<unknown>) { }
 
     /**
      * Converts between index types.
@@ -103,7 +106,11 @@ export class ProcessedIndexMangler {
      * @param to 
      * @returns 
      */
-    map(index: number | undefined, from: RCMT, to: RCMT): number | undefined {
+    map(index: OriginalIndex | undefined, from: "original", to: "repositioned"): RepositionedIndex | undefined;
+    map(index: RepositionedIndex | undefined, from: "repositioned", to: "original"): OriginalIndex | undefined;
+    map(index: OriginalIndex | undefined, from: "original", to: "original"): OriginalIndex | undefined;
+    map(index: RepositionedIndex | undefined, from: "repositioned", to: "repositioned"): RepositionedIndex | undefined;
+    map(index: OriginalIndex | RepositionedIndex | undefined, from: RCMT, to: RCMT): OriginalIndex | RepositionedIndex | undefined {
         if (index == undefined)
             return undefined;
 
@@ -111,13 +118,13 @@ export class ProcessedIndexMangler {
             case 'repositioned': {
                 switch (to) {
                     case 'repositioned': return index;
-                    case 'original': return this._repositionedToOriginal.get(index);
+                    case 'original': return this._repositionedToOriginal.get(index as RepositionedIndex);
                 }
             }
             case 'original': {
                 switch (to) {
                     case 'original': return index;
-                    case 'repositioned': return this._originalToRepositioned.get(index);
+                    case 'repositioned': return this._originalToRepositioned.get(index as OriginalIndex);
                 }
             }
         }
@@ -125,14 +132,15 @@ export class ProcessedIndexMangler {
 
     private _originalChildren: (VNode | null)[] = [];
     public sortedChildren: (VNode | null)[] = [];
-    private _originalToRepositioned = new Map<number, number>();
-    private _repositionedToOriginal = new Map<number, number>();
+    private _originalToRepositioned = new Map<OriginalIndex, RepositionedIndex>();
+    private _repositionedToOriginal = new Map<RepositionedIndex, OriginalIndex>();
 
-    setChildren(children: (VNode | null)[]) {
+    setChildren(children2: (VNode | null)[]) {
+        debugger;
         this._originalToRepositioned.clear();
         this._repositionedToOriginal.clear();
 
-        this._originalChildren = children.slice();
+        this._originalChildren = children2.slice();
         this.sortedChildren = [];
 
         let sortedChildrenWithoutNulls = this._originalChildren.slice().map((vnode, processedIndex) => {
@@ -152,20 +160,20 @@ export class ProcessedIndexMangler {
         // This is a kind of, like, splice/zip of the two arrays, while setting the mappings between them.
         // It's kind of hard to follow--wish you could put, like, hand-drawn, diagrams in comments.
         while (true) {
-            if (rawChildIndexIn >= children.length)
+            if (rawChildIndexIn >= this._originalChildren.length)
                 break;
             if (sortedChildIndexIn >= sortedChildrenWithoutNulls.length)
                 break;
 
             // This value doesn't directly correspond to either an original or a repositioned index.
             // We could have 2 children at indices [100, 101], remember.
-            const childOriginal = children[rawChildIndexIn];
-            const indexRepositioned = childOriginal == null ? undefined : this.getIndex(childOriginal);
+            const childRepositioned = this._originalChildren[rawChildIndexIn];
+            const indexRepositioned = childRepositioned == null ? undefined : this.getIndex(childRepositioned);
 
 
             if (indexRepositioned == null) {
                 // This was a hole in the original array, so just copy it over directly to its original spot.
-                this.sortedChildren[rawChildIndexIn] = childOriginal;
+                this.sortedChildren[rawChildIndexIn] = childRepositioned;
                 // Then move onto the next child.
                 ++rawChildIndexIn;
             }
@@ -196,9 +204,9 @@ export class ProcessedIndexMangler {
                 const indexOriginal = childAtRepositionedSpot.indexOriginal!;
 
 
-                this._originalToRepositioned.set(indexRepositioned, indexOriginal);
-                this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
-                
+                this._repositionedToOriginal.set(indexRepositioned, indexOriginal);
+                this._originalToRepositioned.set(indexOriginal, indexRepositioned);
+
                 this.sortedChildren[rawChildIndexIn] = createElement(childAtRepositionedSpot.vnode!.type as any, {
                     ...childAtRepositionedSpot.vnode!.props,
                     indexOriginal: indexOriginal,
