@@ -135,7 +135,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             debugger; child.setLocallyTabbable(t); }, []);
         const isTabbableValid = useStableCallback((child) => { return !child.untabbable; });
         const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
-            initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
+            initialIndex: (initiallyTabbedIndex ?? (untabbable ? null : 0)),
             onIndexChange: useStableCallback((n, p, r) => {
                 debugLog(`useRovingTabIndex.useChildrenFlag.nIndexChange`);
                 // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange

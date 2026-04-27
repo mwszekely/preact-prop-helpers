@@ -3,7 +3,7 @@ import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js"
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
@@ -60,6 +60,12 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
     typeaheadTimeout: number;
+    /**
+     * From `ManagedChildren`
+     *
+     * TODO: Obviously remove this once `ManagedChildren` is removed
+     */
+    getHighestIndex(): OriginalIndex;
 }
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
@@ -83,7 +89,7 @@ export interface UseTypeaheadNavigationChildReturnType extends TargetedPick<UseT
 }
 interface TypeaheadInfo {
     text: string | null;
-    indexReordered: number;
+    indexOriginal: OriginalIndex;
 }
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
@@ -94,7 +100,7 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, getHighestIndex, ...void3 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 /**
  *
  * @compositeParams

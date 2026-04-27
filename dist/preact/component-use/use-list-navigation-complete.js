@@ -43,7 +43,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
         const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
             managedChildrenReturn: { getChildren },
             linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { getHighestIndex, isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             singleSelectionParameters,
             multiSelectionParameters,

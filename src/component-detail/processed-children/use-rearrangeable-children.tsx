@@ -148,8 +148,7 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
             if (animate) {
                 for (const ch of rearrangedChildren) {
                     const index = ch == null ? null : getIndex(ch);
-                    const mangledIndex = index == null ? null : mangler.map(index, "repositioned", "original");
-                    const demangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
+                    const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
                     if (index != null && mangledIndex != null) {
                         const info = getManagedChildren().getAt(index);
                         const info2 = getManagedChildren().getAt(mangledIndex);

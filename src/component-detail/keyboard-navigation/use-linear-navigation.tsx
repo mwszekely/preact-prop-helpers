@@ -2,16 +2,16 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { debugLog, EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
+import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, RepositionedIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface LinearNavigationResult {
-    valueRepositioned: number | null;
+    valueRepositioned: RepositionedIndex | null;
     status: "normal" | "past-start" | "past-end"
 }
 
@@ -40,14 +40,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: OriginalIndex, event: KeyboardEventType<ChildElement>) => void>;
 
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      * 
      * @stable
      */
-    isValidForLinearNavigation(i: number): boolean;
+    isValidForLinearNavigation(i: OriginalIndex): boolean;
 
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
@@ -101,7 +101,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    getHighestIndex(): number;
+    getHighestIndex(): OriginalIndex;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      * 
@@ -109,7 +109,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    getLowestIndex(): number;
+    getLowestIndex(): OriginalIndex;
 }
 
 
@@ -144,15 +144,19 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
         useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
 
-        const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
-            debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
+        const navigateAbsolute = useCallback((requestedIndex: OriginalIndex, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
+            //const requestedIndexMangled = indexFromOriginalToRepositioned(requestedIndex);
+            //debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
 
+            debugger;
+            
             const highestChildIndex = getHighestIndex();
             const lowestChildIndex = getLowestIndex();
             const _original = (getTabbableIndex() ?? 0);
 
-            const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
-            const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled });
+            //const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
+            const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled: requestedIndex });
+            const valueOriginal = valueRepositioned == null? null : indexFromRepositionedToOriginal(valueRepositioned);
             if (status == "past-end") {
                 if (navigatePastEnd == "wrap") {
                     if (mode == "single")
@@ -164,7 +168,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                         // It works fine, the problem isn't that -- the problem is it just feels wrong. 
                         // Page Up/Down don't feel like they should wrap, even if normally requested. 
                         // That's the arrow keys' domain.
-                        if (false && (valueRepositioned == getTabbableIndex()))
+                        if (false && (valueOriginal == getTabbableIndex()))
                             navigateToFirst(e, fromUserInteraction);
                         else
                             navigateToLast(e, fromUserInteraction);
@@ -187,7 +191,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     else {
                         /* eslint-disable no-constant-condition */
                         // See above. It works fine but just feels wrong to wrap on Page Up/Down.
-                        if (false && valueRepositioned == getTabbableIndex())
+                        if (false && valueOriginal == getTabbableIndex())
                             navigateToLast(e, fromUserInteraction);
                         else
                             navigateToFirst(e, fromUserInteraction);
@@ -203,17 +207,17 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 }
             }
             else {
-                setTabbableIndex(valueRepositioned, e, fromUserInteraction);
-                onNavigateLinear?.(valueRepositioned!, e as KeyboardEventType<ChildElement>);
+                setTabbableIndex(valueOriginal, e, fromUserInteraction);
+                onNavigateLinear?.(valueOriginal!, e as KeyboardEventType<ChildElement>);
                 return "stop";
             }
         }, []);
-        const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
-        const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
-        const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
+        const navigateToFirst = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, event, fromUserInteraction, "single"); });
+        const navigateToLast = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, event, fromUserInteraction, "single"); });
+        const navigateRelative2 = useStableCallback((event: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
             const _highestChildIndex = getHighestIndex();
             const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
-            const original = (getTabbableIndex() ?? 0);
+            const original = (getTabbableIndex() ?? (0 as never));
             /**
              * To get the target, we need to add (or subtract) 1 to our current value,
              * but it need to be relative to any sorting/rearranging that's happened.
@@ -221,8 +225,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
              * We mangle the index to get its "visual" position, add our offset,
              * and then demangle it to get the child that corresponds to the next child "visually".
              */
-            const targetMangled = indexFromOriginalToRepositioned(original) + offset;
-            return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
+            const targetMangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(original) + offset as RepositionedIndex);
+            return navigateAbsolute(targetMangled, searchDirection, event, fromUserInteraction, mode);
         })
         const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
             return navigateRelative2(e, 1, fromUserInteraction, "single");
@@ -230,9 +234,6 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
             return navigateRelative2(e, -1, fromUserInteraction, "single");
         });
-        //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
-        //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
-        //const getPageNavigationSize = useStableGetter(pageNavigationSize);
 
 
         const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
@@ -328,10 +329,10 @@ export interface TryNavigateToIndexParameters {
     isValid(index: number): boolean;
 
     //default: number;
-    targetDemangled: number;
+    targetDemangled: OriginalIndex;
     searchDirection: 1 | -1;
-    indexFromRepositionedToOriginal: (n: number) => number;
-    indexFromOriginalToRepositioned: (n: number) => number;
+    indexFromRepositionedToOriginal: (n: RepositionedIndex) => OriginalIndex;
+    indexFromOriginalToRepositioned: (n: OriginalIndex) => RepositionedIndex;
 
 }
 /**
@@ -343,47 +344,47 @@ export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildInde
         let bestUpResult: LinearNavigationResult | undefined = undefined;
         bestUpResult = tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
         bestUpResult ??= tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
-        return bestUpResult || { valueRepositioned: targetDemangled, status: "normal" };
+        return bestUpResult || { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
     }
     else {
         let bestDownResult: LinearNavigationResult | undefined = undefined;
         bestDownResult = tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex });
         bestDownResult ??= tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, lowestChildIndex });
-        return bestDownResult || { valueRepositioned: targetDemangled, status: "normal" };
+        return bestDownResult || { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
     }
 }
 
 function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, lowestChildIndex: lower, targetDemangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
-        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1);
+        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1 as RepositionedIndex);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled < lower) {
-        return { valueRepositioned: indexFromRepositionedToOriginal(lower), status: "past-start" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(lower as OriginalIndex), status: "past-start" };
     }
     else {
-        return { valueRepositioned: targetDemangled, status: "normal" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
     }
 }
 
 function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, targetDemangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "lowestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
-        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1);
+        targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1 as RepositionedIndex);
     }
 
     if (!isValid(targetDemangled)) {
         return undefined;
     }
     if (targetDemangled > upper) {
-        return { valueRepositioned: indexFromRepositionedToOriginal(upper), status: "past-end" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(upper as OriginalIndex), status: "past-end" };
     }
     else {
-        return { valueRepositioned: targetDemangled, status: "normal" };
+        return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
     }
 }
 

@@ -122,7 +122,7 @@ refElementReturn, ...void1 }) {
             managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
-            processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity, indexFromRepositionedToOriginal: identity },
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned: (identity), indexFromRepositionedToOriginal: (identity) },
             rovingTabIndexParameters: {
                 untabbableBehavior: "leave-child-focused",
                 focusSelfParent: whenThisRowIsFocused,

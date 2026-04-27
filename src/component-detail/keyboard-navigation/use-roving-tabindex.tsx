@@ -12,9 +12,9 @@ import { debugLog, EventType, FocusEventType, StateUpdater, TargetedPick, useCal
 import { ElementProps, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, shouldAlsoFocus: boolean) => void;
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<OriginalIndex | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, shouldAlsoFocus: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
 
@@ -79,7 +79,8 @@ export interface UseRovingTabIndexReturnTypeSelf {
      * 
      * @stable
      */
-    getTabbableIndex: () => number | null;
+    getTabbableIndex: () => OriginalIndex | null;
+
     /** 
      * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      * 
@@ -89,15 +90,7 @@ export interface UseRovingTabIndexReturnTypeSelf {
 }
 
 
-export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
-
-    /**
-     * A **unique integer** (among siblings) representing this child like the index to an array. 
-     * 
-     * @remarks There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
-     */
-    index: number;
-
+export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo {
 
     /**
      * How is this child focused? (Generally just `e => e.focus()`)
@@ -282,7 +275,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
         assertEmptyObject(void1);
 
-        const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
+        const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex as OriginalIndex);
         const getUntabbable = useStableGetter(untabbable);
 
         /**
@@ -298,7 +291,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
             // Notify the relevant children that they should become tabbable/untabbable,
             // but also handle focus management when we changed due to user interaction
-            return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex: number | null | undefined): number | null {
+            return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex: OriginalIndex | null | undefined): OriginalIndex | null {
                 const document = getDocument();
                 let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
                 const untabbable = getUntabbable();
@@ -364,7 +357,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
         // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
         // So every time we change the index for any reason, record that change as a back up here that can be restored.
-        const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState<number, EventType<any, any>>(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
+        const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState<OriginalIndex, EventType<any, any>>(null, useCallback(() => (initiallyTabbedIndex ?? 0) as OriginalIndex, []));
 
         // Any time we switch to being untabbable, set the current tabbable index accordingly.
         useEffect(() => {
@@ -398,7 +391,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
         const setTabbableAt = useCallback((child: M, t: boolean) => { if (child.index == 8) debugger; child.setLocallyTabbable(t); }, []);
         const isTabbableValid = useStableCallback((child: M) => { return !child.untabbable; });
         const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, EventType<any, any> | undefined>({
-            initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
+            initialIndex: (initiallyTabbedIndex ?? (untabbable ? null : 0)) as OriginalIndex,
             onIndexChange: useStableCallback((n, p, r) => {
                 debugLog(`useRovingTabIndex.useChildrenFlag.nIndexChange`);
                 // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange

@@ -190,7 +190,7 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
         // Enormous bag of parameters for useGridNavigationRow
         const parameters = {
             rovingTabIndexParameters,
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
             linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
             refElementReturn,

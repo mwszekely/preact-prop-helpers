@@ -4,8 +4,8 @@ import { ManagedChildInfo, UseGenericChildParameters, UseManagedChildrenParamete
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EventType, StateUpdater, TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, shouldAlsoFocus: boolean) => void;
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<OriginalIndex | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, shouldAlsoFocus: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> {
     /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
@@ -59,7 +59,7 @@ export interface UseRovingTabIndexReturnTypeSelf {
      *
      * @stable
      */
-    getTabbableIndex: () => number | null;
+    getTabbableIndex: () => OriginalIndex | null;
     /**
      * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      *
@@ -67,13 +67,7 @@ export interface UseRovingTabIndexReturnTypeSelf {
      */
     focusSelf: (reason?: any) => void;
 }
-export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
-    /**
-     * A **unique integer** (among siblings) representing this child like the index to an array.
-     *
-     * @remarks There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
-     */
-    index: number;
+export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo {
     /**
      * How is this child focused? (Generally just `e => e.focus()`)
      *

@@ -751,14 +751,15 @@ function identity(value) {
 }
 function noop() {}
 
-//// @ts-expect-error
+// Patch the type (only the type) of useCallback to allow for nullable functions
+const useCallback = q$1;
 function debounceRendering(f) {
-  // TODO?
-  return queueMicrotask(f);
-  //(options.debounceRendering ?? queueMicrotask)(f);
+  (l$1.debounceRendering ?? queueMicrotask)(f);
 }
-const onfocusin = "onFocus";
-const onfocusout = "onBlur";
+// @ts-expect-error (These are correct, I don't know why the types are wrong all of a sudden...?)
+const onfocusin = "onfocusin";
+// @ts-expect-error (Capitalizing these results in errors with at least grid navigation)
+const onfocusout = "onfocusout";
 
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
@@ -830,7 +831,7 @@ function usePassiveState(onChange, getInitialValue, {
   // Make sure that the provided functions are perfectly stable across renders
   useEnsureStability("usePassiveState", initialization, onChange, getInitialValue, customDebounceRendering);
   // Shared between "dependency changed" and "component unmounted".
-  const onShouldCleanUp = q$1(() => {
+  const onShouldCleanUp = useCallback(() => {
     const cleanupCallback = cleanupCallbackRef.current;
     if (cleanupCallback) cleanupCallback();
   }, []);
@@ -838,7 +839,7 @@ function usePassiveState(onChange, getInitialValue, {
   // value in place of having no value at all yet.
   // This is the shared code for that, used on mount and whenever
   // getValue is called.
-  const tryEnsureValue = q$1(() => {
+  const tryEnsureValue = useCallback(() => {
     if (valueRef.current === Unset$2 && getInitialValue != undefined) {
       try {
         const initialValue = getInitialValue();
@@ -849,7 +850,7 @@ function usePassiveState(onChange, getInitialValue, {
       }
     }
   }, [/* getInitialValue, onChange, and initialization intentionally omitted */]);
-  const getValue = q$1(() => {
+  const getValue = useCallback(() => {
     if (warningRef.current) console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
     // The first time we call getValue, if we haven't been given a value yet,
     // (and we were given an initial value to use)
@@ -872,7 +873,7 @@ function usePassiveState(onChange, getInitialValue, {
     }, []);
   }
   // The actual code the user calls to (possibly) run a new effect.
-  const setValue = q$1((arg, reason) => {
+  const setValue = useCallback((arg, reason) => {
     // Regardless of anything else, figure out what our next value is about to be.
     const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$2 ? undefined : valueRef.current) : arg;
     //let id = getId();
@@ -1035,7 +1036,7 @@ function useStableGetter(value) {
   useBeforeLayoutEffect(() => {
     ref.current = value;
   }, [value]);
-  return q$1(() => {
+  return useCallback(() => {
     if (ref.current === Unset$1) {
       throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
     }
@@ -1074,12 +1075,12 @@ function useStableCallback(fn, noDeps) {
   if (isStableGetter()) return fn;
   if (noDeps == null) {
     const currentCallbackGetter = useStableGetter(fn);
-    return setIsStableGetter(q$1((...args) => {
+    return setIsStableGetter(useCallback((...args) => {
       return currentCallbackGetter()(...args);
     }, []));
   } else {
     console.assert(noDeps.length === 0);
-    return setIsStableGetter(q$1(fn, []));
+    return setIsStableGetter(useCallback(fn, []));
   }
 }
 /**
@@ -1872,7 +1873,7 @@ function generateStack() {
 function useStack() {
   {
     const stack = T$1(generateStack, []);
-    const getStack = q$1(() => stack, []);
+    const getStack = useCallback(() => stack, []);
     return getStack;
   }
 }
@@ -1969,10 +1970,10 @@ function useTimeout({
       }
     }
   }, [triggerIndex, disabled]);
-  const getElapsedTime = q$1(() => {
+  const getElapsedTime = useCallback(() => {
     return +new Date() - +(startTimeRef.current ?? new Date());
   }, []);
-  const getRemainingTime = q$1(() => {
+  const getRemainingTime = useCallback(() => {
     const timeout = getTimeout();
     return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
   }, []);
@@ -2068,11 +2069,14 @@ function useLinearNavigation({
   return useMonitoring(function useLinearNavigation() {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
-    const navigateAbsolute = q$1((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
+    const navigateAbsolute = useCallback((requestedIndex, searchDirection, e, fromUserInteraction, mode) => {
+      //const requestedIndexMangled = indexFromOriginalToRepositioned(requestedIndex);
+      //debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
+      debugger;
       const highestChildIndex = getHighestIndex();
       const lowestChildIndex = getLowestIndex();
       getTabbableIndex() ?? 0;
-      const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
+      //const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
       const {
         status,
         valueRepositioned
@@ -2083,8 +2087,9 @@ function useLinearNavigation({
         indexFromOriginalToRepositioned,
         indexFromRepositionedToOriginal,
         searchDirection,
-        targetDemangled
+        targetDemangled: requestedIndex
       });
+      const valueOriginal = valueRepositioned == null ? null : indexFromRepositionedToOriginal(valueRepositioned);
       if (status == "past-end") {
         if (navigatePastEnd == "wrap") {
           if (mode == "single") navigateToFirst(e, fromUserInteraction);else {
@@ -2119,18 +2124,18 @@ function useLinearNavigation({
           return "stop";
         }
       } else {
-        setTabbableIndex(valueRepositioned, e, fromUserInteraction);
-        onNavigateLinear?.(valueRepositioned, e);
+        setTabbableIndex(valueOriginal, e, fromUserInteraction);
+        onNavigateLinear?.(valueOriginal, e);
         return "stop";
       }
     }, []);
-    const navigateToFirst = useStableCallback((e, fromUserInteraction) => {
-      return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single");
+    const navigateToFirst = useStableCallback((event, fromUserInteraction) => {
+      return navigateAbsolute(getLowestIndex(), -1, event, fromUserInteraction, "single");
     });
-    const navigateToLast = useStableCallback((e, fromUserInteraction) => {
-      return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single");
+    const navigateToLast = useStableCallback((event, fromUserInteraction) => {
+      return navigateAbsolute(getHighestIndex(), 1, event, fromUserInteraction, "single");
     });
-    const navigateRelative2 = useStableCallback((e, offset, fromUserInteraction, mode) => {
+    const navigateRelative2 = useStableCallback((event, offset, fromUserInteraction, mode) => {
       getHighestIndex();
       const searchDirection = Math.sign(offset) || 1;
       const original = getTabbableIndex() ?? 0;
@@ -2141,8 +2146,8 @@ function useLinearNavigation({
        * We mangle the index to get its "visual" position, add our offset,
        * and then demangle it to get the child that corresponds to the next child "visually".
        */
-      const targetMangled = indexFromOriginalToRepositioned(original) + offset;
-      return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
+      const targetMangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(original) + offset);
+      return navigateAbsolute(targetMangled, searchDirection, event, fromUserInteraction, mode);
     });
     const navigateToNext = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, 1, fromUserInteraction, "single");
@@ -2150,9 +2155,6 @@ function useLinearNavigation({
     const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, -1, fromUserInteraction, "single");
     });
-    //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
-    //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
-    //const getPageNavigationSize = useStableGetter(pageNavigationSize);
     const stableProps = A(useTagProps({
       onKeyDown: useStableCallback(e => {
         // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
@@ -2244,7 +2246,7 @@ function tryNavigateToIndex({
       highestChildIndex
     });
     return bestUpResult || {
-      valueRepositioned: targetDemangled,
+      valueRepositioned: indexFromOriginalToRepositioned(targetDemangled),
       status: "normal"
     };
   } else {
@@ -2264,7 +2266,7 @@ function tryNavigateToIndex({
       lowestChildIndex
     });
     return bestDownResult || {
-      valueRepositioned: targetDemangled,
+      valueRepositioned: indexFromOriginalToRepositioned(targetDemangled),
       status: "normal"
     };
   }
@@ -2284,12 +2286,12 @@ function tryNavigateUp({
   }
   if (targetDemangled < lower) {
     return {
-      valueRepositioned: indexFromRepositionedToOriginal(lower),
+      valueRepositioned: indexFromOriginalToRepositioned(lower),
       status: "past-start"
     };
   } else {
     return {
-      valueRepositioned: targetDemangled,
+      valueRepositioned: indexFromOriginalToRepositioned(targetDemangled),
       status: "normal"
     };
   }
@@ -2309,12 +2311,12 @@ function tryNavigateDown({
   }
   if (targetDemangled > upper) {
     return {
-      valueRepositioned: indexFromRepositionedToOriginal(upper),
+      valueRepositioned: indexFromOriginalToRepositioned(upper),
       status: "past-end"
     };
   } else {
     return {
-      valueRepositioned: targetDemangled,
+      valueRepositioned: indexFromOriginalToRepositioned(targetDemangled),
       status: "normal"
     };
   }
@@ -2345,13 +2347,13 @@ function useManagedChildren(parentParameters) {
       ...rest
     } = parentParameters;
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
-    const getHighestIndex = q$1(() => {
+    const getHighestIndex = useCallback(() => {
       return managedChildrenArray.current.highestIndex;
     }, []);
-    const getLowestIndex = q$1(() => {
+    const getLowestIndex = useCallback(() => {
       return managedChildrenArray.current.lowestIndex;
     }, []);
-    const updateMinMax = q$1(index => {
+    const updateMinMax = useCallback(index => {
       // The opposite of this is done during the "shrinkwrap" phase, which is debounced.
       managedChildrenArray.current.highestIndex = Math.max(index, managedChildrenArray.current.highestIndex);
       managedChildrenArray.current.lowestIndex = Math.min(index, managedChildrenArray.current.lowestIndex);
@@ -2360,7 +2362,6 @@ function useManagedChildren(parentParameters) {
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
     const managedChildrenArray = A({
       arr: [],
-      rec: {},
       highestIndex: 0,
       lowestIndex: 0
     });
@@ -2369,28 +2370,33 @@ function useManagedChildren(parentParameters) {
     // TODO: The primary use for this is flaggable closest fits
     // which needs to search all children for that closest fit.
     // It would be nice if there was something better for that.
-    const forEachChild = q$1(f => {
+    const forEachChild = useCallback(f => {
       for (const child of managedChildrenArray.current.arr) {
         if (child) {
           if (f(child) == 'break') return;
         }
       }
-      for (const field in managedChildrenArray.current.rec) {
-        const child = managedChildrenArray.current.rec[field];
-        if (child) if (f(child) == 'break') return;
-      }
+      /*for (const field in managedChildrenArray.current.rec) {
+          const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<IndexType, Info>];
+          if (child)
+              if (f(child) == 'break')
+                  return;
+      }*/
     }, []);
     // Retrieves the information associated with the child with the given index.
     // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = q$1((index, indexType) => {
-      if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
+    const getManagedChildInfo = useCallback(index => {
+      //if (typeof index == "number")
+      return managedChildrenArray.current.arr[index];
+      //else
+      //    return managedChildrenArray.current.rec[index as IndexType]!;
     }, []);
     const shrinkwrapHandle = A(null);
     // When we unmount children, we'd like to reduce the array length accordingly.
     // We do this a tick after useEffect to wait for all the child dust to settle, 
     // because this is not critical work; it's just for memory optimization.
     // Honestly, it might even be better to delete this? TODO, I guess.
-    const scheduleShrinkwrap = q$1(() => {
+    const scheduleShrinkwrap = useCallback(() => {
       if (shrinkwrapHandle.current != null) clearTimeout(shrinkwrapHandle.current);
       shrinkwrapHandle.current = setTimeout(() => {
         let shave = 0;
@@ -2422,7 +2428,7 @@ function useManagedChildren(parentParameters) {
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
     const hasRemoteULEChildMounted = A(null);
-    const remoteULEChildMounted = q$1((index, mounted) => {
+    const remoteULEChildMounted = useCallback((index, mounted) => {
       if (!hasRemoteULEChildMounted.current) {
         hasRemoteULEChildMounted.current = {
           mounts: new Set(),
@@ -2442,7 +2448,10 @@ function useManagedChildren(parentParameters) {
             }
           }
           for (const index of unmountsThatDidntMount) {
-            if (typeof index == "number") delete managedChildrenArray.current.arr[index];else delete managedChildrenArray.current.rec[index];
+            //if (typeof index == "number")
+            delete managedChildrenArray.current.arr[index];
+            //else
+            //    delete managedChildrenArray.current.rec[index as IndexType];
           }
           if (onChildrenCountChange || onChildrenMountChange) {
             onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
@@ -2463,19 +2472,18 @@ function useManagedChildren(parentParameters) {
       forEach: forEachChild,
       getAt: getManagedChildInfo,
       getHighestIndex: getHighestIndex,
-      getLowestIndex: getLowestIndex,
-      _arraySlice: q$1(() => {
-        let ret = managedChildrenArray.current.arr.slice();
-        const max = getHighestIndex();
-        for (let i = 0; i <= max; ++i) {
-          if (ret[i] == null) ret[i] = {
-            index: i
-          };
-        }
-        return ret;
-      }, [])
+      getLowestIndex: getLowestIndex
+      /*_arraySlice: useCallback(() => {
+          let ret = managedChildrenArray.current.arr.slice();
+          const max = getHighestIndex();
+          for (let i = 0; i <= max; ++i) {
+              if (ret[i] == null)
+                  ret[i] = { index: i } as M;
+          }
+          return ret;
+      }, [])*/
     });
-    const getChildren = q$1(() => managedChildren, []);
+    const getChildren = useCallback(() => managedChildren, []);
     return {
       context: useMemoObject({
         managedChildContext: useMemoObject({
@@ -2518,16 +2526,15 @@ function useManagedChild({
     _(() => {
       if (managedChildrenArray == null) return;
       // Insert this information in-place
-      if (typeof index == "number") {
-        managedChildrenArray.arr[index] = {
-          ...info
-        };
-        updateMinMax?.(index);
-      } else {
-        managedChildrenArray.rec[index] = {
-          ...info
-        };
-      }
+      //if (typeof index == "number") {
+      managedChildrenArray.arr[index] = {
+        ...info
+      };
+      updateMinMax?.(index);
+      //}
+      //else {
+      //    managedChildrenArray.rec[index as IndexType] = { ...info };
+      //}
     });
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
@@ -2584,7 +2591,7 @@ function useChildrenFlag({
   indexFromRepositionedToOriginal ??= identity;
   indexFromOriginalToRepositioned ??= identity;
   // TODO: useCallback instead of useStableGetter is intentional here, but is it sound?
-  const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => initialIndex, []), {
+  const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, useCallback(() => initialIndex, []), {
     debounceRendering: runImmediately
   });
   const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, undefined, {
@@ -2593,7 +2600,7 @@ function useChildrenFlag({
   });
   // Shared between onChildrenMountChange and changeIndex, not public
   // Only called when `closestFit` is false, naturally.
-  const getClosestFit = q$1(requestedIndex => {
+  const getClosestFit = useCallback(requestedIndex => {
     const children = getChildren();
     let closestDistance = Infinity;
     let closestIndex = null;
@@ -2623,29 +2630,32 @@ function useChildrenFlag({
     const currentIndexOriginal = getCurrentIndex();
     const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
     const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
-    const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+    const currentChild = requestedIndexOriginal == null ? null : children.getAt(requestedIndexOriginal);
     if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+      debugger;
       console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-      const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned);
-      const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+      const closestFitIndexOriginal = getClosestFit(requestedIndexOriginal);
+      //const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
       setCurrentIndex(closestFitIndexOriginal, reason);
       if (currentChild) {
         setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
       }
-      if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
-        const closestFitChild = children.getAt(closestFitIndexRepositioned);
+      if (closestFitIndexOriginal != null) {
+        const closestFitChild = children.getAt(closestFitIndexOriginal);
         console.assert(closestFitChild != null, "Internal logic???");
         setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
         onClosestFit(closestFitIndexOriginal);
       } else {
         onClosestFit(null);
       }
-    } else {
-      if (currentChild) setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
     }
+    //else {
+    //    if (currentChild)
+    //        setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
+    //}
   });
   const reasonRef = A(undefined);
-  const changeIndex = q$1((arg, reason) => {
+  const changeIndex = useCallback((arg, reason) => {
     const children = getChildren();
     const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
     reasonRef.current = reason;
@@ -2736,7 +2746,7 @@ function useState(initialState) {
       setStateP(value);
     }
   });
-  const getState = q$1(() => {
+  const getState = useCallback(() => {
     return ref.current;
   }, []);
   return [state, setState.current, getState];
@@ -2850,7 +2860,7 @@ function useRovingTabIndex({
     });
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
     // So every time we change the index for any reason, record that change as a back up here that can be restored.
-    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, q$1(() => initiallyTabbedIndex ?? 0, []));
+    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, useCallback(() => initiallyTabbedIndex ?? 0, []));
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     y(() => {
       const document = getDocument$1();
@@ -2874,10 +2884,10 @@ function useRovingTabIndex({
       return () => clearTimeout(handle);
     }, []);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
-    const getTabbableAt = q$1(child => {
+    const getTabbableAt = useCallback(child => {
       return child.getLocallyTabbable();
     }, []);
-    const setTabbableAt = q$1((child, t) => {
+    const setTabbableAt = useCallback((child, t) => {
       if (child.index == 8) debugger;
       child.setLocallyTabbable(t);
     }, []);
@@ -2916,7 +2926,7 @@ function useRovingTabIndex({
         avoidFocusingSelfOnMount.current = true;
       }
     });
-    const focusSelf = q$1((force, reason) => {
+    const focusSelf = useCallback((force, reason) => {
       const document = getDocument$1();
       const children = getChildren();
       let index = getTabbableIndex();
@@ -2937,19 +2947,19 @@ function useRovingTabIndex({
     const rovingTabIndexContext = useMemoObject({
       setTabbableIndex,
       parentFocusSelf: focusSelf,
-      getInitiallyTabbedIndex: q$1(() => {
+      getInitiallyTabbedIndex: useCallback(() => {
         return initiallyTabbedIndex ?? (untabbable ? null : 0);
       }, []),
       reevaluateClosestFit,
       untabbable,
       getUntabbableBehavior: useStableGetter(untabbableBehavior),
-      giveParentFocusedElement: q$1(e => {
+      giveParentFocusedElement: useCallback(e => {
         lastFocused.current = e;
       }, [])
     });
     return {
       managedChildrenParameters: {
-        onChildrenMountChange: q$1(() => {
+        onChildrenMountChange: useCallback(() => {
           reevaluateClosestFit(undefined);
         }, [reevaluateClosestFit])
       },
@@ -3015,7 +3025,7 @@ function useRovingTabIndexChild({
     const [tabbable, st, getTabbable] = useState(() => {
       return getInitiallyTabbedIndex() === index;
     });
-    const setTabbable = q$1(t => {
+    const setTabbable = useCallback(t => {
       if (typeof t === 'function') {
         return st(prev => {
           const ret = t(prev);
@@ -3072,11 +3082,12 @@ function useTypeaheadNavigation({
     noTypeahead,
     isValidForTypeaheadNavigation,
     onNavigateTypeahead,
+    getHighestIndex,
     ...void3
   },
   rovingTabIndexReturn: {
-    getTabbableIndex: getIndex,
-    setTabbableIndex: setIndex,
+    getTabbableIndex,
+    setTabbableIndex,
     ...void1
   },
   processedIndexManglerReturn: {
@@ -3117,25 +3128,26 @@ function useTypeaheadNavigation({
         setNextTypeaheadChar(null);
       }
     }, [nextTypeaheadChar]);
-    const comparatorShared = useStableCallback((safeLhs, safeRhs) => {
+    const comparatorShared = useStableCallback((safeLhs, safeRhs, normalizeFirst) => {
       let compare;
-      // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
-      // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-      safeLhs = safeLhs.normalize("NFD");
-      safeRhs = safeRhs.normalize("NFD");
+      if (normalizeFirst) {
+        // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
+        // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
+        safeLhs = safeLhs.normalize("NFD");
+        safeRhs = safeRhs.normalize("NFD");
+      }
       if (collator) compare = collator.compare(safeLhs, safeRhs);else compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
       return compare;
     });
     const insertingComparator = useStableCallback((lhs, rhs) => {
       if (typeof lhs === "string" && typeof rhs.text === "string") {
-        return comparatorShared(lhs, rhs.text);
+        return comparatorShared(lhs, rhs.text, true);
       }
       return lhs - rhs;
     });
     const typeaheadComparator = useStableCallback((lhs, rhs) => {
       if (typeof lhs === "string" && typeof rhs.text === "string") {
-        // TODO: Doing this substring BEFORE normalization is, like, pretty not great?
-        let trimmedRet = comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+        let trimmedRet = comparatorShared(lhs.normalize("NFD"), rhs.text.substring(0, lhs.length).normalize("NFD"), false);
         return trimmedRet;
       }
       return lhs - rhs;
@@ -3198,12 +3210,11 @@ function useTypeaheadNavigation({
     };
     function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
       if (currentTypeahead && sortedTypeaheadInfo.current.length) {
-        debugger;
         // Note the important distinction between "sorted" and "reordered":
         // "sorted" is used for fast searching, whereas "reordered" is the visual, processedChildren thing.
-        const typeaheadIndexIntoSortedChildren = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+        const typeaheadIndexIntoSortedChildren2 = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
         //const sortedTypeaheadIndex = indexFromOriginalToRepositioned(unsortedTypeaheadIndex);
-        if (typeaheadIndexIntoSortedChildren < 0) {
+        if (typeaheadIndexIntoSortedChildren2 < 0) {
           // The user has typed an entry that doesn't exist in the list
           // (or more specifically "for which there is no entry that starts with that input")
           setTypeaheadStatus("invalid");
@@ -3230,39 +3241,76 @@ function useTypeaheadNavigation({
             exception for one-character strings, but that's just kicking the can down
             the road. Maybe one or two characters would be good enough though.
           */
-          // These are used to keep track of the candidates' positions in both our sorted array and the unsorted DOM.
-          let lowestUnsortedIndexAll = null;
-          let lowestSortedIndexAll = typeaheadIndexIntoSortedChildren;
+          if (currentTypeahead == "do") debugger;
+          // Keep track of the lowest/highest indices that still match
+          //let lowestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+          //let highestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+          let lowestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
+          let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
           // These two are only set for elements that are ahead of us, but the principle's the same otherwise
-          let lowestUnsortedIndexNext = null;
-          let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
-          const updateBestFit = indexReordered => {
-            const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
-            if (!isValidForTypeaheadNavigation(indexOriginal)) return;
-            if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
-              lowestUnsortedIndexAll = indexOriginal;
-              lowestSortedIndexAll = i;
-            }
-            if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
-              lowestUnsortedIndexNext = indexOriginal;
-              lowestSortedIndexNext = i;
-            }
-          };
-          let i = typeaheadIndexIntoSortedChildren;
-          while (i >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
-            --i;
+          //let lowestUnsortedIndexNext: number | null = null;
+          //let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
+          /*const updateBestFit = (typeaheadIndex: number) => {
+              //const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
+              if (!isValidForTypeaheadNavigation(indexOriginal))
+                  return;
+               if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
+                  lowestUnsortedIndexAll = indexOriginal;
+                  lowestSortedIndexAll = i;
+              }
+              if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
+                  lowestUnsortedIndexNext = indexOriginal;
+                  lowestSortedIndexNext = i;
+              }
+          }*/
+          //let i = typeaheadIndexIntoSortedChildren;
+          while (lowestCandidateTypeaheadIndex >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[lowestCandidateTypeaheadIndex]) == 0) {
+            //updateBestFit(lowestCandidateTypeaheadIndex);
+            --lowestCandidateTypeaheadIndex;
           }
-          i = typeaheadIndexIntoSortedChildren;
-          while (i < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-            updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
-            ++i;
+          //i = typeaheadIndexIntoSortedChildren;
+          while (highestCandidateTypeaheadIndex < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[highestCandidateTypeaheadIndex]) == 0) {
+            // updateBestFit(sortedTypeaheadInfo.current[i].indexOriginal);
+            ++highestCandidateTypeaheadIndex;
           }
-          let toSet = null;
-          if (lowestUnsortedIndexNext !== null) toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexReordered;else if (lowestUnsortedIndexAll !== null) toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexReordered;
-          if (toSet != null) toSet = indexFromRepositionedToOriginal(toSet);
+          let sortedCandidates = sortedTypeaheadInfo.current.slice(lowestCandidateTypeaheadIndex + 1, highestCandidateTypeaheadIndex);
+          sortedCandidates.sort((lhs, rhs) => {
+            // Knowing that both lhs and rhs start with the search string,
+            // try to find a way to prefer one over the other.
+            //
+            // (Reminder: low scores are "good", high scores are "bad")
+            function score(info) {
+              if (info.text == null || currentTypeahead == null) {
+                /// Shouldn't ever happen???
+                debugger;
+                return 1000;
+              }
+              // Exact matches score the highest
+              if (info.text.length == currentTypeahead.length) return -100;
+              const nextChar = info.text.substring(currentTypeahead.length, currentTypeahead.length + 1);
+              // Failing that, matches at a word boundary or similar score highly.
+              if (/\s/.test(nextChar)) return -10;
+              // Similar to the above, but spaces are better boundaries than other non-letters
+              if (/\P{Letter}/v.test(nextChar)) return -9;
+              // Okay, prefer matches that are as close as possible to our current match,
+              // to prevent jumpiness.
+              const infoRepositionedIndex = indexFromOriginalToRepositioned(info.indexOriginal);
+              const currentRepositionedIndex = indexFromOriginalToRepositioned(getTabbableIndex() ?? 0);
+              const distance = Math.abs(currentRepositionedIndex - infoRepositionedIndex);
+              const proportionateDistance = 1 - distance / getHighestIndex();
+              return 0 - proportionateDistance;
+            }
+            return score(lhs) - score(rhs);
+          });
+          let toSet = sortedCandidates[0]?.indexOriginal ?? null;
+          //if (lowestUnsortedIndexNext !== null)
+          //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexOriginal;
+          //else if (lowestUnsortedIndexAll !== null)
+          //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexOriginal;
+          //if (toSet != null)
+          //    toSet = indexFromRepositionedToOriginal(toSet);
           if (toSet != null) {
-            setIndex(toSet, reason, true);
+            setTabbableIndex(toSet, reason, true);
             onNavigateTypeahead?.(toSet, reason);
           } else {
             // We get here if the only matching child we found was untabbable/missing
@@ -3294,7 +3342,7 @@ function useTypeaheadNavigationChild({
   ...void4
 }) {
   return useMonitoring(function useTypeaheadNavigationChild() {
-    const onTextContentChange = q$1(text => {
+    const onTextContentChange = useStableCallback(text => {
       if (text) {
         // Find where to insert this item.
         // Because all index values should be unique, the returned sortedIndex
@@ -3313,18 +3361,18 @@ function useTypeaheadNavigationChild({
         // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
         const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
         console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
-          indexReordered: index,
+          indexOriginal: index,
           text
         }) == 0);
         if (sortedIndex < 0) {
           sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, {
             text,
-            indexReordered: index
+            indexOriginal: index
           });
         } else {
           sortedTypeaheadInfo.splice(sortedIndex, 1, {
             text,
-            indexReordered: index
+            indexOriginal: index
           });
         }
         return () => {
@@ -3332,7 +3380,7 @@ function useTypeaheadNavigationChild({
           // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
           const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
           console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, {
-            indexReordered: index,
+            indexOriginal: index,
             text
           }) == 0);
           if (sortedIndex >= 0) {
@@ -3340,7 +3388,7 @@ function useTypeaheadNavigationChild({
           }
         };
       }
-    }, []);
+    });
     return {
       textContentParameters: {
         onTextContentChange
@@ -3527,13 +3575,14 @@ function usePaginatedChildren({
       paginationMax: null,
       paginationMin: null
     });
-    const refreshPagination = q$1((paginationMin, paginationMax) => {
+    const refreshPagination = useCallback((paginationMin, paginationMax) => {
       const childMax = getChildren().getHighestIndex() + 1;
       const childMin = getChildren().getLowestIndex();
-      for (let i = childMin; i <= childMax; ++i) {
+      for (let iu = childMin; iu <= childMax; ++iu) {
+        const i = iu;
         const visible = i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity);
-        getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
-        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
+        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     y(() => {
@@ -3563,7 +3612,7 @@ function usePaginatedChildren({
     const pmax = A(paginationMax);
     pmin.current = paginationMin;
     pmax.current = paginationMax;
-    const getDefaultPaginationVisible = q$1(i => {
+    const getDefaultPaginationVisible = useCallback(i => {
       return i >= (pmin.current ?? -Infinity) && i < (pmax.current ?? Infinity);
     }, []);
     const paginatedChildContext = T$1(() => ({
@@ -3683,8 +3732,7 @@ function useRearrangeableChildren({
       if (animate) {
         for (const ch of rearrangedChildren) {
           const index = ch == null ? null : getIndex(ch);
-          const mangledIndex = index == null ? null : mangler.map(index, "repositioned", "original");
-          index == null ? null : mangler.map(index, "original", "repositioned");
+          const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
           if (index != null && mangledIndex != null) {
             const info = getManagedChildren().getAt(index);
             const info2 = getManagedChildren().getAt(mangledIndex);
@@ -3708,7 +3756,7 @@ function useRearrangeableChildren({
       }
       return rearrangedChildren;
     }, [childrenIn, refreshIndex, animate]);
-    const getFLIPStart = q$1(index => {
+    const getFLIPStart = useCallback(index => {
       return allChildPositions.current[index];
     }, []);
     return {
@@ -3790,7 +3838,7 @@ function useRearrangeableChild({
         }
       }
     }, [index, animationIndex, animate]);
-    const updateFLIPAnimation = q$1(position => {
+    const updateFLIPAnimation = useCallback(position => {
       flipStartPosition.current = position;
       setAnimationIndex(p => ++p);
     }, []);
@@ -3837,7 +3885,7 @@ function useStaggeredChildren({
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
     const timeoutHandle = A(-1);
-    const resetEmergencyTimeout = q$1(() => {
+    const resetEmergencyTimeout = useCallback(() => {
       if (timeoutHandle.current != -1) clearTimeout(timeoutHandle.current);
       // We've gone this long without hearing the next child mount itself...
       // We need to continue.
@@ -3872,7 +3920,7 @@ function useStaggeredChildren({
         setDisplayedStaggerIndex(next);
       }
     }, [childCount]);
-    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(q$1((newIndex, prevIndex) => {
+    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
       if (newIndex == null || !s.current) {
         return;
       }
@@ -3894,7 +3942,7 @@ function useStaggeredChildren({
     }, [/* Must be empty */]), returnNull);
     const parentIsStaggered = !!staggered;
     const getChildCount = useStableGetter(childCount);
-    const childCallsThisToTellTheParentToMountTheNextOne = q$1(justMountedChildIndex => {
+    const childCallsThisToTellTheParentToMountTheNextOne = useCallback(justMountedChildIndex => {
       setDisplayedStaggerIndex(prevIndex => {
         let next = Math.min(getTargetStaggerIndex() ?? 0,
         // Don't go higher than the highest child
@@ -3912,7 +3960,7 @@ function useStaggeredChildren({
     // but also probably fine because parents render before children? Does that include suspense?)
     const s = A(parentIsStaggered);
     s.current = parentIsStaggered;
-    const getDefaultStaggeredVisible = q$1(i => {
+    const getDefaultStaggeredVisible = useCallback(i => {
       if (s.current) {
         const staggerIndex = getDisplayedStaggerIndex();
         if (staggerIndex == null) return false;
@@ -3923,10 +3971,10 @@ function useStaggeredChildren({
     }, []);
     const intersectionObserver = A(null);
     const elementToIndex = A(new Map());
-    const setElementToIndexMap = q$1((index, element) => {
+    const setElementToIndexMap = useCallback((index, element) => {
       elementToIndex.current.set(element, index);
     }, []);
-    const getIntersectionObserver = q$1(() => intersectionObserver.current, []);
+    const getIntersectionObserver = useCallback(() => intersectionObserver.current, []);
     const staggeredChildContext = T$1(() => ({
       parentIsStaggered,
       childCallsThisToTellTheParentToMountTheNextOne,
@@ -4007,7 +4055,7 @@ function useStaggeredChild({
     // "heavier processing" child to render, instead of us (the "ligher pre-processing" child).
     // So we return the effect we want to run and let the caller run it as appropriate.
     // (In theory this could be returned as, like, useStaggeredChildChild instead but I really don't wanna do that)
-    const childUseEffect = q$1(() => {
+    const childUseEffect = useCallback(() => {
       if (!becauseScreen.current && parentIsStaggered && staggeredVisible) {
         if (parentIsStaggered && staggeredVisible) {
           childCallsThisToTellTheParentToMountTheNextOne(index);
@@ -4281,6 +4329,13 @@ function useProcessedChild({
 }
 
 /**
+ * Allows for tracking reordered children by their original index and repositioned index. This is referred to in various places as "index mangling" and "demangling".
+ *
+ * The values returned by this hook are used by others like `useLinearNavigation` and `useTypeaheadNavigation` so that they can work even when children are out of order.
+ *
+ * This hook, is separate from useRearrangeableChildren so that it can be included
+ * as part of a parent component, e.g. a table (instead of the tbody).
+ *
  * @compositeParams
  */
 function useProcessedIndexMangler({
@@ -4293,8 +4348,8 @@ function useProcessedIndexMangler({
   return useMonitoring(function useProcessedIndexMangler() {
     useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
     const mangler = T$1(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
-    const indexFromOriginalToRepositioned = q$1(n => mangler.map(n, "original", "repositioned"), []);
-    const indexFromRepositionedToOriginal = q$1(n => mangler.map(n, "repositioned", "original"), []);
+    const indexFromOriginalToRepositioned = useCallback(n => mangler.map(n, "original", "repositioned"), []);
+    const indexFromRepositionedToOriginal = useCallback(n => mangler.map(n, "repositioned", "original"), []);
     const context = useMemoObject({
       processedIndexManglerContext: useMemoObject({
         mangler,
@@ -4323,6 +4378,9 @@ class ProcessedIndexMangler {
   }
   map(index, from, to) {
     if (index == undefined) return undefined;
+    // Note that we default to returning the original index if we don't find a mapping.
+    // This is because non-managed children remain in their original positions in the array,
+    // and if we don't have a mapping we need to assume it's just a non-managed child.
     switch (from) {
       case 'repositioned':
         {
@@ -4330,7 +4388,7 @@ class ProcessedIndexMangler {
             case 'repositioned':
               return index;
             case 'original':
-              return this._repositionedToOriginal.get(index);
+              return this._repositionedToOriginal.get(index) ?? index;
           }
         }
       case 'original':
@@ -4339,7 +4397,7 @@ class ProcessedIndexMangler {
             case 'original':
               return index;
             case 'repositioned':
-              return this._originalToRepositioned.get(index);
+              return this._originalToRepositioned.get(index) ?? index;
           }
         }
     }
@@ -4348,12 +4406,45 @@ class ProcessedIndexMangler {
   sortedChildren = [];
   _originalToRepositioned = new Map();
   _repositionedToOriginal = new Map();
-  setChildren(children) {
-    debugger;
+  setChildren(childrenInOriginalOrder) {
     this._originalToRepositioned.clear();
     this._repositionedToOriginal.clear();
-    this._originalChildren = children.slice();
+    this._originalChildren = childrenInOriginalOrder.slice();
     this.sortedChildren = [];
+    /**
+     * Basic algorithm:
+     *
+     * We need to find a mapping of original -> reordered.
+     *
+     * Initially, children don't actually *know* what their reordered
+     * index is, they only know their original index and their sort value.
+     *
+     * So we need to iterate through all the original children,
+     * determine where they'll end up, and assign that as their reordered index.
+     * (And actually, we do this backwards -- by iterating the ORIGINAL children,
+     * we find out what REORDERED child ends up in that ORIGINAL position)
+     *
+     * Two things further complicate this:
+     *
+     * 1. We have an array of children, but there can be gaps in their indices.
+     *    E.G. children[0].index could be 30, children[1].index 35, etc.
+     *    So we can't just sort and then zip. We need to be a bit more precise.
+     *
+     * 2. Some children might not be managed by us.
+     *    E.G. children[1] might just be a random <div>, and it shouldn't
+     *    be affected by reordering, since it's not ours.
+     *
+     *
+     * Ultimately, this is complex because we're tracking four vaguely-similar indices:
+     * 1. Original child index
+     * 2. Reordered child index
+     * 3. Original child's index into the array of its siblings
+     * 4. Reordered child's index into the array of its siblings
+     */
+    // Sort the original children array.
+    // This is guaranteed to have the same LENGTH as the original child array,
+    // but due to how sorting works, non-managed children will float to
+    // the start of the array. This is accounted for later in the while loop.
     let sortedChildrenWithoutNulls = this._originalChildren.slice().map((vnode, processedIndex) => {
       const indexOriginal = vnode == null ? undefined : this.getIndex(vnode);
       const sortValue = indexOriginal == null ? null : this.getSortValue(indexOriginal);
@@ -4364,54 +4455,71 @@ class ProcessedIndexMangler {
         processedIndex
       };
     }).toSorted((lhs, rhs) => this.compare(lhs.sortValue, rhs.sortValue));
-    let rawChildIndexIn = 0; // The index to the input and output
-    let sortedChildIndexIn = 0; // The index to the *sorted* (not repositioned) child array
+    // IMPORTANT:
+    // These indices aren't original or repositioned indices.
+    // They are *specifically* 0-based array indices.
+    // If unorderedArrayIndex is 0, children[unorderedArrayIndex].index 
+    // could well be, like, 25 or something.
+    let unorderedArrayIndex = 0;
+    let reorderedArrayIndex = 0;
+    // First, before anything, skip over all the unmanaged children in the sorted array.
+    // When we find them in the original array, we just copy them over unmodified,
+    // and there isn't a trivial way to do this during the sort itself.
+    while (reorderedArrayIndex < sortedChildrenWithoutNulls.length && sortedChildrenWithoutNulls[reorderedArrayIndex].indexOriginal == null) {
+      ++reorderedArrayIndex;
+    }
     // This is a kind of, like, splice/zip of the two arrays, while setting the mappings between them.
     // It's kind of hard to follow--wish you could put, like, hand-drawn, diagrams in comments.
     while (true) {
-      if (rawChildIndexIn >= children.length) break;
-      if (sortedChildIndexIn >= sortedChildrenWithoutNulls.length) break;
-      // This value doesn't directly correspond to either an original or a repositioned index.
-      // We could have 2 children at indices [100, 101], remember.
-      const childRepositioned = children[rawChildIndexIn];
-      const indexRepositioned = childRepositioned == null ? undefined : this.getIndex(childRepositioned);
-      if (indexRepositioned == null) {
-        // This was a hole in the original array, so just copy it over directly to its original spot.
-        this.sortedChildren[rawChildIndexIn] = childRepositioned;
+      if (unorderedArrayIndex >= this._originalChildren.length) break;
+      if (reorderedArrayIndex >= sortedChildrenWithoutNulls.length) break;
+      // Get the child at the array position we're working with.
+      // This also turns our *array* index into an *original* index.
+      const childOriginal = this._originalChildren[unorderedArrayIndex];
+      const indexOriginal = childOriginal == null ? undefined : this.getIndex(childOriginal);
+      if (indexOriginal == null) {
+        // This was a spot in the original array where there was a non-managed child.
+        // It gets copied to the same spot in the output array, since it can't be sorted.
+        // A special exception where the output array is indexed by the input array's variable.
+        this.sortedChildren[unorderedArrayIndex] = childOriginal;
         // Then move onto the next child.
-        ++rawChildIndexIn;
+        ++unorderedArrayIndex;
       } else {
-        // This is a known, managed child. Find all its mappings and recreate it with a new key.
-        // Skip over all the nulls that get sorted to the front of the array
-        // (scary while-in-while only happens once because of this)
-        while (sortedChildIndexIn < sortedChildrenWithoutNulls.length && sortedChildrenWithoutNulls[sortedChildIndexIn].indexOriginal == null) {
-          ++sortedChildIndexIn;
-        }
+        // This is a known, managed child.
+        // We need to figure out its new index.
         // This line should never happen because the nulls get sorted to the front
         // and for us to have gotten here in the first place there must have been at least one non-null child.
-        if (sortedChildrenWithoutNulls[sortedChildIndexIn].indexOriginal == null) {
+        if (sortedChildrenWithoutNulls[reorderedArrayIndex].indexOriginal == null) {
           /* eslint-disable no-debugger */
           debugger;
           break;
         }
-        let rawChildIndexOut = sortedChildIndexIn;
-        const childAtRepositionedSpot = sortedChildrenWithoutNulls[rawChildIndexOut];
-        // This is indexOriginal, despite us getting it from childAtRepositionedSpot.indexOriginal.
-        // The reason is because we're writing to the OUTPUT array now, so our
-        // terminology is suddenly relevant to that.
-        const indexOriginal = childAtRepositionedSpot.indexOriginal;
-        this._repositionedToOriginal.set(indexRepositioned, indexOriginal);
-        this._originalToRepositioned.set(indexOriginal, indexRepositioned);
-        this.sortedChildren[rawChildIndexIn] = k$1(childAtRepositionedSpot.vnode.type, {
-          ...childAtRepositionedSpot.vnode.props,
-          indexOriginal: indexOriginal,
-          indexRepositioned: indexRepositioned,
-          key: indexRepositioned
-        });
-        ++rawChildIndexIn;
-        ++sortedChildIndexIn;
+        const childAtRepositionedSpot = sortedChildrenWithoutNulls[reorderedArrayIndex];
+        const indexRepositioned = childAtRepositionedSpot.indexOriginal;
+        // This one-statement block is weird! Read the comments carefully!
+        {
+          // This looks incorrect at a first glance:
+          // Indexing the sorted array by the unsorted index?
+          // Why does indexOriginal := indexRepositioned and vice-versa?
+          this.sortedChildren[unorderedArrayIndex] = k$1(childAtRepositionedSpot.vnode.type, {
+            ...childAtRepositionedSpot.vnode.props,
+            indexOriginal: indexRepositioned,
+            indexRepositioned: indexOriginal,
+            key: indexRepositioned
+          });
+          // We do this because we are basically working **backwards**.
+          // By determining which reordered child this original child corresponds to,
+          // we've determined that the reordered child goes at the ARRAY POSITION of the original child.
+          // But we actually still don't technically know where the final ARRAY POSITION of the original child itself will be.
+          // That will come later when we get to that child.
+          this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
+          this._originalToRepositioned.set(indexRepositioned, indexOriginal);
+        }
+        ++unorderedArrayIndex;
+        ++reorderedArrayIndex;
       }
     }
+    debugger;
     return this.sortedChildren;
   }
 }
@@ -4580,8 +4688,8 @@ function useMultiSelection({
           multiSelectionAriaPropName,
           multiSelectionMode,
           changeAllChildren,
-          getCtrlKeyDown: q$1(() => ctrlKeyHeld.current, []),
-          getShiftKeyDown: q$1(() => shiftKeyHeld.current, []),
+          getCtrlKeyDown: useCallback(() => ctrlKeyHeld.current, []),
+          getShiftKeyDown: useCallback(() => shiftKeyHeld.current, []),
           getAnyFocused
         })
       }),
@@ -4801,10 +4909,10 @@ function useSingleSelection({
 }) {
   return useMonitoring(function useSingleSelection() {
     const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
-    const getSelectedAt = q$1(m => {
+    const getSelectedAt = useCallback(m => {
       return m.getSingleSelected();
     }, []);
-    const setSelectedAt = q$1((m, t, newSelectedIndex, prevSelectedIndex) => {
+    const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
       if (m.untabbable) {
         console.assert(false);
       }
@@ -4814,7 +4922,7 @@ function useSingleSelection({
       if (t) console.assert(newSelectedIndex === m.index);
       m.setLocalSingleSelected(t, direction);
     }, []);
-    const isSelectedValid = q$1(m => {
+    const isSelectedValid = useCallback(m => {
       return !m.untabbable;
     }, []);
     const {
@@ -4951,7 +5059,7 @@ function useSingleSelectionDeclarative({
   }, [s]);
   return {
     singleSelectionParameters: {
-      onSingleSelectedIndexChange: q$1(e => {
+      onSingleSelectedIndexChange: useCallback(e => {
         reasonRef.current = e;
         return onSingleSelectedIndexChange?.(e);
       }, [onSingleSelectedIndexChange])
@@ -5165,7 +5273,7 @@ function useRefElement(args) {
   } = args.refElementParameters || {};
   useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
   // Called (indirectly) by the ref that the element receives.
-  const handler = q$1((e, prevValue) => {
+  const handler = useCallback((e, prevValue) => {
     if (!(e == null || e instanceof Element)) {
       console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
       nonElementWarn.current = true;
@@ -5624,11 +5732,11 @@ function useHasCurrentFocus(args) {
       debounceRendering: runImmediately,
       initialization: "off"
     });
-    const onFocusIn = q$1(e => {
+    const onFocusIn = useCallback(e => {
       setFocusedInner(true, e);
       setFocused(e.target == getElement(), e);
     }, []);
-    const onFocusOut = q$1(e => {
+    const onFocusOut = useCallback(e => {
       // Even if we're focusOut-ing to another inner element,
       // that'll be caught during onFocusIn,
       // so just set everything to false and let that revert things back to true if necessary.
@@ -5678,10 +5786,10 @@ function useCompleteListNavigation({
   ...void1
 }) {
   return useMonitoring(function useCompleteListNavigation() {
-    const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
-    const getLowestIndex = q$1(() => getChildren().getLowestIndex(), []);
-    const getHighestIndex = q$1(() => getChildren().getHighestIndex(), []);
-    const isValidForNavigation = q$1(i => {
+    const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
+    const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
+    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const isValidForNavigation = useCallback(i => {
       const child = getChildren().getAt(i);
       if (!child) return false;
       if (child.untabbable) return false;
@@ -5735,6 +5843,7 @@ function useCompleteListNavigation({
         ...linearNavigationParameters
       },
       typeaheadNavigationParameters: {
+        getHighestIndex,
         isValidForTypeaheadNavigation: isValidForNavigation,
         ...typeaheadNavigationParameters
       },
@@ -5804,7 +5913,7 @@ function useCompleteListNavigation({
         getSortValueAt,
         compare,
         getIndex,
-        provideParentWithRefreshRows: q$1(e => {
+        provideParentWithRefreshRows: useCallback(e => {
           refreshRows.current = e;
         }, [])
       }),
@@ -5822,7 +5931,7 @@ function useCompleteListNavigation({
       childrenHaveFocusReturn,
       refElementReturn,
       rearrangeableChildrenReturn: {
-        refresh: q$1(() => refreshRows.current(), [])
+        refresh: useCallback(() => refreshRows.current(), [])
       }
     };
   });
@@ -6495,16 +6604,16 @@ function useAsync(asyncHandler, options) {
   const [settleCount, setSettleCount] = useState(0);
   const [resolveCount, setResolveCount] = useState(0);
   const [rejectCount, setRejectCount] = useState(0);
-  const incrementCallCount = q$1(() => {
+  const incrementCallCount = useCallback(() => {
     setRunCount(c => c + 1);
   }, []);
-  const incrementResolveCount = q$1(() => {
+  const incrementResolveCount = useCallback(() => {
     setResolveCount(c => c + 1);
   }, []);
-  const incrementRejectCount = q$1(() => {
+  const incrementRejectCount = useCallback(() => {
     setRejectCount(c => c + 1);
   }, []);
-  const incrementFinallyCount = q$1(() => {
+  const incrementFinallyCount = useCallback(() => {
     setSettleCount(c => c + 1);
   }, []);
   /* eslint-disable prefer-const */
@@ -6789,7 +6898,7 @@ function usePress(args) {
       const element = getElement();
       if (element) focusSelf(element);
     });
-    const onTouchMove = q$1(e => {
+    const onTouchMove = useCallback(e => {
       pressLog("touchmove", e);
       e.preventDefault();
       e.stopPropagation();
@@ -6805,11 +6914,11 @@ function usePress(args) {
       setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
       setHovering(hoveringAtAnyPoint);
     }, []);
-    const preventClickEventsOnIosSafari = q$1(e => {
+    const preventClickEventsOnIosSafari = useCallback(e => {
       e.preventDefault();
       e.stopPropagation();
     }, []);
-    const onTouchEnd = q$1(e => {
+    const onTouchEnd = useCallback(e => {
       pressLog("touchend", e);
       e.preventDefault();
       e.stopPropagation();
@@ -6855,7 +6964,7 @@ function usePress(args) {
         setIsPressing(hovering && getPointerDownStartedHere(), e);
       }
     });
-    const onPointerUp = q$1(e => {
+    const onPointerUp = useCallback(e => {
       pressLog("pointerup", e);
       const hovering = getHovering();
       const pointerDownStartedHere = getPointerDownStartedHere();
@@ -6873,11 +6982,11 @@ function usePress(args) {
       setLongPress(false);
       setIsPressing(false, e);
     }, []);
-    const onPointerEnter = q$1(_e => {
+    const onPointerEnter = useCallback(_e => {
       pressLog("pointerenter", _e);
       setHovering(true);
     }, []);
-    const onPointerLeave = q$1(_e => {
+    const onPointerLeave = useCallback(_e => {
       pressLog("pointerleave", _e);
       setHovering(false);
       setLongPress(false);
@@ -7078,7 +7187,7 @@ function useHasLastFocus(args) {
       activeElementReturn
     } = useActiveElement({
       activeElementParameters: {
-        onLastActiveElementChange: q$1((lastActiveElement, prevLastActiveElement, e) => {
+        onLastActiveElementChange: useCallback((lastActiveElement, prevLastActiveElement, e) => {
           const selfElement = getElement();
           const focused = selfElement != null && selfElement == lastActiveElement;
           const focusedInner = !!selfElement?.contains(lastActiveElement);
@@ -8294,7 +8403,7 @@ const DemoUseRovingTabIndexChildren = N(function DemoUseRovingTabIndexChildren({
                 children: "hole in the array"
               }), "; this <li> just decided to hang out where #1 would be.)"]
             })
-          });else yield u(DemoUseRovingTabIndexChildOuter, {
+          });else if (i != 8) yield u(DemoUseRovingTabIndexChildOuter, {
             index: i,
             word: RandomWords2[i]
           }, i);

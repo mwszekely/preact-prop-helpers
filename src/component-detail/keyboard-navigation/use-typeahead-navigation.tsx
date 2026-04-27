@@ -6,11 +6,11 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { TargetedPick, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface UseTypeaheadNavigationReturnTypeSelf {
@@ -78,6 +78,14 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
     typeaheadTimeout: number;
+
+
+    /**
+     * From `ManagedChildren`
+     * 
+     * TODO: Obviously remove this once `ManagedChildren` is removed
+     */
+    getHighestIndex(): OriginalIndex;
 }
 
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
@@ -117,7 +125,7 @@ export interface UseTypeaheadNavigationChildReturnType extends
 
 interface TypeaheadInfo {
     text: string | null;
-    indexReordered: number;
+    indexOriginal: OriginalIndex;
 }
 
 
@@ -131,8 +139,8 @@ interface TypeaheadInfo {
  * @compositeParams
  */
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
-    rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, getHighestIndex, ...void3 },
+    rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 },
     processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 },
     ...void2
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
@@ -174,12 +182,14 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         }, [nextTypeaheadChar]);
 
 
-        const comparatorShared = useStableCallback((safeLhs: string, safeRhs: string) => {
+        const comparatorShared = useStableCallback((safeLhs: string, safeRhs: string, normalizeFirst: boolean) => {
             let compare: number;
-            // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
-            // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-            safeLhs = safeLhs.normalize("NFD");
-            safeRhs = safeRhs.normalize("NFD")
+            if (normalizeFirst) {
+                // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
+                // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
+                safeLhs = safeLhs.normalize("NFD");
+                safeRhs = safeRhs.normalize("NFD");
+            }
 
             if (collator)
                 compare = collator.compare(safeLhs, safeRhs)
@@ -192,7 +202,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         const insertingComparator = useStableCallback((lhs: string | null, rhs: TypeaheadInfo) => {
 
             if (typeof lhs === "string" && typeof rhs.text === "string") {
-                return comparatorShared(lhs, rhs.text);
+                return comparatorShared(lhs, rhs.text, true);
             }
 
             return (lhs as unknown as number) - (rhs as unknown as number);
@@ -201,8 +211,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         const typeaheadComparator = useStableCallback((lhs: string, rhs: TypeaheadInfo) => {
 
             if (typeof lhs === "string" && typeof rhs.text === "string") {
-                // TODO: Doing this substring BEFORE normalization is, like, pretty not great?
-                let trimmedRet = comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+
+                let trimmedRet = comparatorShared(lhs.normalize("NFD"), rhs.text.substring(0, lhs.length).normalize("NFD"), false);
                 return trimmedRet;
             }
 
@@ -293,14 +303,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventType<any, any>) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
-                debugger;
 
                 // Note the important distinction between "sorted" and "reordered":
                 // "sorted" is used for fast searching, whereas "reordered" is the visual, processedChildren thing.
-                const typeaheadIndexIntoSortedChildren = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+                const typeaheadIndexIntoSortedChildren2 = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
                 //const sortedTypeaheadIndex = indexFromOriginalToRepositioned(unsortedTypeaheadIndex);
 
-                if (typeaheadIndexIntoSortedChildren < 0) {
+                if (typeaheadIndexIntoSortedChildren2 < 0) {
                     // The user has typed an entry that doesn't exist in the list
                     // (or more specifically "for which there is no entry that starts with that input")
                     setTypeaheadStatus("invalid");
@@ -334,17 +343,21 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                       the road. Maybe one or two characters would be good enough though.
                     */
 
+                    if (currentTypeahead == "do")
+                        debugger;
 
-                    // These are used to keep track of the candidates' positions in both our sorted array and the unsorted DOM.
-                    let lowestUnsortedIndexAll: number | null = null;
-                    let lowestSortedIndexAll = typeaheadIndexIntoSortedChildren;
+                    // Keep track of the lowest/highest indices that still match
+                    //let lowestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+                    //let highestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+                    let lowestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
+                    let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
 
                     // These two are only set for elements that are ahead of us, but the principle's the same otherwise
-                    let lowestUnsortedIndexNext: number | null = null;
-                    let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
+                    //let lowestUnsortedIndexNext: number | null = null;
+                    //let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
 
-                    const updateBestFit = (indexReordered: number) => {
-                        const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
+                    /*const updateBestFit = (typeaheadIndex: number) => {
+                        //const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
                         if (!isValidForTypeaheadNavigation(indexOriginal))
                             return;
 
@@ -356,32 +369,74 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                             lowestUnsortedIndexNext = indexOriginal;
                             lowestSortedIndexNext = i;
                         }
+                    }*/
+
+                    //let i = typeaheadIndexIntoSortedChildren;
+                    while (lowestCandidateTypeaheadIndex >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[lowestCandidateTypeaheadIndex]) == 0) {
+                        //updateBestFit(lowestCandidateTypeaheadIndex);
+                        --lowestCandidateTypeaheadIndex;
                     }
 
-                    let i = typeaheadIndexIntoSortedChildren;
-                    while (i >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
-                        --i;
+                    //i = typeaheadIndexIntoSortedChildren;
+                    while (highestCandidateTypeaheadIndex < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[highestCandidateTypeaheadIndex]) == 0) {
+                        // updateBestFit(sortedTypeaheadInfo.current[i].indexOriginal);
+                        ++highestCandidateTypeaheadIndex;
                     }
 
-                    i = typeaheadIndexIntoSortedChildren;
-                    while (i < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
-                        updateBestFit(sortedTypeaheadInfo.current[i].indexReordered);
-                        ++i;
-                    }
+                    let sortedCandidates = sortedTypeaheadInfo.current.slice(lowestCandidateTypeaheadIndex + 1, highestCandidateTypeaheadIndex);
+                    sortedCandidates.sort((lhs, rhs) => {
+                        // Knowing that both lhs and rhs start with the search string,
+                        // try to find a way to prefer one over the other.
+                        //
+                        // (Reminder: low scores are "good", high scores are "bad")
 
-                    let toSet: number | null = null;
+                        function score(info: TypeaheadInfo) {
+                            if (info.text == null || currentTypeahead == null) {
+                                /// Shouldn't ever happen???
+                                debugger;
+                                return 1000;
+                            }
 
-                    if (lowestUnsortedIndexNext !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexReordered;
-                    else if (lowestUnsortedIndexAll !== null)
-                        toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexReordered;
+                            // Exact matches score the highest
+                            if (info.text.length == currentTypeahead.length)
+                                return -100;
 
-                    if (toSet != null)
-                        toSet = indexFromRepositionedToOriginal(toSet);
+                            const nextChar = info.text.substring(currentTypeahead.length, currentTypeahead.length + 1);
+
+                            // Failing that, matches at a word boundary or similar score highly.
+                            if (/\s/.test(nextChar))
+                                return -10;
+                            // Similar to the above, but spaces are better boundaries than other non-letters
+                            if (/\P{Letter}/v.test(nextChar))
+                                return -9;
+
+                            // Okay, prefer matches that are as close as possible to our current match,
+                            // to prevent jumpiness.
+                            const infoRepositionedIndex = indexFromOriginalToRepositioned(info.indexOriginal);
+                            const currentRepositionedIndex = indexFromOriginalToRepositioned(getTabbableIndex() ?? 0 as OriginalIndex);
+                            const distance = (Math.abs(currentRepositionedIndex - infoRepositionedIndex));
+                            const proportionateDistance = 1 - (distance / getHighestIndex());
+
+                            return 0 - proportionateDistance;
+                        }
+
+                        return score(lhs) - score(rhs);
+                    })
+
+                    let toSet: OriginalIndex | null = sortedCandidates[0]?.indexOriginal ?? null;
+
+                    //if (lowestUnsortedIndexNext !== null)
+                    //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexOriginal;
+                    //else if (lowestUnsortedIndexAll !== null)
+                    //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexOriginal;
+
+                    //if (toSet != null)
+                    //    toSet = indexFromRepositionedToOriginal(toSet);
+
+
 
                     if (toSet != null) {
-                        setIndex(toSet, reason, true);
+                        setTabbableIndex(toSet, reason, true);
                         onNavigateTypeahead?.(toSet, reason as KeyboardEventType<any>);
                     }
                     else {
@@ -409,7 +464,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
         assertEmptyObject(void2);
         assertEmptyObject(void4);
 
-        const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+        const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useStableCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
             if (text) {
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
@@ -427,19 +482,19 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
                 // Or we need to be able to support columns here, within typeahead?
                 // Don't really like that idea (what if we want 3d navigation, woo-ooo-ooo).
                 const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexOriginal: index, text }) == 0);
                 if (sortedIndex < 0) {
-                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, indexReordered: index });
+                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, indexOriginal: index });
                 }
                 else {
-                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, indexReordered: index });
+                    sortedTypeaheadInfo.splice(sortedIndex, 1, { text, indexOriginal: index });
                 }
 
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexReordered: index, text }) == 0);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { indexOriginal: index, text }) == 0);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.splice(sortedIndex, 1);
@@ -447,7 +502,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
                 }
             }
 
-        }, []);
+        });
 
         return {
             textContentParameters: { onTextContentChange },

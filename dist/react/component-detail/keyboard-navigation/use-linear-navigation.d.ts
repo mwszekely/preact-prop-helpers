@@ -1,10 +1,10 @@
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, RepositionedIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface LinearNavigationResult {
-    valueRepositioned: number | null;
+    valueRepositioned: RepositionedIndex | null;
     status: "normal" | "past-start" | "past-end";
 }
 export interface UseLinearNavigationReturnTypeSelf {
@@ -23,13 +23,13 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: OriginalIndex, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      *
      * @stable
      */
-    isValidForLinearNavigation(i: number): boolean;
+    isValidForLinearNavigation(i: OriginalIndex): boolean;
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
      *
@@ -77,7 +77,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    getHighestIndex(): number;
+    getHighestIndex(): OriginalIndex;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      *
@@ -85,7 +85,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    getLowestIndex(): number;
+    getLowestIndex(): OriginalIndex;
 }
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -102,10 +102,10 @@ export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;
     isValid(index: number): boolean;
-    targetDemangled: number;
+    targetDemangled: OriginalIndex;
     searchDirection: 1 | -1;
-    indexFromRepositionedToOriginal: (n: number) => number;
-    indexFromOriginalToRepositioned: (n: number) => number;
+    indexFromRepositionedToOriginal: (n: RepositionedIndex) => OriginalIndex;
+    indexFromOriginalToRepositioned: (n: OriginalIndex) => RepositionedIndex;
 }
 /**
  * #__NO_SIDE_EFFECTS__

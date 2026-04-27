@@ -31,7 +31,7 @@ import { useMemoObject } from "./use-stable-getter.js";
  */
 const _comments = void (0);
 
-export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo> {
     getChildren(): ManagedChildren<M>;
     managedChildrenArray: InternalChildInfo<M>;
     remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
@@ -39,7 +39,7 @@ export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> 
     //remoteULEChildChanged: (index: M["index"]) => (() => void);
 }
 
-export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenContext<M extends ManagedChildInfo> {
     managedChildContext: UseManagedChildrenContextSelf<M>
 }
 
@@ -50,7 +50,7 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
  * 
  * Other hooks will inherit from this to provide more complicated behavior.
  */
-export interface ManagedChildInfo<T extends string | number> {
+export interface ManagedChildInfo {
     /**
      * A unique value representing this child.
      * 
@@ -58,7 +58,7 @@ export interface ManagedChildInfo<T extends string | number> {
      * 
      * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
      */
-    index: T;
+    index: OriginalIndex;
 }
 
 
@@ -66,7 +66,7 @@ export interface ManagedChildInfo<T extends string | number> {
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 
-export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo> {
     /**
      * Runs after one or more children have updated their information (index, etc.).
      * 
@@ -93,7 +93,7 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
     onChildrenCountChange?: Nullable<((count: number) => void)>;
 }
 
-export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenParameters<M extends ManagedChildInfo> {
     managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
 }
 
@@ -115,7 +115,7 @@ export interface UseGenericChildParameters<C extends {} | null, M extends {}> {
  * E.G. `UseRovingTabIndexChildParameters` won't extend this, even though it has `info` and `context` parameters.
  * They look similar, should there be a GenericChildParameters type that provides those?
  */
-export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> extends UseGenericChildParameters<UseManagedChildrenContext<M> | null, M> {
+export interface UseManagedChildParameters<M extends ManagedChildInfo> extends UseGenericChildParameters<UseManagedChildrenContext<M> | null, M> {
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
@@ -127,7 +127,7 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> exte
     info: M;
 }
 
-export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo> {
     /** 
      * @stable
      *
@@ -139,7 +139,7 @@ export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any
 
 }
 
-export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenReturnType<M extends ManagedChildInfo> {
     /**
      * Returns information about the child that rendered itself with the requested key.
      * 
@@ -153,9 +153,11 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     context: UseManagedChildrenContext<M>;
 }
 
-export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo> {
     /**
      * Returns a proxy to all the information each child rendered with. The function, returned object, and every function within it are all stable.
+     * 
+     * TODO: Remove ManagedChildren, it's not a class, it's just a bag of functions, it can all be inlined here
      * 
      * @stable
      */
@@ -163,37 +165,40 @@ export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> 
 }
 
 
-export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildReturnType<M extends ManagedChildInfo> {
     managedChildReturn: UseManagedChildReturnTypeSelf<M>;
 }
 
 
 /**
  * Abstraction over the managed children
+ * 
+ * TODO: Get rid of this thing and put all these functions in `UseManagedChildReturnTypeSelf` directly, jeez
  */
-export interface ManagedChildren<M extends ManagedChildInfo<any>> {
+export interface ManagedChildren<M extends ManagedChildInfo> {
     /** 
-     * Returns the `info` of the child at the specified index.
-     * 
-     * The index is into the array of **repositioned** children if using the relevant processedChildren hooks.
+     * Returns the `info` of the child at the specified (original, non-repositioned) index.
      * 
      * @remarks This is the same as what's passed to `useManagedChild`.
      * 
      * @stable
      */
-    getAt(repositionedIndex: M["index"]): M | undefined;
+    getAt(originalIndex: OriginalIndex): M | undefined;
+
     /** 
      * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      * 
      * @stable
      */
-    getHighestIndex(): number;
+    getHighestIndex(): OriginalIndex;
+
     /**
      * Returns the lowest number corresponding to a child, often 0. Inclusive, but hopefully that wasn't in question.
      *  
      * @stable
      */
-    getLowestIndex(): number;
+    getLowestIndex(): OriginalIndex;
+
     /**
      * Executes a callback on every existing child.
      *  
@@ -218,14 +223,14 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
      * 
      * @internal
      */
-    _arraySlice: () => M[];
+    //_arraySlice: () => M[];
 }
 
-interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
+interface InternalChildInfo<M extends ManagedChildInfo> {
     arr: Array<M>;
-    rec: Partial<Record<M["index"], M>>;
-    highestIndex: number;
-    lowestIndex: number;
+    //rec: Partial<Record<M["index"], M>>;
+    highestIndex: OriginalIndex;
+    lowestIndex: OriginalIndex;
 }
 
 /**
@@ -242,9 +247,9 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * 
  * @compositeParams
  */
-export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
+export function useManagedChildren<M extends ManagedChildInfo>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     return useMonitoring(function useManagedChildren(): UseManagedChildrenReturnType<M> {
-        type IndexType = M["index"];
+
         type Info = M;
 
         const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
@@ -252,17 +257,17 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
         useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
 
-        const getHighestIndex = useCallback((): number => { return managedChildrenArray.current.highestIndex; }, []);
-        const getLowestIndex = useCallback((): number => { return managedChildrenArray.current.lowestIndex; }, []);
+        const getHighestIndex = useCallback((): OriginalIndex => { return managedChildrenArray.current.highestIndex; }, []);
+        const getLowestIndex = useCallback((): OriginalIndex => { return managedChildrenArray.current.lowestIndex; }, []);
         const updateMinMax = useCallback((index: number) => {
             // The opposite of this is done during the "shrinkwrap" phase, which is debounced.
-            managedChildrenArray.current.highestIndex = Math.max(index, managedChildrenArray.current.highestIndex);
-            managedChildrenArray.current.lowestIndex = Math.min(index, managedChildrenArray.current.lowestIndex);
+            managedChildrenArray.current.highestIndex = Math.max(index, managedChildrenArray.current.highestIndex) as OriginalIndex;
+            managedChildrenArray.current.lowestIndex = Math.min(index, managedChildrenArray.current.lowestIndex) as OriginalIndex;
         }, [])
 
         // All the information we have about our children is stored in this **stable** array.
         // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-        const managedChildrenArray = useRef<InternalChildInfo<M>>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+        const managedChildrenArray = useRef<InternalChildInfo<M>>({ arr: [], highestIndex: 0 as OriginalIndex, lowestIndex: 0 as OriginalIndex });
 
         // For indirect access to each child
         // Compare getManagedChildInfo
@@ -276,22 +281,22 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                         return;
                 }
             }
-            for (const field in managedChildrenArray.current.rec) {
+            /*for (const field in managedChildrenArray.current.rec) {
                 const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<IndexType, Info>];
                 if (child)
                     if (f(child) == 'break')
                         return;
-            }
+            }*/
         }, [])
 
         // Retrieves the information associated with the child with the given index.
         // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = useCallback<ManagedChildren<M>["getAt"]>((index: IndexType, indexType?: "original" | "repositioned") => {
-            if (typeof index == "number")
-                return managedChildrenArray.current.arr[index as number]!;
+        const getManagedChildInfo = useCallback<ManagedChildren<M>["getAt"]>((index: OriginalIndex) => {
+            //if (typeof index == "number")
+            return managedChildrenArray.current.arr[index as number]!;
 
-            else
-                return managedChildrenArray.current.rec[index as IndexType]!;
+            //else
+            //    return managedChildrenArray.current.rec[index as IndexType]!;
         }, []);
 
         const shrinkwrapHandle = useRef(null as null | number);
@@ -313,7 +318,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
 
 
-                managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+                managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1 as OriginalIndex;
 
                 shrinkwrapHandle.current = null;
 
@@ -340,8 +345,8 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         // the microtask (by checking hasRemoteULE first) so that the "effect" only
         // runs once. When it's done, hasRemoteULE is reset so it can run again if
         // more children mount/unmount.
-        const hasRemoteULEChildMounted = useRef<{ mounts: Set<IndexType>, unmounts: Set<IndexType>, mountInfos: Map<IndexType, M> } | null>(null);
-        const remoteULEChildMounted = useCallback((index: IndexType, mounted: boolean): void => {
+        const hasRemoteULEChildMounted = useRef<{ mounts: Set<OriginalIndex>, unmounts: Set<OriginalIndex>, mountInfos: Map<OriginalIndex, M> } | null>(null);
+        const remoteULEChildMounted = useCallback((index: OriginalIndex, mounted: boolean): void => {
             if (!hasRemoteULEChildMounted.current) {
                 hasRemoteULEChildMounted.current = {
                     mounts: new Set(),
@@ -354,17 +359,17 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
                     for (const index of mounts) {
                         if (typeof index == "number") {
-                            managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-                            managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index);
+                            managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index) as OriginalIndex;
+                            managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index) as OriginalIndex;
                         }
                     }
 
                     for (const index of unmountsThatDidntMount) {
 
-                        if (typeof index == "number")
-                            delete managedChildrenArray.current.arr[index as number];
-                        else
-                            delete managedChildrenArray.current.rec[index as IndexType];
+                        //if (typeof index == "number")
+                        delete managedChildrenArray.current.arr[index as number];
+                        //else
+                        //    delete managedChildrenArray.current.rec[index as IndexType];
                     }
 
                     if (onChildrenCountChange || onChildrenMountChange) {
@@ -389,7 +394,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
             getAt: getManagedChildInfo,
             getHighestIndex: getHighestIndex,
             getLowestIndex: getLowestIndex,
-            _arraySlice: useCallback(() => {
+            /*_arraySlice: useCallback(() => {
                 let ret = managedChildrenArray.current.arr.slice();
                 const max = getHighestIndex();
                 for (let i = 0; i <= max; ++i) {
@@ -397,7 +402,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                         ret[i] = { index: i } as M;
                 }
                 return ret;
-            }, [])
+            }, [])*/
         });
 
         const getChildren = useCallback(() => managedChildren, []);
@@ -422,7 +427,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 /**
  * @compositeParams
  */
-export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     return useMonitoring(function useManagedChild(): UseManagedChildReturnType<M> {
         type IndexType = M["index"];
 
@@ -437,13 +442,13 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>({ c
 
 
             // Insert this information in-place
-            if (typeof index == "number") {
-                managedChildrenArray.arr[index as number] = { ...info };
-                updateMinMax?.(index);
-            }
-            else {
-                managedChildrenArray.rec[index as IndexType] = { ...info };
-            }
+            //if (typeof index == "number") {
+            managedChildrenArray.arr[index as number] = { ...info };
+            updateMinMax?.(index);
+            //}
+            //else {
+            //    managedChildrenArray.rec[index as IndexType] = { ...info };
+            //}
         });
 
         // When we mount, notify the parent via queueMicrotask
@@ -475,7 +480,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>({ c
 }
 
 
-export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
+export interface UseChildrenFlagParameters<M extends ManagedChildInfo, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
 
     /**
      * Which child is considered active on mount.
@@ -495,7 +500,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> e
      */
     closestFit: boolean;
 
-    onClosestFit: ((newFit: number | null) => void) | null;
+    onClosestFit: ((newFit: OriginalIndex | null) => void) | null;
 
     getChildren(): ManagedChildren<M>;
 
@@ -519,7 +524,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> e
     isValid(index: M): boolean;
 }
 
-export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
+export interface UseChildrenFlagReturnType<M extends ManagedChildInfo, R> {
     /** 
      * @stable
      * 
@@ -529,7 +534,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      * 
      * The returned value will be the new index that will be used. If `closestFit` is false, it will always be the same as what you passed in.
      */
-    changeIndex: PassiveStateUpdater<M["index"] | null, R>;
+    changeIndex: PassiveStateUpdater<OriginalIndex | null, R>;
     /** 
      * @stable
      * 
@@ -537,7 +542,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      */
     reevaluateClosestFit: (reason: R) => void;
     /** @stable */
-    getCurrentIndex: () => M["index"] | null;
+    getCurrentIndex: () => OriginalIndex | null;
 }
 
 /**
@@ -553,7 +558,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * 
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
+export function useChildrenFlag<M extends ManagedChildInfo, R>({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     initialIndex ??= null;
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned);
 
@@ -567,7 +572,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
 
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
-    const getClosestFit = useCallback((requestedIndex: number): number => {
+    const getClosestFit = useCallback((requestedIndex: OriginalIndex): OriginalIndex => {
         const children = getChildren();
         let closestDistance = Infinity;
         let closestIndex: number | null = null;
@@ -582,7 +587,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
                 }
             }
         });
-        return closestIndex!;
+        return closestIndex! as OriginalIndex;
     }, [/* Must remain stable! */]);
 
     if (closestFit) {
@@ -603,31 +608,34 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
         const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
         const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
 
-        const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+        const currentChild = requestedIndexOriginal == null ? null : children.getAt(requestedIndexOriginal);
 
         if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+
+            debugger;
+
             console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
-            const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned as number);
-            const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+            const closestFitIndexOriginal = getClosestFit(requestedIndexOriginal);
+            //const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
             setCurrentIndex(closestFitIndexOriginal, reason!);
             if (currentChild) {
                 setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
             }
-            if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
-                const closestFitChild = children.getAt(closestFitIndexRepositioned)!;
+            if (closestFitIndexOriginal != null) {
+                const closestFitChild = children.getAt(closestFitIndexOriginal)!;
                 console.assert(closestFitChild != null, "Internal logic???");
                 setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
-                onClosestFit!(closestFitIndexOriginal as number);
+                onClosestFit!(closestFitIndexOriginal);
             }
             else {
                 onClosestFit!(null);
             }
         }
-        else {
-            if (currentChild)
-                setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
-        }
+        //else {
+        //    if (currentChild)
+        //        setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
+        //}
     });
 
 
@@ -666,7 +674,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
                 console.assert(closestFit);
                 console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
-                const closestFitIndex = getClosestFit(requestedIndex as number);
+                const closestFitIndex = getClosestFit(requestedIndex);
                 setCurrentIndex(closestFitIndex, reason as never);
                 if (closestFitIndex != null) {
                     newMatchingChild = children.getAt(closestFitIndex)!;

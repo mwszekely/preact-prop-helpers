@@ -55,7 +55,7 @@ export function useManagedChildren(parentParameters) {
         }, []);
         // All the information we have about our children is stored in this **stable** array.
         // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-        const managedChildrenArray = useRef({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+        const managedChildrenArray = useRef({ arr: [], highestIndex: 0, lowestIndex: 0 });
         // For indirect access to each child
         // Compare getManagedChildInfo
         // TODO: The primary use for this is flaggable closest fits
@@ -68,20 +68,20 @@ export function useManagedChildren(parentParameters) {
                         return;
                 }
             }
-            for (const field in managedChildrenArray.current.rec) {
-                const child = managedChildrenArray.current.rec[field];
+            /*for (const field in managedChildrenArray.current.rec) {
+                const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<IndexType, Info>];
                 if (child)
                     if (f(child) == 'break')
                         return;
-            }
+            }*/
         }, []);
         // Retrieves the information associated with the child with the given index.
         // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = useCallback((index, indexType) => {
-            if (typeof index == "number")
-                return managedChildrenArray.current.arr[index];
-            else
-                return managedChildrenArray.current.rec[index];
+        const getManagedChildInfo = useCallback((index) => {
+            //if (typeof index == "number")
+            return managedChildrenArray.current.arr[index];
+            //else
+            //    return managedChildrenArray.current.rec[index as IndexType]!;
         }, []);
         const shrinkwrapHandle = useRef(null);
         // When we unmount children, we'd like to reduce the array length accordingly.
@@ -138,10 +138,10 @@ export function useManagedChildren(parentParameters) {
                         }
                     }
                     for (const index of unmountsThatDidntMount) {
-                        if (typeof index == "number")
-                            delete managedChildrenArray.current.arr[index];
-                        else
-                            delete managedChildrenArray.current.rec[index];
+                        //if (typeof index == "number")
+                        delete managedChildrenArray.current.arr[index];
+                        //else
+                        //    delete managedChildrenArray.current.rec[index as IndexType];
                     }
                     if (onChildrenCountChange || onChildrenMountChange) {
                         onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
@@ -161,15 +161,15 @@ export function useManagedChildren(parentParameters) {
             getAt: getManagedChildInfo,
             getHighestIndex: getHighestIndex,
             getLowestIndex: getLowestIndex,
-            _arraySlice: useCallback(() => {
+            /*_arraySlice: useCallback(() => {
                 let ret = managedChildrenArray.current.arr.slice();
                 const max = getHighestIndex();
                 for (let i = 0; i <= max; ++i) {
                     if (ret[i] == null)
-                        ret[i] = { index: i };
+                        ret[i] = { index: i } as M;
                 }
                 return ret;
-            }, [])
+            }, [])*/
         });
         const getChildren = useCallback(() => managedChildren, []);
         return {
@@ -201,13 +201,13 @@ export function useManagedChild({ context, info }) {
             if (managedChildrenArray == null)
                 return;
             // Insert this information in-place
-            if (typeof index == "number") {
-                managedChildrenArray.arr[index] = { ...info };
-                updateMinMax?.(index);
-            }
-            else {
-                managedChildrenArray.rec[index] = { ...info };
-            }
+            //if (typeof index == "number") {
+            managedChildrenArray.arr[index] = { ...info };
+            updateMinMax?.(index);
+            //}
+            //else {
+            //    managedChildrenArray.rec[index as IndexType] = { ...info };
+            //}
         });
         // When we mount, notify the parent via queueMicrotask
         // (every child does this, so everything's coordinated to only queue a single microtask per tick)
@@ -285,17 +285,18 @@ export function useChildrenFlag({ getChildren, indexFromRepositionedToOriginal, 
         const currentIndexOriginal = (getCurrentIndex());
         const requestedIndexRepositioned = indexFromOriginalToRepositioned(requestedIndexOriginal);
         const currentIndexRepositioned = indexFromOriginalToRepositioned(currentIndexOriginal);
-        const currentChild = currentIndexRepositioned == null ? null : children.getAt(currentIndexRepositioned);
+        const currentChild = requestedIndexOriginal == null ? null : children.getAt(requestedIndexOriginal);
         if (requestedIndexRepositioned != null && closestFit && (requestedIndexRepositioned != currentIndexRepositioned || currentChild == null || !isValid(currentChild))) {
+            debugger;
             console.assert(typeof requestedIndexRepositioned == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-            const closestFitIndexRepositioned = getClosestFit(requestedIndexRepositioned);
-            const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
+            const closestFitIndexOriginal = getClosestFit(requestedIndexOriginal);
+            //const closestFitIndexOriginal = indexFromRepositionedToOriginal(closestFitIndexRepositioned);
             setCurrentIndex(closestFitIndexOriginal, reason);
             if (currentChild) {
                 setAt(currentChild, false, closestFitIndexOriginal, currentIndexOriginal);
             }
-            if (closestFitIndexOriginal != null && closestFitIndexRepositioned != null) {
-                const closestFitChild = children.getAt(closestFitIndexRepositioned);
+            if (closestFitIndexOriginal != null) {
+                const closestFitChild = children.getAt(closestFitIndexOriginal);
                 console.assert(closestFitChild != null, "Internal logic???");
                 setAt(closestFitChild, true, closestFitIndexOriginal, currentIndexOriginal);
                 onClosestFit(closestFitIndexOriginal);
@@ -304,10 +305,10 @@ export function useChildrenFlag({ getChildren, indexFromRepositionedToOriginal, 
                 onClosestFit(null);
             }
         }
-        else {
-            if (currentChild)
-                setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
-        }
+        //else {
+        //    if (currentChild)
+        //        setAt(currentChild, true, currentIndexRepositioned, currentIndexOriginal);
+        //}
     });
     const reasonRef = useRef(undefined);
     const changeIndex = useCallback((arg, reason) => {

@@ -31,6 +31,8 @@
     "postbuild": "node ./post-build.mjs",
     "build:preact": "npx tsc -p ./tsconfig.preact.json",
     "build:react": "npx tsc -p ./tsconfig.react.json",
+    "watch:preact": "npx tsc --watch -p ./tsconfig.preact.json",
+    "watch:react": "npx tsc --watch -p ./tsconfig.react.json",
     "build:preact-bundle": "npx rollup -c rollup-p.config.js",
     "test": "playwright test",
     "test-ui": "playwright test --ui",
@@ -43,7 +45,9 @@
   "peerDependencies": {
     "preact": "^10.28.3",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

@@ -9,6 +9,7 @@ import { debugLog, identity } from "../../util/lib.js";
 import { ElementPropsAll, EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
+import { OriginalIndex } from "../processed-children/use-processed-index-mangler.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
 
@@ -26,7 +27,7 @@ export interface UseGridNavigationCellParametersSelf {
 
 export interface UseGridNavigationCellContextSelf {
     //allChildCellsAreUntabbable: boolean;
-    getRowIndex: () => number;
+    getRowIndex: () => OriginalIndex;
     setTabbableRow: SetTabbableIndex; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
     getTabbableColumn: () => TabbableColumnInfo;
     setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
@@ -106,9 +107,9 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
 
 export interface TabbableColumnInfo {
     /** Which cell in this row is actually tabbable? */
-    actual: number | null;
+    actual: OriginalIndex | null;
     /** Which column was the last column the user navigated to? */
-    ideal: number | null;
+    ideal: OriginalIndex | null;
 }
 
 export interface UseGridNavigationCellContext extends UseListNavigationContext {
@@ -146,7 +147,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
     return useMonitoring(function useGridNavigation(): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
         const [getTabbableColumn, setTabbableColumn] = usePassiveState<TabbableColumnInfo, EventType<any, any> | undefined>(onTabbableColumnChange, useStableCallback(() => {
-            let t = (initiallyTabbableColumn ?? 0);
+            let t = (initiallyTabbableColumn ?? 0) as OriginalIndex;
             return { actual: t, ideal: t }
         }));
 
@@ -235,7 +236,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
                 // then we focus the cell that should be focused in this row.
                 let { ideal, actual: _actual } = (getTabbableColumn());
 
-                let index = (ideal ?? 0);
+                let index = (ideal ?? 0) as OriginalIndex;
                 let child = getChildren().getAt(index);
                 let lowestIndex = getChildren().getLowestIndex();
                 let highestIndex = getChildren().getHighestIndex();
@@ -283,7 +284,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
-            processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity, indexFromRepositionedToOriginal: identity },
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity<any>, indexFromRepositionedToOriginal: identity<any> },
             rovingTabIndexParameters: {
                 untabbableBehavior: "leave-child-focused",
                 focusSelfParent: whenThisRowIsFocused,

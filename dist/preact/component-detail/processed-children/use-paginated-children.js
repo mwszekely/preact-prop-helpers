@@ -19,11 +19,12 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
         const refreshPagination = useCallback((paginationMin, paginationMax) => {
             const childMax = (getChildren().getHighestIndex() + 1);
             const childMin = (getChildren().getLowestIndex());
-            for (let i = childMin; i <= childMax; ++i) {
+            for (let iu = childMin; iu <= childMax; ++iu) {
+                const i = iu;
                 const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
         }, [ /* Must be empty */]);
         useEffect(() => {

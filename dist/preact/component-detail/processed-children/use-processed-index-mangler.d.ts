@@ -1,19 +1,38 @@
 import { Nullable, createElement } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
-export type GetIndex = (row: VNode) => (number | undefined);
+export type GetIndex = (row: VNode) => (OriginalIndex | undefined);
 export type OriginalIndex = number & {
-    _original?: true;
+    _original: true;
 };
 export type RepositionedIndex = number & {
-    _repositioned?: true;
+    _repositioned: true;
 };
 export interface UseProcessedIndexManglerParametersSelf {
     /**
-     * The sorted children to render.
+     * Returns the index of the given child's VNode.
+     *
+     * Generally, this is just vnode.props.index,
+     * but if you want the index prop to be called
+     * something else, you can specify that here.
+     *
+     * @stable
      */
     getIndex: GetIndex;
+    /**
+     * Returns the sort value for the given child's index.
+     *
+     * For an unsorted list, this could just be each child's index itself.
+     *
+     * @stable
+     */
     getSortValueAt: (index: number) => unknown;
+    /**
+     * Compares the sort values returned by getSortValueAt.
+     * If unspecified, a sensible default for numbers/strings is used.
+     *
+     * @stable
+     */
     compare: Nullable<Compare<unknown>>;
 }
 export interface UseProcessedIndexManglerParameters {
@@ -47,6 +66,13 @@ export interface UseProcessedIndexManglerContextSelf {
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf {
 }
 /**
+ * Allows for tracking reordered children by their original index and repositioned index. This is referred to in various places as "index mangling" and "demangling".
+ *
+ * The values returned by this hook are used by others like `useLinearNavigation` and `useTypeaheadNavigation` so that they can work even when children are out of order.
+ *
+ * This hook, is separate from useRearrangeableChildren so that it can be included
+ * as part of a parent component, e.g. a table (instead of the tbody).
+ *
  * @compositeParams
  */
 export declare function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType;
@@ -54,7 +80,7 @@ export declare class ProcessedIndexMangler {
     private getIndex;
     private getSortValue;
     private compare;
-    constructor(getIndex: <N extends OriginalIndex | RepositionedIndex>(vnode: VNode) => (N | undefined), getSortValue: (index: number) => unknown, compare: Compare<unknown>);
+    constructor(getIndex: (vnode: VNode) => (OriginalIndex | undefined), getSortValue: (index: number) => unknown, compare: Compare<unknown>);
     /**
      * Converts between index types.
      *
@@ -74,10 +100,10 @@ export declare class ProcessedIndexMangler {
     sortedChildren: (VNode | null)[];
     private _originalToRepositioned;
     private _repositionedToOriginal;
-    setChildren(children: (VNode | null)[]): (createElement.JSX.Element | null)[];
+    setChildren(childrenInOriginalOrder: (VNode | null)[]): (createElement.JSX.Element | null)[];
 }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
+export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 1 | -1 | 0;
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

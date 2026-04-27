@@ -7,7 +7,7 @@ import { ElementProps, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
-import { UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
     setPaginationVisible(visible: boolean): void;
@@ -84,11 +84,12 @@ export function usePaginatedChildren<TabbableChildElement extends Element>({
         const refreshPagination = useCallback((paginationMin: Nullable<number>, paginationMax: Nullable<number>) => {
             const childMax = (getChildren().getHighestIndex() + 1);
             const childMin = (getChildren().getLowestIndex());
-            for (let i = childMin; i <= childMax; ++i) {
+            for (let iu = childMin; iu <= childMax; ++iu) {
+                const i = iu as OriginalIndex;
                 const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
 
         }, [/* Must be empty */])

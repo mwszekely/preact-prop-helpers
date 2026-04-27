@@ -195,7 +195,7 @@ export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndex
                 for (let i = 0; i < (count); ++i) {
                     if (i == 1)
                         yield <li><span>(Item {i} is a <strong>hole in the array</strong>; this &lt;li&gt; just decided to hang out where #1 would be.)</span></li>;
-                    else
+                    else if (i != 8)
                         yield <DemoUseRovingTabIndexChildOuter index={i} word={RandomWords2[i]} key={i} />
                 }
             })()), [count]),

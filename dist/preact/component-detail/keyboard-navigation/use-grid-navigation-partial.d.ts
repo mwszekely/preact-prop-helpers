@@ -1,6 +1,7 @@
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { OriginalIndex } from "../processed-children/use-processed-index-mangler.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
 export interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> {
@@ -16,7 +17,7 @@ export interface UseGridNavigationCellParametersSelf {
     colSpan: Nullable<number>;
 }
 export interface UseGridNavigationCellContextSelf {
-    getRowIndex: () => number;
+    getRowIndex: () => OriginalIndex;
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
     setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
@@ -63,9 +64,9 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
 }
 export interface TabbableColumnInfo {
     /** Which cell in this row is actually tabbable? */
-    actual: number | null;
+    actual: OriginalIndex | null;
     /** Which column was the last column the user navigated to? */
-    ideal: number | null;
+    ideal: OriginalIndex | null;
 }
 export interface UseGridNavigationCellContext extends UseListNavigationContext {
     gridNavigationCellContext: UseGridNavigationCellContextSelf;

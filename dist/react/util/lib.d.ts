@@ -1,2 +1,2 @@
-export * from "./lib-react.js";
+export * from "./lib-preact.js";
 //# sourceMappingURL=lib.d.ts.map

@@ -35,17 +35,17 @@ export type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseComplet
     Exclude<keyof M, keyof UseCompleteGridNavigationCellInfo<any>> |
     UseGridNavigationSelectionCellInfoKeysParameters | "focusSelf";
 
-export interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSelectChildRowInfo<RowElement>, ManagedChildInfo<number> { }
-export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSelectChildCellInfo<CellElement>, ManagedChildInfo<number> { }
+export interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSelectChildRowInfo<RowElement>, ManagedChildInfo { }
+export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSelectChildCellInfo<CellElement>, ManagedChildInfo { }
 
 export interface UseCompleteGridNavigationRowsInfo<ChildElement extends Element> extends
     UseProcessedChildInfo<ChildElement>,
-    ManagedChildInfo<number> { }
+    ManagedChildInfo { }
 
 export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends
     OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "processedIndexManglerReturn" | "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">,
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
+    TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation" | "getHighestIndex">,
     TargetedOmit<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">,
     TargetedOmit<UseProcessedIndexManglerParameters, "processedIndexManglerParameters", "getSortValueAt">,
     Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters"> {
@@ -459,7 +459,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         // Enormous bag of parameters for useGridNavigationRow
         const parameters: UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM> = {
             rovingTabIndexParameters,
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
             linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
             refElementReturn,
