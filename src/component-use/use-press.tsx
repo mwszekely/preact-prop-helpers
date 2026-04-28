@@ -114,6 +114,8 @@ function ensureManualClickHandlersInstalled() {
     if (installedManualClickHandlers)
         return;
 
+    installedManualClickHandlers = true;
+
     let manualClickTimeout1 = null as number | null;
     let manualClickTimeout2 = null as number | null;
     onHandledManualClickEvent = function onHandledManualClickEvent() {

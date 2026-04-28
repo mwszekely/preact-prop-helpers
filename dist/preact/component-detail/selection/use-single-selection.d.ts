@@ -6,7 +6,7 @@ import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
-import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     /**
@@ -28,17 +28,17 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
     setLocalSingleSelected(selected: boolean, direction: number | null): void;
 }
 export type SingleSelectionChangeHandler = EnhancedEventHandler<Event, {
-    selectedIndex: number;
+    selectedIndex: OriginalIndex;
 }>;
 export type SingleSelectionChangeEvent = TargetedEnhancedEvent<Event, {
-    selectedIndex: number;
+    selectedIndex: OriginalIndex;
 }>;
 export interface UseSingleSelectionParametersSelf {
     /**
      * This is imperative, as opposed to declarative,
      * to save on re-rendering the parent whenever the selected index changes.
      */
-    initiallySingleSelectedIndex: Nullable<number>;
+    initiallySingleSelectedIndex: Nullable<OriginalIndex>;
     /**
      * Called when a child is selected (via a press or other method).
      *
@@ -82,11 +82,11 @@ export interface UseSingleSelectionReturnTypeSelf {
      *
      * @stable
      */
-    changeSingleSelectedIndex: PassiveStateUpdater<number | null, SingleSelectionChangeEvent>;
+    changeSingleSelectedIndex: PassiveStateUpdater<OriginalIndex | null, SingleSelectionChangeEvent>;
     /**
      * @stable
      */
-    getSingleSelectedIndex(): number | null;
+    getSingleSelectedIndex(): OriginalIndex | null;
 }
 export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<SingleSelectionContextSelf>, "singleSelectionMode"> {
     /**
@@ -165,7 +165,7 @@ export declare function useSingleSelection<ParentOrChildElement extends Element,
  */
 export declare function useSingleSelectionChild<ChildElement extends Element>({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>>;
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
-    singleSelectedIndex: Nullable<number>;
+    singleSelectedIndex: Nullable<OriginalIndex>;
 }
 export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;

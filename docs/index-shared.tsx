@@ -1,7 +1,30 @@
 //import "preact/debug";
 //import { options, render } from "preact";
 import { createContext, memo, MouseEvent, useContext, useRef } from "react";
-import { ElementSize, EventType, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useDraggable, useDroppable, useElementSize, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/react/index.js";
+import {
+    ElementSize,
+    EventType,
+    focus,
+    useAnimationFrame,
+    useAsyncHandler,
+    useChildrenHaveFocus,
+    useChildrenHaveFocusChild,
+    UseChildrenHaveFocusChildParameters,
+    useDraggable,
+    useDroppable,
+    useElementSize,
+    useGlobalHandler,
+    useHasCurrentFocus,
+    useHasLastFocus,
+    useInterval,
+    useMergedProps,
+    usePortalChildren,
+    usePress,
+    useRandomDualIds,
+    useRefElement,
+    useStableCallback,
+    useState
+} from "../dist/react/index.js";
 
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
 
@@ -117,7 +140,7 @@ const DemoUseElementSizeAnimation = () => {
     });
 
     return (
-        <div style={{height: "300px", width: "300px", contain: "strict"}}>
+        <div style={{ height: "300px", width: "300px", contain: "strict" }}>
             <div {...useMergedProps(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
                 <pre>{JSON.stringify(elementSize, null, 2)}</pre>
             </div>
@@ -128,34 +151,34 @@ const DemoUseElementSizeAnimation = () => {
 
 const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
     return <div />
-/*
-    const [active, setActive] = useState(false);
-
-    const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
-        focusTrapParameters: {
-            trapActive: active,
-            onlyMoveFocus: false,
-            focusOpener: e =>focus( e),
-            focusPopup: (e, f) => focus(f() as HTMLElement),
-        },
-        activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
-        refElementReturn
-    });
-    //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
-
-    const divProps = useMergedProps(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
-    if (depth == 2)
-        return <div />;
-
-    return (
-        <div className="demo">
-            <label>Active: <input type="checkbox" checked={active} onInput={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
-            <div {...divProps} >
-                <DemoUseFocusTrapChild active={active} setActive={setActive} depth={depth ?? 0} />
+    /*
+        const [active, setActive] = useState(false);
+    
+        const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
+        const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
+            focusTrapParameters: {
+                trapActive: active,
+                onlyMoveFocus: false,
+                focusOpener: e =>focus( e),
+                focusPopup: (e, f) => focus(f() as HTMLElement),
+            },
+            activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
+            refElementReturn
+        });
+        //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
+    
+        const divProps = useMergedProps(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
+        if (depth == 2)
+            return <div />;
+    
+        return (
+            <div className="demo">
+                <label>Active: <input type="checkbox" checked={active} onInput={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
+                <div {...divProps} >
+                    <DemoUseFocusTrapChild active={active} setActive={setActive} depth={depth ?? 0} />
+                </div>
             </div>
-        </div>
-    );*/
+        );*/
 });
 
 
@@ -391,7 +414,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
         pressParameters: {
-            focusSelf: e => { focus( e); },
+            focusSelf: e => { focus(e); },
             longPressThreshold: 1000,
             onPressSync: () => {
                 /*setTimeout(() => {
@@ -574,7 +597,7 @@ export const Root = () => {
         <hr />
 
 
-       {/*  <DemoUseFocusTrap />
+        {/*  <DemoUseFocusTrap />
         <hr />
         <DemoUseAsyncHandler1 />
         <hr />

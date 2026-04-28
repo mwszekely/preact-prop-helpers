@@ -7,6 +7,8 @@ import {
     GetIndex,
     MultiSelectionChangeEvent,
     UseProcessedChildContext as NormalListChildContext,
+    OriginalIndex,
+    RepositionedIndex,
     StateUpdater,
     UseCompleteListNavigationChildInfo,
     UseCompleteListNavigationChildrenInfo,
@@ -43,24 +45,26 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
 
-    const [singleSelectedIndex, setSingleSelectedIndex] = useState(null as number | null);
+    const [tabbableIndex, setLocalTabbableIndex] = useState(null as OriginalIndex | null);
+    const [singleSelectedIndex, setSingleSelectedIndex] = useState(null as OriginalIndex | null);
     const [singleSelectionMode, setSingleSelectionMode] = useState("focus" as "focus" | "activation" | "disabled");
     const [multiSelectionMode, setMultiSelectionMode] = useState("activation" as "focus" | "activation" | "disabled");
     const [count, setCount] = useState(10);
-    let [min, setMin] = useState<number | null>(null);
-    let [max, setMax] = useState<number | null>(null);
+    let [paginationStart, setPaginationMin] = useState<RepositionedIndex | null>(null);
+    let [paginationCount, setPaginationCount] = useState<RepositionedIndex | null>(1 as RepositionedIndex);
     const [staggered, setStaggered] = useState<boolean>(false);
 
-    if (!isFinite(min ?? NaN))
-        min = null!;
-    if (!isFinite(max ?? NaN))
-        max = null!;
+    if (!isFinite(paginationStart ?? NaN))
+        paginationStart = null!;
+    if (!isFinite(paginationCount ?? NaN))
+        paginationCount = null!;
 
     const untabbable = false;
 
     const onSelectionChange = (e: MultiSelectionChangeEvent) => {
         setMultiSelectPercent(e[EventDetail].selectedPercent)
     }
+
 
 
     const shuffle2 = useCallback(() => {
@@ -73,21 +77,30 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
         refreshRows();
     }, []);
 
-    const causeProblems = useCallback(() => {
-        const problemIndex = 7;
-        sortValues.current[problemIndex] = -100000;
+    const rotate = useCallback(() => {
+        sortValues.current = [sortValues.current.at(-1)!, ...sortValues.current.slice(0, sortValues.current.length - 1)];
         refreshRows();
     }, []);
 
     let sortValues = useRef<number[]>([]);
+    while (sortValues.current.length < count) {
+        sortValues.current.push(sortValues.current.length);
+    }
+
+    if (sortValues.current.length > count)
+        sortValues.current.splice(count, sortValues.current.length - count)
+
+    let paginated = (paginationStart != null && paginationCount != null);
+    const paginationMin = paginated ? paginationStart : null;
+    const paginationMax = paginated ? (paginationStart! + paginationCount! - 1) as RepositionedIndex : null;
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
-        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
+        rovingTabIndexParameters: { onTabbableIndexChange: setLocalTabbableIndex, untabbable, focusSelfParent: focus },
         singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
         refElementParameters: {},
-        paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
+        paginatedChildrenParameters: { paginationMin, paginationMax },
         singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode },
         processedIndexManglerParameters: {
@@ -148,12 +161,12 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle2()}>Shuffle</button>
             <button onClick={() => reverse2()}>Reverse</button>
-            <button onClick={(e) => { e.currentTarget.focus(); setSingleSelectedIndex(0); causeProblems(); }}>Cause problems</button>
+            <button onClick={(e) => { rotate(); }}>Rotate</button>
             <button onClick={() => halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn()}>Halve # of children in {secondsToHalve} seconds</button>
-            <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
-            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {singleSelectedIndex})</label>
-            <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
-            <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber as OriginalIndex, e, false); }} /> (currently {tabbableIndex})</label>
+            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber as OriginalIndex); }} /> (currently {singleSelectedIndex})</label>
+            <label>Pagination window starts at: <input type="number" value={paginationStart ?? undefined} min={0} max={count != null ? (count - 1) : undefined} onInput={e => { e.preventDefault(); setPaginationMin(e.currentTarget.valueAsNumber as RepositionedIndex); }} /></label>
+            <label>Pagination window size: <input type="number" value={paginationCount ?? undefined} min={paginationCount ?? undefined} max={count} onInput={e => { e.preventDefault(); setPaginationCount(e.currentTarget.valueAsNumber as RepositionedIndex); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
             {/*<label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>*/}
             <label>Single-Selection mode:
@@ -173,7 +186,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <UntabbableContext.Provider value={untabbable}>
                 <ListNavigationSingleSelectionChildContext.Provider value={context}>
                     <ol start={0} {...props} className="demo-list">
-                        <DemoUseRovingTabIndexChildren max={max} min={min} staggered={staggered} count={count} animate={animate} setStaggering={setStaggering} />
+                        <DemoUseRovingTabIndexChildren max={paginationMax} min={paginationMin} staggered={staggered} count={count} animate={animate} setStaggering={setStaggering} />
                     </ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </UntabbableContext.Provider>
@@ -221,15 +234,15 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, indexOriginal, indexRepositioned }: { index: number, word: string, indexOriginal?: number, indexRepositioned?: number }) {
-    
-    const { 
-        hide, 
-        managedChildReturn, 
-        paginatedChildReturn, 
-        props, 
-        refElementReturn, 
-        staggeredChildReturn 
+const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, indexOriginal, indexRepositioned }: { index: OriginalIndex, word: string, indexOriginal?: number, indexRepositioned?: number }) {
+
+    const {
+        hide,
+        managedChildReturn,
+        paginatedChildReturn,
+        props,
+        refElementReturn,
+        staggeredChildReturn
     } = useCompleteListNavigationChildOuter<HTMLLIElement, UseCompleteListNavigationChildrenInfo<HTMLLIElement>>({
         context: useContext(ListChildContext),
         info: { index },
@@ -239,8 +252,9 @@ const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChild
 
     //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />, [indexOriginal, indexRepositioned, index]);
     const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />;
+
     return (
-        <li {...props}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
+        <li {...props} hidden={hide}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
 });
 

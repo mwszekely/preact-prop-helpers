@@ -41,7 +41,8 @@ export default {
 				{ find: 'react', replacement: 'preact/compat' },
 				{ find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
 				{ find: 'react-dom', replacement: 'preact/compat' },
-				{ find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' }
+				{ find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' },
+				{ find: /(dist\/react\/index.js)/, replacement: 'dist/preact/index.js' }
 			]
 		}),
         resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks"] }),   // TODO: Why, exactly, is dedupe needed? It doesn't not make sense, but specifically. Why.

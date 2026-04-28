@@ -39,7 +39,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element> 
      *
      * **MUST** be stable!
      */
-    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
+    onTabbableIndexChange: Nullable<OnPassiveStateChange<OriginalIndex | null, EventType<any, any>>>;
 }
 export interface UseRovingTabIndexReturnTypeSelf {
     /**

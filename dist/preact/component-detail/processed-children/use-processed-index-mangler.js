@@ -185,7 +185,6 @@ export class ProcessedIndexMangler {
                 ++reorderedArrayIndex;
             }
         }
-        debugger;
         return this.sortedChildren;
     }
 }

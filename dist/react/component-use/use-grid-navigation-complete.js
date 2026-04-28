@@ -64,7 +64,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
             processedIndexManglerReturn
         });
@@ -115,7 +115,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
  *
  * @compositeParams
  */
-export function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
+export function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, processedIndexManglerReturn, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigationRows() {
         assertEmptyObject(void1);
         const { completeGridNavigationContext: { compare, getIndex, getSortValueAt, provideParentWithRefreshRows } } = context;
@@ -125,6 +125,7 @@ export function useCompleteGridNavigationRows({ context, paginatedChildrenParame
             staggeredChildrenParameters,
             managedChildrenParameters,
             rearrangeableChildrenParameters,
+            processedIndexManglerReturn,
             context,
         });
         useLayoutEffect(() => {

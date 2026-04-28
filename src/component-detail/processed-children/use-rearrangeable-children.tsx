@@ -30,7 +30,7 @@ type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "wi
 
 
 
-export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
+export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo {
     getElement(): ChildElement | null;
 
     /** 
@@ -151,7 +151,7 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
                     const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
                     if (index != null && mangledIndex != null) {
                         const info = getManagedChildren().getAt(index);
-                        const info2 = getManagedChildren().getAt(mangledIndex);
+                        const info2 = getManagedChildren().getAt(mangler.map(mangledIndex, "repositioned", "original"));
                         if (info && info2 && animate) {
 
                             const element = info2.getElement();

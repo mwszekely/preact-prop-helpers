@@ -268,6 +268,7 @@ export function useCompleteListNavigationChildren<TabbableChildElement extends E
     staggeredChildrenParameters,
     managedChildrenParameters,
     rearrangeableChildrenParameters,
+    processedIndexManglerReturn,
     ...void1
 }: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M, RM>): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, RM> {
     return useMonitoring(function useCompleteListNavigationChildren(): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, RM> {
@@ -286,6 +287,7 @@ export function useCompleteListNavigationChildren<TabbableChildElement extends E
             rearrangeableChildrenParameters,
             staggeredChildrenParameters,
             managedChildrenParameters,
+            processedIndexManglerReturn,
             context,
         });
 

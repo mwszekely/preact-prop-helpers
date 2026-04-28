@@ -1,12 +1,12 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
-import { UseTextContentParameters, UseTextContentParametersSelf } from "../../dom-helpers/use-text-content.js";
+import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
-import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useLayoutEffect, useRef } from "../../util/lib.js";
+import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -99,7 +99,7 @@ export interface UseTypeaheadNavigationContext {
 }
 
 
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index" | "untabbable"> { }
 
 
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends
@@ -108,14 +108,14 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
-export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
+export type UseTypeaheadNavigationChildInfoKeysParameters = "index" | "untabbable";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
-    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>/*,
+    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>
     //TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">,
-    TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement">*/ {
+    /*TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement">*/ {
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends
@@ -317,73 +317,24 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 else {
                     setTypeaheadStatus("valid");
 
-                    /*
-                      We know roughly where, in the sorted array of strings, our next typeahead location is.
-                      But roughly isn't good enough if there are multiple matches.
-                      To convert our sorted index to the unsorted index we need, we have to find the first
-                      element that matches us *and* (if any such exist) is *after* our current selection.
-        
-                      In other words, the only way typeahead moves backwards relative to our current
-                      position is if the only other option is behind us.
-        
-                      It's not specified in WCAG what to do in that case.  I suppose wrap back to the start?
-                      Though there's also a case for just going upwards to the nearest to prevent jumpiness.
-                      But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
-                      I dunno. Going back to the start is the simplest though.
-        
-                      Basically what this does: Starting from where we found ourselves after our binary search,
-                      scan backwards and forwards through all adjacent entries that also compare equally so that
-                      we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
-                      (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-        
-                      TODO: The binary search starts this off with a solid O(log n), but one-character 
-                      searches are, thanks to pigeonhole principal, eventually guaranteed to become 
-                      O(n*log n). This is annoying but probably not easily solvable? There could be an 
-                      exception for one-character strings, but that's just kicking the can down 
-                      the road. Maybe one or two characters would be good enough though.
-                    */
+                    // If we've gotten here, we know at least one child matches
+                    // our typeahead search. There could be multiple, though,
+                    // so we also need to find the best candidate of those.
 
-                    if (currentTypeahead == "do")
-                        debugger;
-
-                    // Keep track of the lowest/highest indices that still match
-                    //let lowestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
-                    //let highestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+                    // Find the range of all possible candidates surrounding the one we just found.
                     let lowestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
-                    let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
-
-                    // These two are only set for elements that are ahead of us, but the principle's the same otherwise
-                    //let lowestUnsortedIndexNext: number | null = null;
-                    //let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
-
-                    /*const updateBestFit = (typeaheadIndex: number) => {
-                        //const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
-                        if (!isValidForTypeaheadNavigation(indexOriginal))
-                            return;
-
-                        if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
-                            lowestUnsortedIndexAll = indexOriginal;
-                            lowestSortedIndexAll = i;
-                        }
-                        if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
-                            lowestUnsortedIndexNext = indexOriginal;
-                            lowestSortedIndexNext = i;
-                        }
-                    }*/
-
-                    //let i = typeaheadIndexIntoSortedChildren;
                     while (lowestCandidateTypeaheadIndex >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[lowestCandidateTypeaheadIndex]) == 0) {
-                        //updateBestFit(lowestCandidateTypeaheadIndex);
                         --lowestCandidateTypeaheadIndex;
                     }
 
-                    //i = typeaheadIndexIntoSortedChildren;
+                    let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
                     while (highestCandidateTypeaheadIndex < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[highestCandidateTypeaheadIndex]) == 0) {
-                        // updateBestFit(sortedTypeaheadInfo.current[i].indexOriginal);
                         ++highestCandidateTypeaheadIndex;
                     }
 
                     let sortedCandidates = sortedTypeaheadInfo.current.slice(lowestCandidateTypeaheadIndex + 1, highestCandidateTypeaheadIndex);
+
+                    // Now find the best candidate of those
                     sortedCandidates.sort((lhs, rhs) => {
                         // Knowing that both lhs and rhs start with the search string,
                         // try to find a way to prefer one over the other.
@@ -412,6 +363,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
                             // Okay, prefer matches that are as close as possible to our current match,
                             // to prevent jumpiness.
+                            // (The math gets a bit weird to translate "close distance (low number)" -> "bad score (high number)"
                             const infoRepositionedIndex = indexFromOriginalToRepositioned(info.indexOriginal);
                             const currentRepositionedIndex = indexFromOriginalToRepositioned(getTabbableIndex() ?? 0 as OriginalIndex);
                             const distance = (Math.abs(currentRepositionedIndex - infoRepositionedIndex));
@@ -424,15 +376,6 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                     })
 
                     let toSet: OriginalIndex | null = sortedCandidates[0]?.indexOriginal ?? null;
-
-                    //if (lowestUnsortedIndexNext !== null)
-                    //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexOriginal;
-                    //else if (lowestUnsortedIndexAll !== null)
-                    //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexOriginal;
-
-                    //if (toSet != null)
-                    //    toSet = indexFromRepositionedToOriginal(toSet);
-
 
 
                     if (toSet != null) {
@@ -454,7 +397,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
  * @compositeParams
  */
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
-    info: { index, ...void1 },
+    info: { index, untabbable, ...void1 },
     //textContentReturn: { getTextContent, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     ...void4
@@ -464,8 +407,8 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
         assertEmptyObject(void2);
         assertEmptyObject(void4);
 
-        const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useStableCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
-            if (text) {
+        const handleTextContentUpdate = useCallback((text: string | null, untabbable: boolean) => {
+            if (text && !untabbable) {
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)   
@@ -501,11 +444,23 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
                     }
                 }
             }
+        }, []);
 
-        });
+        const [getText, setText] = usePassiveState<string | null, unknown>(useStableCallback((next, prev) => {
+            return handleTextContentUpdate(next, untabbable);
+        }), returnNull);
+
+        useLayoutEffect(() => {
+            return handleTextContentUpdate(getText(), untabbable);
+        }, [untabbable])
+
+
+        /*const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useStableCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+            setText(text);
+        });*/
 
         return {
-            textContentParameters: { onTextContentChange },
+            textContentParameters: { onTextContentChange: setText },
             pressParameters: { excludeSpace }
         };
     });

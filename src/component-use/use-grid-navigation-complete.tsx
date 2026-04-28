@@ -3,7 +3,7 @@ import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigat
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildrenReturnType } from "../component-detail/processed-children/use-paginated-children.js";
 import { UseProcessedChildContext, UseProcessedChildInfo, UseProcessedChildParameters, UseProcessedChildReturnType, UseProcessedChildrenContext, UseProcessedChildrenParameters, UseProcessedChildrenReturnType, useProcessedChild, useProcessedChildren } from "../component-detail/processed-children/use-processed-children.js";
-import { UseProcessedIndexManglerParameters, UseProcessedIndexManglerParametersSelf, useProcessedIndexMangler } from "../component-detail/processed-children/use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerParameters, UseProcessedIndexManglerParametersSelf, useProcessedIndexMangler } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { UseRearrangeableChildrenReturnType } from "../component-detail/processed-children/use-rearrangeable-children.js";
 import { UseStaggeredChildrenReturnType } from "../component-detail/processed-children/use-staggered-children.js";
 import { MakeMultiSelectionChildDeclarativeParameters, MultiSelectChildChangeEvent } from "../component-detail/selection/use-multi-selection.js";
@@ -112,7 +112,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     Pick<UseTextContentParameters<RowElement>, "textContentParameters">,
     UseRefElementParameters<RowElement>,
     TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
+    TargetedOmit<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation" | "getHighestIndex">,
     OmitStrong<UseHasCurrentFocusParameters<RowElement>, "refElementReturn"> {
 }
 
@@ -214,11 +214,11 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 
         assertEmptyObject(void1);
         const getChildren: () => ManagedChildren<RM> = useCallback<() => ManagedChildren<RM>>(() => managedChildrenReturn.getChildren(), []);
-        const getLowestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
-        const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
+        const getLowestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getLowestIndex(), []);
+        const getHighestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getHighestIndex(), []);
 
 
-        const isValidForNavigation = useCallback((i: number) => {
+        const isValidForNavigation = useCallback((i: OriginalIndex) => {
             const child = getChildren().getAt(i);
             if (child == null)
                 return false;
@@ -262,7 +262,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
             linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
             processedIndexManglerReturn
         });
@@ -328,6 +328,7 @@ export function useCompleteGridNavigationRows<TabbableChildElement extends Eleme
     staggeredChildrenParameters,
     managedChildrenParameters,
     rearrangeableChildrenParameters,
+    processedIndexManglerReturn,
     ...void1
 }: UseCompleteGridNavigationRowsParameters<TabbableChildElement, M, RsM>): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM> {
     return useMonitoring(function useCompleteGridNavigationRows(): UseCompleteGridNavigationRowsReturnType<TabbableChildElement, RsM> {
@@ -344,6 +345,7 @@ export function useCompleteGridNavigationRows<TabbableChildElement extends Eleme
             staggeredChildrenParameters,
             managedChildrenParameters,
             rearrangeableChildrenParameters,
+            processedIndexManglerReturn,
             context,
         });
 
@@ -442,9 +444,9 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
         // Create some helper functions
         const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
-        const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
-        const getLowestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
-        const isValidForNavigation = useCallback((i: number) => {
+        const getHighestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getHighestIndex(), []);
+        const getLowestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getLowestIndex(), []);
+        const isValidForNavigation = useCallback((i: OriginalIndex) => {
             const child = getChildren().getAt(i);
             if (child == null)
                 return false;

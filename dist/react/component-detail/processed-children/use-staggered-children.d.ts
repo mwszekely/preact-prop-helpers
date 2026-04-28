@@ -2,6 +2,7 @@ import { UseRefElementParameters } from "../../dom-helpers/use-ref-element.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+import { UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     setStaggeredVisible(visible: boolean): void;
     getStaggeredVisible(): boolean;
@@ -27,7 +28,7 @@ export interface UseStaggeredChildrenParametersSelf {
      */
     disableIntersectionObserver: boolean;
 }
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
@@ -83,11 +84,14 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  *
+ * TODO: Staggering is currently too slow to be useful. There needs to be an option
+ * to simultaneously render X number of items at once instead of strictly one-by-one.
+ *
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
  */
-export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver }, }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren, ...void1 }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void4 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

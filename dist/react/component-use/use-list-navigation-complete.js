@@ -101,7 +101,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
  *
  * @compositeParams
  */
-export function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
+export function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, processedIndexManglerReturn, ...void1 }) {
     return useMonitoring(function useCompleteListNavigationChildren() {
         assertEmptyObject(void1);
         const { listNavigationCompleteContext: { getSortValueAt, compare, getIndex, provideParentWithRefreshRows } } = context;
@@ -111,6 +111,7 @@ export function useCompleteListNavigationChildren({ context, paginatedChildrenPa
             rearrangeableChildrenParameters,
             staggeredChildrenParameters,
             managedChildrenParameters,
+            processedIndexManglerReturn,
             context,
         });
         useLayoutEffect(() => {

@@ -15,6 +15,7 @@ import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+import { OriginalIndex } from "../processed-children/use-processed-index-mangler.js";
 
 /**
  * 
@@ -283,7 +284,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
         });
 
-        const changeAllChildren = useStableCallback((event: KeyboardEvent | EventType<any, any>, shouldBeSelected: (index: number) => boolean) => {
+        const changeAllChildren = useStableCallback((event: KeyboardEvent | EventType<any, any>, shouldBeSelected: (index: OriginalIndex) => boolean) => {
             getChildren().forEach(child => {
                 if (!child.getMultiSelectionDisabled()) {
                     child.setSelectedFromParent(event, shouldBeSelected(child.index));

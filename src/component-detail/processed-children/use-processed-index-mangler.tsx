@@ -9,7 +9,29 @@ type RCMT = 'original' | 'repositioned';
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 export type GetIndex = (row: VNode) => (OriginalIndex | undefined);
 
+/**
+ * A tagged integer type used to represent **unsorted** indices.
+ * 
+ * Things that operate strictly on a programmatic basis, like
+ * rovingTabIndex, singleSelect, or anything involving
+ * retrieving per-child data is going to use this directly. 
+ * 
+ * Feel free to freely cast a `number` to this when appropriate
+ * (i.e. when you have a plain number that represents this concept).
+ */
 export type OriginalIndex = number & { _original: true };
+
+/**
+ * A tagged integer type used to represent **visual-order** indices.
+ * 
+ * Things that operate strictly on children relative to their
+ * post-sort position, like pagination, staggering, rearranging, etc.
+ * are going to use this directly. 
+ * 
+ * Feel free to freely cast a `number` to this when appropriate
+ * (i.e. when you have a plain number that represents this concept).
+ * 
+ */
 export type RepositionedIndex = number & { _repositioned: true };
 
 export interface UseProcessedIndexManglerParametersSelf {
@@ -133,6 +155,11 @@ export class ProcessedIndexMangler {
      * @param to 
      * @returns 
      */
+
+    map(index: OriginalIndex, from: "original", to: "repositioned"): RepositionedIndex;
+    map(index: RepositionedIndex, from: "repositioned", to: "original"): OriginalIndex;
+    map(index: OriginalIndex, from: "original", to: "original"): OriginalIndex;
+    map(index: RepositionedIndex, from: "repositioned", to: "repositioned"): RepositionedIndex;
     map(index: OriginalIndex | undefined, from: "original", to: "repositioned"): RepositionedIndex | undefined;
     map(index: RepositionedIndex | undefined, from: "repositioned", to: "original"): OriginalIndex | undefined;
     map(index: OriginalIndex | undefined, from: "original", to: "original"): OriginalIndex | undefined;
@@ -307,7 +334,6 @@ export class ProcessedIndexMangler {
 
         }
 
-        debugger;
         return this.sortedChildren;
     }
 

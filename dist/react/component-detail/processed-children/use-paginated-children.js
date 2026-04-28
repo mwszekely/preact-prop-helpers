@@ -17,14 +17,14 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
         const lastPagination = useRef({ paginationMax: null, paginationMin: null });
         const refreshPagination = useCallback((paginationMin, paginationMax) => {
-            const childMax = (getChildren().getHighestIndex() + 1);
+            const childMax = (getChildren().getHighestIndex());
             const childMin = (getChildren().getLowestIndex());
             for (let iu = childMin; iu <= childMax; ++iu) {
                 const i = iu;
-                const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-                getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
+                const visible = (i >= (paginationMin ?? -Infinity) && i <= (paginationMax ?? Infinity));
+                getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
             }
         }, [ /* Must be empty */]);
         useEffect(() => {
@@ -38,13 +38,13 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
                 let shouldFocus = getAnyFocused() || false;
                 setTimeout(() => {
                     if (paginationMin != null && tabbableIndex < paginationMin) {
-                        setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                        setTabbableIndex(indexFromRepositionedToOriginal(paginationMin), undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
                     }
                     else if (paginationMax != null && tabbableIndex >= paginationMax) {
                         let next = paginationMax - 1;
                         if (next == -1)
                             next = null;
-                        setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                        setTabbableIndex(indexFromRepositionedToOriginal(next), undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
                     }
                 }, 1);
             }
@@ -69,9 +69,9 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
             const count = childCount ?? 0;
             if (paginationMax != null || paginationMin != null) {
                 const min = (paginationMin ?? 0);
-                const max = (paginationMax ?? count);
-                for (let i = min; i < max; ++i) {
-                    getChildren().getAt(i)?.setChildCountIfPaginated(count);
+                const max = (paginationMax ?? (count - 1));
+                for (let i = min; i <= max; ++i) {
+                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
                 }
             }
         }, [childCount]);

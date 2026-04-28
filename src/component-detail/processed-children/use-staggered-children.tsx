@@ -4,11 +4,13 @@ import { returnNull, usePassiveState } from "../../preact-extensions/use-passive
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
 import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
+import { OriginalIndex, RepositionedIndex, UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 
 export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
@@ -41,7 +43,10 @@ export interface UseStaggeredChildrenParametersSelf {
 }
 
 export interface UseStaggeredChildrenParameters extends
-    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">/*,
+    Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">,
+    
+    TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">
+    /*,
     TargetedPick<UseRefElementReturnType<any>, "refElementReturn", "getElement"> */ {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
@@ -113,15 +118,24 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  * 
+ * TODO: Staggering is currently too slow to be useful. There needs to be an option
+ * to simultaneously render X number of items at once instead of strictly one-by-one.
+ * 
  * @hasChild {@link useStaggeredChild}
  * 
  * @compositeParams
  */
 export function useStaggeredChildren({
-    managedChildrenReturn: { getChildren },
-    staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
+    managedChildrenReturn: { getChildren, ...void1 },
+    staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver, ...void2 },
+    processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 },
+    ...void4
     //refElementReturn: { getElement }
 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     return useMonitoring(function useStaggeredChildren(): UseStaggeredChildrenReturnType {
 
         // TODO: Right now, staggering doesn't take into consideration reordering via index mangling.
@@ -131,7 +145,7 @@ export function useStaggeredChildren({
         const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
 
         // This is the highest index that we want to show, inclusive.
-        const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1);
+        const getTargetStaggerIndex = useStableGetter((childCount || 0) - 1 as RepositionedIndex);
 
         // By default, when a child mounts, we tell the next child to mount and simply repeat.
         // If a child is missing, however, it will break that chain.
@@ -153,8 +167,8 @@ export function useStaggeredChildren({
                     timeoutHandle.current = -1;
                     let target = getTargetStaggerIndex();
                     setDisplayedStaggerIndex(prev => {
-                        let next = Math.min(target || 0, (prev || 0) + 1);
-                        while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+                        let next = Math.min(target || 0, (prev || 0) + 1) as RepositionedIndex;
+                        while (next <= (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible() == true)
                             ++next;
                         return next;
                     });
@@ -173,13 +187,13 @@ export function useStaggeredChildren({
                 // If there's no timeout running, then that also means we're not waiting for a child to mount.
                 // So ask a child to mount and then wait for that child to mount.
                 let current = getDisplayedStaggerIndex();
-                let next = Math.min(childCount ?? 0, (current ?? 0) + 1);
+                let next = Math.min(childCount ?? 0, (current ?? 0) + 1) as RepositionedIndex;
 
                 setDisplayedStaggerIndex(next);
             }
         }, [childCount]);
 
-        const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
+        const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<RepositionedIndex | null, never>(useCallback((newIndex: RepositionedIndex | null, prevIndex: RepositionedIndex | null | undefined) => {
             if (newIndex == null || !s.current) {
                 return;
             }
@@ -195,8 +209,8 @@ export function useStaggeredChildren({
 
             // (queueMicrotask prevents warnings if debounceRendering is immediate)
             queueMicrotask(() => {
-                for (let i = (prevIndex ?? 0) - 1; i <= newIndex; ++i) {
-                    getChildren().getAt(i)?.setStaggeredVisible(true);
+                for (let i = (prevIndex ?? 0) - 1 as RepositionedIndex; i <= newIndex; ++i) {
+                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setStaggeredVisible(true);
                 }
             });
 
@@ -212,10 +226,10 @@ export function useStaggeredChildren({
                 let next = Math.min(
                     (getTargetStaggerIndex() ?? 0), // Don't go higher than the highest child
                     1 + (Math.max(prevIndex ?? 0, justMountedChildIndex))   // Go one higher than the child that just mounted itself or any previously mounted child (TODO: Is that last bit working as intended?)
-                );
+                ) as RepositionedIndex;
                 // Skip over any children that have already been made visible ahead
                 // (through IntersectionObserver)
-                while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
+                while (next < (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible()) {
                     ++next;
                 }
 
@@ -241,8 +255,8 @@ export function useStaggeredChildren({
         }, []);
 
         const intersectionObserver = useRef<IntersectionObserver | null>(null);
-        const elementToIndex = useRef(new Map<Element, number>());
-        const setElementToIndexMap = useCallback((index: number, element: any) => {
+        const elementToIndex = useRef(new Map<Element, OriginalIndex>());
+        const setElementToIndexMap = useCallback((index: OriginalIndex, element: any) => {
             elementToIndex.current.set(element, index);
         }, [])
 

@@ -104,8 +104,8 @@ export interface UseProcessedChildrenParameters<TabbableChildElement extends Ele
  * hidden because it's paginated out or not staggered in yet, then we want to avoid running the normal
  * child list logic (which is as fast as possible, but still only so fast).
  * 
- * Similarly, it can be useful for the children to be in a separate component for performance reasons, which
- * is another reason to separate this logic from `useListNavigation`.
+ * Similarly, it can be useful for the children to be in a separate component for performance reasons,
+ * or necessary for HTML structural reasons, which is another reason to separate this logic from `useListNavigation`.
  * 
  * Finally, `useListNavigation` imposes no requirements on how your children are laid out in the DOM, but
  * this hook **requires** all children be in one contiguous array.
@@ -163,6 +163,7 @@ export function useProcessedChildren<TabbableChildElement extends Element, M ext
         }: UseStaggeredChildrenReturnType = useStaggeredChildren({
             managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildContext.getChildren()) },
             staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
+            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
             //refElementReturn: { getElement: context.processedChildrenContext.getElement }
         });
 

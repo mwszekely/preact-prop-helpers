@@ -10,7 +10,7 @@ export interface UseRearrangedChildrenContextSelf {
 export interface UseRearrangedChildrenContext extends UseProcessedIndexManglerContext {
 }
 type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "width" | "height">;
-export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
+export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo {
     getElement(): ChildElement | null;
     /**
      * This notifies the child of the position that it is currently in,

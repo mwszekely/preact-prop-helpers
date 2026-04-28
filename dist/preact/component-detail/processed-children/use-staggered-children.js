@@ -2,6 +2,7 @@ import { returnNull, usePassiveState } from "../../preact-extensions/use-passive
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -14,13 +15,20 @@ import { useTagProps } from "../../util/use-tag-props.js";
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  *
+ * TODO: Staggering is currently too slow to be useful. There needs to be an option
+ * to simultaneously render X number of items at once instead of strictly one-by-one.
+ *
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
  */
-export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
+export function useStaggeredChildren({ managedChildrenReturn: { getChildren, ...void1 }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void4
 //refElementReturn: { getElement }
  }) {
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     return useMonitoring(function useStaggeredChildren() {
         // TODO: Right now, staggering doesn't take into consideration reordering via index mangling.
         // This isn't a huge deal because the IntersectionObserver takes care of any holes, but it can look a bit odd
@@ -48,7 +56,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
                     let target = getTargetStaggerIndex();
                     setDisplayedStaggerIndex(prev => {
                         let next = Math.min(target || 0, (prev || 0) + 1);
-                        while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true)
+                        while (next <= (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible() == true)
                             ++next;
                         return next;
                     });
@@ -83,7 +91,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
             // (queueMicrotask prevents warnings if debounceRendering is immediate)
             queueMicrotask(() => {
                 for (let i = (prevIndex ?? 0) - 1; i <= newIndex; ++i) {
-                    getChildren().getAt(i)?.setStaggeredVisible(true);
+                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setStaggeredVisible(true);
                 }
             });
             // Set a new emergency timeout
@@ -98,7 +106,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
                 );
                 // Skip over any children that have already been made visible ahead
                 // (through IntersectionObserver)
-                while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
+                while (next < (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible()) {
                     ++next;
                 }
                 return next;

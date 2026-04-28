@@ -85,7 +85,7 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
 export function useListNavigationChild({ info: { index, untabbable, ...void1 }, context, refElementReturn, ...void2 }) {
     return useMonitoring(function useListNavigationChild() {
         const { props, ...rticr } = useRovingTabIndexChild({ context, info: { index, untabbable }, refElementReturn });
-        const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index } });
+        const { ...tncr } = useTypeaheadNavigationChild({ context, info: { index, untabbable } });
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         return {

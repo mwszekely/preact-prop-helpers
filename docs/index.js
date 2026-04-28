@@ -3220,60 +3220,20 @@ function useTypeaheadNavigation({
           setTypeaheadStatus("invalid");
         } else {
           setTypeaheadStatus("valid");
-          /*
-            We know roughly where, in the sorted array of strings, our next typeahead location is.
-            But roughly isn't good enough if there are multiple matches.
-            To convert our sorted index to the unsorted index we need, we have to find the first
-            element that matches us *and* (if any such exist) is *after* our current selection.
-                     In other words, the only way typeahead moves backwards relative to our current
-            position is if the only other option is behind us.
-                     It's not specified in WCAG what to do in that case.  I suppose wrap back to the start?
-            Though there's also a case for just going upwards to the nearest to prevent jumpiness.
-            But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
-            I dunno. Going back to the start is the simplest though.
-                     Basically what this does: Starting from where we found ourselves after our binary search,
-            scan backwards and forwards through all adjacent entries that also compare equally so that
-            we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
-            (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                     TODO: The binary search starts this off with a solid O(log n), but one-character
-            searches are, thanks to pigeonhole principal, eventually guaranteed to become
-            O(n*log n). This is annoying but probably not easily solvable? There could be an
-            exception for one-character strings, but that's just kicking the can down
-            the road. Maybe one or two characters would be good enough though.
-          */
-          if (currentTypeahead == "do") debugger;
-          // Keep track of the lowest/highest indices that still match
-          //let lowestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
-          //let highestCandidateOriginalIndex: OriginalIndex = sortedTypeaheadInfo.current[typeaheadIndexIntoSortedChildren].indexOriginal;
+          // If we've gotten here, we know at least one child matches
+          // our typeahead search. There could be multiple, though,
+          // so we also need to find the best candidate of those.
+          // Find the range of all possible candidates surrounding the one we just found.
           let lowestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
-          let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
-          // These two are only set for elements that are ahead of us, but the principle's the same otherwise
-          //let lowestUnsortedIndexNext: number | null = null;
-          //let lowestSortedIndexNext = typeaheadIndexIntoSortedChildren;
-          /*const updateBestFit = (typeaheadIndex: number) => {
-              //const indexOriginal = indexFromRepositionedToOriginal(indexReordered);
-              if (!isValidForTypeaheadNavigation(indexOriginal))
-                  return;
-               if (lowestUnsortedIndexAll == null || indexOriginal < lowestUnsortedIndexAll) {
-                  lowestUnsortedIndexAll = indexOriginal;
-                  lowestSortedIndexAll = i;
-              }
-              if ((lowestUnsortedIndexNext == null || indexOriginal < lowestUnsortedIndexNext) && indexOriginal > (getIndex() ?? -Infinity)) {
-                  lowestUnsortedIndexNext = indexOriginal;
-                  lowestSortedIndexNext = i;
-              }
-          }*/
-          //let i = typeaheadIndexIntoSortedChildren;
           while (lowestCandidateTypeaheadIndex >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[lowestCandidateTypeaheadIndex]) == 0) {
-            //updateBestFit(lowestCandidateTypeaheadIndex);
             --lowestCandidateTypeaheadIndex;
           }
-          //i = typeaheadIndexIntoSortedChildren;
+          let highestCandidateTypeaheadIndex = typeaheadIndexIntoSortedChildren2;
           while (highestCandidateTypeaheadIndex < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[highestCandidateTypeaheadIndex]) == 0) {
-            // updateBestFit(sortedTypeaheadInfo.current[i].indexOriginal);
             ++highestCandidateTypeaheadIndex;
           }
           let sortedCandidates = sortedTypeaheadInfo.current.slice(lowestCandidateTypeaheadIndex + 1, highestCandidateTypeaheadIndex);
+          // Now find the best candidate of those
           sortedCandidates.sort((lhs, rhs) => {
             // Knowing that both lhs and rhs start with the search string,
             // try to find a way to prefer one over the other.
@@ -3294,6 +3254,7 @@ function useTypeaheadNavigation({
               if (/\P{Letter}/v.test(nextChar)) return -9;
               // Okay, prefer matches that are as close as possible to our current match,
               // to prevent jumpiness.
+              // (The math gets a bit weird to translate "close distance (low number)" -> "bad score (high number)"
               const infoRepositionedIndex = indexFromOriginalToRepositioned(info.indexOriginal);
               const currentRepositionedIndex = indexFromOriginalToRepositioned(getTabbableIndex() ?? 0);
               const distance = Math.abs(currentRepositionedIndex - infoRepositionedIndex);
@@ -3303,12 +3264,6 @@ function useTypeaheadNavigation({
             return score(lhs) - score(rhs);
           });
           let toSet = sortedCandidates[0]?.indexOriginal ?? null;
-          //if (lowestUnsortedIndexNext !== null)
-          //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].indexOriginal;
-          //else if (lowestUnsortedIndexAll !== null)
-          //    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].indexOriginal;
-          //if (toSet != null)
-          //    toSet = indexFromRepositionedToOriginal(toSet);
           if (toSet != null) {
             setTabbableIndex(toSet, reason, true);
             onNavigateTypeahead?.(toSet, reason);
@@ -3328,6 +3283,7 @@ function useTypeaheadNavigation({
 function useTypeaheadNavigationChild({
   info: {
     index,
+    untabbable,
     ...void1
   },
   //textContentReturn: { getTextContent, ...void5 },
@@ -3342,8 +3298,8 @@ function useTypeaheadNavigationChild({
   ...void4
 }) {
   return useMonitoring(function useTypeaheadNavigationChild() {
-    const onTextContentChange = useStableCallback(text => {
-      if (text) {
+    const handleTextContentUpdate = useCallback((text, untabbable) => {
+      if (text && !untabbable) {
         // Find where to insert this item.
         // Because all index values should be unique, the returned sortedIndex
         // should always refer to a new location (i.e. be negative)   
@@ -3388,10 +3344,19 @@ function useTypeaheadNavigationChild({
           }
         };
       }
-    });
+    }, []);
+    const [getText, setText] = usePassiveState(useStableCallback((next, prev) => {
+      return handleTextContentUpdate(next, untabbable);
+    }), returnNull);
+    _(() => {
+      return handleTextContentUpdate(getText(), untabbable);
+    }, [untabbable]);
+    /*const onTextContentChange: UseTextContentParametersSelf<any>["onTextContentChange"] = useStableCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
+        setText(text);
+    });*/
     return {
       textContentParameters: {
-        onTextContentChange
+        onTextContentChange: setText
       },
       pressParameters: {
         excludeSpace
@@ -3528,7 +3493,8 @@ function useListNavigationChild({
     } = useTypeaheadNavigationChild({
       context,
       info: {
-        index
+        index,
+        untabbable
       }
     });
     return {
@@ -3576,13 +3542,13 @@ function usePaginatedChildren({
       paginationMin: null
     });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
-      const childMax = getChildren().getHighestIndex() + 1;
+      const childMax = getChildren().getHighestIndex();
       const childMin = getChildren().getLowestIndex();
       for (let iu = childMin; iu <= childMax; ++iu) {
         const i = iu;
-        const visible = i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity);
-        getChildren().getAt(indexFromOriginalToRepositioned(i))?.setPaginationVisible(visible);
-        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromOriginalToRepositioned(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        const visible = i >= (paginationMin ?? -Infinity) && i <= (paginationMax ?? Infinity);
+        getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+        if (visible && (paginationMax != null || paginationMin != null)) getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     y(() => {
@@ -3596,11 +3562,11 @@ function usePaginatedChildren({
         let shouldFocus = getAnyFocused() || false;
         setTimeout(() => {
           if (paginationMin != null && tabbableIndex < paginationMin) {
-            setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+            setTabbableIndex(indexFromRepositionedToOriginal(paginationMin), undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
           } else if (paginationMax != null && tabbableIndex >= paginationMax) {
             let next = paginationMax - 1;
             if (next == -1) next = null;
-            setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+            setTabbableIndex(indexFromRepositionedToOriginal(next), undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
           }
         }, 1);
       }
@@ -3627,9 +3593,9 @@ function usePaginatedChildren({
       const count = childCount ?? 0;
       if (paginationMax != null || paginationMin != null) {
         const min = paginationMin ?? 0;
-        const max = paginationMax ?? count;
-        for (let i = min; i < max; ++i) {
-          getChildren().getAt(i)?.setChildCountIfPaginated(count);
+        const max = paginationMax ?? count - 1;
+        for (let i = min; i <= max; ++i) {
+          getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
         }
       }
     }, [childCount]);
@@ -3735,7 +3701,7 @@ function useRearrangeableChildren({
           const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
           if (index != null && mangledIndex != null) {
             const info = getManagedChildren().getAt(index);
-            const info2 = getManagedChildren().getAt(mangledIndex);
+            const info2 = getManagedChildren().getAt(mangler.map(mangledIndex, "repositioned", "original"));
             if (info && info2 && animate) {
               const element = info2.getElement();
               const rect = element?.getBoundingClientRect();
@@ -3859,19 +3825,30 @@ function useRearrangeableChild({
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  *
+ * TODO: Staggering is currently too slow to be useful. There needs to be an option
+ * to simultaneously render X number of items at once instead of strictly one-by-one.
+ *
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
  */
 function useStaggeredChildren({
   managedChildrenReturn: {
-    getChildren
+    getChildren,
+    ...void1
   },
   staggeredChildrenParameters: {
     staggered,
     childCount,
-    disableIntersectionObserver
-  }
+    disableIntersectionObserver,
+    ...void2
+  },
+  processedIndexManglerReturn: {
+    indexFromOriginalToRepositioned,
+    indexFromRepositionedToOriginal,
+    ...void3
+  },
+  ...void4
   //refElementReturn: { getElement }
 }) {
   return useMonitoring(function useStaggeredChildren() {
@@ -3900,7 +3877,7 @@ function useStaggeredChildren({
           let target = getTargetStaggerIndex();
           setDisplayedStaggerIndex(prev => {
             let next = Math.min(target || 0, (prev || 0) + 1);
-            while (next <= (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible() == true) ++next;
+            while (next <= (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible() == true) ++next;
             return next;
           });
         }, 10);
@@ -3934,7 +3911,7 @@ function useStaggeredChildren({
       // (queueMicrotask prevents warnings if debounceRendering is immediate)
       queueMicrotask(() => {
         for (let i = (prevIndex ?? 0) - 1; i <= newIndex; ++i) {
-          getChildren().getAt(i)?.setStaggeredVisible(true);
+          getChildren().getAt(indexFromRepositionedToOriginal(i))?.setStaggeredVisible(true);
         }
       });
       // Set a new emergency timeout
@@ -3950,7 +3927,7 @@ function useStaggeredChildren({
         );
         // Skip over any children that have already been made visible ahead
         // (through IntersectionObserver)
-        while (next < (getChildCount() || 0) && getChildren().getAt(next)?.getStaggeredVisible()) {
+        while (next < (getChildCount() || 0) && getChildren().getAt(indexFromRepositionedToOriginal(next))?.getStaggeredVisible()) {
           ++next;
         }
         return next;
@@ -4132,8 +4109,8 @@ function useStaggeredChild({
  * hidden because it's paginated out or not staggered in yet, then we want to avoid running the normal
  * child list logic (which is as fast as possible, but still only so fast).
  *
- * Similarly, it can be useful for the children to be in a separate component for performance reasons, which
- * is another reason to separate this logic from `useListNavigation`.
+ * Similarly, it can be useful for the children to be in a separate component for performance reasons,
+ * or necessary for HTML structural reasons, which is another reason to separate this logic from `useListNavigation`.
  *
  * Finally, `useListNavigation` imposes no requirements on how your children are laid out in the DOM, but
  * this hook **requires** all children be in one contiguous array.
@@ -4225,6 +4202,10 @@ function useProcessedChildren({
         staggered,
         childCount,
         disableIntersectionObserver
+      },
+      processedIndexManglerReturn: {
+        indexFromOriginalToRepositioned,
+        indexFromRepositionedToOriginal
       }
       //refElementReturn: { getElement: context.processedChildrenContext.getElement }
     });
@@ -4519,7 +4500,6 @@ class ProcessedIndexMangler {
         ++reorderedArrayIndex;
       }
     }
-    debugger;
     return this.sortedChildren;
   }
 }
@@ -5949,6 +5929,7 @@ function useCompleteListNavigationChildren({
   staggeredChildrenParameters,
   managedChildrenParameters,
   rearrangeableChildrenParameters,
+  processedIndexManglerReturn,
   ...void1
 }) {
   return useMonitoring(function useCompleteListNavigationChildren() {
@@ -6773,9 +6754,24 @@ function pressLog(...args) {
 function supportsPointerEvents() {
   return "onpointerup" in globalThis;
 }
+// All our checking for pointerdown and up doesn't mean anything if it's
+// a programmatic onClick event, which could come from any non-user source.
+// We want to handle those just like GUI clicks, but we don't want to double-up on press events.
+// So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
+//
+// Also, this is global to handle the following situation:
+// A button is tapped
+// Some heavy rendering-logic is done and the page jumps around
+// Now there's a new button underneath the user's finger
+// And it receives a click event just cause.
+// ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
+// But TODO because it doesn't work well it this library is used multiple times on the same page.
+let installedManualClickHandlers = false;
 let justHandledManualClickEvent = false;
 let onHandledManualClickEvent;
 function ensureManualClickHandlersInstalled() {
+  if (installedManualClickHandlers) return;
+  installedManualClickHandlers = true;
   let manualClickTimeout1 = null;
   let manualClickTimeout2 = null;
   onHandledManualClickEvent = function onHandledManualClickEvent() {
@@ -8062,15 +8058,16 @@ const ListNavigationSingleSelectionChildContext = X$1(null);
 const ListChildContext = X$1(null);
 const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
   const [multiSelectPercent, setMultiSelectPercent] = useState(0);
+  const [tabbableIndex, setLocalTabbableIndex] = useState(null);
   const [singleSelectedIndex, setSingleSelectedIndex] = useState(null);
   const [singleSelectionMode, setSingleSelectionMode] = useState("focus");
   const [multiSelectionMode, setMultiSelectionMode] = useState("activation");
   const [count, setCount] = useState(10);
-  let [min, setMin] = useState(null);
-  let [max, setMax] = useState(null);
+  let [paginationStart, setPaginationMin] = useState(null);
+  let [paginationCount, setPaginationCount] = useState(1);
   const [staggered, setStaggered] = useState(false);
-  if (!isFinite(min ?? NaN)) min = null;
-  if (!isFinite(max ?? NaN)) max = null;
+  if (!isFinite(paginationStart ?? NaN)) paginationStart = null;
+  if (!isFinite(paginationCount ?? NaN)) paginationCount = null;
   const untabbable = false;
   const onSelectionChange = e => {
     setMultiSelectPercent(e[EventDetail].selectedPercent);
@@ -8083,15 +8080,21 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     sortValues.current = reverse(sortValues.current);
     refreshRows();
   }, []);
-  const causeProblems = q$1(() => {
-    const problemIndex = 7;
-    sortValues.current[problemIndex] = -1e5;
+  const rotate = q$1(() => {
+    sortValues.current = [sortValues.current.at(-1), ...sortValues.current.slice(0, sortValues.current.length - 1)];
     refreshRows();
   }, []);
   let sortValues = A([]);
+  while (sortValues.current.length < count) {
+    sortValues.current.push(sortValues.current.length);
+  }
+  if (sortValues.current.length > count) sortValues.current.splice(count, sortValues.current.length - count);
+  let paginated = paginationStart != null && paginationCount != null;
+  const paginationMin = paginated ? paginationStart : null;
+  const paginationMax = paginated ? paginationStart + paginationCount - 1 : null;
   const r = useCompleteListNavigationDeclarative({
     rovingTabIndexParameters: {
-      onTabbableIndexChange: null,
+      onTabbableIndexChange: setLocalTabbableIndex,
       untabbable,
       focusSelfParent: focus
     },
@@ -8117,8 +8120,8 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     },
     refElementParameters: {},
     paginatedChildrenParameters: {
-      paginationMin: min,
-      paginationMax: max
+      paginationMin,
+      paginationMax
     },
     singleSelectionParameters: {
       singleSelectionAriaPropName: "aria-selected",
@@ -8229,11 +8232,9 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
       children: "Reverse"
     }), u("button", {
       onClick: e => {
-        e.currentTarget.focus();
-        setSingleSelectedIndex(0);
-        causeProblems();
+        rotate();
       },
-      children: "Cause problems"
+      children: "Rotate"
     }), u("button", {
       onClick: () => halveNumberOfChildrenInWhateverNumberOfSecondsIFinallyDecidedOn(),
       children: ["Halve # of children in ", secondsToHalve, " seconds"]
@@ -8244,7 +8245,7 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
           e.preventDefault();
           setTabbableIndex(e.currentTarget.valueAsNumber, e, false);
         }
-      })]
+      }), " (currently ", tabbableIndex, ")"]
     }), u("label", {
       children: ["Imperatively set the selected index to: ", u("input", {
         type: "number",
@@ -8256,23 +8257,23 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
     }), u("label", {
       children: ["Pagination window starts at: ", u("input", {
         type: "number",
-        value: min ?? undefined,
+        value: paginationStart ?? undefined,
         min: 0,
-        max: max ?? undefined,
+        max: count != null ? count - 1 : undefined,
         onInput: e => {
           e.preventDefault();
-          setMin(e.currentTarget.valueAsNumber);
+          setPaginationMin(e.currentTarget.valueAsNumber);
         }
       })]
     }), u("label", {
-      children: ["Pagination window ends at: ", u("input", {
+      children: ["Pagination window size: ", u("input", {
         type: "number",
-        value: max ?? undefined,
-        min: min ?? undefined,
+        value: paginationCount ?? undefined,
+        min: paginationCount ?? undefined,
         max: count,
         onInput: e => {
           e.preventDefault();
-          setMax(e.currentTarget.valueAsNumber);
+          setPaginationCount(e.currentTarget.valueAsNumber);
         }
       })]
     }), u("label", {
@@ -8363,8 +8364,8 @@ const DemoUseRovingTabIndex = N(function DemoUseRovingTabIndex() {
           ...props,
           className: "demo-list",
           children: u(DemoUseRovingTabIndexChildren, {
-            max: max,
-            min: min,
+            max: paginationMax,
+            min: paginationMin,
             staggered: staggered,
             count: count,
             animate: animate,
@@ -8459,6 +8460,7 @@ const DemoUseRovingTabIndexChildOuter = N(function DemoUseRovingTabIndexChildOut
   });
   return u("li", {
     ...props,
+    hidden: hide,
     children: paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c
   });
 });

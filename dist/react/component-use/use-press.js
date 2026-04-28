@@ -33,6 +33,7 @@ let onHandledManualClickEvent;
 function ensureManualClickHandlersInstalled() {
     if (installedManualClickHandlers)
         return;
+    installedManualClickHandlers = true;
     let manualClickTimeout1 = null;
     let manualClickTimeout2 = null;
     onHandledManualClickEvent = function onHandledManualClickEvent() {

@@ -145,7 +145,7 @@ export function useListNavigationChild<ChildElement extends Element>({
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
     return useMonitoring(function useListNavigationChild(): UseListNavigationChildReturnType<ChildElement> {
         const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ context, info: { index, untabbable }, refElementReturn });
-        const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ context, info: { index } });
+        const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ context, info: { index, untabbable } });
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);

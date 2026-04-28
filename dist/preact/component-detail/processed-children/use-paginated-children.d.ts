@@ -3,14 +3,23 @@ import { UseManagedChildrenReturnType } from "../../preact-extensions/use-manage
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
-import { UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
+import { RepositionedIndex, UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
 export interface UsePaginatedChildrenParametersSelf {
-    paginationMin: Nullable<number>;
-    paginationMax: Nullable<number>;
+    /**
+     * Inclusive. The minimum **reordered** index of the child that should be shown.
+     */
+    paginationMin: Nullable<RepositionedIndex>;
+    /**
+     * Inclusive. The maximum **reordered** index of the child that should be shown.
+     */
+    paginationMax: Nullable<RepositionedIndex>;
+    /**
+     * The total number of children. Used for ARIA .
+     */
     childCount: Nullable<number>;
 }
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
