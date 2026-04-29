@@ -34,7 +34,7 @@ const DUMMY = 0;
  *
  * @compositeParams
  */
-export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void5 }, ...void4 }) {
+export function useSingleSelection({ managedChildrenReturn: { getChildAt, forEachChild, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void5 }, ...void4 }) {
     return useMonitoring(function useSingleSelection() {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -57,7 +57,8 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
         }, []);
         const isSelectedValid = useCallback((m) => { return !m.untabbable; }, []);
         const { changeIndex: changeSingleSelectedIndex, getCurrentIndex: getSingleSelectedIndex } = useChildrenFlag({
-            getChildren,
+            getChildAt,
+            forEachChild,
             onIndexChange: null,
             initialIndex: initiallySingleSelectedIndex,
             getAt: getSelectedAt,
@@ -98,8 +99,9 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
  *
  * @compositeParams
  */
-export function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
+export function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index: indexUntyped, untabbable, ...void3 }, ...void4 }) {
     return useMonitoring(function useSingleSelectionChild() {
+        const index = indexUntyped;
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
@@ -152,10 +154,11 @@ export function useSingleSelectionChild({ singleSelectionChildParameters: { sing
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
-    let s = (singleSelectedIndex ?? null);
+export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex: ssiu, onSingleSelectedIndexChange } }) {
+    const singleSelectedIndex2 = ssiu;
+    let singleSelectedIndex = (singleSelectedIndex2 ?? null);
     let reasonRef = useRef(undefined);
-    useLayoutEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
+    useLayoutEffect(() => { changeSingleSelectedIndex(singleSelectedIndex, reasonRef.current); }, [singleSelectedIndex]);
     return {
         singleSelectionParameters: {
             onSingleSelectedIndexChange: useCallback((e) => {

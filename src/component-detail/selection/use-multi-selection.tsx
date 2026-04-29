@@ -81,7 +81,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
 
 export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends
     TargetedPick<UseChildrenHaveFocusReturnType<any>, "childrenHaveFocusReturn", "getAnyFocused">,
-    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "forEachChild" | "getChildAt"> {
     multiSelectionParameters: UseMultiSelectionParametersSelf;
 }
 
@@ -198,7 +198,7 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
      * it's not recommended to use "focus" mode for multi-selection
      * anyway.
      */
-    firePressSelectionEvent: (e: Event) => void;
+    firePressSelectionEvent: (e: Event | EventType<any, any>) => void;
 }
 
 /**
@@ -213,12 +213,12 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  * 
  * @compositeParams
  */
-export function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseMultiSelectionChildInfo<ChildElement>>({
     multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 },
-    managedChildrenReturn: { getChildren, ...void1 },
+    managedChildrenReturn: {  forEachChild, getChildAt, ...void1 },
     childrenHaveFocusReturn: { getAnyFocused, ...void4 },
     ...void2
-}: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
+}: UseMultiSelectionParameters<M>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
     return useMonitoring(function useMultiSelection(): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
         ;
         // By having both we get the total number of children for free, even if there are holes in the array.
@@ -285,9 +285,9 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         });
 
         const changeAllChildren = useStableCallback((event: KeyboardEvent | EventType<any, any>, shouldBeSelected: (index: OriginalIndex) => boolean) => {
-            getChildren().forEach(child => {
+            forEachChild(child => {
                 if (!child.getMultiSelectionDisabled()) {
-                    child.setSelectedFromParent(event, shouldBeSelected(child.index));
+                    child.setSelectedFromParent(event, shouldBeSelected(child.index as OriginalIndex));
                 }
             })
         });
@@ -315,10 +315,10 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
                 changeAllChildren(event, (childIndex) => {
                     if (childIndex >= startIndex && childIndex <= endIndex) {
                         // If this child is within the range, toggle it.
-                        return !getChildren().getAt(childIndex)?.getMultiSelected();
+                        return getChildAt(childIndex)?.getMultiSelected() ?? false;
                     }
                     else {
-                        return !!getChildren().getAt(childIndex)?.getMultiSelected();
+                        return getChildAt(childIndex)?.getMultiSelected() ?? false;
                     }
                 });
             }
@@ -385,7 +385,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
  * 
  * @compositeParams
  */
-export function useMultiSelectionChild<E extends Element>({
+export function useMultiSelectionChild<E extends Element, M extends UseMultiSelectionChildInfo<E>>({
     info: { index, ...void4 },
     multiSelectionChildParameters: {
         initiallyMultiSelected,
@@ -408,8 +408,8 @@ export function useMultiSelectionChild<E extends Element>({
         ...void3
     },
     ...void2
-}: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
-    return useMonitoring(function useMultiSelectionChild(): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
+}: UseMultiSelectionChildParameters<E, M>): UseMultiSelectionChildReturnType<E, M> {
+    return useMonitoring(function useMultiSelectionChild(): UseMultiSelectionChildReturnType<E, M> {
         // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
         // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
         // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
@@ -418,7 +418,7 @@ export function useMultiSelectionChild<E extends Element>({
         const pressFreebie = useRef(false);
 
 
-        const firePressSelectionEvent = (e: Event) => {
+        const firePressSelectionEvent = (e: Event | EventType<any, any>) => {
             if (!multiSelectionDisabled) {
                 if (multiSelectionMode == "activation") {
                     if ((e as KeyboardEvent).shiftKey) {

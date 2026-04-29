@@ -12,7 +12,7 @@ import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from 
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../dom-helpers/use-text-content.js";
 import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
-import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildReturnTypeSelf, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
@@ -33,8 +33,8 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
     Pick<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters">,
     TargetedOmit<Pick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters">, "paginatedChildrenParameters", "childCount">,
     Pick<UseRefElementParameters<ParentElement>, "refElementParameters">,
-    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
-    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation" | "getHighestIndex">,
+    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "isValidForLinearNavigation">,
+    TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     TargetedOmit<UseListNavigationSelectionParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "untabbableBehavior">,
     TargetedOmit<UseProcessedIndexManglerParameters, "processedIndexManglerParameters", never> {
 
@@ -166,11 +166,16 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     ...void1
 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
     return useMonitoring(function useCompleteListNavigation(): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
-        const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
-        const getLowestIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getLowestIndex(), []);
-        const getHighestIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => getChildren().getHighestIndex(), []);
+
+        // Due to the order in which functions need to be called and passed to each other,
+        // it's necessary to create these wrappers, as they're used before they're declared.
+        const getChildAt = useCallback((i: OriginalIndex) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChild = useCallback<UseManagedChildReturnTypeSelf<M>["forEachChild"]>(f => managedChildrenReturn.forEachChild(f), []);
+        const getLowestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getHighestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getHighestChildIndex(), []);
+
         const isValidForNavigation = useCallback((i: OriginalIndex) => {
-            const child = getChildren().getAt(i);
+            const child = getChildAt(i);
             if (!child)
                 return false;
             if (child.untabbable)
@@ -180,7 +185,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
         const { propsStable: propsRef, refElementReturn } = useRefElement<ParentElement>({ refElementParameters });
 
-        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters })
+        const { context: { processedIndexManglerContext }, processedIndexManglerReturn } = useProcessedIndexMangler({ processedIndexManglerParameters })
 
         const {
             childrenHaveFocusParameters,
@@ -194,17 +199,17 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             props,
 
             ...void2
-        } = useListNavigationSelection<ParentElement, ChildElement>({
-            managedChildrenReturn: { getChildren },
-            linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { getHighestIndex, isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        } = useListNavigationSelection<ParentElement, ChildElement, M>({
+            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             singleSelectionParameters,
             multiSelectionParameters,
             paginatedChildrenParameters,
             refElementReturn,
             childrenHaveFocusReturn: { getAnyFocused: useStableCallback((): boolean => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
+            processedIndexManglerReturn
         });
 
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
@@ -268,7 +273,6 @@ export function useCompleteListNavigationChildren<TabbableChildElement extends E
     staggeredChildrenParameters,
     managedChildrenParameters,
     rearrangeableChildrenParameters,
-    processedIndexManglerReturn,
     ...void1
 }: UseCompleteListNavigationChildrenParameters<TabbableChildElement, M, RM>): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, RM> {
     return useMonitoring(function useCompleteListNavigationChildren(): UseCompleteListNavigationChildrenReturnType<TabbableChildElement, RM> {
@@ -287,7 +291,6 @@ export function useCompleteListNavigationChildren<TabbableChildElement extends E
             rearrangeableChildrenParameters,
             staggeredChildrenParameters,
             managedChildrenParameters,
-            processedIndexManglerReturn,
             context,
         });
 
@@ -396,7 +399,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
             propsChild,
             propsTabbable,
             ...void4
-        } = useListNavigationSelectionChild<ChildElement>({
+        } = useListNavigationSelectionChild<ChildElement, M>({
             info: { index, untabbable },
             context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
             singleSelectionChildParameters,

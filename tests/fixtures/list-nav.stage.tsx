@@ -162,7 +162,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
     const {
         context: contextFromList,
         linearNavigationReturn: { },
-        managedChildrenReturn: { getChildren },
+        managedChildrenReturn: {  },
         //paginatedChildrenReturn: { refreshPagination },
         props,
         refElementReturn,
@@ -172,7 +172,9 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         singleSelectionReturn: { getSingleSelectedIndex },
         //sortableChildrenReturn: { sort },
         //staggeredChildrenReturn: { stillStaggering },
-        typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
+        typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
+        rearrangeableChildrenReturn,
+        processedIndexManglerReturn
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
@@ -209,6 +211,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         staggeredChildrenReturn: { stillStaggering },
     } = useCompleteListNavigationChildren({
         context: contextFromList,
+        processedIndexManglerReturn,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             animate: false,
@@ -310,7 +313,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
     const focusSelf = (e: HTMLLIElement) => { focus(e) };
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
-        managedChildReturn: { getChildren },
+        managedChildReturn: {  },
         //paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         propsChild,
         propsTabbable,

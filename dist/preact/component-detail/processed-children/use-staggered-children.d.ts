@@ -28,7 +28,7 @@ export interface UseStaggeredChildrenParametersSelf {
      */
     disableIntersectionObserver: boolean;
 }
-export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
+export interface UseStaggeredChildrenParameters extends TargetedPick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn", "getChildAt">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
@@ -84,14 +84,19 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> exten
  * When using the child hook, it's highly recommended to separate out any heavy logic into
  * a separate component that won't be rendered until it's de-staggered into visibility.
  *
- * TODO: Staggering is currently too slow to be useful. There needs to be an option
- * to simultaneously render X number of items at once instead of strictly one-by-one.
+ *
+ * TODO: This hook is...less than useful. It has two problems:
+ * 1. It's waaay too slow, assuming you want to view any later list items.
+ * There needs to be an option to load X-number of children per group.
+ * There also used to be a way to forcibly show children who appeared in the viewport, but the overhead from measuring
+ * so many DOM nodes seemed to outweigh the benefits of staggering in the first place.
+ * 2. And as the exact opposite, in React, it's waaaay to fast, basically being the same as not staggering at all.
  *
  * @hasChild {@link useStaggeredChild}
  *
  * @compositeParams
  */
-export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren, ...void1 }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void4 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren({ managedChildrenReturn: { getChildAt, ...void1 }, staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void4 }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

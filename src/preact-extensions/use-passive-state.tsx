@@ -14,7 +14,7 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * 
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
-export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
+/*@__NO_SIDE_EFFECTS__*/ function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
     if (process.env.NODE_ENV !== 'development')
         return;
 
@@ -42,6 +42,8 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
         }
     }
 }
+
+export { useEnsureStability };
 
 export interface UsePassiveStateOptions {
 

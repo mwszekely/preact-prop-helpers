@@ -33,7 +33,7 @@ const DUMMY = 0;
  *
  * @compositeParams
  */
-export function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
+export function useMultiSelection({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { forEachChild, getChildAt, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }) {
     return useMonitoring(function useMultiSelection() {
         ;
         // By having both we get the total number of children for free, even if there are holes in the array.
@@ -92,7 +92,7 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
             onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
         });
         const changeAllChildren = useStableCallback((event, shouldBeSelected) => {
-            getChildren().forEach(child => {
+            forEachChild(child => {
                 if (!child.getMultiSelectionDisabled()) {
                     child.setSelectedFromParent(event, shouldBeSelected(child.index));
                 }
@@ -118,10 +118,10 @@ export function useMultiSelection({ multiSelectionParameters: { onSelectionChang
                 changeAllChildren(event, (childIndex) => {
                     if (childIndex >= startIndex && childIndex <= endIndex) {
                         // If this child is within the range, toggle it.
-                        return !getChildren().getAt(childIndex)?.getMultiSelected();
+                        return getChildAt(childIndex)?.getMultiSelected() ?? false;
                     }
                     else {
-                        return !!getChildren().getAt(childIndex)?.getMultiSelected();
+                        return getChildAt(childIndex)?.getMultiSelected() ?? false;
                     }
                 });
             }

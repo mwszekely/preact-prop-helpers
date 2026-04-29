@@ -56,16 +56,12 @@ const _dummy = null;
 export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, ...void1 }) {
     return useMonitoring(function useListNavigation() {
         const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
-        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, processedIndexManglerReturn });
-        const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
+        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, processedIndexManglerReturn, managedChildrenReturn });
+        const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn, managedChildrenReturn });
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
         assertEmptyObject(void4);
-        // Merge the props while keeping them stable
-        // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-        //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
-        //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
         return {
             managedChildrenParameters,
             rovingTabIndexReturn,

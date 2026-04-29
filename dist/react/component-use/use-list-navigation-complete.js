@@ -27,11 +27,14 @@ export function useCompleteListNavigation({ linearNavigationParameters, typeahea
 //staggeredChildrenParameters,
 refElementParameters, processedIndexManglerParameters, ...void1 }) {
     return useMonitoring(function useCompleteListNavigation() {
-        const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
-        const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
-        const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+        // Due to the order in which functions need to be called and passed to each other,
+        // it's necessary to create these wrappers, as they're used before they're declared.
+        const getChildAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChild = useCallback(f => managedChildrenReturn.forEachChild(f), []);
+        const getLowestChildIndex = useCallback(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getHighestChildIndex = useCallback(() => managedChildrenReturn.getHighestChildIndex(), []);
         const isValidForNavigation = useCallback((i) => {
-            const child = getChildren().getAt(i);
+            const child = getChildAt(i);
             if (!child)
                 return false;
             if (child.untabbable)
@@ -39,18 +42,18 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             return true;
         }, []);
         const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-        const { context: { processedIndexManglerContext }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, mangler } } = useProcessedIndexMangler({ processedIndexManglerParameters });
+        const { context: { processedIndexManglerContext }, processedIndexManglerReturn } = useProcessedIndexMangler({ processedIndexManglerParameters });
         const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
-            managedChildrenReturn: { getChildren },
-            linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { getHighestIndex, isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             singleSelectionParameters,
             multiSelectionParameters,
             paginatedChildrenParameters,
             refElementReturn,
             childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
+            processedIndexManglerReturn
         });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const mcr = useManagedChildren({
@@ -101,7 +104,7 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
  *
  * @compositeParams
  */
-export function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, processedIndexManglerReturn, ...void1 }) {
+export function useCompleteListNavigationChildren({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
     return useMonitoring(function useCompleteListNavigationChildren() {
         assertEmptyObject(void1);
         const { listNavigationCompleteContext: { getSortValueAt, compare, getIndex, provideParentWithRefreshRows } } = context;
@@ -111,7 +114,6 @@ export function useCompleteListNavigationChildren({ context, paginatedChildrenPa
             rearrangeableChildrenParameters,
             staggeredChildrenParameters,
             managedChildrenParameters,
-            processedIndexManglerReturn,
             context,
         });
         useLayoutEffect(() => {

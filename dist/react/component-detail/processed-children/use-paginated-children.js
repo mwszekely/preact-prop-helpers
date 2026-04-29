@@ -12,19 +12,21 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }) {
+export function usePaginatedChildren({ managedChildrenReturn: { getChildAt, getHighestChildIndex, getLowestChildIndex }, paginatedChildrenParameters: { paginationMax: paginationMaxU, paginationMin: paginationMinU, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }) {
     return useMonitoring(function usePaginatedChildren() {
+        const paginationMax = paginationMaxU;
+        const paginationMin = paginationMinU;
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
         const lastPagination = useRef({ paginationMax: null, paginationMin: null });
         const refreshPagination = useCallback((paginationMin, paginationMax) => {
-            const childMax = (getChildren().getHighestIndex());
-            const childMin = (getChildren().getLowestIndex());
+            const childMax = (getHighestChildIndex());
+            const childMin = (getLowestChildIndex());
             for (let iu = childMin; iu <= childMax; ++iu) {
                 const i = iu;
                 const visible = (i >= (paginationMin ?? -Infinity) && i <= (paginationMax ?? Infinity));
-                getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+                getChildAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getHighestChildIndex() + 1);
             }
         }, [ /* Must be empty */]);
         useEffect(() => {
@@ -71,7 +73,7 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, p
                 const min = (paginationMin ?? 0);
                 const max = (paginationMax ?? (count - 1));
                 for (let i = min; i <= max; ++i) {
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
+                    getChildAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
                 }
             }
         }, [childCount]);

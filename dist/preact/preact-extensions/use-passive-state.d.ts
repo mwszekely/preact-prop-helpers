@@ -9,7 +9,8 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  *
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
-export declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
+declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
+export { useEnsureStability };
 export interface UsePassiveStateOptions {
     /**
      * Controls when value initialization and the first effect callback runs.

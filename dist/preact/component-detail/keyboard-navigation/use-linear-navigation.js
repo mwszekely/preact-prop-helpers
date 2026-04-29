@@ -15,7 +15,7 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void1 }) {
+export function useLinearNavigation({ linearNavigationParameters: { isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, managedChildrenReturn: { getHighestChildIndex, getLowestChildIndex, ...void6 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 }, ...void1 }) {
     return useMonitoring(function useLinearNavigation() {
         let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
         assertEmptyObject(void1);
@@ -23,15 +23,12 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
         assertEmptyObject(void3);
         assertEmptyObject(void4);
         assertEmptyObject(void5);
+        assertEmptyObject(void6);
         useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
         const navigateAbsolute = useCallback((requestedIndex, searchDirection, e, fromUserInteraction, mode) => {
-            //const requestedIndexMangled = indexFromOriginalToRepositioned(requestedIndex);
-            //debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
-            debugger;
-            const highestChildIndex = getHighestIndex();
-            const lowestChildIndex = getLowestIndex();
+            const highestChildIndex = getHighestChildIndex();
+            const lowestChildIndex = getLowestChildIndex();
             const _original = (getTabbableIndex() ?? 0);
-            //const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
             const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled: requestedIndex });
             const valueOriginal = valueRepositioned == null ? null : indexFromRepositionedToOriginal(valueRepositioned);
             if (status == "past-end") {
@@ -88,10 +85,10 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
                 return "stop";
             }
         }, []);
-        const navigateToFirst = useStableCallback((event, fromUserInteraction) => { return navigateAbsolute(getLowestIndex(), -1, event, fromUserInteraction, "single"); });
-        const navigateToLast = useStableCallback((event, fromUserInteraction) => { return navigateAbsolute(getHighestIndex(), 1, event, fromUserInteraction, "single"); });
+        const navigateToFirst = useStableCallback((event, fromUserInteraction) => { return navigateAbsolute(indexFromRepositionedToOriginal(getLowestChildIndex()), -1, event, fromUserInteraction, "single"); });
+        const navigateToLast = useStableCallback((event, fromUserInteraction) => { return navigateAbsolute(indexFromRepositionedToOriginal(getHighestChildIndex()), 1, event, fromUserInteraction, "single"); });
         const navigateRelative2 = useStableCallback((event, offset, fromUserInteraction, mode) => {
-            const _highestChildIndex = getHighestIndex();
+            const _highestChildIndex = getHighestChildIndex();
             const searchDirection = (Math.sign(offset) || 1);
             const original = (getTabbableIndex() ?? 0);
             /**
@@ -118,7 +115,7 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
                     return;
                 const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
                 const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
-                let childRange = (getHighestIndex() - getLowestIndex());
+                let childRange = (getHighestChildIndex() - getLowestChildIndex());
                 let paginatedRange = getPaginatedRange() ?? childRange;
                 let truePageNavigationSize = pageNavigationSize;
                 if (truePageNavigationSize != null && truePageNavigationSize < 1) {

@@ -125,10 +125,10 @@ export declare class ProcessedIndexMangler {
     sortedChildren: (VNode | null)[];
     private _originalToRepositioned;
     private _repositionedToOriginal;
-    setChildren(childrenInOriginalOrder: (VNode | null)[]): (createElement.JSX.Element | null)[];
+    setChildren(childrenInOriginalOrder: (VNode | null)[], reorderedIndexProp: string | null | undefined): (createElement.JSX.Element | null)[];
 }
 /**
  * #__NO_SIDE_EFFECTS__
  */
-export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 1 | -1 | 0;
+export declare function defaultCompare(lhs: unknown | undefined, rhs: unknown | undefined): 0 | 1 | -1;
 //# sourceMappingURL=use-processed-index-mangler.d.ts.map

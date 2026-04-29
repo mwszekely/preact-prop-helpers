@@ -69,7 +69,7 @@ export class ProcessedIndexMangler {
     sortedChildren = [];
     _originalToRepositioned = new Map();
     _repositionedToOriginal = new Map();
-    setChildren(childrenInOriginalOrder) {
+    setChildren(childrenInOriginalOrder, reorderedIndexProp) {
         this._originalToRepositioned.clear();
         this._repositionedToOriginal.clear();
         this._originalChildren = childrenInOriginalOrder.slice();
@@ -162,24 +162,22 @@ export class ProcessedIndexMangler {
                 }
                 const childAtRepositionedSpot = sortedChildrenWithoutNulls[reorderedArrayIndex];
                 const indexRepositioned = childAtRepositionedSpot.indexOriginal;
-                // This one-statement block is weird! Read the comments carefully!
+                // This block is weird! Read the comments carefully!
                 {
                     // This looks incorrect at a first glance:
                     // Indexing the sorted array by the unsorted index?
                     // Why does indexOriginal := indexRepositioned and vice-versa?
-                    this.sortedChildren[unorderedArrayIndex] = createElement(childAtRepositionedSpot.vnode.type, {
-                        ...childAtRepositionedSpot.vnode.props,
-                        indexOriginal: indexRepositioned,
-                        indexRepositioned: indexOriginal,
-                        key: indexRepositioned
-                    });
+                    const newProps = { ...childAtRepositionedSpot.vnode.props, key: indexRepositioned };
+                    if (reorderedIndexProp != null)
+                        newProps[reorderedIndexProp] = indexOriginal; // This is correct!
+                    this.sortedChildren[unorderedArrayIndex] = createElement(childAtRepositionedSpot.vnode.type, newProps);
+                    this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
+                    this._originalToRepositioned.set(indexRepositioned, indexOriginal);
                     // We do this because we are basically working **backwards**.
-                    // By determining which reordered child this original child corresponds to,
+                    // By finding which reordered child this original child corresponds to,
                     // we've determined that the reordered child goes at the ARRAY POSITION of the original child.
                     // But we actually still don't technically know where the final ARRAY POSITION of the original child itself will be.
                     // That will come later when we get to that child.
-                    this._repositionedToOriginal.set(indexOriginal, indexRepositioned);
-                    this._originalToRepositioned.set(indexRepositioned, indexOriginal);
                 }
                 ++unorderedArrayIndex;
                 ++reorderedArrayIndex;

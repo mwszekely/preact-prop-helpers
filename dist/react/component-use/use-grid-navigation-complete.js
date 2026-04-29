@@ -31,11 +31,14 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             return gsva(row, column);
         }, [gsva, getSortColumn]);
         assertEmptyObject(void1);
-        const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
-        const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
-        const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
+        // Due to the declarations needing to come before the actual definitions,
+        // we need to define these wrapper functions.
+        const getHighestChildIndex = useCallback(() => managedChildrenReturn.getHighestChildIndex(), []);
+        const getLowestChildIndex = useCallback(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getChildAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChild = useCallback((f) => managedChildrenReturn.forEachChild(f), []);
         const isValidForNavigation = useCallback((i) => {
-            const child = getChildren().getAt(i);
+            const child = getChildAt(i);
             if (child == null)
                 return false;
             if (child.untabbable)
@@ -61,10 +64,10 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             multiSelectionParameters,
             paginatedChildrenParameters,
             refElementReturn,
-            linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            managedChildrenReturn: { getChildren },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             childrenHaveFocusReturn: { getAnyFocused },
             processedIndexManglerReturn
         });
@@ -115,7 +118,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
  *
  * @compositeParams
  */
-export function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, processedIndexManglerReturn, ...void1 }) {
+export function useCompleteGridNavigationRows({ context, paginatedChildrenParameters, staggeredChildrenParameters, managedChildrenParameters, rearrangeableChildrenParameters, ...void1 }) {
     return useMonitoring(function useCompleteGridNavigationRows() {
         assertEmptyObject(void1);
         const { completeGridNavigationContext: { compare, getIndex, getSortValueAt, provideParentWithRefreshRows } } = context;
@@ -125,7 +128,6 @@ export function useCompleteGridNavigationRows({ context, paginatedChildrenParame
             staggeredChildrenParameters,
             managedChildrenParameters,
             rearrangeableChildrenParameters,
-            processedIndexManglerReturn,
             context,
         });
         useLayoutEffect(() => {
@@ -174,12 +176,14 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
     return useMonitoring(function useCompleteGridNavigationRow() {
         // TODO: customUserInfo may contain setSelectedFromParent from the declarative version of this hook.
         // This is a bit of an edge case and should probably be handled more concretely.
-        // Create some helper functions
-        const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
-        const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
-        const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
+        // Due to the declarations needing to come before the actual definitions,
+        // we need to define these wrapper functions.
+        const getHighestChildIndex = useCallback(() => managedChildrenReturn.getHighestChildIndex(), []);
+        const getLowestChildIndex = useCallback(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getChildAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChild = useCallback((f) => managedChildrenReturn.forEachChild(f), []);
         const isValidForNavigation = useCallback((i) => {
-            const child = getChildren().getAt(i);
+            const child = managedChildReturn.getChildAt(i);
             if (child == null)
                 return false;
             if (child.untabbable)
@@ -191,9 +195,9 @@ export function useCompleteGridNavigationRow({ info: { index, untabbable, ...cus
         // Enormous bag of parameters for useGridNavigationRow
         const parameters = {
             rovingTabIndexParameters,
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, ...typeaheadNavigationParameters },
-            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
-            managedChildrenReturn: { getChildren },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
             refElementReturn,
             context: contextIncomingForRowAsChildOfTable,
             info: { index, untabbable },

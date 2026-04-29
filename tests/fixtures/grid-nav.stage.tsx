@@ -110,7 +110,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         childrenHaveFocusReturn: { getAnyFocused },
         context: contextFromGrid,
         linearNavigationReturn: { },
-        managedChildrenReturn: { getChildren },
+        managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
         //paginatedChildrenReturn: { refreshPagination },
         props,
         //rearrangeableChildrenReturn: { indexFromOriginalToRepositioned, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
@@ -236,7 +236,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
-        managedChildReturn: { getChildren },
+        managedChildReturn: {  },
         //paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         props,
         context,
@@ -321,7 +321,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
-        managedChildReturn: { getChildren },
+        managedChildReturn: {  },
         pressParameters: { excludeSpace },
         props,
         refElementReturn: { getElement },

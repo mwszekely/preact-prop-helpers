@@ -64,7 +64,7 @@ export interface UseSingleSelectionParametersSelf {
      * This is imperative, as opposed to declarative, 
      * to save on re-rendering the parent whenever the selected index changes.
      */
-    initiallySingleSelectedIndex: Nullable<OriginalIndex>;
+    initiallySingleSelectedIndex: Nullable<number | OriginalIndex>;
 
     /**
      * Called when a child is selected (via a press or other method).
@@ -160,11 +160,11 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
      * This is not necessary in the "focus" selection mode, as the 
      * focus handler is quite capable of firing the event itself.
      */
-    firePressSelectionEvent: (e: Event) => void;
+    firePressSelectionEvent: (e: Event | EventType<any, any>) => void;
 }
 
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
-    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">,
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildAt" | "forEachChild">,
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
@@ -214,13 +214,13 @@ export interface UseSingleSelectionContext {
  * 
  * @compositeParams
  */
-export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
-    managedChildrenReturn: { getChildren, ...void1 },
+export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
+    managedChildrenReturn: { getChildAt, forEachChild, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
     processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void5 },
     ...void4
-}: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement> {
+}: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement> {
     return useMonitoring(function useSingleSelection(): UseSingleSelectionReturnType<ChildElement> {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -228,11 +228,10 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         assertEmptyObject(void4);
         assertEmptyObject(void5);
 
-        type R = Event;
         const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
 
-        const getSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return m.getSingleSelected(); }, []);
-        const setSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
+        const getSelectedAt = useCallback((m: M) => { return m.getSingleSelected(); }, []);
+        const setSelectedAt = useCallback((m: M, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
             if (m.untabbable) {
                 console.assert(false);
             }
@@ -245,15 +244,16 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             m.setLocalSingleSelected(t, direction);
         }, []);
-        const isSelectedValid = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return !m.untabbable; }, []);
+        const isSelectedValid = useCallback((m: M) => { return !m.untabbable; }, []);
 
         const {
             changeIndex: changeSingleSelectedIndex,
             getCurrentIndex: getSingleSelectedIndex
-        } = useChildrenFlag<UseSingleSelectionChildInfo<ChildElement>, R>({
-            getChildren,
+        } = useChildrenFlag<M, Event>({
+            getChildAt,
+            forEachChild,
             onIndexChange: null,
-            initialIndex: initiallySingleSelectedIndex,
+            initialIndex: initiallySingleSelectedIndex as Nullable<OriginalIndex>,
             getAt: getSelectedAt,
             setAt: setSelectedAt,
             isValid: isSelectedValid,
@@ -294,14 +294,16 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
  * 
  * @compositeParams
  */
-export function useSingleSelectionChild<ChildElement extends Element>({
+export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
     singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
     context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 },
-    info: { index, untabbable, ...void3 },
+    info: { index: indexUntyped, untabbable, ...void3 },
     ...void4
-}: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
-    return useMonitoring(function useSingleSelectionChild(): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
+}: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement, M> {
+    return useMonitoring(function useSingleSelectionChild(): UseSingleSelectionChildReturnType<ChildElement, M> {
         type R = EventType<any, any>;
+
+        const index = indexUntyped as OriginalIndex;
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -320,7 +322,7 @@ export function useSingleSelectionChild<ChildElement extends Element>({
             }
         });
 
-        const firePressSelectionEvent = useStableCallback((e: Event) => {
+        const firePressSelectionEvent = useStableCallback((e: Event | EventType<any, any>) => {
             // We allow press events for selectionMode == 'focus' because
             // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
             if (!singleSelectionDisabled && !untabbable) {
@@ -360,7 +362,7 @@ export function useSingleSelectionChild<ChildElement extends Element>({
 }
 
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
-    singleSelectedIndex: Nullable<OriginalIndex>;
+    singleSelectedIndex: Nullable<number | OriginalIndex>;
 }
 
 export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
@@ -375,11 +377,12 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  */
 export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({
     singleSelectionReturn: { changeSingleSelectedIndex },
-    singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange }
+    singleSelectionDeclarativeParameters: { singleSelectedIndex: ssiu, onSingleSelectedIndexChange }
 }: UseSingleSelectionDeclarativeParameters<ChildElement>) {
-    let s = (singleSelectedIndex ?? null);
+    const singleSelectedIndex2 = (ssiu as OriginalIndex);
+    let singleSelectedIndex = (singleSelectedIndex2 ?? null);
     let reasonRef = useRef<SingleSelectionChangeEvent | undefined>(undefined);
-    useLayoutEffect(() => { changeSingleSelectedIndex(s, reasonRef.current!); }, [s]);
+    useLayoutEffect(() => { changeSingleSelectedIndex(singleSelectedIndex, reasonRef.current!); }, [singleSelectedIndex]);
 
     return {
         singleSelectionParameters: {

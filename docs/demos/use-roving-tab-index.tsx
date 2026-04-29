@@ -27,7 +27,9 @@ import {
     useState
 } from "../../dist/react/index.js";
 
-const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+const RandomWordsFirst = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+const RandomWordsBackup = "吾輩は 猫である。 名前は まだ無い。 どこで 生れたか とんと 見当が つかぬ。 何でも 薄暗い じめじめ した 所で ニャーニャー 泣いて いた 事だけは 記憶して いる。吾輩は ここで 始めて 人間と いう ものを 見た。".split(" ");
+const RandomWords2 = [...RandomWordsFirst, ...RandomWordsBackup];
 
 function _getDocument() {
     return window.document;
@@ -49,7 +51,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
     const [singleSelectedIndex, setSingleSelectedIndex] = useState(null as OriginalIndex | null);
     const [singleSelectionMode, setSingleSelectionMode] = useState("focus" as "focus" | "activation" | "disabled");
     const [multiSelectionMode, setMultiSelectionMode] = useState("activation" as "focus" | "activation" | "disabled");
-    const [count, setCount] = useState(10);
+    const [count, setCount] = useState(100);
     let [paginationStart, setPaginationMin] = useState<RepositionedIndex | null>(null);
     let [paginationCount, setPaginationCount] = useState<RepositionedIndex | null>(1 as RepositionedIndex);
     const [staggered, setStaggered] = useState<boolean>(false);
@@ -118,7 +120,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
         props,
         context,
         rovingTabIndexReturn: { setTabbableIndex },
-        managedChildrenReturn: { getChildren },
+        managedChildrenReturn: {  },
         typeaheadNavigationReturn: { typeaheadStatus },
         rearrangeableChildrenReturn: { refresh: refreshRows }
     } = r;
@@ -167,17 +169,17 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSingleSelectedIndex(e.currentTarget.valueAsNumber as OriginalIndex); }} /> (currently {singleSelectedIndex})</label>
             <label>Pagination window starts at: <input type="number" value={paginationStart ?? undefined} min={0} max={count != null ? (count - 1) : undefined} onInput={e => { e.preventDefault(); setPaginationMin(e.currentTarget.valueAsNumber as RepositionedIndex); }} /></label>
             <label>Pagination window size: <input type="number" value={paginationCount ?? undefined} min={paginationCount ?? undefined} max={count} onInput={e => { e.preventDefault(); setPaginationCount(e.currentTarget.valueAsNumber as RepositionedIndex); }} /></label>
-            <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
+            <label>Stagger delay: <input type="checkbox" checked={staggered == true} onChange={e => { setStaggered(e.currentTarget.checked); }} /></label>
             {/*<label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>*/}
             <label>Single-Selection mode:
-                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setSingleSelectionMode("disabled"); }} /> Off</label>
-                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setSingleSelectionMode("focus"); }} /> On focus</label>
-                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setSingleSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onChange={e => { setSingleSelectionMode("disabled"); }} /> Off</label>
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onChange={e => { setSingleSelectionMode("focus"); }} /> On focus</label>
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'activation'} onChange={e => { setSingleSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
             <label>Multi-Selection mode:
-                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setMultiSelectionMode("disabled"); }} /> Off</label>
-                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setMultiSelectionMode("focus"); }} /> On focus</label>
-                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'disabled'} onChange={e => { setMultiSelectionMode("disabled"); }} /> Off</label>
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'focus'} onChange={e => { setMultiSelectionMode("focus"); }} /> On focus</label>
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onChange={e => { setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
             <div>Staggering status: {staggered ? staggering ? "Staggering..." : "Done staggering" : "Not staggered"}</div>
@@ -204,10 +206,11 @@ export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndex
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
             animate: false,
+            reorderedIndexProp: "indexRepositioned",
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {
                     if (i == 1)
-                        yield <li><span>(Item {i} is a <strong>hole in the array</strong>; this &lt;li&gt; just decided to hang out where #1 would be.)</span></li>;
+                        yield <li key={i}><span>(Item {i} is a <strong>hole in the array</strong>; this &lt;li&gt; just decided to hang out where #1 would be.)</span></li>;
                     else if (i != 8)
                         yield <DemoUseRovingTabIndexChildOuter index={i} word={RandomWords2[i]} key={i} />
                 }
@@ -234,7 +237,7 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, indexOriginal, indexRepositioned }: { index: OriginalIndex, word: string, indexOriginal?: number, indexRepositioned?: number }) {
+const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, indexRepositioned }: { index: number | OriginalIndex, word: string, indexRepositioned?: number }) {
 
     const {
         hide,
@@ -251,14 +254,14 @@ const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChild
     });
 
     //const c = useMemo(() => <DemoUseRovingTabIndexChild word={word} index={index} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />, [indexOriginal, indexRepositioned, index]);
-    const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} indexOriginal={indexOriginal} indexRepositioned={indexRepositioned} />;
+    const c = <DemoUseRovingTabIndexChild word={word} index={index} childUseEffect={staggeredChildReturn.childUseEffect} indexRepositioned={indexRepositioned} />;
 
     return (
         <li {...props} hidden={hide}>{paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered ? "\xA0" : c}</li>
     )
 });
 
-const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, indexOriginal, indexRepositioned, childUseEffect }: { index: number, word: string, indexOriginal: number | undefined, indexRepositioned: number | undefined, childUseEffect: () => void }) {
+const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ index, word, indexRepositioned, childUseEffect }: { index: number, word: string, indexRepositioned: number | undefined, childUseEffect: () => void }) {
     useEffect(childUseEffect, [childUseEffect]);
     let disabled = (index == 6);
     let hidden = (index == 7);
@@ -301,7 +304,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
-    const text = `${randomWord} This is item #${index} (#${indexOriginal} to #${indexRepositioned}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+    const text = `${randomWord} This is item #${index}${index != indexRepositioned? ` (repositioned to #${indexRepositioned})` : ``}. Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
         <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<HTMLInputElement>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>

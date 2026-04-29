@@ -18,12 +18,12 @@ export interface UsePaginatedChildrenParametersSelf {
     /**
      * Inclusive. The minimum **reordered** index of the child that should be shown.
      */
-    paginationMin: Nullable<RepositionedIndex>;
+    paginationMin: Nullable<number | RepositionedIndex>;
 
     /**
      * Inclusive. The maximum **reordered** index of the child that should be shown.
      */
-    paginationMax: Nullable<RepositionedIndex>;
+    paginationMax: Nullable<number | RepositionedIndex>;
     
     /**
      * The total number of children. Used for ARIA .
@@ -32,7 +32,8 @@ export interface UsePaginatedChildrenParametersSelf {
 }
 
 export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
-    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
+    extends 
+    TargetedPick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn", "getChildAt" | "getLowestChildIndex" | "getHighestChildIndex">,
     TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">,
     TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
@@ -82,25 +83,27 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * @compositeParams
  */
 export function usePaginatedChildren<TabbableChildElement extends Element>({
-    managedChildrenReturn: { getChildren },
-    paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
+    managedChildrenReturn: { getChildAt, getHighestChildIndex, getLowestChildIndex },
+    paginatedChildrenParameters: { paginationMax: paginationMaxU, paginationMin: paginationMinU, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     childrenHaveFocusReturn: { getAnyFocused },
     processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
 }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
     return useMonitoring(function usePaginatedChildren(): UsePaginatedChildrenReturnType {
+        const paginationMax = paginationMaxU as Nullable<RepositionedIndex>;
+        const paginationMin = paginationMinU as Nullable<RepositionedIndex>;
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
         const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as number | null });
         const refreshPagination = useCallback((paginationMin: Nullable<number>, paginationMax: Nullable<number>) => {
-            const childMax = (getChildren().getHighestIndex());
-            const childMin = (getChildren().getLowestIndex());
+            const childMax = (getHighestChildIndex());
+            const childMin = (getLowestChildIndex());
             for (let iu = childMin; iu <= childMax; ++iu) {
                 const i = iu as number as RepositionedIndex;
                 const visible = (i >= (paginationMin ?? -Infinity) && i <= (paginationMax ?? Infinity));
-                getChildren().getAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
+                getChildAt(indexFromRepositionedToOriginal(i))?.setPaginationVisible(visible);
                 if (visible && (paginationMax != null || paginationMin != null))
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+                    getChildAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(getHighestChildIndex() + 1);
             }
 
         }, [/* Must be empty */])
@@ -155,7 +158,7 @@ export function usePaginatedChildren<TabbableChildElement extends Element>({
                 const min = (paginationMin ?? 0) as RepositionedIndex;
                 const max = (paginationMax ?? (count - 1)) as RepositionedIndex;
                 for (let i = min; i <= max; ++i) {
-                    getChildren().getAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
+                    getChildAt(indexFromRepositionedToOriginal(i))?.setChildCountIfPaginated(count);
                 }
             }
         }, [childCount]);

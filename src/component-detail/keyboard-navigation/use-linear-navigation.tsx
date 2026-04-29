@@ -1,3 +1,4 @@
+import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -26,9 +27,10 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 //export interface UseLinearNavigationChildInfo { }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends ManagedChildInfo> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned">,
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getHighestChildIndex" | "getLowestChildIndex">,
     TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
@@ -94,22 +96,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      */
     disableHomeEndKeys: boolean;
 
-    /**
-     * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
-     * 
-     * @returns [0, n], not [0, n)
-     * 
-     * @stable
-     */
-    getHighestIndex(): OriginalIndex;
-    /**
-     * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
-     * 
-     * @see {@link UseLinearNavigationParametersSelf.getLowestIndex}
-     * 
-     * @stable
-     */
-    getLowestIndex(): OriginalIndex;
 }
 
 
@@ -123,13 +109,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * 
  * @compositeParams
  */
-export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
+export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends ManagedChildInfo>({
+    linearNavigationParameters: { isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
+    managedChildrenReturn: { getHighestChildIndex, getLowestChildIndex, ...void6 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void3 },
     ...void1
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
+}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement> {
     return useMonitoring(function useLinearNavigation(): UseLinearNavigationReturnType<ParentOrChildElement> {
         type R = EventType<any, any>;
 
@@ -140,21 +127,18 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         assertEmptyObject(void3);
         assertEmptyObject(void4);
         assertEmptyObject(void5);
+        assertEmptyObject(void6);
 
 
         useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
 
         const navigateAbsolute = useCallback((requestedIndex: OriginalIndex, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
-            //const requestedIndexMangled = indexFromOriginalToRepositioned(requestedIndex);
-            //debugLog(`useLinearNavigation.navigateAbsolute(${requestedIndexMangled})`);
 
-            debugger;
             
-            const highestChildIndex = getHighestIndex();
-            const lowestChildIndex = getLowestIndex();
+            const highestChildIndex = getHighestChildIndex();
+            const lowestChildIndex = getLowestChildIndex();
             const _original = (getTabbableIndex() ?? 0);
 
-            //const targetDemangled = indexFromRepositionedToOriginal(requestedIndexMangled);
             const { status, valueRepositioned } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, searchDirection, targetDemangled: requestedIndex });
             const valueOriginal = valueRepositioned == null? null : indexFromRepositionedToOriginal(valueRepositioned);
             if (status == "past-end") {
@@ -212,10 +196,10 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 return "stop";
             }
         }, []);
-        const navigateToFirst = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, event, fromUserInteraction, "single"); });
-        const navigateToLast = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, event, fromUserInteraction, "single"); });
+        const navigateToFirst = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(indexFromRepositionedToOriginal(getLowestChildIndex() as number as RepositionedIndex), -1, event, fromUserInteraction, "single"); });
+        const navigateToLast = useStableCallback((event: R, fromUserInteraction: boolean) => { return navigateAbsolute(indexFromRepositionedToOriginal(getHighestChildIndex() as number as RepositionedIndex), 1, event, fromUserInteraction, "single"); });
         const navigateRelative2 = useStableCallback((event: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
-            const _highestChildIndex = getHighestIndex();
+            const _highestChildIndex = getHighestChildIndex();
             const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
             const original = (getTabbableIndex() ?? (0 as never));
             /**
@@ -247,7 +231,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
 
 
-                let childRange = (getHighestIndex() - getLowestIndex());
+                let childRange = (getHighestChildIndex() - getLowestChildIndex());
                 let paginatedRange = getPaginatedRange() ?? childRange;
 
                 let truePageNavigationSize = pageNavigationSize;

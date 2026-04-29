@@ -57,12 +57,25 @@ export interface UseRearrangeableChildrenParametersSelf {
      * TODO: Disabled for now for performance reasons
      */
     animate: false;
+
+    /**
+     * If provided, then children will receive their reordered index
+     * as a prop by this name.
+     * 
+     * If you don't need this, set it to null, as using it will
+     * re-render every single child when the order changes,
+     * whereas normally that can be skipped and the children 
+     * simply moved around without re-rendering.
+     */
+    reorderedIndexProp: Nullable<string>;
 }
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>> extends UseProcessedIndexManglerParameters, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+export interface UseRearrangeableChildrenParameters<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>> extends
+    UseProcessedIndexManglerParameters,
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildAt"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
     context: UseRearrangedChildrenContext;
 }
@@ -130,9 +143,9 @@ export interface UseRearrangeableChildParametersSelf {
  * @compositeParams
  */
 export function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
-    rearrangeableChildrenParameters: { children: childrenIn, animate },
+    rearrangeableChildrenParameters: { children: childrenIn, animate, reorderedIndexProp },
     processedIndexManglerParameters: { getIndex, getSortValueAt },
-    managedChildrenReturn: { getChildren: getManagedChildren },
+    managedChildrenReturn: { getChildAt },
     context: { processedIndexManglerContext: { mangler } }
 }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType {
     return useMonitoring(function useRearrangeableChildren(): UseRearrangeableChildrenReturnType {
@@ -143,15 +156,15 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
         const [refreshIndex, setRefreshIndex] = useState(0);
 
         const childrenOut = useMemo(() => {
-            const rearrangedChildren = mangler.setChildren(childrenIn);
+            const rearrangedChildren = mangler.setChildren(childrenIn, reorderedIndexProp);
 
             if (animate) {
                 for (const ch of rearrangedChildren) {
                     const index = ch == null ? null : getIndex(ch);
                     const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
                     if (index != null && mangledIndex != null) {
-                        const info = getManagedChildren().getAt(index);
-                        const info2 = getManagedChildren().getAt(mangler.map(mangledIndex, "repositioned", "original"));
+                        const info = getChildAt(index);
+                        const info2 = getChildAt(mangler.map(mangledIndex, "repositioned", "original"));
                         if (info && info2 && animate) {
 
                             const element = info2.getElement();

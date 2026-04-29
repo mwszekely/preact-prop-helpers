@@ -32,11 +32,21 @@ export interface UseRearrangeableChildrenParametersSelf {
      * TODO: Disabled for now for performance reasons
      */
     animate: false;
+    /**
+     * If provided, then children will receive their reordered index
+     * as a prop by this name.
+     *
+     * If you don't need this, set it to null, as using it will
+     * re-render every single child when the order changes,
+     * whereas normally that can be skipped and the children
+     * simply moved around without re-rendering.
+     */
+    reorderedIndexProp: Nullable<string>;
 }
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>> extends UseProcessedIndexManglerParameters, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+export interface UseRearrangeableChildrenParameters<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>> extends UseProcessedIndexManglerParameters, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildAt"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
     context: UseRearrangedChildrenContext;
 }
@@ -90,7 +100,7 @@ export interface UseRearrangeableChildParametersSelf {
  *
  * @compositeParams
  */
-export declare function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ rearrangeableChildrenParameters: { children: childrenIn, animate }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType;
+export declare function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({ rearrangeableChildrenParameters: { children: childrenIn, animate, reorderedIndexProp }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildAt }, context: { processedIndexManglerContext: { mangler } } }: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType;
 export interface UseRearrangeableChildReturnType<ChildElement extends Element> {
     info: Pick<UseRearrangeableChildInfo<ChildElement>, "updateFLIPAnimation">;
 }

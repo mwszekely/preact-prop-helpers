@@ -1,11 +1,9 @@
 import { OriginalIndex, UseProcessedIndexManglerReturnTypeSelf } from "../component-detail/processed-children/use-processed-index-mangler.js";
 import { Nullable } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
-export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo> {
-    getChildren(): ManagedChildren<M>;
+export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo> extends ManagedChildren2<M> {
     managedChildrenArray: InternalChildInfo<M>;
-    remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-    updateMinMax(index: number): void;
+    remoteULEChildMounted: (index: OriginalIndex, mounted: boolean) => void;
 }
 export interface UseManagedChildrenContext<M extends ManagedChildInfo> {
     managedChildContext: UseManagedChildrenContextSelf<M>;
@@ -19,11 +17,11 @@ export interface ManagedChildInfo {
     /**
      * A unique value representing this child.
      *
-     * If a `number`, then it's like the index to an array. There can be holes/gaps, even negative numbers, but children are contiguous to a degree. There can be a child "before" or "after" this one.
-     *
-     * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
+     * The index must be a **non-negative integer** for virtually all hooks.
+     * Gaps between indices are allowed, but keep them reasonable
+     * (probably avoid gaps larger than 100 spaces, for example).
      */
-    index: OriginalIndex;
+    index: number;
 }
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
@@ -38,13 +36,13 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo> {
      *
      * @stable
      */
-    onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
+    onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<OriginalIndex>>;
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      *
      * @stable
      */
-    onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+    onChildrenMountChange?: Nullable<OnChildrenMountChange<OriginalIndex>>;
     /**
      *
      * @stable
@@ -81,15 +79,7 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo> extends U
      */
     info: M;
 }
-export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo> {
-    /**
-     * @stable
-     *
-     * Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!
-     *
-     * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere
-     */
-    getChildren(): ManagedChildren<M>;
+export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo> extends ManagedChildren2<M> {
 }
 export interface UseManagedChildrenReturnType<M extends ManagedChildInfo> {
     /**
@@ -103,15 +93,7 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo> {
     managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
     context: UseManagedChildrenContext<M>;
 }
-export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo> {
-    /**
-     * Returns a proxy to all the information each child rendered with. The function, returned object, and every function within it are all stable.
-     *
-     * TODO: Remove ManagedChildren, it's not a class, it's just a bag of functions, it can all be inlined here
-     *
-     * @stable
-     */
-    getChildren(): ManagedChildren<M>;
+export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo> extends ManagedChildren2<M> {
 }
 export interface UseManagedChildReturnType<M extends ManagedChildInfo> {
     managedChildReturn: UseManagedChildReturnTypeSelf<M>;
@@ -121,7 +103,7 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo> {
  *
  * TODO: Get rid of this thing and put all these functions in `UseManagedChildReturnTypeSelf` directly, jeez
  */
-export interface ManagedChildren<M extends ManagedChildInfo> {
+interface ManagedChildren2<M extends ManagedChildInfo> {
     /**
      * Returns the `info` of the child at the specified (original, non-repositioned) index.
      *
@@ -129,30 +111,28 @@ export interface ManagedChildren<M extends ManagedChildInfo> {
      *
      * @stable
      */
-    getAt(originalIndex: OriginalIndex): M | undefined;
+    getChildAt(originalIndex: OriginalIndex): M | undefined;
     /**
      * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      *
      * @stable
      */
-    getHighestIndex(): OriginalIndex;
+    getHighestChildIndex(): OriginalIndex;
     /**
      * Returns the lowest number corresponding to a child, often 0. Inclusive, but hopefully that wasn't in question.
      *
      * @stable
      */
-    getLowestIndex(): OriginalIndex;
+    getLowestChildIndex(): OriginalIndex;
     /**
      * Executes a callback on every existing child.
      *
      * @stable
      */
-    forEach: (f: (child: M) => void) => void | "break";
+    forEachChild: (f: (child: M) => void) => void | "break";
 }
 interface InternalChildInfo<M extends ManagedChildInfo> {
     arr: Array<M>;
-    highestIndex: OriginalIndex;
-    lowestIndex: OriginalIndex;
 }
 /**
  * Allows a parent component to access information about certain
@@ -173,13 +153,13 @@ export declare function useManagedChildren<M extends ManagedChildInfo>(parentPar
  * @compositeParams
  */
 export declare function useManagedChild<M extends ManagedChildInfo>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
-export interface UseChildrenFlagParameters<M extends ManagedChildInfo, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal"> {
+export interface UseChildrenFlagParameters<M extends ManagedChildInfo, R> extends Pick<UseProcessedIndexManglerReturnTypeSelf, "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">, Pick<ManagedChildren2<M>, "getChildAt" | "forEachChild"> {
     /**
      * Which child is considered active on mount.
      *
      * After mount, change the current active child with `changeIndex`.
      */
-    initialIndex: M["index"] | null | undefined;
+    initialIndex: OriginalIndex | null | undefined;
     /**
      * When provided, if the given activatedIndex doesn't map onto any
      * provided child (either because it's too large or that child
@@ -191,7 +171,6 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo, R> extend
      */
     closestFit: boolean;
     onClosestFit: ((newFit: OriginalIndex | null) => void) | null;
-    getChildren(): ManagedChildren<M>;
     /**
      * Called whenever a new index is selected.
      *
@@ -200,9 +179,9 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo, R> extend
      *
      * @stable
      */
-    onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
+    onIndexChange: null | OnPassiveStateChange<OriginalIndex | null, R>;
     /** @stable */
-    setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
+    setAt(index: M, value: boolean, newSelectedIndex: OriginalIndex | null, prevSelectedIndex: OriginalIndex | null): void;
     /** @stable */
     getAt(index: M): boolean;
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
@@ -241,6 +220,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo, R> {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  */
-export declare function useChildrenFlag<M extends ManagedChildInfo, R>({ getChildren, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
+export declare function useChildrenFlag<M extends ManagedChildInfo, R>({ getChildAt, forEachChild, indexFromRepositionedToOriginal, indexFromOriginalToRepositioned, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};
 //# sourceMappingURL=use-managed-children.d.ts.map

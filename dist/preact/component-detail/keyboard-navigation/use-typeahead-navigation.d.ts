@@ -1,6 +1,6 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseTextContentParameters } from "../../dom-helpers/use-text-content.js";
-import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { OriginalIndex, UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
@@ -60,12 +60,6 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * How long after the user's last typeahead-related keypress does it take for the system to reset?
      */
     typeaheadTimeout: number;
-    /**
-     * From `ManagedChildren`
-     *
-     * TODO: Obviously remove this once `ManagedChildren` is removed
-     */
-    getHighestIndex(): OriginalIndex;
 }
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
@@ -77,7 +71,7 @@ export interface UseTypeaheadNavigationContext {
 }
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index" | "untabbable"> {
 }
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getHighestChildIndex">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromRepositionedToOriginal" | "indexFromOriginalToRepositioned"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index" | "untabbable";
@@ -100,24 +94,11 @@ interface TypeaheadInfo {
  *
  * @compositeParams
  */
-export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, getHighestIndex, ...void3 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, managedChildrenReturn: { getHighestChildIndex, ...void5 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 /**
  *
  * @compositeParams
  */
 export declare function useTypeaheadNavigationChild<ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType;
-/**
- * Your usual binary search implementation.
- *
- * It's used here to quickly find a good spot to start searching for our next typeahead candidate.
- * @param array - The array to search through
- * @param wanted - The value you'd like to find
- * @param comparator - Compares `wanted` with the current value in `array`
- * @returns A non-negative value if `wanted` was found, and a negative number if not.
- * The absolute value of this number, minus one, is where `wanted` *would* be found if it *was* in `array`
- *
- * #__NO_SIDE_EFFECTS__
- */
-export declare function binarySearch<T, U, F extends (lhs: U, rhs: T) => number>(array: T[], wanted: U, comparator: F): number;
 export {};
 //# sourceMappingURL=use-typeahead-navigation.d.ts.map

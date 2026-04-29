@@ -155,8 +155,6 @@ export const DemoUseGrid = memo(() => {
         },
         linearNavigationReturn: { },
         managedChildrenReturn: {
-            // Returns metadata about each row
-            getChildren
         },
         //paginatedChildrenReturn: {
         // Largely internal use only
@@ -216,6 +214,7 @@ const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildre
     } = useCompleteGridNavigationRows({
         paginatedChildrenParameters: { paginationMax: max, paginationMin: min },
         rearrangeableChildrenParameters: {
+            reorderedIndexProp: null,
             animate: false,
             children: useMemo(() => Array.from((function* () {
                 for (let i = 0; i < (count); ++i) {

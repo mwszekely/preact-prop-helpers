@@ -7,5 +7,6 @@
  *
  * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
  */
-export declare function assertEmptyObject<T extends {} | void>(_a: [keyof T] extends [never] ? T : [T] extends [void] ? void : `Unhandled keys in this rest spread object!`): void;
+declare function assertEmptyObject<T extends {} | void>(_a: [keyof T] extends [never] ? T : [T] extends [void] ? void : `Unhandled keys in this rest spread object!`): void;
+export { assertEmptyObject };
 //# sourceMappingURL=assert.d.ts.map

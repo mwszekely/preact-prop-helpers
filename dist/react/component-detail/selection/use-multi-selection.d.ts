@@ -50,7 +50,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
     getMultiSelected(): boolean;
     getMultiSelectionDisabled(): boolean;
 }
-export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends TargetedPick<UseChildrenHaveFocusReturnType<any>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends TargetedPick<UseChildrenHaveFocusReturnType<any>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "forEachChild" | "getChildAt"> {
     multiSelectionParameters: UseMultiSelectionParametersSelf;
 }
 export interface UseMultiSelectionReturnTypeSelf {
@@ -146,7 +146,7 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
      * it's not recommended to use "focus" mode for multi-selection
      * anyway.
      */
-    firePressSelectionEvent: (e: Event) => void;
+    firePressSelectionEvent: (e: Event | EventType<any, any>) => void;
 }
 /**
  * Allows a parent to track the changes made to multi-selection children.
@@ -160,12 +160,12 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  *
  * @compositeParams
  */
-export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
+export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseMultiSelectionChildInfo<ChildElement>>({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { forEachChild, getChildAt, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }: UseMultiSelectionParameters<M>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
 /**
  *
  * @compositeParams
  */
-export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
+export declare function useMultiSelectionChild<E extends Element, M extends UseMultiSelectionChildInfo<E>>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, M>): UseMultiSelectionChildReturnType<E, M>;
 export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
     info: Pick<M, "setSelectedFromParent">;
 }

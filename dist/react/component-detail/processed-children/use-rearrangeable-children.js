@@ -26,20 +26,20 @@ import { useMonitoring } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn, animate }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildren: getManagedChildren }, context: { processedIndexManglerContext: { mangler } } }) {
+export function useRearrangeableChildren({ rearrangeableChildrenParameters: { children: childrenIn, animate, reorderedIndexProp }, processedIndexManglerParameters: { getIndex, getSortValueAt }, managedChildrenReturn: { getChildAt }, context: { processedIndexManglerContext: { mangler } } }) {
     return useMonitoring(function useRearrangeableChildren() {
         useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt);
         const allChildPositions = useRef([]);
         const [refreshIndex, setRefreshIndex] = useState(0);
         const childrenOut = useMemo(() => {
-            const rearrangedChildren = mangler.setChildren(childrenIn);
+            const rearrangedChildren = mangler.setChildren(childrenIn, reorderedIndexProp);
             if (animate) {
                 for (const ch of rearrangedChildren) {
                     const index = ch == null ? null : getIndex(ch);
                     const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
                     if (index != null && mangledIndex != null) {
-                        const info = getManagedChildren().getAt(index);
-                        const info2 = getManagedChildren().getAt(mangler.map(mangledIndex, "repositioned", "original"));
+                        const info = getChildAt(index);
+                        const info2 = getChildAt(mangler.map(mangledIndex, "repositioned", "original"));
                         if (info && info2 && animate) {
                             const element = info2.getElement();
                             const rect = element?.getBoundingClientRect();

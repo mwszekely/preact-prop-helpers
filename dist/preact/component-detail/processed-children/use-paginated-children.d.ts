@@ -12,17 +12,17 @@ export interface UsePaginatedChildrenParametersSelf {
     /**
      * Inclusive. The minimum **reordered** index of the child that should be shown.
      */
-    paginationMin: Nullable<RepositionedIndex>;
+    paginationMin: Nullable<number | RepositionedIndex>;
     /**
      * Inclusive. The maximum **reordered** index of the child that should be shown.
      */
-    paginationMax: Nullable<RepositionedIndex>;
+    paginationMax: Nullable<number | RepositionedIndex>;
     /**
      * The total number of children. Used for ARIA .
      */
     childCount: Nullable<number>;
 }
-export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element> extends TargetedPick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn", "getChildAt" | "getLowestChildIndex" | "getHighestChildIndex">, TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexFromOriginalToRepositioned" | "indexFromRepositionedToOriginal">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 export interface UsePaginatedChildContextSelf {
@@ -53,7 +53,7 @@ export interface UsePaginatedChildrenReturnType {
  *
  * @compositeParams
  */
-export declare function usePaginatedChildren<TabbableChildElement extends Element>({ managedChildrenReturn: { getChildren }, paginatedChildrenParameters: { paginationMax, paginationMin, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType;
+export declare function usePaginatedChildren<TabbableChildElement extends Element>({ managedChildrenReturn: { getChildAt, getHighestChildIndex, getLowestChildIndex }, paginatedChildrenParameters: { paginationMax: paginationMaxU, paginationMin: paginationMinU, childCount }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, childrenHaveFocusReturn: { getAnyFocused }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal } }: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType;
 export interface UsePaginatedChildParameters {
     info: {
         index: number;

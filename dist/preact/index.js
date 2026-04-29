@@ -317,7 +317,7 @@ export { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "
 export { tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
 export { useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
 export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
-export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
+export { useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
 export { usePaginatedChild, usePaginatedChildren } from "./component-detail/processed-children/use-paginated-children.js";
 export { useProcessedChild, useProcessedChildren } from "./component-detail/processed-children/use-processed-children.js";
 export { defaultCompare, useProcessedIndexMangler } from "./component-detail/processed-children/use-processed-index-mangler.js";
@@ -386,4 +386,7 @@ export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
 export { cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, Fragment, getEventMapping, identity, memo, noop, onfocusin, onfocusout, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
 export { preactAddUseInsertionEffectHook, useBeforeLayoutEffect } from "./util/use-before-layout-effect.js";
+// And export these two too, I guess. Sure.
+export { binarySearch } from "./util/binary-search.js";
+export { PriorityQueue } from "./util/heap.js";
 //# sourceMappingURL=index.js.map

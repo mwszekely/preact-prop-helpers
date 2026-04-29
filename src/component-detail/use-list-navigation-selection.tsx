@@ -1,9 +1,9 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { UseGenericChildParameters } from "../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback, useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, ExtendMerge, OmitStrong, TargetedOmit } from "../util/types.js";
+import { ElementProps, ExtendMerge, OmitStrong, TargetedOmit, TargetedPick } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./keyboard-navigation/use-list-navigation-partial.js";
 import { UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild } from "./selection/use-selection.js";
@@ -12,9 +12,11 @@ export interface UseListNavigationSelectionChildInfo<TabbableChildElement extend
 export interface UseListNavigationSelectionChildContext extends UseListNavigationContext, UseSelectionContext { }
 
 export interface UseListNavigationSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends
-    OmitStrong<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters">,
+    OmitStrong<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters" | "managedChildrenReturn">,
+    OmitStrong<UseSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn" | "managedChildrenReturn">,
     TargetedOmit<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex">,
-    OmitStrong<UseSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn"> { }
+    TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildAt" | "forEachChild" | "getLowestChildIndex" | "getHighestChildIndex"> { }
+
 export interface UseListNavigationSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseSelectionReturnType<ParentOrChildElement, ChildElement>, "propsStable"> {
     context: UseListNavigationSelectionChildContext;
     props: ElementProps<ParentOrChildElement>;
@@ -43,7 +45,7 @@ export interface UseListNavigationSelectionChildReturnType<ChildElement extends 
  * 
  * @compositeParams
  */
-export function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
@@ -55,9 +57,9 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
     processedIndexManglerReturn,
     childrenHaveFocusReturn,
     ...void3
-}: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
+}: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
     return useMonitoring(function useListNavigationSelection(): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement> {
-        const { context: contextSS, propsStable, ...retSS } = useSelection<ParentOrChildElement, ChildElement>({
+        const { context: contextSS, propsStable, ...retSS } = useSelection<ParentOrChildElement, ChildElement, M>({
             childrenHaveFocusReturn,
             rovingTabIndexReturn: { setTabbableIndex: useStableCallback((...a) => { rovingTabIndexReturn.setTabbableIndex(...a) }) },
             managedChildrenReturn,
@@ -70,7 +72,7 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
             props,
             rovingTabIndexReturn,
             ...retLN
-        } = useListNavigation<ParentOrChildElement, ChildElement>({
+        } = useListNavigation<ParentOrChildElement, ChildElement, M>({
             rovingTabIndexParameters: { ...rovingTabIndexParameters, initiallyTabbedIndex: singleSelectionParameters.initiallySingleSelectedIndex || 0 },
             linearNavigationParameters,
             paginatedChildrenParameters,
@@ -98,15 +100,15 @@ export function useListNavigationSelection<ParentOrChildElement extends Element,
 /**
  * @compositeParams
  */
-export function useListNavigationSelectionChild<ChildElement extends Element>({
+export function useListNavigationSelectionChild<ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>>({
     info: { index, untabbable, ...void2 },
     context,
     refElementReturn,
     singleSelectionChildParameters,
     multiSelectionChildParameters,
     ...void1
-}: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
-    return useMonitoring(function useListNavigationSelectionChild(): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>> {
+}: UseListNavigationSelectionChildParameters<ChildElement, M>): UseListNavigationSelectionChildReturnType<ChildElement, M> {
+    return useMonitoring(function useListNavigationSelectionChild(): UseListNavigationSelectionChildReturnType<ChildElement, M> {
         const {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 },
             info: infoSS,
@@ -115,7 +117,7 @@ export function useListNavigationSelectionChild<ChildElement extends Element>({
             props: propsSS,
             selectionChildReturn,
             ...void9
-        } = useSelectionChild<ChildElement>({
+        } = useSelectionChild<ChildElement, M>({
             info: { index, untabbable },
             context,
             multiSelectionChildParameters,

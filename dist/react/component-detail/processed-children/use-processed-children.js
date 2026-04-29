@@ -53,7 +53,8 @@ import { useStaggeredChild, useStaggeredChildren } from "./use-staggered-childre
  *
  * @compositeParams
  */
-export function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters, processedIndexManglerParameters }) {
+export function useProcessedChildren({ rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, context, managedChildrenParameters, processedIndexManglerParameters, ...void1 }) {
+    assertEmptyObject(void1);
     return useMonitoring(function useProcessedChildren() {
         const childCount = rearrangeableChildrenParameters.children.length;
         const { paginationMax, paginationMin } = paginatedChildrenParameters;
@@ -70,14 +71,14 @@ export function useProcessedChildren({ rearrangeableChildrenParameters, paginate
             managedChildrenReturn
         });
         const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, context: { paginatedChildContext } } = usePaginatedChildren({
-            managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
+            managedChildrenReturn,
             rovingTabIndexReturn: context.processedChildrenContext,
             childrenHaveFocusReturn: context.processedChildrenContext,
             paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
             processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
         });
         const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({
-            managedChildrenReturn: { getChildren: useStableCallback(() => managedChildContext.getChildren()) },
+            managedChildrenReturn,
             staggeredChildrenParameters: { staggered, childCount, disableIntersectionObserver },
             processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal }
             //refElementReturn: { getElement: context.processedChildrenContext.getElement }

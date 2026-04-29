@@ -4,7 +4,7 @@ import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util
  *
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
-export function useEnsureStability(parentHookName, ...values) {
+/*@__NO_SIDE_EFFECTS__*/ function useEnsureStability(parentHookName, ...values) {
     if (process.env.NODE_ENV !== 'development')
         return;
     const helperToEnsureStability = useRef([]);
@@ -27,6 +27,7 @@ export function useEnsureStability(parentHookName, ...values) {
         }
     }
 }
+export { useEnsureStability };
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash;
  * updates don't cause a re-render and so the value shouldn't be used during

@@ -7,5 +7,7 @@
  *
  * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
  */
-export function assertEmptyObject(_a) { }
+/*@__NO_SIDE_EFFECTS__*/
+function assertEmptyObject(_a) { }
+export { assertEmptyObject };
 //# sourceMappingURL=assert.js.map

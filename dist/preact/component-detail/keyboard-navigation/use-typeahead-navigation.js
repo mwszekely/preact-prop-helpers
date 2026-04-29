@@ -3,6 +3,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { binarySearch } from "../../util/binary-search.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -15,12 +16,13 @@ import { useTagProps } from "../../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, getHighestIndex, ...void3 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, ...void2 }) {
+export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void1 }, processedIndexManglerReturn: { indexFromOriginalToRepositioned, indexFromRepositionedToOriginal, ...void4 }, managedChildrenReturn: { getHighestChildIndex, ...void5 }, ...void2 }) {
     return useMonitoring(function useTypeaheadNavigation() {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
         assertEmptyObject(void4);
+        assertEmptyObject(void5);
         useEnsureStability("useTypeaheadNavigation", onNavigateTypeahead, isValidForTypeaheadNavigation, indexFromOriginalToRepositioned, indexFromRepositionedToOriginal);
         // For typeahead, keep track of what our current "search" string is (if we have one)
         // and also clear it every 1000 ms since the last time it changed.
@@ -189,7 +191,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
                             const infoRepositionedIndex = indexFromOriginalToRepositioned(info.indexOriginal);
                             const currentRepositionedIndex = indexFromOriginalToRepositioned(getTabbableIndex() ?? 0);
                             const distance = (Math.abs(currentRepositionedIndex - infoRepositionedIndex));
-                            const proportionateDistance = 1 - (distance / getHighestIndex());
+                            const proportionateDistance = 1 - (distance / getHighestChildIndex());
                             return 0 - proportionateDistance;
                         }
                         return score(lhs) - score(rhs);
@@ -269,35 +271,5 @@ context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparato
             pressParameters: { excludeSpace }
         };
     });
-}
-/**
- * Your usual binary search implementation.
- *
- * It's used here to quickly find a good spot to start searching for our next typeahead candidate.
- * @param array - The array to search through
- * @param wanted - The value you'd like to find
- * @param comparator - Compares `wanted` with the current value in `array`
- * @returns A non-negative value if `wanted` was found, and a negative number if not.
- * The absolute value of this number, minus one, is where `wanted` *would* be found if it *was* in `array`
- *
- * #__NO_SIDE_EFFECTS__
- */
-export function binarySearch(array, wanted, comparator) {
-    let firstIndex = 0;
-    let lastIndex = array.length - 1;
-    while (firstIndex <= lastIndex) {
-        const testIndex = (lastIndex + firstIndex) >> 1;
-        const comparisonResult = comparator(wanted, array[testIndex]);
-        if (comparisonResult > 0) {
-            firstIndex = testIndex + 1;
-        }
-        else if (comparisonResult < 0) {
-            lastIndex = testIndex - 1;
-        }
-        else {
-            return testIndex;
-        }
-    }
-    return -firstIndex - 1;
 }
 //# sourceMappingURL=use-typeahead-navigation.js.map
