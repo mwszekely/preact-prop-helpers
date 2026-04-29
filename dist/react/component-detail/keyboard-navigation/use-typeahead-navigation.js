@@ -55,8 +55,12 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
             if (normalizeFirst) {
                 // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
                 // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-                safeLhs = safeLhs.normalize("NFD");
-                safeRhs = safeRhs.normalize("NFD");
+                //
+                // TODO: Pretty sure NFC is **generally** the default? Maybe?
+                // Meaning that if it's already in NFC, normalization might
+                // be skipped if there's nothing to do.
+                safeLhs = safeLhs.normalize("NFC");
+                safeRhs = safeRhs.normalize("NFC");
             }
             if (collator)
                 compare = collator.compare(safeLhs, safeRhs);
@@ -72,7 +76,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         });
         const typeaheadComparator = useStableCallback((lhs, rhs) => {
             if (typeof lhs === "string" && typeof rhs.text === "string") {
-                let trimmedRet = comparatorShared(lhs.normalize("NFD"), rhs.text.substring(0, lhs.length).normalize("NFD"), false);
+                let trimmedRet = comparatorShared(lhs.normalize("NFC"), rhs.text.substring(0, lhs.length).normalize("NFC"), false);
                 return trimmedRet;
             }
             return lhs - rhs;

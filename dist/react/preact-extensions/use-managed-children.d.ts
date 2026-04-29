@@ -131,6 +131,12 @@ interface ManagedChildren2<M extends ManagedChildInfo> {
      */
     forEachChild: (f: (child: M) => void) => void | "break";
 }
+/**
+ * TODO: Probably remove this.
+ *
+ * It's been reduced to nothing but the array of child info
+ * after multiple refactorings.
+ */
 interface InternalChildInfo<M extends ManagedChildInfo> {
     arr: Array<M>;
 }

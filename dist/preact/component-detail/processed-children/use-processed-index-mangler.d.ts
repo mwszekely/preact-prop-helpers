@@ -1,7 +1,7 @@
 import { Nullable, createElement } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
-export type GetIndex = (row: VNode) => (OriginalIndex | undefined);
+export type GetIndex = (row: VNode) => (OriginalIndex | number | undefined);
 /**
  * A tagged integer type used to represent **unsorted** indices.
  *
@@ -107,6 +107,12 @@ export declare class ProcessedIndexMangler {
      *
      * An "original" index represents a child's "programmatic" index; the one it thinks it has no matter where it is.
      * A "repositioned" index represents a child's "visual" position in a re-ordered list. The child usually doesn't care about this, unless it is interacting with other elements and depends on their visual order.
+     *
+     * TODO: This is over-typed because it was originally going to also include
+     * "array index" and "sorted array index" (i.e. what index into the literal
+     * array of VNode children is this), but that hasn't been needed yet (and
+     * *probably* won't ever?), so this should probably just be replaced with
+     * the more basic `fromOriginalToRepositioned` (etc) functions.
      *
      * @param index
      * @param from

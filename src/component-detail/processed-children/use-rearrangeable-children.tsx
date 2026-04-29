@@ -6,7 +6,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "../../util/lib.js";
 import { Nullable, TargetedPick, VNode } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
-import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
+import { OriginalIndex, UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 
 
 
@@ -160,7 +160,7 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
 
             if (animate) {
                 for (const ch of rearrangedChildren) {
-                    const index = ch == null ? null : getIndex(ch);
+                    const index = ch == null ? null : (getIndex(ch) as OriginalIndex);
                     const mangledIndex = index == null ? null : mangler.map(index, "original", "repositioned");
                     if (index != null && mangledIndex != null) {
                         const info = getChildAt(index);

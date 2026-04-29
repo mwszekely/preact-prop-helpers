@@ -177,7 +177,7 @@ globalThis["process"]??={};globalThis["process"]["env"]??={};globalThis["process
 // replaces `"development"` with the string `"development"` or not.
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
-globalThis.requestIdleCallback??=callback=>{return setTimeout(()=>{callback({didTimeout:false,timeRemaining:()=>{return 0;}});},5);};let timeoutHandle=null;let i=0;/**
+globalThis.requestIdleCallback??=callback=>{return setTimeout(()=>{callback({didTimeout:false,timeRemaining:()=>{return 0;}});},5);};let timeoutHandle=null;/**
  * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if "development" is "development").
  *
  * @remarks Some of the more basic hooks, like `setState`, do not call `useMonitoring` at all.
@@ -186,7 +186,7 @@ globalThis.requestIdleCallback??=callback=>{return setTimeout(()=>{callback({did
  * than the function itself.
  */function useMonitoring(originalHook){const impl=globalThis._monitor_call_duration?useMonitoringImpl:dontUseMonitoringImpl;return impl(originalHook);}/**
  *
- */function dontUseMonitoringImpl(t){return t();}/**
+ */function dontUseMonitoringImpl(t){return t();}let i=0;/**
  *
  */function useMonitoringImpl(originalHook){let wrappedHook=originalHook;if(globalThis._monitor_call_duration){wrappedHook=function(...args){const r=reactExports.useRef(++i);monitorCallCount(originalHook);const start=performance.mark(`${originalHook.name}-start-${r.current}`);const ret=originalHook(...args);const end=performance.mark(`${originalHook.name}-end-${r.current}`);performance.measure(originalHook.name,start.name,end.name);return ret;};}return wrappedHook();}/**
  * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
@@ -476,14 +476,12 @@ let keyPressIsValidForOrientation=true;switch(e.key){case"ArrowUp":case"ArrowDow
  * @hasChild {@link useManagedChild}
  *
  * @compositeParams
- */function useManagedChildren(parentParameters){return useMonitoring(function useManagedChildren(){const{managedChildrenParameters:{onAfterChildLayoutEffect,onChildrenMountChange,onChildrenCountChange},...rest}=parentParameters;//const [,,getHighestIndexQueue] = useState(() => new PriorityQueue<number>((lhs, rhs) => (lhs > rhs))); 
-//const [,,getLowestIndexQueue] = useState(() => new PriorityQueue<number>((lhs, rhs) => (lhs < rhs))); 
-/**
+ */function useManagedChildren(parentParameters){return useMonitoring(function useManagedChildren(){const{managedChildrenParameters:{onAfterChildLayoutEffect,onChildrenMountChange,onChildrenCountChange},...rest}=parentParameters;/**
          * We need to keep track of the highest and lowest index of all mounted children.
          *
          * Our requirements:
-         * 1. Must be able to mounting a child of arbitrary index
-         * 2. Must be able to unmounting a child of arbitrary index
+         * 1. Must be able to mount a child of arbitrary index
+         * 2. Must be able to unmount a child of arbitrary index
          * 3. Getting the highest index must be O(1).
          *
          * And none of these can be quadratic when mounting or
@@ -496,20 +494,25 @@ let keyPressIsValidForOrientation=true;switch(e.key){case"ArrowUp":case"ArrowDow
          *
          * When we unmount a child, to satisfy both #2 and #3,
          * we do the following:
-         * 1. If the removed child IS the highest index, just
-         *    remove it from the heap. Pretty simple. Go to step 3.
-         * 2. If the removed child ISN'T the highest index,
-         *    add it to a set that tracks the indices that
-         *    haven't been "processed" yet.
-         * 3. After removing a child that WAS the highest index,
-         *    see if the NEXT highest index (which we already know,
-         *    because it's O(1) for a heap) exists in that "to-be-
-         *    processed" set of child indices. If it is, remove
-         *    that one from the heap as well and repeat.
          *
-         *    This is O(1) + O(log n) + O(log n), meaning
-         *    that removing N children is just O(n*log n)
-         */const indexTracking=reactExports.useRef({highestIndexPriorityQueue:new PriorityQueue((lhs,rhs)=>lhs>rhs),highIndicesNotYetRemoved:new Set(),lowestIndexPriorityQueue:new PriorityQueue((lhs,rhs)=>lhs<rhs),lowIndicesNotYetRemoved:new Set()});const getHighestIndex=reactExports.useCallback(()=>{return indexTracking.current.highestIndexPriorityQueue.peek();},[]);const getLowestIndex=reactExports.useCallback(()=>{return indexTracking.current.lowestIndexPriorityQueue.peek();},[]);const updateMinMax=reactExports.useCallback((index,mounted)=>{if(mounted){indexTracking.current.highestIndexPriorityQueue.push(index);indexTracking.current.lowestIndexPriorityQueue.push(index);}else{if(index!=getHighestIndex()){indexTracking.current.highIndicesNotYetRemoved.add(index);}else{indexTracking.current.highestIndexPriorityQueue.pop();while(indexTracking.current.highestIndexPriorityQueue.size()>0&&indexTracking.current.highIndicesNotYetRemoved.has(indexTracking.current.highestIndexPriorityQueue.peek())){indexTracking.current.highIndicesNotYetRemoved.delete(indexTracking.current.highestIndexPriorityQueue.pop());}}if(index!=getLowestIndex()){indexTracking.current.lowIndicesNotYetRemoved.add(index);}else{indexTracking.current.lowestIndexPriorityQueue.pop();while(indexTracking.current.lowestIndexPriorityQueue.size()>0&&indexTracking.current.lowIndicesNotYetRemoved.has(indexTracking.current.lowestIndexPriorityQueue.peek())){indexTracking.current.lowIndicesNotYetRemoved.delete(indexTracking.current.lowestIndexPriorityQueue.pop());}}}},[]);// All the information we have about our children is stored in this **stable** array.
+         * 1. If the removed child ISN'T the highest index (which
+         *    we would know, because getting that is O(1)), then
+         *    we add it to a `Set` that tracks the indices that
+         *    haven't been "processed" yet.
+         *
+         *    This is O(log n) for one child, and O(n log n) for
+         *    N children, satisfying our requirements for this case.
+         *
+         * 2. If the removed child IS the highest index, pop it
+         *    off the heap. Then we see if the NEWLY highest
+         *    index exists in that "to-be-processed" `Set` of child
+         *    indices. If it is, pop that one from the heap too
+         *    and repeat until the highest index is no longer in
+         *    that `Set`.
+         *
+         *    This is O(log n) + O(log n) for one child, satisfying
+         *    our requirements for this case as well.
+         */const indexTracking=reactExports.useRef({highestIndexPriorityQueue:new PriorityQueue((lhs,rhs)=>lhs>rhs),highIndicesNotYetRemoved:new Set(),lowestIndexPriorityQueue:new PriorityQueue((lhs,rhs)=>lhs<rhs),lowIndicesNotYetRemoved:new Set()});const getHighestChildIndex=reactExports.useCallback(()=>{return indexTracking.current.highestIndexPriorityQueue.peek();},[]);const getLowestChildIndex=reactExports.useCallback(()=>{return indexTracking.current.lowestIndexPriorityQueue.peek();},[]);const updateMinMax=reactExports.useCallback((index,mounted)=>{if(mounted){indexTracking.current.highestIndexPriorityQueue.push(index);indexTracking.current.lowestIndexPriorityQueue.push(index);}else{if(index!=getHighestChildIndex()){indexTracking.current.highIndicesNotYetRemoved.add(index);}else{indexTracking.current.highestIndexPriorityQueue.pop();while(indexTracking.current.highestIndexPriorityQueue.size()>0&&indexTracking.current.highIndicesNotYetRemoved.has(indexTracking.current.highestIndexPriorityQueue.peek())){indexTracking.current.highIndicesNotYetRemoved.delete(indexTracking.current.highestIndexPriorityQueue.pop());}}if(index!=getLowestChildIndex()){indexTracking.current.lowIndicesNotYetRemoved.add(index);}else{indexTracking.current.lowestIndexPriorityQueue.pop();while(indexTracking.current.lowestIndexPriorityQueue.size()>0&&indexTracking.current.lowIndicesNotYetRemoved.has(indexTracking.current.lowestIndexPriorityQueue.peek())){indexTracking.current.lowIndicesNotYetRemoved.delete(indexTracking.current.lowestIndexPriorityQueue.pop());}}}},[]);// All the information we have about our children is stored in this **stable** array.
 // Any mutations to this array **DO NOT** trigger any sort of a re-render.
 const managedChildrenArray=reactExports.useRef({arr:[]});// For indirect access to each child
 // Compare getManagedChildInfo
@@ -518,55 +521,18 @@ const managedChildrenArray=reactExports.useRef({arr:[]});// For indirect access 
 // It would be nice if there was something better for that.
 const forEachChild=reactExports.useCallback(f=>{for(const child of managedChildrenArray.current.arr){if(child){if(f(child)=='break')return;}}},[]);// Retrieves the information associated with the child with the given index.
 // `undefined` if not child there, or it's unmounted.
-const getManagedChildInfo=reactExports.useCallback(index=>{return managedChildrenArray.current.arr[index];},[]);//const shrinkwrapHandle = useRef(null as null | number);
-// When we unmount children, we'd like to reduce the array length accordingly.
-// We do this a tick after useEffect to wait for all the child dust to settle, 
-// because this is not critical work; it's just for memory optimization.
-// Honestly, it might even be better to delete this? TODO, I guess.
-/*const scheduleShrinkwrap = useCallback(() => {
-            if (shrinkwrapHandle.current != null)
-                clearTimeout(shrinkwrapHandle.current);
-
-            shrinkwrapHandle.current = setTimeout(() => {
-
-                let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
-                    ++shave;
-                }
-                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-
-
-                //managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1 as OriginalIndex;
-                ensureSortedIndexQueue();
-                const indexOfIndexToRemove = -binarySearch(indexQueue.current.indicesSorted, Number.MAX_VALUE, (lhs, rhs) => lhs - rhs) + 1;
-
-                getHighestIndexQueue().push(index);
-                getLowestIndexQueue().(index);
-
-                shrinkwrapHandle.current = null;
-
-                // TODO: length automatically adjusts to give us the highest index,
-                // but there's no corresponding property to get the lowest index when it changes...
-                // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
-            }, 1);
-
-        }, []);*/// tl;dr this is a way to have run useLayoutEffect once after all N children
-// have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-// ourselves because of having a `childCount` state or anything similar.
-//
-// When the child count ref updates, we want the parent to also run an effect
-// to maybe do something with all these children that just mounted.
-// The easiest way would be useEffect(..., [childCount]) but
-// that would require us having a childCount state, then calling
-// setChildCount and re-rendering every time children mount
-// (only one re-render at a time unless children are staggered, but still)
-// 
-// As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-// to emulate running ULE on the parent. Only the first child will actually queue
-// the microtask (by checking hasRemoteULE first) so that the "effect" only
-// runs once. When it's done, hasRemoteULE is reset so it can run again if
-// more children mount/unmount.
-const hasRemoteULEChildMounted=reactExports.useRef(null);const remoteULEChildMounted=reactExports.useCallback((index,mounted)=>{updateMinMax(index,mounted);if(!hasRemoteULEChildMounted.current){hasRemoteULEChildMounted.current={mounts:new Set(),unmounts:new Set(),mountInfos:new Map()};debounceRendering(()=>{const{mounts,unmounts}=hasRemoteULEChildMounted.current;const unmountsThatDidntMount=unmounts.difference(mounts);for(const index of unmountsThatDidntMount){delete managedChildrenArray.current.arr[index];}if(onChildrenCountChange||onChildrenMountChange){onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts,hasRemoteULEChildMounted.current.unmounts);onChildrenCountChange?.(getHighestIndex()+1);hasRemoteULEChildMounted.current=null;}});}hasRemoteULEChildMounted?.current?.[mounted?"mounts":"unmounts"]?.add?.(index);},[/* Must remain stable */]);return{context:useMemoObject({managedChildContext:useMemoObject({managedChildrenArray:managedChildrenArray.current,remoteULEChildMounted,forEachChild,getChildAt:getManagedChildInfo,getHighestChildIndex:getHighestIndex,getLowestChildIndex:getLowestIndex,updateMinMax})}),managedChildrenReturn:{forEachChild,getChildAt:getManagedChildInfo,getHighestChildIndex:getHighestIndex,getLowestChildIndex:getLowestIndex}};});}/**
+const getManagedChildInfo=reactExports.useCallback(index=>{return managedChildrenArray.current.arr[index];},[]);/**
+         * Children call `remoteULEChildMounted` when they mount/unmount.
+         *
+         * When they do, we queue a microtask that waits for *all* of them to mount,
+         * and then fire any callbacks that look for changes in mounted children.
+         */const hasRemoteULEChildMounted=reactExports.useRef(null);const remoteULEChildMounted=reactExports.useCallback((index,mounted)=>{// While the callbacks are debounced by a microtick,
+// we can update the min/max indices immediately.
+updateMinMax(index,mounted);// Only queue the microtask once.
+// All mounted children will share this same microtask.
+if(!hasRemoteULEChildMounted.current){hasRemoteULEChildMounted.current={mounts:new Set(),unmounts:new Set(),mountInfos:new Map()};debounceRendering(()=>{const{mounts,unmounts}=hasRemoteULEChildMounted.current;const unmountsThatDidntMount=unmounts.difference(mounts);for(const index of unmountsThatDidntMount){delete managedChildrenArray.current.arr[index];}if(onChildrenCountChange||onChildrenMountChange){onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts,hasRemoteULEChildMounted.current.unmounts);onChildrenCountChange?.(getHighestChildIndex()+1);}// Reset the microtask tracker to allow us to
+// do this again the next time children mount/unmount.
+hasRemoteULEChildMounted.current=null;});}hasRemoteULEChildMounted?.current?.[mounted?"mounts":"unmounts"]?.add?.(index);},[/* Must remain stable */]);return{context:useMemoObject({managedChildContext:useMemoObject({managedChildrenArray:managedChildrenArray.current,remoteULEChildMounted,forEachChild,getChildAt:getManagedChildInfo,getHighestChildIndex,getLowestChildIndex,updateMinMax})}),managedChildrenReturn:{forEachChild,getChildAt:getManagedChildInfo,getHighestChildIndex,getLowestChildIndex}};});}/**
  * @compositeParams
  */function useManagedChild({context,info}){return useMonitoring(function useManagedChild(){const{managedChildContext:{forEachChild,getChildAt,getHighestChildIndex,getLowestChildIndex,managedChildrenArray,remoteULEChildMounted}}=context??{managedChildContext:{}};const index=info.index;// Any time our child props change, make that information available
 // the parent if they need it.
@@ -721,7 +687,11 @@ const[,setImeActive,getImeActive]=useState(false);// Because composition events 
 // we can use this to keep track of which event we're listening for on the first keydown.
 const[nextTypeaheadChar,setNextTypeaheadChar]=useState(null);reactExports.useLayoutEffect(()=>{if(nextTypeaheadChar!==null){setCurrentTypeahead(typeahead=>(typeahead??"")+nextTypeaheadChar,undefined);setNextTypeaheadChar(null);}},[nextTypeaheadChar]);const comparatorShared=useStableCallback((safeLhs,safeRhs,normalizeFirst)=>{let compare;if(normalizeFirst){// For the purposes of typeahead, only compare a string of the same size as our currently typed string.
 // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-safeLhs=safeLhs.normalize("NFD");safeRhs=safeRhs.normalize("NFD");}if(collator)compare=collator.compare(safeLhs,safeRhs);else compare=safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase()??"");return compare;});const insertingComparator=useStableCallback((lhs,rhs)=>{if(typeof lhs==="string"&&typeof rhs.text==="string"){return comparatorShared(lhs,rhs.text,true);}return lhs-rhs;});const typeaheadComparator=useStableCallback((lhs,rhs)=>{if(typeof lhs==="string"&&typeof rhs.text==="string"){let trimmedRet=comparatorShared(lhs.normalize("NFD"),rhs.text.substring(0,lhs.length).normalize("NFD"),false);return trimmedRet;}return lhs-rhs;});const isDisabled=useStableGetter(noTypeahead);const propsStable=reactExports.useRef(useTagProps({onKeyDown:useStableCallback(e=>{if(isDisabled())return;const imeActive=getImeActive();const key=e.key;// Not handled by typeahead (i.e. assume this is a keyboard shortcut)
+//
+// TODO: Pretty sure NFC is **generally** the default? Maybe?
+// Meaning that if it's already in NFC, normalization might
+// be skipped if there's nothing to do.
+safeLhs=safeLhs.normalize("NFC");safeRhs=safeRhs.normalize("NFC");}if(collator)compare=collator.compare(safeLhs,safeRhs);else compare=safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase()??"");return compare;});const insertingComparator=useStableCallback((lhs,rhs)=>{if(typeof lhs==="string"&&typeof rhs.text==="string"){return comparatorShared(lhs,rhs.text,true);}return lhs-rhs;});const typeaheadComparator=useStableCallback((lhs,rhs)=>{if(typeof lhs==="string"&&typeof rhs.text==="string"){let trimmedRet=comparatorShared(lhs.normalize("NFC"),rhs.text.substring(0,lhs.length).normalize("NFC"),false);return trimmedRet;}return lhs-rhs;});const isDisabled=useStableGetter(noTypeahead);const propsStable=reactExports.useRef(useTagProps({onKeyDown:useStableCallback(e=>{if(isDisabled())return;const imeActive=getImeActive();const key=e.key;// Not handled by typeahead (i.e. assume this is a keyboard shortcut)
 if(e.ctrlKey||e.metaKey)return;if(!imeActive&&e.key==="Backspace"){// Remove the last character in a way that doesn't split UTF-16 surrogates.
 setCurrentTypeahead(t=>t==null?null:[...t].reverse().slice(1).reverse().join(""),e);e.preventDefault();e.stopPropagation();return;}// The key property represents the typed character OR the "named key attribute" of the key pressed.
 // There's no definite way to tell the difference, but for all intents and purposes

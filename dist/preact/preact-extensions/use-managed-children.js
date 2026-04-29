@@ -47,14 +47,12 @@ export function useManagedChildren(parentParameters) {
         const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
         assertEmptyObject(rest);
         useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
-        //const [,,getHighestIndexQueue] = useState(() => new PriorityQueue<number>((lhs, rhs) => (lhs > rhs))); 
-        //const [,,getLowestIndexQueue] = useState(() => new PriorityQueue<number>((lhs, rhs) => (lhs < rhs))); 
         /**
          * We need to keep track of the highest and lowest index of all mounted children.
          *
          * Our requirements:
-         * 1. Must be able to mounting a child of arbitrary index
-         * 2. Must be able to unmounting a child of arbitrary index
+         * 1. Must be able to mount a child of arbitrary index
+         * 2. Must be able to unmount a child of arbitrary index
          * 3. Getting the highest index must be O(1).
          *
          * And none of these can be quadratic when mounting or
@@ -67,19 +65,24 @@ export function useManagedChildren(parentParameters) {
          *
          * When we unmount a child, to satisfy both #2 and #3,
          * we do the following:
-         * 1. If the removed child IS the highest index, just
-         *    remove it from the heap. Pretty simple. Go to step 3.
-         * 2. If the removed child ISN'T the highest index,
-         *    add it to a set that tracks the indices that
-         *    haven't been "processed" yet.
-         * 3. After removing a child that WAS the highest index,
-         *    see if the NEXT highest index (which we already know,
-         *    because it's O(1) for a heap) exists in that "to-be-
-         *    processed" set of child indices. If it is, remove
-         *    that one from the heap as well and repeat.
          *
-         *    This is O(1) + O(log n) + O(log n), meaning
-         *    that removing N children is just O(n*log n)
+         * 1. If the removed child ISN'T the highest index (which
+         *    we would know, because getting that is O(1)), then
+         *    we add it to a `Set` that tracks the indices that
+         *    haven't been "processed" yet.
+         *
+         *    This is O(log n) for one child, and O(n log n) for
+         *    N children, satisfying our requirements for this case.
+         *
+         * 2. If the removed child IS the highest index, pop it
+         *    off the heap. Then we see if the NEWLY highest
+         *    index exists in that "to-be-processed" `Set` of child
+         *    indices. If it is, pop that one from the heap too
+         *    and repeat until the highest index is no longer in
+         *    that `Set`.
+         *
+         *    This is O(log n) + O(log n) for one child, satisfying
+         *    our requirements for this case as well.
          */
         const indexTracking = useRef({
             highestIndexPriorityQueue: new PriorityQueue((lhs, rhs) => lhs > rhs),
@@ -87,10 +90,10 @@ export function useManagedChildren(parentParameters) {
             lowestIndexPriorityQueue: new PriorityQueue((lhs, rhs) => lhs < rhs),
             lowIndicesNotYetRemoved: new Set()
         });
-        const getHighestIndex = useCallback(() => {
+        const getHighestChildIndex = useCallback(() => {
             return indexTracking.current.highestIndexPriorityQueue.peek();
         }, []);
-        const getLowestIndex = useCallback(() => {
+        const getLowestChildIndex = useCallback(() => {
             return indexTracking.current.lowestIndexPriorityQueue.peek();
         }, []);
         const updateMinMax = useCallback((index, mounted) => {
@@ -99,7 +102,7 @@ export function useManagedChildren(parentParameters) {
                 indexTracking.current.lowestIndexPriorityQueue.push(index);
             }
             else {
-                if (index != getHighestIndex()) {
+                if (index != getHighestChildIndex()) {
                     indexTracking.current.highIndicesNotYetRemoved.add(index);
                 }
                 else {
@@ -108,7 +111,7 @@ export function useManagedChildren(parentParameters) {
                         indexTracking.current.highIndicesNotYetRemoved.delete(indexTracking.current.highestIndexPriorityQueue.pop());
                     }
                 }
-                if (index != getLowestIndex()) {
+                if (index != getLowestChildIndex()) {
                     indexTracking.current.lowIndicesNotYetRemoved.add(index);
                 }
                 else {
@@ -140,58 +143,19 @@ export function useManagedChildren(parentParameters) {
         const getManagedChildInfo = useCallback((index) => {
             return managedChildrenArray.current.arr[index];
         }, []);
-        //const shrinkwrapHandle = useRef(null as null | number);
-        // When we unmount children, we'd like to reduce the array length accordingly.
-        // We do this a tick after useEffect to wait for all the child dust to settle, 
-        // because this is not critical work; it's just for memory optimization.
-        // Honestly, it might even be better to delete this? TODO, I guess.
-        /*const scheduleShrinkwrap = useCallback(() => {
-            if (shrinkwrapHandle.current != null)
-                clearTimeout(shrinkwrapHandle.current);
-
-            shrinkwrapHandle.current = setTimeout(() => {
-
-                let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
-                    ++shave;
-                }
-                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-
-
-                //managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1 as OriginalIndex;
-                ensureSortedIndexQueue();
-                const indexOfIndexToRemove = -binarySearch(indexQueue.current.indicesSorted, Number.MAX_VALUE, (lhs, rhs) => lhs - rhs) + 1;
-
-                getHighestIndexQueue().push(index);
-                getLowestIndexQueue().(index);
-
-                shrinkwrapHandle.current = null;
-
-                // TODO: length automatically adjusts to give us the highest index,
-                // but there's no corresponding property to get the lowest index when it changes...
-                // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
-            }, 1);
-
-        }, []);*/
-        // tl;dr this is a way to have run useLayoutEffect once after all N children
-        // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-        // ourselves because of having a `childCount` state or anything similar.
-        //
-        // When the child count ref updates, we want the parent to also run an effect
-        // to maybe do something with all these children that just mounted.
-        // The easiest way would be useEffect(..., [childCount]) but
-        // that would require us having a childCount state, then calling
-        // setChildCount and re-rendering every time children mount
-        // (only one re-render at a time unless children are staggered, but still)
-        // 
-        // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-        // to emulate running ULE on the parent. Only the first child will actually queue
-        // the microtask (by checking hasRemoteULE first) so that the "effect" only
-        // runs once. When it's done, hasRemoteULE is reset so it can run again if
-        // more children mount/unmount.
+        /**
+         * Children call `remoteULEChildMounted` when they mount/unmount.
+         *
+         * When they do, we queue a microtask that waits for *all* of them to mount,
+         * and then fire any callbacks that look for changes in mounted children.
+         */
         const hasRemoteULEChildMounted = useRef(null);
         const remoteULEChildMounted = useCallback((index, mounted) => {
+            // While the callbacks are debounced by a microtick,
+            // we can update the min/max indices immediately.
             updateMinMax(index, mounted);
+            // Only queue the microtask once.
+            // All mounted children will share this same microtask.
             if (!hasRemoteULEChildMounted.current) {
                 hasRemoteULEChildMounted.current = {
                     mounts: new Set(),
@@ -206,9 +170,11 @@ export function useManagedChildren(parentParameters) {
                     }
                     if (onChildrenCountChange || onChildrenMountChange) {
                         onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-                        onChildrenCountChange?.(getHighestIndex() + 1);
-                        hasRemoteULEChildMounted.current = null;
+                        onChildrenCountChange?.(getHighestChildIndex() + 1);
                     }
+                    // Reset the microtask tracker to allow us to
+                    // do this again the next time children mount/unmount.
+                    hasRemoteULEChildMounted.current = null;
                 });
             }
             hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
@@ -220,16 +186,16 @@ export function useManagedChildren(parentParameters) {
                     remoteULEChildMounted,
                     forEachChild,
                     getChildAt: getManagedChildInfo,
-                    getHighestChildIndex: getHighestIndex,
-                    getLowestChildIndex: getLowestIndex,
+                    getHighestChildIndex,
+                    getLowestChildIndex,
                     updateMinMax
                 })
             }),
             managedChildrenReturn: {
                 forEachChild,
                 getChildAt: getManagedChildInfo,
-                getHighestChildIndex: getHighestIndex,
-                getLowestChildIndex: getLowestIndex,
+                getHighestChildIndex,
+                getLowestChildIndex,
             }
         };
     });

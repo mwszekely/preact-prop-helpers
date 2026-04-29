@@ -17,7 +17,6 @@ type WindowWithHookCallCount = (Window & typeof globalThis) & {
     _hookCallCount: HookCallCount;
 }
 
-let i = 0;
 
 /**
  * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if process.env.NODE_ENV is "development").
@@ -39,6 +38,7 @@ function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnT
     return t();
 }
 
+let i = 0;
 /**
  * 
  */

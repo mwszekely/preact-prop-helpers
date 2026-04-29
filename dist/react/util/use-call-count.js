@@ -6,7 +6,6 @@ globalThis.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
-let i = 0;
 /**
  * Adds a function to your browser's Performance tab, under "markers", so you can watch the call stack more clearly than random interval sampling (only if process.env.NODE_ENV is "development").
  *
@@ -25,6 +24,7 @@ export function useMonitoring(originalHook) {
 function dontUseMonitoringImpl(t) {
     return t();
 }
+let i = 0;
 /**
  *
  */
