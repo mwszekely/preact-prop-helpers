@@ -10,8 +10,7 @@ package-lock.json
 !docs/index.js
 !docs/index.js.map
 !dist/**
-!temp
-!temp/preact-prop-helpers.d.ts
+!tests/globals.d.ts
 temp/tsdoc-metadata.json
 test-results
 
