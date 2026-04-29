@@ -432,12 +432,12 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
         // Due to the declarations needing to come before the actual definitions,
         // we need to define these wrapper functions.
-        const getHighestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getHighestChildIndex(), []);
-        const getLowestChildIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getLowestChildIndex(), []);
-        const getChildAt = useCallback<UseManagedChildrenReturnTypeSelf<CM>["getChildAt"]>((i) => managedChildrenReturn.getChildAt(i), []);
-        const forEachChild = useCallback<UseManagedChildrenReturnTypeSelf<CM>["forEachChild"]>((f) => managedChildrenReturn.forEachChild(f), []);
-        const isValidForNavigation = useCallback((i: OriginalIndex) => {
-            const child = managedChildReturn.getChildAt(i);
+        const getHighestChildCellIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getHighestChildIndex(), []);
+        const getLowestChildCellIndex: (() => OriginalIndex) = useCallback<() => OriginalIndex>(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getChildCellAt = useCallback<UseManagedChildrenReturnTypeSelf<CM>["getChildAt"]>((i) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChildCell = useCallback<UseManagedChildrenReturnTypeSelf<CM>["forEachChild"]>((f) => managedChildrenReturn.forEachChild(f), []);
+        const isCellValidForNavigation = useCallback((i: OriginalIndex) => {
+            const child = managedChildrenReturn.getChildAt(i);
             if (child == null)
                 return false;
             if (child.untabbable)
@@ -451,9 +451,9 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         // Enormous bag of parameters for useGridNavigationRow
         const parameters: UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM> = {
             rovingTabIndexParameters,
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isCellValidForNavigation, ...typeaheadNavigationParameters },
+            linearNavigationParameters: { isValidForLinearNavigation: isCellValidForNavigation, ...linearNavigationParameters },
+            managedChildrenReturn: { forEachChild: forEachChildCell, getChildAt: getChildCellAt, getHighestChildIndex: getHighestChildCellIndex, getLowestChildIndex: getLowestChildCellIndex },
             refElementReturn,
             context: contextIncomingForRowAsChildOfTable,
             info: { index, untabbable },

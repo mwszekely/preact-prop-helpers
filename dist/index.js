@@ -1296,11 +1296,11 @@ function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepo
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1);
     }
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled < lower) {
         return { valueRepositioned: indexFromOriginalToRepositioned(lower), status: "past-start" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
@@ -1310,11 +1310,11 @@ function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRe
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1);
     }
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled > upper) {
         return { valueRepositioned: indexFromOriginalToRepositioned(upper), status: "past-end" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
@@ -2419,7 +2419,7 @@ function useGridNavigationRow({
 // Stuff for the row as a child of the parent grid
 info: { index, untabbable, ...void3 }, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
-linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn: { getChildAt, getHighestChildIndex, getLowestChildIndex, forEachChild, ...void7 }, typeaheadNavigationParameters, 
+linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
     return useMonitoring(function useGridNavigationRow() {
@@ -2438,16 +2438,16 @@ refElementReturn, ...void1 }) {
                 // then we focus the cell that should be focused in this row.
                 let { ideal} = (getTabbableColumn());
                 let index = (ideal ?? 0);
-                let child = getChildAt(index);
-                let lowestIndex = getLowestChildIndex();
-                let highestIndex = getHighestChildIndex();
+                let child = managedChildrenReturn.getChildAt(index);
+                let lowestIndex = managedChildrenReturn.getLowestChildIndex();
+                let highestIndex = managedChildrenReturn.getHighestChildIndex();
                 while ((!child || child.untabbable) && index > lowestIndex) {
                     --index;
-                    child = getChildAt(index);
+                    child = managedChildrenReturn.getChildAt(index);
                 }
                 while ((!child || child.untabbable) && index <= highestIndex) {
                     ++index;
-                    child = getChildAt(index);
+                    child = managedChildrenReturn.getChildAt(index);
                 }
                 if (child) {
                     const e = child.getElement();
@@ -2464,7 +2464,7 @@ refElementReturn, ...void1 }) {
         const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
         //console.log(`Row ${index} is untabbable? ${allChildCellsAreUntabbable.toString()}`)
         const { props: propsLN, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn} = useListNavigation({
-            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
             processedIndexManglerReturn: { indexFromOriginalToRepositioned: (identity), indexFromRepositionedToOriginal: (identity) },
@@ -4100,7 +4100,7 @@ function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 },
  */
 function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void2 }) {
     return useMonitoring(function useGridNavigationSelection() {
-        const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
+        const { props, context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, managedChildrenParameters, typeaheadNavigationReturn, } = useGridNavigation({
             gridNavigationParameters,
             linearNavigationParameters,
             managedChildrenReturn,
@@ -4391,7 +4391,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
                 return false;
             return true;
         }, []);
-        const { refElementReturn, propsStable} = useRefElement({ refElementParameters });
+        const { refElementReturn, propsStable } = useRefElement({ refElementParameters });
         const { context: { processedIndexManglerContext }, processedIndexManglerReturn } = useProcessedIndexMangler({
             processedIndexManglerParameters: {
                 compare,
@@ -4399,33 +4399,25 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
                 getSortValueAt
             }
         });
-        // Grab the information from the array of children we may or may not render.
-        // (see useProcessedChildren -- it send this information to us if it's used.)
-        // These are all stable functions, except for `contextPreprocessing`, which is how it sends things to us.
-        //const { context: { rearrangeableChildrenContext, ...void4 }, indexFromOriginalToRepositioned, indexMangler, rearrange, reverse, shuffle, sort } = useCreateProcessedChildrenContext();
         const getAnyFocused = useStableCallback(() => childrenHaveFocusReturn.getAnyFocused());
-        const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn} = useGridNavigationSelection({
+        const { props, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexReturn, ...restGridNavReturns } = useGridNavigationSelection({
             gridNavigationParameters,
             singleSelectionParameters,
             multiSelectionParameters,
             paginatedChildrenParameters,
-            refElementReturn,
             linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
             rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
             typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-            childrenHaveFocusReturn: { getAnyFocused },
-            processedIndexManglerReturn
+            refElementReturn,
+            processedIndexManglerReturn,
+            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
+            childrenHaveFocusReturn: { getAnyFocused }
         });
         const refreshRows = useRef(() => { });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
         const processedChildrenContext = useMemoObject({ getTabbableIndex, setTabbableIndex, getAnyFocused, getElement: refElementReturn.getElement });
-        /*const c2 = useMemoObject<UseProcessedChildrenContext>({
-            processedChildrenContext,
-            rearrangeableChildrenContext,
-        });*/
         const context = useMemoObject({
             singleSelectionContext,
             multiSelectionContext,
@@ -4445,11 +4437,8 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
             managedChildrenReturn,
             rovingTabIndexReturn,
             childrenHaveFocusReturn,
-            linearNavigationReturn,
-            singleSelectionReturn,
-            multiSelectionReturn,
-            typeaheadNavigationReturn,
             rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) },
+            ...restGridNavReturns
             //completeGridNavigationReturn: { refreshRows }
         };
     });
@@ -4520,12 +4509,12 @@ function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUser
         // This is a bit of an edge case and should probably be handled more concretely.
         // Due to the declarations needing to come before the actual definitions,
         // we need to define these wrapper functions.
-        const getHighestChildIndex = useCallback(() => managedChildrenReturn.getHighestChildIndex(), []);
-        const getLowestChildIndex = useCallback(() => managedChildrenReturn.getLowestChildIndex(), []);
-        const getChildAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
-        const forEachChild = useCallback((f) => managedChildrenReturn.forEachChild(f), []);
-        const isValidForNavigation = useCallback((i) => {
-            const child = managedChildReturn.getChildAt(i);
+        const getHighestChildCellIndex = useCallback(() => managedChildrenReturn.getHighestChildIndex(), []);
+        const getLowestChildCellIndex = useCallback(() => managedChildrenReturn.getLowestChildIndex(), []);
+        const getChildCellAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
+        const forEachChildCell = useCallback((f) => managedChildrenReturn.forEachChild(f), []);
+        const isCellValidForNavigation = useCallback((i) => {
+            const child = managedChildrenReturn.getChildAt(i);
             if (child == null)
                 return false;
             if (child.untabbable)
@@ -4537,9 +4526,9 @@ function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUser
         // Enormous bag of parameters for useGridNavigationRow
         const parameters = {
             rovingTabIndexParameters,
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            managedChildrenReturn: { forEachChild, getChildAt, getHighestChildIndex, getLowestChildIndex },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isCellValidForNavigation, ...typeaheadNavigationParameters },
+            linearNavigationParameters: { isValidForLinearNavigation: isCellValidForNavigation, ...linearNavigationParameters },
+            managedChildrenReturn: { forEachChild: forEachChildCell, getChildAt: getChildCellAt, getHighestChildIndex: getHighestChildCellIndex, getLowestChildIndex: getLowestChildCellIndex },
             refElementReturn,
             context: contextIncomingForRowAsChildOfTable,
             info: { index, untabbable },
@@ -4685,9 +4674,7 @@ function useCompleteGridNavigationRowDeclarative({ multiSelectionChildParameters
  *
  * @compositeParams
  */
-function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
-//staggeredChildrenParameters,
-refElementParameters, processedIndexManglerParameters, ...void1 }) {
+function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, refElementParameters, processedIndexManglerParameters, ...void1 }) {
     return useMonitoring(function useCompleteListNavigation() {
         // Due to the order in which functions need to be called and passed to each other,
         // it's necessary to create these wrappers, as they're used before they're declared.
@@ -4705,17 +4692,17 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
         }, []);
         const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
         const { context: { processedIndexManglerContext }, processedIndexManglerReturn } = useProcessedIndexMangler({ processedIndexManglerParameters });
-        const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props} = useListNavigationSelection({
-            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
-            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-            rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+        const { props, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, rovingTabIndexReturn, ...restListNavReturns } = useListNavigationSelection({
             singleSelectionParameters,
             multiSelectionParameters,
             paginatedChildrenParameters,
+            rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             refElementReturn,
-            childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn
+            processedIndexManglerReturn,
+            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) }
         });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const mcr = useManagedChildren({
@@ -4745,14 +4732,11 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             context,
             props: useMergedProps(props, propsRef),
             managedChildrenReturn,
-            linearNavigationReturn,
-            rovingTabIndexReturn,
-            singleSelectionReturn,
-            multiSelectionReturn,
-            typeaheadNavigationReturn,
             childrenHaveFocusReturn,
             refElementReturn,
-            rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) }
+            rovingTabIndexReturn,
+            rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) },
+            ...restListNavReturns
         };
     });
 }

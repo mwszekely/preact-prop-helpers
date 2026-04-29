@@ -170,7 +170,8 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             children,
-            animate: false
+            animate: false,
+            reorderedIndexProp: null
         },
         managedChildrenParameters: {},
         staggeredChildrenParameters: { staggered, disableIntersectionObserver: true },
@@ -232,11 +233,11 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <tr data-grid-nav-row  {...useMergedProps(p1, p2)}><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
+        return <tr data-grid-nav-row {...useMergedProps(p1, p2, { style: { opacity: 0.5 } })}><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
-        managedChildReturn: {  },
+        managedChildReturn: { },
         //paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         props,
         context,
@@ -275,6 +276,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
 
                 {...useMergedProps(props, p1, p2,
                     {
+                        style: { opacity: hidden ? 0.5 : 1 },
                         role: "row",
                         "data-grid-nav-row": true,
                         "data-index": index,
@@ -316,12 +318,13 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     const disabled = (index === DisabledIndex);
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
+    const parentRowIsHidden = (row === HiddenIndex);
     if (missing)
-        return <td data-grid-nav-cell colSpan={colSpan} {...useMergedProps(p1, p2)}>(The #{index}-th item is missing)</td>;
+        return <td data-grid-nav-cell colSpan={colSpan} {...useMergedProps(p1, p2, { style: { opacity: 0.5 } })}>(The #{index}-th item is missing)</td>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
-        managedChildReturn: {  },
+        managedChildReturn: { },
         pressParameters: { excludeSpace },
         props,
         refElementReturn: { getElement },
@@ -339,12 +342,13 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
             <td
 
                 {...useMergedProps(props, p1, p2, {
+                    style: { opacity: hidden ? 0.5 : 1 },
                     "data-grid-nav-cell": true,
                     colSpan,
                     role: "cell",
                     "data-index": index,
                     "data-tabbable": tabbable,
-                } as {})}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</td>
+                } as {})}>{textContent}{hidden && " (cell hidden)"}{parentRowIsHidden && ` (row hidden)`}{disabled && " (disabled)"}</td>
         </>
     )
 }

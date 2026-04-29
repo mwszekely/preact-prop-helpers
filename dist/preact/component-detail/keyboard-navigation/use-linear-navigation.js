@@ -197,11 +197,11 @@ function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepo
     while (targetDemangled >= lower && !isValid(targetDemangled)) {
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1);
     }
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled < lower) {
         return { valueRepositioned: indexFromOriginalToRepositioned(lower), status: "past-start" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
@@ -211,11 +211,11 @@ function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRe
     while (targetDemangled <= upper && !isValid(targetDemangled)) {
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1);
     }
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled > upper) {
         return { valueRepositioned: indexFromOriginalToRepositioned(upper), status: "past-end" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };

@@ -23,10 +23,9 @@ import { useMonitoring } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, 
-//staggeredChildrenParameters,
-refElementParameters, processedIndexManglerParameters, ...void1 }) {
+export function useCompleteListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, refElementParameters, processedIndexManglerParameters, ...void1 }) {
     return useMonitoring(function useCompleteListNavigation() {
+        assertEmptyObject(void1);
         // Due to the order in which functions need to be called and passed to each other,
         // it's necessary to create these wrappers, as they're used before they're declared.
         const getChildAt = useCallback((i) => managedChildrenReturn.getChildAt(i), []);
@@ -43,17 +42,17 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
         }, []);
         const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
         const { context: { processedIndexManglerContext }, processedIndexManglerReturn } = useProcessedIndexMangler({ processedIndexManglerParameters });
-        const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, props, ...void2 } = useListNavigationSelection({
-            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
-            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-            rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+        const { props, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, rovingTabIndexReturn, ...restListNavReturns } = useListNavigationSelection({
             singleSelectionParameters,
             multiSelectionParameters,
             paginatedChildrenParameters,
+            rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+            linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+            typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
             refElementReturn,
-            childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
-            processedIndexManglerReturn
+            processedIndexManglerReturn,
+            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) }
         });
         const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const mcr = useManagedChildren({
@@ -79,20 +78,15 @@ refElementParameters, processedIndexManglerParameters, ...void1 }) {
             listNavigationCompleteContext: useMemoObject({ getSortValueAt, compare, getIndex, provideParentWithRefreshRows: useCallback((e) => { refreshRows.current = e; }, []) }),
             processedIndexManglerContext,
         });
-        assertEmptyObject(void1);
-        assertEmptyObject(void2);
         return {
             context,
             props: useMergedProps(props, propsRef),
             managedChildrenReturn,
-            linearNavigationReturn,
-            rovingTabIndexReturn,
-            singleSelectionReturn,
-            multiSelectionReturn,
-            typeaheadNavigationReturn,
             childrenHaveFocusReturn,
             refElementReturn,
-            rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) }
+            rovingTabIndexReturn,
+            rearrangeableChildrenReturn: { refresh: useCallback(() => refreshRows.current(), []) },
+            ...restListNavReturns
         };
     });
 }

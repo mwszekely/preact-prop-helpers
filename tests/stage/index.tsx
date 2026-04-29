@@ -33,9 +33,13 @@ globalThis.getFocusedElementSelector = function () {
 }
 globalThis.run = (key, key2, ...args) => ((globalThis).getTestingHandler?.(key, key2) as Function | null)?.(...(args as any[]));
 
-// From https://stackoverflow.com/a/69104350
+// Modified from https://stackoverflow.com/a/69104350
 function getDomPath(el: Element | ParentNode | null): string {
     if (el == null)
+        return '';
+
+    // Don't include the tests-container node itself (or its parents) for brevity
+    if ("classList" in el && el.classList.contains("tests-container"))
         return '';
 
     let nodeName = el.nodeName.toLowerCase();
@@ -64,8 +68,9 @@ function getDomPath(el: Element | ParentNode | null): string {
         return 'body';
     if ("id" in el && el.id)
         nodeName += '#' + el.id;
-    else if ("classList" in el && el.classList.length)
-        nodeName += '.' + [...el.classList].join('.');
+    else if ("classList" in el && el.classList.length) {
+            nodeName += '.' + [...el.classList].join('.');
+    }
 
     return getDomPath(el.parentNode) + (childIndex || " ") + nodeName;
 };

@@ -173,8 +173,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         //sortableChildrenReturn: { sort },
         //staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
-        rearrangeableChildrenReturn,
-        processedIndexManglerReturn
+        rearrangeableChildrenReturn
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
@@ -211,10 +210,10 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         staggeredChildrenReturn: { stillStaggering },
     } = useCompleteListNavigationChildren({
         context: contextFromList,
-        processedIndexManglerReturn,
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: {
             animate: false,
+            reorderedIndexProp: null,
             children: Array.from(function* () {
                 for (let i = 0; i < childCount; ++i) {
                     if (i == MissingIndex)

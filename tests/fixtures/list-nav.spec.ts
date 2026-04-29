@@ -295,7 +295,7 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
     await expect(focusableFirst).toBeFocused();
     await run("ListNav", "setChildCount", count);
     await expect(focusableFirst).toBeFocused();
-    await run("ListNav", "setPagination", [10, 20]);
+    await run("ListNav", "setPagination", [10, 20 - 1]);
     await expect(focusableFirst).toBeFocused();
     await run("ListNav", "setMounted", true);
     await expect(focusableFirst).toBeFocused();
@@ -318,7 +318,7 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
     await page.keyboard.press("ArrowUp");
     await expect(listNav.list.locator("li").nth(18), "Pressing up should keep focus on the topmost list item").toBeFocused();
 
-    await run("ListNav", "setPagination", [20, 30]);
+    await run("ListNav", "setPagination", [20, 30 - 1]);
     await expect(listNav.list.locator("li:nth-child(15)"), "Child 15 should be hidden by a window of [20,30]").toHaveAttribute("data-hide-because-paginated", "true");
     await expect(listNav.list.locator("li:nth-child(25)"), "Child 25 should NOT be hidden by a window of [20,30]").toHaveAttribute("data-hide-because-paginated", "false");
     await expect(listNav.list.locator("li:nth-child(35)"), "Child 35 should be hidden by a window of [20,30]").toHaveAttribute("data-hide-because-paginated", "true");

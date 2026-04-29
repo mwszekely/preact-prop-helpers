@@ -6,9 +6,9 @@ import { useMonitoring } from "../util/use-call-count.js";
 import { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./keyboard-navigation/use-grid-navigation-partial.js";
 import { useSelection, useSelectionChild } from "./selection/use-selection.js";
 /**
- * List navigation gets  selection, so grid navigation does too.
+ * List navigation gets selection, so grid navigation does too.
  *
- * Any given row of the grid can be selected, akin to it being a  select list but with options that can be left/right arrowed to.
+ * Any given row of the grid can be selected, akin to it being a select list but with options that can be left/right arrowed to.
  *
  * Highly recommended to make the `selectionMode` *not* be `"focus"`, but it's up to you, ultimately.
  */
@@ -25,7 +25,7 @@ const _dummy = 0;
  */
 export function useGridNavigationSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, processedIndexManglerReturn, childrenHaveFocusReturn, ...void2 }) {
     return useMonitoring(function useGridNavigationSelection() {
-        const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, props, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
+        const { props, context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, managedChildrenParameters, typeaheadNavigationReturn, } = useGridNavigation({
             gridNavigationParameters,
             linearNavigationParameters,
             managedChildrenReturn,

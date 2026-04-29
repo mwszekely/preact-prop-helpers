@@ -344,11 +344,11 @@ function tryNavigateUp({ isValid, indexFromOriginalToRepositioned, indexFromRepo
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) - 1 as RepositionedIndex);
     }
 
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled < lower) {
         return { valueRepositioned: indexFromOriginalToRepositioned(lower as OriginalIndex), status: "past-start" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };
@@ -361,11 +361,11 @@ function tryNavigateDown({ isValid, indexFromOriginalToRepositioned, indexFromRe
         targetDemangled = indexFromRepositionedToOriginal(indexFromOriginalToRepositioned(targetDemangled) + 1 as RepositionedIndex);
     }
 
-    if (!isValid(targetDemangled)) {
-        return undefined;
-    }
     if (targetDemangled > upper) {
         return { valueRepositioned: indexFromOriginalToRepositioned(upper as OriginalIndex), status: "past-end" };
+    }
+    else if (!isValid(targetDemangled)) {
+        return undefined;
     }
     else {
         return { valueRepositioned: indexFromOriginalToRepositioned(targetDemangled), status: "normal" };

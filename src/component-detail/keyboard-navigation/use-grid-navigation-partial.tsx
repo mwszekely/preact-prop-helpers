@@ -207,7 +207,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     // Stuff for the row as a parent of child cells
     linearNavigationParameters,
     rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 },
-    managedChildrenReturn: { getChildAt, getHighestChildIndex, getLowestChildIndex, forEachChild, ...void7 },
+    managedChildrenReturn,
     typeaheadNavigationParameters,
 
     // Both/neither
@@ -238,16 +238,16 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
                 let { ideal, actual: _actual } = (getTabbableColumn());
 
                 let index = (ideal ?? 0) as OriginalIndex;
-                let child = getChildAt(index);
-                let lowestIndex = getLowestChildIndex();
-                let highestIndex = getHighestChildIndex();
+                let child = managedChildrenReturn.getChildAt(index);
+                let lowestIndex = managedChildrenReturn.getLowestChildIndex();
+                let highestIndex = managedChildrenReturn.getHighestChildIndex();
                 while ((!child || child.untabbable) && index > lowestIndex) {
                     --index;
-                    child = getChildAt(index);
+                    child = managedChildrenReturn.getChildAt(index);
                 }
                 while ((!child || child.untabbable) && index <= highestIndex) {
                     ++index;
-                    child = getChildAt(index);
+                    child = managedChildrenReturn.getChildAt(index);
                 }
                 if (child) {
                     const e = child.getElement()!;
@@ -282,7 +282,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             typeaheadNavigationReturn,
             ...void5
         } = useListNavigation<RowElement, CellElement, CM>({
-            managedChildrenReturn: { forEachChild, getChildAt, getLowestChildIndex, getHighestChildIndex },
+            managedChildrenReturn,
             refElementReturn,
             typeaheadNavigationParameters,
             processedIndexManglerReturn: { indexFromOriginalToRepositioned: identity<any>, indexFromRepositionedToOriginal: identity<any> },
@@ -317,7 +317,6 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         assertEmptyObject(void4);
         assertEmptyObject(void5);
         assertEmptyObject(void6);
-        assertEmptyObject(void7);
 
         const { setTabbableIndex } = rovingTabIndexReturn;
 
