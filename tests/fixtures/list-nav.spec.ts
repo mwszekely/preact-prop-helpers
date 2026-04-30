@@ -26,8 +26,8 @@ test("Navigation with arrow keys works", async ({ page, listNav: { list, items }
         }
         ++itemIndex;
     }
-    await expect(page.locator("li").last()).toBeFocused();
-    await page.keyboard.press("ArrowDown");
+    await expect(page.locator("li").first()).toBeFocused();
+    await page.keyboard.press("ArrowUp");
     await expect(page.locator("li").last()).toBeFocused();
 
     do {
@@ -39,8 +39,8 @@ test("Navigation with arrow keys works", async ({ page, listNav: { list, items }
 
     } while (itemIndex > 0);
 
-    await expect(page.locator("li").first()).toBeFocused();
-    await page.keyboard.press("ArrowUp");
+    await expect(page.locator("li").last()).toBeFocused();
+    await page.keyboard.press("ArrowDown");
     await expect(page.locator("li").first()).toBeFocused();
 });
 
@@ -308,13 +308,15 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
     await page.keyboard.press("Tab");
     await expect(listNav.list.locator("li").nth(10)).toBeFocused();
     await page.keyboard.press("ArrowUp");
-    await expect(listNav.list.locator("li").nth(10), "Pressing up should keep focus on the topmost list item").toBeFocused();
+    await expect(listNav.list.locator("li").nth(19), "Pressing up should wrap to the last list item").toBeFocused();
+    await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     await expect(listNav.list.locator("li").nth(11), "Pressing down should now focus the 11th item -- it should not get stuck or jump anywhere else").toBeFocused();
     await page.keyboard.press("End");
     await expect(listNav.list.locator("li").nth(19), "Pressing End should focus the last item within the paginated range").toBeFocused();
     await page.keyboard.press("ArrowDown");
-    await expect(listNav.list.locator("li").nth(19), "Pressing down should keep the focus on the last list item within the paginated range").toBeFocused();
+    await expect(listNav.list.locator("li").nth(10), "Pressing down should wrap to the first list item within the paginated range").toBeFocused();
+    await page.keyboard.press("ArrowUp");
     await page.keyboard.press("ArrowUp");
     await expect(listNav.list.locator("li").nth(18), "Pressing up should keep focus on the topmost list item").toBeFocused();
 

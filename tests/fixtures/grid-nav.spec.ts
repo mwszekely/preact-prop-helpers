@@ -32,13 +32,15 @@ test("Pressing up/down moves focus between rows", async ({ page, gridNav: { grid
         ++rowIndex;
     }
     await expect(getCells(rows.at(0)!).nth(column), "(Redundant, probably)").toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(getCells(rows.at(-1)!).nth(column), "(Redundant, probably)").toBeFocused();
 
     // Quickly make sure that moving focus around didn't leave any lingering tabbables behind,
     // then move focus back to where it was.
     await page.keyboard.press("Shift+Tab");
     await expect(focusableFirst, "Shift+Tab should move focus out of the composite").toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(getCells(rows.at(0)!).nth(column), "Tab should move focus back into the composite in the same position it was before").toBeFocused();
+    await expect(getCells(rows.at(-1)!).nth(column), "Tab should move focus back into the composite in the same position it was before").toBeFocused();
     await page.keyboard.press("Tab");
     await expect(focusableLast, "Tab should move focus out of the composite").toBeFocused();
     await page.keyboard.press("Shift+Tab");
@@ -50,7 +52,8 @@ test("Pressing up/down moves focus between rows", async ({ page, gridNav: { grid
             await page.keyboard.press("ArrowUp");
         }
     } while (rowIndex > 0)
-    await expect(getCells(rows.at(0)!).nth(column)).toBeFocused();
+
+    await expect(getCells(rows.at(-1)!).nth(column)).toBeFocused();
 })
 
 test("Arrow keys, wrapping, colspan", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount, focusableLast, focusableFirst } }) => {
