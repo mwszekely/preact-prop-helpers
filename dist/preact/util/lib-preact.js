@@ -18,6 +18,8 @@ export const onfocusout = "onfocusout";
 export function getEventMapping() {
     return {
         beforetoggle: null,
+        beforematch: null,
+        pointerrawupdate: null,
         dblclick: "onDblClick",
         focusin: "onFocusIn",
         focusout: "onFocusOut",

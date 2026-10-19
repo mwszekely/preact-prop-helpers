@@ -25,6 +25,7 @@ export type ExtendMerge<A, B> = { [K in (keyof A) | (keyof B)]: K extends keyof 
 /** These are all the event mappings that are shared between Preact/React */
 export function getEventMapping() {
     return {
+        command: "onCommand", 
         abort: "onAbort",
         animationend: "onAnimationEnd",
         animationstart: "onAnimationStart",

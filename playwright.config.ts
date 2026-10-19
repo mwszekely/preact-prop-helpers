@@ -75,5 +75,6 @@ export default defineConfig({
     command: 'npm run start --prefix tests',
     url: 'http://127.0.0.1:51082',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000
   },
 });

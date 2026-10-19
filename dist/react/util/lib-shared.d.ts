@@ -24,6 +24,7 @@ export type ExtendMerge<A, B> = {
 };
 /** These are all the event mappings that are shared between Preact/React */
 export declare function getEventMapping(): {
+    readonly command: "onCommand";
     readonly abort: "onAbort";
     readonly animationend: "onAnimationEnd";
     readonly animationstart: "onAnimationStart";

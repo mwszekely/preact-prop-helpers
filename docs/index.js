@@ -70,7 +70,7 @@ function C$1(n) {
   }
 }
 function M$1(n) {
-  (!n.__d && (n.__d = !0) && i$1.push(n) && !$.__r++ || o$1 != l$1.debounceRendering) && ((o$1 = l$1.debounceRendering) || r$1)($);
+  (!n.__d && (n.__d = true) && i$1.push(n) && !$.__r++ || o$1 != l$1.debounceRendering) && ((o$1 = l$1.debounceRendering) || r$1)($);
 }
 function $() {
   for (var n, u, t, o, r, f, c, s = 1; i$1.length;) i$1.length > s && i$1.sort(e$1), n = i$1.shift(), s = i$1.length, n.__d && (t = void 0, o = void 0, r = (o = (u = n).__v).__e, f = [], c = [], u.__P && ((t = w$1({}, o)).__v = o.__v + 1, l$1.vnode && l$1.vnode(t), O(u.__P, t, o, u.__n, u.__P.namespaceURI, 32 & o.__u ? [r] : null, f, null == r ? S(o) : r, !!(32 & o.__u), c), t.__v = o.__v, t.__.__k[t.__i] = t, N$1(f, t, c), o.__e = o.__ = null, t.__e != r && C$1(t)));
@@ -148,7 +148,7 @@ function j$2(n, l, u, t, i) {
       n[l] = null == u ? "" : u;
       break n;
     } catch (n) {}
-    "function" == typeof u || (null == u || !1 === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
+    "function" == typeof u || (null == u || false === u && "-" != l[4] ? n.removeAttribute(l) : n.setAttribute(l, "popover" == l && 1 == u ? "" : u));
   }
 }
 function F$1(n) {
@@ -216,7 +216,7 @@ function O(n, u, t, i, o, r, e, f, c, s) {
   return (a = l$1.diffed) && a(u), 128 & u.__u ? void 0 : f;
 }
 function z$1(n) {
-  n && n.__c && (n.__c.__e = !0), n && n.__k && n.__k.forEach(z$1);
+  n && n.__c && (n.__c.__e = true), n && n.__k && n.__k.forEach(z$1);
 }
 function N$1(n, u, t) {
   for (var i = 0; i < t.length; i++) B$2(t[i], t[++i], t[++i]);
@@ -250,7 +250,7 @@ function q$2(u, t, i, o, r, e, f, c, s) {
   }
   if (null == u) {
     if (null == x) return document.createTextNode(k);
-    u = document.createElementNS(r, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = !1), e = null;
+    u = document.createElementNS(r, x, k.is && k), c && (l$1.__m && l$1.__m(t, e), c = false), e = null;
   }
   if (null == x) b === k || c && u.data == k || (u.data = k);else {
     if (e = e && n.call(u.childNodes), !c && null != e) for (b = {}, a = 0; a < u.attributes.length; a++) b[(w = u.attributes[a]).name] = w.value;
@@ -292,7 +292,7 @@ function E$1(n, l, u) {
 }
 function G$1(u, t, i) {
   var o, r, e, f;
-  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), r = (o = "function" == typeof i) ? null : t.__k, e = [], f = [], O(t, u = (!o && i || t).__k = _$1(k$1, null, [u]), r || p$1, p$1, t.namespaceURI, !o && i ? [i] : r ? null : t.firstChild ? n.call(t.childNodes) : null, e, !o && i ? i : r ? r.__e : t.firstChild, o, f), N$1(e, u, f);
+  t == document && (t = document.documentElement), l$1.__ && l$1.__(u, t), r = (o = "function" == "undefined") ? null : t.__k, e = [], f = [], O(t, u = t.__k = _$1(k$1, null, [u]), r || p$1, p$1, t.namespaceURI, r ? null : t.firstChild ? n.call(t.childNodes) : null, e, r ? r.__e : t.firstChild, o, f), N$1(e, u, f);
 }
 function Q$1(n) {
   function l(n) {
@@ -303,7 +303,7 @@ function Q$1(n) {
       u = null;
     }, this.shouldComponentUpdate = function (n) {
       this.props.value != n.value && u.forEach(function (n) {
-        n.__e = !0, M$1(n);
+        n.__e = true, M$1(n);
       });
     }, this.sub = function (n) {
       u.add(n);
@@ -330,10 +330,10 @@ n = v$1.slice, l$1 = {
   var u;
   u = null != this.__s && this.__s != this.state ? this.__s : this.__s = w$1({}, this.state), "function" == typeof n && (n = n(w$1({}, u), this.props)), n && w$1(u, n), null != n && this.__v && (l && this._sb.push(l), M$1(this));
 }, x$1.prototype.forceUpdate = function (n) {
-  this.__v && (this.__e = !0, n && this.__h.push(n), M$1(this));
+  this.__v && (this.__e = true, n && this.__h.push(n), M$1(this));
 }, x$1.prototype.render = k$1, i$1 = [], r$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e$1 = function (n, l) {
   return n.__v.__b - l.__v.__b;
-}, $.__r = 0, f$2 = /(PointerCapture)$|Capture$/i, c$1 = 0, s$1 = F$1(!1), a$1 = F$1(!0), h$1 = 0;
+}, $.__r = 0, f$2 = /(PointerCapture)$|Capture$/i, c$1 = 0, s$1 = F$1(false), a$1 = F$1(true), h$1 = 0;
 var f$1 = 0;
 function u$1(e, t, n, o, i, u) {
   t || (t = {});
@@ -393,7 +393,7 @@ function h(n, u, i) {
     t !== r && (o.__N = [r, o.__[1]], o.__c.setState({}));
   }], o.__c = r, !r.__f)) {
     var f = function (n, t, r) {
-      if (!o.__c.__H) return !0;
+      if (!o.__c.__H) return true;
       var u = o.__c.__H.__.filter(function (n) {
         return !!n.__c;
       });
@@ -404,11 +404,11 @@ function h(n, u, i) {
       return u.forEach(function (n) {
         if (n.__N) {
           var t = n.__[0];
-          n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
+          n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = true);
         }
       }), c && c.call(this, n, t, r) || i;
     };
-    r.__f = !0;
+    r.__f = true;
     var c = r.shouldComponentUpdate,
       e = r.componentWillUpdate;
     r.componentWillUpdate = function (n, t, r) {
@@ -448,7 +448,7 @@ function q$1(n, t) {
 function x(n) {
   var u = r.context[n.__c],
     i = p(t++, 9);
-  return i.c = n, u ? (null == i.__ && (i.__ = !0, u.sub(r)), u.props.value) : n.__;
+  return i.c = n, u ? (null == i.__ && (i.__ = true, u.sub(r)), u.props.value) : n.__;
 }
 function j$1() {
   for (var n; n = f.shift();) if (n.__P && n.__H) try {
@@ -528,9 +528,9 @@ function g(n, t) {
   return n;
 }
 function E(n, t) {
-  for (var e in n) if ("__source" !== e && !(e in t)) return !0;
-  for (var r in t) if ("__source" !== r && n[r] !== t[r]) return !0;
-  return !1;
+  for (var e in n) if ("__source" !== e && !(e in t)) return true;
+  for (var r in t) if ("__source" !== r && n[r] !== t[r]) return true;
+  return false;
 }
 function N(n, t) {
   this.props = n, this.context = t;
@@ -544,9 +544,9 @@ function M(n, e) {
   function u(e) {
     return this.shouldComponentUpdate = r, _$1(n, e);
   }
-  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.prototype.isReactComponent = !0, u.__f = !0, u.type = n, u;
+  return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.prototype.isReactComponent = true, u.__f = true, u.type = n, u;
 }
-(N.prototype = new x$1()).isPureReactComponent = !0, N.prototype.shouldComponentUpdate = function (n, t) {
+(N.prototype = new x$1()).isPureReactComponent = true, N.prototype.shouldComponentUpdate = function (n, t) {
   return E(this.props, n) || E(this.state, t);
 };
 var T = l$1.__b;
@@ -562,14 +562,14 @@ var F = l$1.unmount;
 function V(n, t, e) {
   return n && (n.__c && n.__c.__H && (n.__c.__H.__.forEach(function (n) {
     "function" == typeof n.__c && n.__c();
-  }), n.__c.__H = null), null != (n = g({}, n)).__c && (n.__c.__P === e && (n.__c.__P = t), n.__c.__e = !0, n.__c = null), n.__k = n.__k && n.__k.map(function (n) {
+  }), n.__c.__H = null), null != (n = g({}, n)).__c && (n.__c.__P === e && (n.__c.__P = t), n.__c.__e = true, n.__c = null), n.__k = n.__k && n.__k.map(function (n) {
     return V(n, t, e);
   })), n;
 }
 function W(n, t, e) {
   return n && e && (n.__v = null, n.__k = n.__k && n.__k.map(function (n) {
     return W(n, t, e);
-  }), n.__c && n.__c.__P === t && (n.__e && e.appendChild(n.__e), n.__c.__e = !0, n.__c.__P = e)), n;
+  }), n.__c && n.__c.__P === t && (n.__e && e.appendChild(n.__e), n.__c.__e = true, n.__c.__P = e)), n;
 }
 function P() {
   this.__u = 0, this.o = null, this.__b = null;
@@ -584,15 +584,15 @@ function B() {
 }
 l$1.unmount = function (n) {
   var t = n.__c;
-  t && (t.__z = !0), t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), F && F(n);
+  t && (t.__z = true), t && t.__R && t.__R(), t && 32 & n.__u && (n.type = null), F && F(n);
 }, (P.prototype = new x$1()).__c = function (n, t) {
   var e = t.__c,
     r = this;
   null == r.o && (r.o = []), r.o.push(e);
   var u = j(r.__v),
-    o = !1,
+    o = false,
     i = function () {
-      o || r.__z || (o = !0, e.__R = null, u ? u(c) : c());
+      o || r.__z || (o = true, e.__R = null, u ? u(c) : c());
     };
   e.__R = i;
   var l = e.__P;
@@ -665,14 +665,14 @@ var q = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element"
   };
 x$1.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function (t) {
   Object.defineProperty(x$1.prototype, t, {
-    configurable: !0,
+    configurable: true,
     get: function () {
       return this["UNSAFE_" + t];
     },
     set: function (n) {
       Object.defineProperty(this, t, {
-        configurable: !0,
-        writable: !0,
+        configurable: true,
+        writable: true,
         value: n
       });
     }
@@ -690,8 +690,8 @@ l$1.event = function (n) {
   return en && (n = en(n)), n.persist = rn, n.isPropagationStopped = un, n.isDefaultPrevented = on, n.nativeEvent = n;
 };
 var cn = {
-    enumerable: !1,
-    configurable: !0,
+    enumerable: false,
+    configurable: true,
     get: function () {
       return this.class;
     }
@@ -707,7 +707,7 @@ l$1.vnode = function (n) {
       var l = t[i];
       if (!("value" === i && "defaultValue" in t && null == l || Q && "children" === i && "noscript" === e || "class" === i || "className" === i)) {
         var c = i.toLowerCase();
-        "defaultValue" === i && "value" in t && null == t.value ? i = "value" : "download" === i && !0 === l ? l = "" : "translate" === c && "no" === l ? l = !1 : "o" === c[0] && "n" === c[1] ? "ondoubleclick" === c ? i = "ondblclick" : "onchange" !== c || "input" !== e && "textarea" !== e || X(t.type) ? "onfocus" === c ? i = "onfocusin" : "onblur" === c ? i = "onfocusout" : J.test(i) && (i = c) : c = i = "oninput" : o && G.test(i) ? i = i.replace(K, "-$&").toLowerCase() : null === l && (l = void 0), "oninput" === c && u[i = c] && (i = "oninputCapture"), u[i] = l;
+        "defaultValue" === i && "value" in t && null == t.value ? i = "value" : "download" === i && true === l ? l = "" : "translate" === c && "no" === l ? l = false : "o" === c[0] && "n" === c[1] ? "ondoubleclick" === c ? i = "ondblclick" : "onchange" !== c || "input" !== e && "textarea" !== e || X(t.type) ? "onfocus" === c ? i = "onfocusin" : "onblur" === c ? i = "onfocusout" : J.test(i) && (i = c) : c = i = "oninput" : o && G.test(i) ? i = i.replace(K, "-$&").toLowerCase() : null === l && (l = void 0), "oninput" === c && u[i = c] && (i = "oninputCapture"), u[i] = l;
       }
     }
     "select" == e && u.multiple && Array.isArray(u.value) && (u.value = H$1(t.children).forEach(function (n) {
@@ -845,12 +845,15 @@ function usePassiveState(onChange, getInitialValue, {
   skipMountInitialization: false
 }) {
   skipMountInitialization ??= false;
+  useEnsureStability("usePassiveState", skipMountInitialization);
   //let [id, ,getId] = useState(() => generateRandomId());
   const valueRef = A(Unset$2);
   const reasonRef = A(Unset$2);
   const warningRef = A(false);
   const dependencyToCompareAgainst = A(Unset$2);
   const cleanupCallbackRef = A(undefined);
+  // Make sure that the provided functions are perfectly stable across renders
+  useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
   // Shared between "dependency changed" and "component unmounted".
   const onShouldCleanUp = useCallback(() => {
     const cleanupCallback = cleanupCallbackRef.current;
@@ -899,7 +902,7 @@ function usePassiveState(onChange, getInitialValue, {
     const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$2 ? undefined : valueRef.current) : arg;
     //let id = getId();
     //console.log((nextValue !== valueRef.current? "" : "NOT ") + "Scheduling effect ", id, " with value ", nextValue);
-    if ( /*dependencyToCompareAgainst.current === Unset &&*/nextValue !== valueRef.current) {
+    if (/*dependencyToCompareAgainst.current === Unset &&*/nextValue !== valueRef.current) {
       // This is the first request to change this value.
       // Evaluate the request immediately, then queue up the onChange function
       // Save our current value so that we can compare against it later
@@ -1042,6 +1045,7 @@ function useStableMergedCallback(...fns) {
  */
 function useGlobalHandler(target, type, handler, options, mode) {
   mode ||= "grouped";
+  useEnsureStability("useGlobalHandler", target, mode);
   if (!target) return;
   if (mode === "grouped") {
     // Note to self: The typing doesn't improve even if this is split up into a sub-function.
@@ -1110,7 +1114,7 @@ function useGlobalHandlerSingle(target, type, handler, options) {
 
 // eslint-disable-next-line no-restricted-globals
 function getWindow(element) {
-  return typeof window == "undefined" ? undefined : element?.ownerDocument?.defaultView ?? globalThis ?? {};
+  return typeof window == "undefined" ? undefined : globalThis ?? {};
 }
 // eslint-disable-next-line no-restricted-globals
 function getDocument$1(element) {
@@ -2242,12 +2246,12 @@ function mergeFunctions(lhs, rhs) {
 }
 
 /*!
-* tabbable 6.4.0
+* tabbable 6.5.0
 * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
 */
 // NOTE: separate `:not()` selectors has broader browser support than the newer
 //  `:not([inert], [inert] *)` (Feb 2023)
-var candidateSelectors = ['input:not([inert]):not([inert] *)', 'select:not([inert]):not([inert] *)', 'textarea:not([inert]):not([inert] *)', 'a[href]:not([inert]):not([inert] *)', 'button:not([inert]):not([inert] *)', '[tabindex]:not(slot):not([inert]):not([inert] *)', 'audio[controls]:not([inert]):not([inert] *)', 'video[controls]:not([inert]):not([inert] *)', '[contenteditable]:not([contenteditable="false"]):not([inert]):not([inert] *)', 'details>summary:first-of-type:not([inert]):not([inert] *)', 'details:not([inert]):not([inert] *)'];
+var candidateSelectors = ['input:not([inert]):not([inert] *)', 'select:not([inert]):not([inert] *)', 'textarea:not([inert]):not([inert] *)', 'a[href]:not([inert]):not([inert] *)', 'area[href]:not([inert]):not([inert] *)', 'button:not([inert]):not([inert] *)', '[tabindex]:not(slot):not([inert]):not([inert] *)', 'audio[controls]:not([inert]):not([inert] *)', 'video[controls]:not([inert]):not([inert] *)', '[contenteditable]:not([contenteditable="false"]):not([inert]):not([inert] *)', 'details>summary:first-of-type:not([inert]):not([inert] *)', 'details:not([inert]):not([inert] *)'];
 var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
 var NoElement = typeof Element === 'undefined';
 var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
@@ -2438,7 +2442,9 @@ var isHidden = function isHidden(node, _ref) {
   //  (this is legacy behavior from a very long way back)
   // NOTE: we check this regardless of `displayCheck="none"` because this is a
   //  _visibility_ check, not a _display_ check
-  if (getComputedStyle(node).visibility === 'hidden') {
+  var _getComputedStyle = getComputedStyle(node),
+    visibility = _getComputedStyle.visibility;
+  if (visibility === 'hidden' || visibility === 'collapse') {
     return true;
   }
   var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
@@ -2751,6 +2757,7 @@ function useLinearNavigation({
 }) {
   return useMonitoring(function useLinearNavigation() {
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
+    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
       const highestChildIndex = getHighestIndex();
       const lowestChildIndex = getLowestIndex();
@@ -3027,6 +3034,7 @@ function useManagedChildren(parentParameters) {
       },
       ...rest
     } = parentParameters;
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     const getHighestIndex = useCallback(() => {
       return managedChildrenArray.current.highestIndex;
     }, []);
@@ -3260,6 +3268,7 @@ function useChildrenFlag({
   setAt,
   isValid
 }) {
+  useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid, indexDemangler);
   indexDemangler ??= identity;
   // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
   const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, undefined);
@@ -4333,6 +4342,7 @@ function useRearrangeableChildren({
   }
 }) {
   return useMonitoring(function useRearrangeableChildren() {
+    useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt);
     const allChildPositions = A([]);
     const [refreshIndex, setRefreshIndex] = d(0);
     const childrenOut = T$1(() => {
@@ -4946,6 +4956,7 @@ function useProcessedIndexMangler({
   }
 }) {
   return useMonitoring(function useProcessedIndexMangler() {
+    useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
     const mangler = T$1(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
     const indexDemangler = useCallback(n => mangler.map(n, "mangled", "demangled") ?? n, []);
     const indexMangler = useCallback(n => mangler.map(n, "demangled", "mangled") ?? n, []);
@@ -5548,6 +5559,7 @@ function useSingleSelectionChild({
   ...void4
 }) {
   return useMonitoring(function useSingleSelectionChild() {
+    useEnsureStability("useSingleSelectionChild", getSingleSelectedIndex, onSingleSelectedIndexChange);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSingleSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSingleSelectedIndex() == null ? null : getSingleSelectedIndex() - index);
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
@@ -5824,6 +5836,7 @@ function useRefElement(args) {
     onMount,
     onUnmount
   } = args.refElementParameters || {};
+  useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
   // Called (indirectly) by the ref that the element receives.
   const handler = useCallback((e, prevValue) => {
     if (!(e == null || e instanceof Element)) {
@@ -5943,6 +5956,7 @@ function useActiveElement({
   }
 }) {
   return useMonitoring(function useActiveElement() {
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     y(() => {
       const document = getDocument();
       const window = document?.defaultView;
@@ -6014,7 +6028,7 @@ let be;
     let d = !!globalThis.document;
     globalThis.document ??= {};
     /// @ts-expect-error
-    await import('./blocking-elements.min-OTCcoWW8.js');
+    await import('./blocking-elements.min-Cz6SwTwA.js');
     be = document.$blockingElements;
     if (!d) delete globalThis.document;
   }
@@ -6055,7 +6069,6 @@ function useBlockingElement({
       onActiveElementChange,
       onWindowFocusedChange,
       onLastActiveElementChange: useStableCallback((e, prev, reason) => {
-        onLastActiveElementChange?.(e, prev, reason);
         if (e) {
           if (enabled) setLastActiveWhenOpen(e, reason);else setLastActiveWhenClosed(e, reason);
         }
@@ -6262,15 +6275,13 @@ function useListNavigationSelectionChild({
   return useMonitoring(function useListNavigationSelectionChild() {
     const {
       hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: ocfic2,
-        ...void3
+        onCurrentFocusedInnerChanged: ocfic2
       },
       info: infoSS,
       multiSelectionChildReturn,
       singleSelectionChildReturn,
       props: propsSS,
-      selectionChildReturn,
-      ...void9
+      selectionChildReturn
     } = useSelectionChild({
       info: {
         index,
@@ -6443,6 +6454,7 @@ function useHasCurrentFocus(args) {
         getElement
       }
     } = args;
+    useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, {
       debounceRendering: runImmediately,
       skipMountInitialization: true
@@ -6688,7 +6700,6 @@ function useCompleteListNavigationChildren({
       paginatedChildrenParameters,
       processedIndexManglerParameters: {
         getSortValueAt,
-        compare,
         getIndex
       },
       rearrangeableChildrenParameters,
@@ -6809,8 +6820,7 @@ function useCompleteListNavigationChild({
   return useMonitoring(function useCompleteListNavigationChild() {
     const {
       refElementReturn,
-      propsStable,
-      ...void6
+      propsStable
     } = useRefElement({
       refElementParameters
     });
@@ -6934,10 +6944,8 @@ function useCompleteListNavigationDeclarative({
   });
   const {
     singleSelectionParameters: {
-      onSingleSelectedIndexChange,
-      ...void3
-    },
-    ...void2
+      onSingleSelectedIndexChange
+    }
   } = useSelectionDeclarative({
     singleSelectionDeclarativeParameters,
     singleSelectionReturn: ret.singleSelectionReturn
@@ -6971,8 +6979,7 @@ function useCompleteListNavigationChildDeclarative({
     multiSelectionChildParameters: {
       onMultiSelectChange
     },
-    info: i2,
-    ...void2
+    info: i2
   } = useSelectionChildDeclarative({
     multiSelectionChildDeclarativeParameters: {
       onMultiSelectedChange,
@@ -7315,11 +7322,11 @@ function useAsync(asyncHandler, options) {
   //
   // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
   // when we start/stop an async action.
-  const [pending, setPending, _getPending] = useState(false);
-  const [result, setResult, _getResult] = useState(undefined);
-  const [error, setError, _getError] = useState(undefined);
-  const [hasError, setHasError, _getHasError] = useState(false);
-  const [hasResult, setHasResult, _getHasResult] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [result, setResult] = useState(undefined);
+  const [error, setError] = useState(undefined);
+  const [hasError, setHasError] = useState(false);
+  const [hasResult, setHasResult] = useState(false);
   const [asyncDebouncing, setAsyncDebouncing] = useState(false);
   const [syncDebouncing, setSyncDebouncing] = useState(false);
   const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
@@ -7898,6 +7905,7 @@ function useHasLastFocus(args) {
         ...void1
       }
     } = args;
+    useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
     const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, {
       debounceRendering: runImmediately,
       skipMountInitialization: true
@@ -8364,11 +8372,8 @@ const DemoUseRovingTabIndexChild = M(function DemoUseRovingTabIndexChild({
   }, []);
   useStableCallback(() => index);
   const {
-    hasCurrentFocusReturn,
-    managedChildReturn,
     propsChild,
     propsTabbable,
-    textContentReturn,
     rovingTabIndexChildReturn: {
       tabbable
     },

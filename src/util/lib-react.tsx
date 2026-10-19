@@ -41,6 +41,8 @@ export type VNode = JSX.Element;
 export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
     return {
         beforetoggle: null!,
+        beforematch: null!,
+        pointerrawupdate: null!,
         dblclick: "onDoubleClick",
         focusin: "onFocus",
         focusout: "onBlur",

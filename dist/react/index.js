@@ -10,6 +10,7 @@ import { clsx } from 'clsx';
 /** These are all the event mappings that are shared between Preact/React */
 function getEventMapping$1() {
     return {
+        command: "onCommand",
         abort: "onAbort",
         animationend: "onAnimationEnd",
         animationstart: "onAnimationStart",
@@ -121,6 +122,8 @@ const onfocusout = "onBlur";
 function getEventMapping() {
     return {
         beforetoggle: null,
+        beforematch: null,
+        pointerrawupdate: null,
         dblclick: "onDoubleClick",
         focusin: "onFocus",
         focusout: "onBlur",
