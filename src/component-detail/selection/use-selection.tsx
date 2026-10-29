@@ -3,12 +3,12 @@ import { UseGenericChildParameters } from "../../preact-extensions/use-managed-c
 import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ExtendMerge, OmitStrong, TargetedOmit } from "../../util/types.js";
+import { ExtendMerge, OmitStrong, TargetedOmit, JSX } from "../../util/types.js";
 import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
 import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
 
 
-export interface UseSelectionChildInfo<E extends Element> extends UseSingleSelectionChildInfo<E>, UseMultiSelectionChildInfo<E> { }
+export interface UseSelectionChildInfo<Tag extends keyof JSX.IntrinsicElements> extends UseSingleSelectionChildInfo<Tag>, UseMultiSelectionChildInfo<Tag> { }
 export type UseSelectionChildInfoKeysParameters = UseSingleSelectionChildInfoKeysParameters | UseMultiSelectionChildInfoKeysParameters;
 export type UseSelectionChildInfoKeysReturnType = UseSingleSelectionChildInfoKeysReturnType | UseMultiSelectionChildInfoKeysReturnType;
 export interface UseSelectionContext extends UseSingleSelectionContext, UseMultiSelectionContext { }
@@ -29,29 +29,29 @@ export interface UseSelectionChildReturnTypeSelf {
     firePressSelectionEvent: (e: Event) => void;
 }
 
-export interface UseSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
-    UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>,
+export interface UseSelectionParameters<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseSelectionChildInfo<ChildElementTag>> extends
+    UseSingleSelectionParameters<ParentOrChildElementTag, ChildElementTag, M>,
     UseMultiSelectionParameters<M> {
 }
 
-export interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends
-    ExtendMerge<UseSingleSelectionReturnType<ParentElement>,
-    UseMultiSelectionReturnType<ParentElement, ChildElement>> {
+export interface UseSelectionReturnType<ParentElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    ExtendMerge<UseSingleSelectionReturnType<ParentElementTag>,
+    UseMultiSelectionReturnType<ParentElementTag, ChildElementTag>> {
     context: UseSelectionContext;
 }
 
-export interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
+export interface UseSelectionChildParameters<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseSelectionChildInfo<ChildElementTag>> extends
     UseGenericChildParameters<UseSelectionContext, Pick<M, UseSelectionChildInfoKeysParameters>>,
-    OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">,
-    OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
+    OmitStrong<UseSingleSelectionChildParameters<ChildElementTag, M>, "info" | "context">,
+    OmitStrong<UseMultiSelectionChildParameters<ChildElementTag, M>, "info" | "context"> {
 }
 
-export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
+export interface UseSelectionChildReturnType<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseSelectionChildInfo<ChildElementTag>> extends
     ExtendMerge<
-        OmitStrong<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn">,
-        OmitStrong<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn">>,
-    TargetedOmit<UseMultiSelectionChildReturnType<ChildElement, M>, "multiSelectionChildReturn", "firePressSelectionEvent">,
-    TargetedOmit<UseSingleSelectionChildReturnType<ChildElement, M>, "singleSelectionChildReturn", "firePressSelectionEvent"> {
+        OmitStrong<UseMultiSelectionChildReturnType<ChildElementTag, M>, "multiSelectionChildReturn">,
+        OmitStrong<UseSingleSelectionChildReturnType<ChildElementTag, M>, "singleSelectionChildReturn">>,
+    TargetedOmit<UseMultiSelectionChildReturnType<ChildElementTag, M>, "multiSelectionChildReturn", "firePressSelectionEvent">,
+    TargetedOmit<UseSingleSelectionChildReturnType<ChildElementTag, M>, "singleSelectionChildReturn", "firePressSelectionEvent"> {
         selectionChildReturn: UseSelectionChildReturnTypeSelf;
 }
 
@@ -74,9 +74,9 @@ export interface UseSelectionChildReturnType<ChildElement extends Element, M ext
  * 
  * @compositeParams
  */
-export function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement> {
-    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...void3 }, context: contextSS, singleSelectionReturn, ...void1 } = useSingleSelection<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexReturn, singleSelectionParameters });
-    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc2, ...void4 }, context: contextMS, multiSelectionReturn, propsStable, ...void2 } = useMultiSelection<ParentOrChildElement, ChildElement>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn });
+export function useSelection<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }: UseSelectionParameters<ParentOrChildElementTag, ChildElementTag, UseSelectionChildInfo<ChildElementTag>>): UseSelectionReturnType<ParentOrChildElementTag, ChildElementTag> {
+    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc1, ...void3 }, context: contextSS, singleSelectionReturn, ...void1 } = useSingleSelection<ParentOrChildElementTag, ChildElementTag>({ managedChildrenReturn, rovingTabIndexReturn, singleSelectionParameters });
+    const { childrenHaveFocusParameters: { onCompositeFocusChange: ocfc2, ...void4 }, context: contextMS, multiSelectionReturn, propsStable, ...void2 } = useMultiSelection<ParentOrChildElementTag, ChildElementTag>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -95,7 +95,7 @@ export function useSelection<ParentOrChildElement extends Element, ChildElement 
  * 
  * @compositeParams
  */
-export function useSelectionChild<ChildElement extends Element>({
+export function useSelectionChild<ChildElementTag extends keyof JSX.IntrinsicElements>({
     context,
     info: {
         index,
@@ -105,9 +105,9 @@ export function useSelectionChild<ChildElement extends Element>({
     singleSelectionChildParameters,
     multiSelectionChildParameters,
     ...void3
-}: UseSelectionChildParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionChildReturnType<ChildElement, UseSelectionChildInfo<ChildElement>> {
-    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild<ChildElement>({ context, info: { index, untabbable }, singleSelectionChildParameters });
-    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElement>({ context, info: { index }, multiSelectionChildParameters });
+}: UseSelectionChildParameters<ChildElementTag, UseSelectionChildInfo<ChildElementTag>>): UseSelectionChildReturnType<ChildElementTag, UseSelectionChildInfo<ChildElementTag>> {
+    const { props: p1, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: { getSingleSelected, setLocalSingleSelected, singleSelected, ...void1 }, singleSelectionChildReturn, } = useSingleSelectionChild<ChildElementTag>({ context, info: { index, untabbable }, singleSelectionChildParameters });
+    const { props: p2, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, multiSelectionChildReturn, info: { getMultiSelected, setSelectedFromParent, getMultiSelectionDisabled, ...void5 }, ...void4 } = useMultiSelectionChild<ChildElementTag>({ context, info: { index }, multiSelectionChildParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -135,19 +135,19 @@ export type MakeSelectionDeclarativeParameters<P> = MakeSingleSelectionDeclarati
 export type MakeSelectionDeclarativeReturnType<R> = MakeSingleSelectionDeclarativeReturnType<R>;
 export type MakeSelectionDeclarativeChildParameters<P extends UseMultiSelectionChildParameters<any, any>> = MakeMultiSelectionChildDeclarativeParameters<P>;
 export type MakeSelectionDeclarativeChildReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = MakeMultiSelectionChildDeclarativeReturnType<R>;
-export interface UseSelectionDeclarativeParameters<ChildElement extends Element> extends UseSingleSelectionDeclarativeParameters<ChildElement> { }
-export interface UseSelectionChildDeclarativeParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseMultiSelectionChildDeclarativeParameters<ChildElement, M> { }
+export interface UseSelectionDeclarativeParameters<ChildElementTag extends keyof JSX.IntrinsicElements> extends UseSingleSelectionDeclarativeParameters<ChildElementTag> { }
+export interface UseSelectionChildDeclarativeParameters<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseSelectionChildInfo<ChildElementTag>> extends UseMultiSelectionChildDeclarativeParameters<ChildElementTag, M> { }
 
 /**
  * @compositeParams
  */
-export function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>) {
+export function useSelectionDeclarative<ChildElementTag extends keyof JSX.IntrinsicElements>(args: UseSelectionDeclarativeParameters<ChildElementTag>) {
     return useSingleSelectionDeclarative(args);
 }
 
 /**
  * @compositeParams
  */
-export function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>) {
+export function useSelectionChildDeclarative<ChildElementTag extends keyof JSX.IntrinsicElements>(args: UseSelectionChildDeclarativeParameters<ChildElementTag, UseSelectionChildInfo<ChildElementTag>>) {
     return useMultiSelectionChildDeclarative(args);
 }

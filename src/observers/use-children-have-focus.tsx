@@ -1,26 +1,27 @@
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnZero, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
-import { FocusEventType, TargetedPick } from "../util/types.js";
+import { FocusEventTypeByTag } from "../util/lib.js";
+import { TargetedPick, JSX } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
 
-export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
+export interface UseChildrenHaveFocusParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
      * 
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
+    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventTypeByTag<Tag> | undefined>;
 }
 
 
-export interface UseChildrenHaveFocusParameters<T extends Element> {
-    childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<T>
+export interface UseChildrenHaveFocusParameters<Tag extends keyof JSX.IntrinsicElements> {
+    childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<Tag>
 }
 
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+export interface UseChildrenHaveFocusChildReturnType<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseHasCurrentFocusParameters<Tag>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
 }
 
 export interface UseChildrenHaveFocusReturnTypeSelf {
@@ -28,20 +29,20 @@ export interface UseChildrenHaveFocusReturnTypeSelf {
     getAnyFocused(): boolean;
 }
 
-export interface UseChildrenHaveFocusReturnType<T extends Element> {
+export interface UseChildrenHaveFocusReturnType<Tag extends keyof JSX.IntrinsicElements> {
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeSelf;
-    context: UseChildrenHaveFocusContext<T>;
+    context: UseChildrenHaveFocusContext<Tag>;
 }
 
-export interface UseChildrenHaveFocusContext<T extends Element> {
+export interface UseChildrenHaveFocusContext<Tag extends keyof JSX.IntrinsicElements> {
     childrenHaveFocusChildContext: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventTypeByTag<Tag> | undefined>;
     }
 }
 
-export interface UseChildrenHaveFocusChildParameters<T extends Element> {
-    context: UseChildrenHaveFocusContext<T>;
+export interface UseChildrenHaveFocusChildParameters<Tag extends keyof JSX.IntrinsicElements> {
+    context: UseChildrenHaveFocusContext<Tag>;
 }
 
 
@@ -58,19 +59,19 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * 
  * @compositeParams
  */
-export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
-    return useMonitoring(function useChildrenHaveFocus(): UseChildrenHaveFocusReturnType<ChildElement> {
+export function useChildrenHaveFocus<ChildElementTag extends keyof JSX.IntrinsicElements>(args: UseChildrenHaveFocusParameters<ChildElementTag>): UseChildrenHaveFocusReturnType<ChildElementTag> {
+    return useMonitoring(function useChildrenHaveFocus(): UseChildrenHaveFocusReturnType<ChildElementTag> {
         const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
-        const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
+        const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventTypeByTag<ChildElementTag> | undefined>(onCompositeFocusChange, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventTypeByTag<ChildElementTag> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventTypeByTag<ChildElementTag> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
             console.assert(anyFocused >= 0 && anyFocused <= 1);
             setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
         }), returnZero, { debounceRendering: setTimeout, skipMountInitialization: true });    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being able to be runImmediately...
 
         return {
             childrenHaveFocusReturn: { getAnyFocused },
-            context: useMemoObject<UseChildrenHaveFocusContext<ChildElement>>({ childrenHaveFocusChildContext: useMemoObject<UseChildrenHaveFocusContext<ChildElement>["childrenHaveFocusChildContext"]>({ setFocusCount }) }),
+            context: useMemoObject<UseChildrenHaveFocusContext<ChildElementTag>>({ childrenHaveFocusChildContext: useMemoObject<UseChildrenHaveFocusContext<ChildElementTag>["childrenHaveFocusChildContext"]>({ setFocusCount }) }),
         }
     });
 }
@@ -78,8 +79,8 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 /**
  * @compositeParams
  */
-export function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
-    return useMonitoring(function useChildrenHaveFocusChild(): UseChildrenHaveFocusChildReturnType<E> {
+export function useChildrenHaveFocusChild<Tag extends keyof JSX.IntrinsicElements>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<Tag>): UseChildrenHaveFocusChildReturnType<Tag> {
+    return useMonitoring(function useChildrenHaveFocusChild(): UseChildrenHaveFocusChildReturnType<Tag> {
         return {
             hasCurrentFocusParameters: {
                 onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

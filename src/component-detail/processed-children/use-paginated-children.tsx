@@ -2,14 +2,14 @@ import { UseChildrenHaveFocusReturnType } from "../../observers/use-children-hav
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { TargetedPick, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
+import { JSX, TargetedPick, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
 import { UseProcessedIndexManglerReturnType } from "./use-processed-index-mangler.js";
 
-export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
+export interface UsePaginatedChildrenInfo<TabbableChildElementTag extends keyof JSX.IntrinsicElements> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElementTag>, "index"> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
@@ -20,11 +20,11 @@ export interface UsePaginatedChildrenParametersSelf {
     childCount: Nullable<number>;
 }
 
-export interface UsePaginatedChildrenParameters<TabbableChildElement extends Element>
-    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
-    TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElement>, "childrenHaveFocusReturn", "getAnyFocused">,
+export interface UsePaginatedChildrenParameters<TabbableChildElementTag extends keyof JSX.IntrinsicElements>
+    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElementTag>>, "managedChildrenReturn">,
+    TargetedPick<UseChildrenHaveFocusReturnType<TabbableChildElementTag>, "childrenHaveFocusReturn", "getAnyFocused">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler">,
-    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElementTag>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 
@@ -70,13 +70,13 @@ export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManage
  * 
  * @compositeParams
  */
-export function usePaginatedChildren<TabbableChildElement extends Element>({
+export function usePaginatedChildren<TabbableChildElementTag extends keyof JSX.IntrinsicElements>({
     managedChildrenReturn: { getChildren },
     paginatedChildrenParameters: { paginationMax, paginationMin, childCount },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     childrenHaveFocusReturn: { getAnyFocused },
     processedIndexManglerReturn: { indexDemangler, indexMangler }
-}: UsePaginatedChildrenParameters<TabbableChildElement>): UsePaginatedChildrenReturnType {
+}: UsePaginatedChildrenParameters<TabbableChildElementTag>): UsePaginatedChildrenReturnType {
     return useMonitoring(function usePaginatedChildren(): UsePaginatedChildrenReturnType {
         const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
@@ -162,10 +162,10 @@ export interface UsePaginatedChildParameters {
     context: UsePaginatedChildContext;
 }
 
-export interface UsePaginatedChildReturnType<ChildElement extends Element> {
-    props: ElementProps<ChildElement>;
+export interface UsePaginatedChildReturnType<ChildElementTag extends keyof JSX.IntrinsicElements> {
+    props: ElementProps<ChildElementTag>;
     paginatedChildReturn: UsePaginatedChildReturnTypeSelf;
-    info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">
+    info: Pick<UsePaginatedChildrenInfo<ChildElementTag>, "setPaginationVisible" | "setChildCountIfPaginated">
 }
 
 export interface UsePaginatedChildReturnTypeSelf {
@@ -189,13 +189,13 @@ export interface UsePaginatedChildReturnTypeSelf {
  * 
  * @compositeParams
  */
-export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
-    return useMonitoring(function usePaginatedChild(): UsePaginatedChildReturnType<ChildElement> {
+export function usePaginatedChild<ChildElementTag extends keyof JSX.IntrinsicElements>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElementTag> {
+    return useMonitoring(function usePaginatedChild(): UsePaginatedChildReturnType<ChildElementTag> {
         const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
         const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
 
         return {
-            props: useTagProps(!parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)), "data-paginated-children-child"),
+            props: useTagProps(!parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElementTag>)), "data-paginated-children-child"),
             paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
             info: {
                 setPaginationVisible: setPaginatedVisible,

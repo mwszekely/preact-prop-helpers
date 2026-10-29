@@ -5,16 +5,16 @@ import { returnNull, usePassiveState } from "../preact-extensions/use-passive-st
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { blockingElements } from "../util/blocking-elements.js";
-import { FocusEventType, useLayoutEffect } from "../util/lib.js";
+import { FocusEventTypeByTag, JSX, TagToElement, useLayoutEffect } from "../util/lib.js";
 
 
-export interface UseBlockingElementParametersSelf<E extends Element> {
+export interface UseBlockingElementParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
     enabled: boolean;
-    getTarget(): (E | null)
+    getTarget(): (TagToElement<Tag> | null)
 }
 
-export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
-    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+export interface UseBlockingElementParameters<Tag extends keyof JSX.IntrinsicElements> extends UseActiveElementParameters {
+    blockingElementParameters: UseBlockingElementParametersSelf<Tag>;
 }
 
 export interface UseBlockingElementReturnType {
@@ -32,7 +32,7 @@ export interface UseBlockingElementReturnType {
  * 
  * @param target 
  */
-export function useBlockingElement<E extends Element>({
+export function useBlockingElement<Tag extends keyof JSX.IntrinsicElements>({
     activeElementParameters: {
         getDocument,
         onActiveElementChange,
@@ -46,7 +46,7 @@ export function useBlockingElement<E extends Element>({
         ...void1
     },
     ...void2
-}: UseBlockingElementParameters<E>): UseBlockingElementReturnType {
+}: UseBlockingElementParameters<Tag>): UseBlockingElementReturnType {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -64,17 +64,17 @@ export function useBlockingElement<E extends Element>({
 
                 if (e) {
                     if (enabled)
-                        setLastActiveWhenOpen(e as HTMLElement, reason);
+                        setLastActiveWhenOpen(e as HTMLElement, reason as any);
                     else
-                        setLastActiveWhenClosed(e as HTMLElement, reason);
+                        setLastActiveWhenClosed(e as HTMLElement, reason as any);
                 }
             })
         }
     })
 
     const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
-    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
-    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
+    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventTypeByTag<any>>(null, returnNull);
+    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, FocusEventTypeByTag<any>>(null, returnNull);
 
     /**
      * Push/pop the element from the blockingElements stack.

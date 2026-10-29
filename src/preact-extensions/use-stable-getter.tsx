@@ -1,4 +1,4 @@
-import { useBeforeLayoutEffect, useCallback, useMemo, useRef } from "../util/lib.js";
+import { useBeforeLayoutEffect, useCallback, useEffectEvent, useMemo, useRef } from "../util/lib.js";
 import { useEnsureStability } from "./use-passive-state.js";
 
 const Unset = Symbol("unset");
@@ -13,7 +13,9 @@ const Unset = Symbol("unset");
  */
 export function useStableGetter<T>(value: T) {
 
-    const ref = useRef<T>(Unset as unknown as T);
+    return useEffectEvent(() => value);
+
+    /*const ref = useRef<T>(Unset as unknown as T);
     useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
 
     return useCallback(() => {
@@ -21,7 +23,7 @@ export function useStableGetter<T>(value: T) {
             throw new Error('Value retrieved from useStableGetter() cannot be called during render.')
         }
         return ref.current;
-    }, []);
+    }, []);*/
 }
 
 
@@ -44,6 +46,6 @@ function _useStableObject<T extends {}>(t: T): T {
  * @returns 
  */
 export function useMemoObject<T extends {}>(t: T): T {
-    return useMemo(() => { return t; }, Object.values(t));
+    return useMemo(() => { return t; }, Object["values"](t));
 }
 

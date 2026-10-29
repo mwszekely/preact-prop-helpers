@@ -38,7 +38,7 @@ export interface ListNavConstants {
     setHiddenIndex(index: number): Promise<void>;
 }
 
-const Context1 = createContext<CompleteListNavigationContext<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
+const Context1 = createContext<CompleteListNavigationContext<'li', UseCompleteListNavigationChildInfo<'li'>>>(null!);
 //const Context2 = createContext<UseProcessedChildrenContext>(null!);
 const Context3 = createContext<UseProcessedChildContext<any, any>>(null!);
 export function TestBasesListNav() {
@@ -173,7 +173,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
         //sortableChildrenReturn: { sort },
         //staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
-    } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
+    } = useCompleteListNavigationDeclarative<'ol', 'li', UseCompleteListNavigationChildInfo<'li'>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
@@ -185,7 +185,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
             }, [])
         },
         multiSelectionParameters: { multiSelectionAriaPropName: "aria-pressed", multiSelectionMode: "disabled", onSelectionChange: null, },
-        //sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
+        //sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<'li'>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         //staggeredChildrenParameters: { staggered },
         //paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null },
@@ -272,7 +272,7 @@ function Outer({ index }: { index: number }) {
         hide,
         refElementReturn,
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
-    } = useCompleteListNavigationChildOuter<HTMLLIElement, UseCompleteListNavigationChildrenInfo<HTMLLIElement>>({
+    } = useCompleteListNavigationChildOuter<'li', UseCompleteListNavigationChildrenInfo<'li'>>({
         context,
         info: { index },
         refElementParameters: {},
@@ -322,7 +322,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
         textContentReturn: { },
         pressParameters: { excludeSpace },
         selectionChildReturn: { firePressSelectionEvent }
-    } = useCompleteListNavigationChildDeclarative<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
+    } = useCompleteListNavigationChildDeclarative<'li', UseCompleteListNavigationChildInfo<'li'>>({
         context: useContext(Context1),
         info: {
             focusSelf,

@@ -1,7 +1,7 @@
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { getDocument, getWindow } from "../util/get-window.js";
-import { useCallback, useEffect, useRef } from "../util/lib.js";
+import { JSX, TagToElement, useCallback, useEffect, useRef } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseElementSizeParametersSelf {
@@ -26,7 +26,7 @@ export interface UseElementSizeParametersSelf {
 }
 
 
-export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
+export interface UseElementSizeParameters<Tag extends keyof JSX.IntrinsicElements> extends UseRefElementParameters<Tag> {
     elementSizeParameters: UseElementSizeParametersSelf;
 }
 
@@ -51,7 +51,7 @@ export interface UseElementSizeReturnTypeSelf {
 }
 
 
-export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
+export interface UseElementSizeReturnType<Tag extends keyof JSX.IntrinsicElements> extends UseRefElementReturnType<Tag> {
     elementSizeReturn: UseElementSizeReturnTypeSelf;
 }
 
@@ -60,8 +60,8 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
  * 
  * @compositeParams
  */
-export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
-    return useMonitoring(function useElementSize(): UseElementSizeReturnType<E> {
+export function useElementSize<Tag extends keyof JSX.IntrinsicElements>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<Tag>): UseElementSizeReturnType<Tag> {
+    return useMonitoring(function useElementSize(): UseElementSizeReturnType<Tag> {
         const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
         useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
@@ -70,7 +70,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
         const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 
-        const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
+        const needANewObserver = useCallback((element: TagToElement<Tag> | null, observeBox: ResizeObserverBoxOptions | undefined) => {
             if (element) {
                 const document = getDocument(element);
                 const window = getWindow(element);
@@ -97,9 +97,9 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
             }
         }, [])
 
-        const { refElementReturn, ...rest } = useRefElement<E>({
+        const { refElementReturn, ...rest } = useRefElement<Tag>({
             refElementParameters: {
-                onElementChange: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
+                onElementChange: useCallback((e: TagToElement<Tag> | null, p: TagToElement<Tag> | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
                 onMount,
                 onUnmount
             }

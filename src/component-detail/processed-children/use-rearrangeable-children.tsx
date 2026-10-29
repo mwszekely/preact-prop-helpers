@@ -3,8 +3,8 @@ import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-ext
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "../../util/lib.js";
-import { Nullable, TargetedPick, VNode } from "../../util/types.js";
+import { TagToElement, useCallback, useLayoutEffect, useMemo, useRef, useState } from "../../util/lib.js";
+import { Nullable, TargetedPick, VNode, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 
@@ -64,8 +64,8 @@ type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "wi
 
 
 
-export interface UseRearrangeableChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
-    getElement(): ChildElement | null;
+export interface UseRearrangeableChildInfo<ChildElementTag extends keyof JSX.IntrinsicElements> extends ManagedChildInfo<number> {
+    getElement(): TagToElement<ChildElementTag> | null;
 
     /** 
      * This notifies the child of the position that it is currently in,
@@ -94,7 +94,7 @@ export interface UseRearrangeableChildrenParametersSelf {
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>> extends UseProcessedIndexManglerParameters, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+export interface UseRearrangeableChildrenParameters<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseRearrangeableChildInfo<ChildElementTag>> extends UseProcessedIndexManglerParameters, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
     rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
     context: UseRearrangedChildrenContext;
 }
@@ -177,8 +177,8 @@ export interface UseRearrangeableChildrenReturnTypeSelf {
 
 }
 
-export interface UseRearrangeableChildParameters<ChildElement extends Element> {
-    info: Pick<UseRearrangeableChildInfo<ChildElement>, "getElement" | "index">;
+export interface UseRearrangeableChildParameters<ChildElementTag extends keyof JSX.IntrinsicElements> {
+    info: Pick<UseRearrangeableChildInfo<ChildElementTag>, "getElement" | "index">;
     rearrangeableChildParameters: UseRearrangeableChildParametersSelf;
     context: UseRearrangeableChildrenContext;
 }
@@ -211,12 +211,12 @@ export interface UseRearrangeableChildParametersSelf {
  * 
  * @compositeParams
  */
-export function useRearrangeableChildren<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
+export function useRearrangeableChildren<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseRearrangeableChildInfo<ChildElementTag>>({
     rearrangeableChildrenParameters: { children: childrenIn, animate },
     processedIndexManglerParameters: { getIndex, getSortValueAt },
     managedChildrenReturn: { getChildren: getManagedChildren },
     context: { processedIndexManglerContext: { mangler } }
-}: UseRearrangeableChildrenParameters<ChildElement, M>): UseRearrangeableChildrenReturnType {
+}: UseRearrangeableChildrenParameters<ChildElementTag, M>): UseRearrangeableChildrenReturnType {
     return useMonitoring(function useRearrangeableChildren(): UseRearrangeableChildrenReturnType {
         useEnsureStability("useRearrangeableChildren", getIndex, getSortValueAt);
 
@@ -268,19 +268,19 @@ export function useRearrangeableChildren<ChildElement extends Element, M extends
     });
 }
 
-export interface UseRearrangeableChildReturnType<ChildElement extends Element> {
-    info: Pick<UseRearrangeableChildInfo<ChildElement>, "updateFLIPAnimation">;
+export interface UseRearrangeableChildReturnType<ChildElementTag extends keyof JSX.IntrinsicElements> {
+    info: Pick<UseRearrangeableChildInfo<ChildElementTag>, "updateFLIPAnimation">;
 }
 
 /**
  * @compositeParams
  */
-export function useRearrangeableChild<ChildElement extends Element, M extends UseRearrangeableChildInfo<ChildElement>>({
+export function useRearrangeableChild<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseRearrangeableChildInfo<ChildElementTag>>({
     context,
     info: { getElement, index },
     rearrangeableChildParameters: { cssProperty, duration }
-}: UseRearrangeableChildParameters<ChildElement>): UseRearrangeableChildReturnType<ChildElement> {
-    return useMonitoring(function useRearrangeableChild(): UseRearrangeableChildReturnType<ChildElement> {
+}: UseRearrangeableChildParameters<ChildElementTag>): UseRearrangeableChildReturnType<ChildElementTag> {
+    return useMonitoring(function useRearrangeableChild(): UseRearrangeableChildReturnType<ChildElementTag> {
         const { rearrangeableChildrenContext: { getFLIPStart, animate } } = context;
 
         const getCssProperty = useStableGetter(cssProperty);

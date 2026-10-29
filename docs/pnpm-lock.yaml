@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  preact-prop-helpers:
+    specifier: link:..
+    version: link:..
   tslib:
     specifier: ^2.8.1
     version: 2.8.1

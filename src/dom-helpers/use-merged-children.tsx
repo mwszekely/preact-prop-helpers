@@ -8,7 +8,7 @@ import { ElementProps } from "../util/types.js";
  * 
  * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
-export function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"] {
+export function useMergedChildren(lhs: ElementProps<'div'>["children"], rhs: ElementProps<'div'>["children"]): ElementProps<'div'>["children"] {
     if (lhs == null && rhs == null) {
         return undefined;
     }

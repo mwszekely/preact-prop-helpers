@@ -1,6 +1,6 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
+import { createContext, createElement, useCallback, useContext, useEffect, useRef, ComponentChildren } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
@@ -16,7 +16,7 @@ const SharedAnimationFrameContext = /* @__PURE__ */ createContext<null | Context
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
  */
-export function ProvideBatchedAnimationFrames({ children }: { children: ElementProps<EventTarget>["children"] }) {
+export function ProvideBatchedAnimationFrames({ children }: { children: ComponentChildren }) {
 
     const addCallback = useCallback<ContextType["addCallback"]>((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
     const removeCallback = useCallback<ContextType["removeCallback"]>((callback) => { allCallbacks.current.delete(callback); }, []);

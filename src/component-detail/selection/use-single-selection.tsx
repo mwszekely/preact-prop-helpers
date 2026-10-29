@@ -10,8 +10,8 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { focus } from "../../util/focus.js";
 import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
-import { EventType, TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { ElementProps, Nullable } from "../../util/types.js";
+import { EventTypeByTag, TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { ElementProps, Nullable, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -33,7 +33,7 @@ import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyb
 const DUMMY = 0;
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
-export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+export interface UseSingleSelectionChildInfo<Tag extends keyof JSX.IntrinsicElements> extends UseRovingTabIndexChildInfo<Tag> {
     singleSelected: boolean;
     getSingleSelected(): boolean;
     /**
@@ -161,9 +161,9 @@ export interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<Sin
     firePressSelectionEvent: (e: Event) => void;
 }
 
-export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
+export interface UseSingleSelectionParameters<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseSingleSelectionChildInfo<ChildElementTag>> extends
     TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">,
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElementTag, ChildElementTag>, "rovingTabIndexReturn", "setTabbableIndex"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
 }
 
@@ -175,21 +175,21 @@ export interface UseSingleSelectionChildParametersSelf {
     singleSelectionDisabled: boolean;
 }
 
-export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends
+export interface UseSingleSelectionChildParameters<Tag extends keyof JSX.IntrinsicElements, M extends UseSingleSelectionChildInfo<Tag>> extends
     UseGenericChildParameters<UseSingleSelectionContext, Pick<M, UseSingleSelectionChildInfoKeysParameters>> {
     singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
 }
 
 
-export interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E> {
-    props: ElementProps<E>;
+export interface UseSingleSelectionChildReturnType<Tag extends keyof JSX.IntrinsicElements, M extends UseSingleSelectionChildInfo<Tag>> extends UseChildrenHaveFocusChildReturnType<Tag> {
+    props: ElementProps<Tag>;
 
     info: Pick<M, UseSingleSelectionChildInfoKeysReturnType>;
 
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
-export interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+export interface UseSingleSelectionReturnType<ChildElementTag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElementTag>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
     singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
     context: UseSingleSelectionContext;
 }
@@ -211,13 +211,13 @@ export interface UseSingleSelectionContext {
  * 
  * @compositeParams
  */
-export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useSingleSelection<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     managedChildrenReturn: { getChildren, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 },
     ...void4
-}: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement> {
-    return useMonitoring(function useSingleSelection(): UseSingleSelectionReturnType<ChildElement> {
+}: UseSingleSelectionParameters<ParentOrChildElementTag, ChildElementTag, UseSingleSelectionChildInfo<ChildElementTag>>): UseSingleSelectionReturnType<ChildElementTag> {
+    return useMonitoring(function useSingleSelection(): UseSingleSelectionReturnType<ChildElementTag> {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
@@ -226,8 +226,8 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         type R = Event;
         const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
 
-        const getSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return m.getSingleSelected(); }, []);
-        const setSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
+        const getSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElementTag>) => { return m.getSingleSelected(); }, []);
+        const setSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElementTag>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
             if (m.untabbable) {
                 console.assert(false);
             }
@@ -240,12 +240,12 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             m.setLocalSingleSelected(t, direction);
         }, []);
-        const isSelectedValid = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return !m.untabbable; }, []);
+        const isSelectedValid = useCallback((m: UseSingleSelectionChildInfo<ChildElementTag>) => { return !m.untabbable; }, []);
 
         const {
             changeIndex: changeSingleSelectedIndex,
             getCurrentIndex: getSingleSelectedIndex
-        } = useChildrenFlag<UseSingleSelectionChildInfo<ChildElement>, R>({
+        } = useChildrenFlag<UseSingleSelectionChildInfo<ChildElementTag>, R>({
             getChildren,
             onIndexChange: null,
             initialIndex: initiallySingleSelectedIndex,
@@ -288,14 +288,14 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
  * 
  * @compositeParams
  */
-export function useSingleSelectionChild<ChildElement extends Element>({
+export function useSingleSelectionChild<ChildElementTag extends keyof JSX.IntrinsicElements>({
     singleSelectionChildParameters: { singleSelectionDisabled, ...void5 },
     context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 },
     info: { index, untabbable, ...void3 },
     ...void4
-}: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
-    return useMonitoring(function useSingleSelectionChild(): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>> {
-        type R = EventType<any, any>;
+}: UseSingleSelectionChildParameters<ChildElementTag, UseSingleSelectionChildInfo<ChildElementTag>>): UseSingleSelectionChildReturnType<ChildElementTag, UseSingleSelectionChildInfo<ChildElementTag>> {
+    return useMonitoring(function useSingleSelectionChild(): UseSingleSelectionChildReturnType<ChildElementTag, UseSingleSelectionChildInfo<ChildElementTag>> {
+        type R = EventTypeByTag<any, any>;
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -357,7 +357,7 @@ export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSin
     singleSelectedIndex: Nullable<number>;
 }
 
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
+export interface UseSingleSelectionDeclarativeParameters<ChildElementTag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseSingleSelectionReturnType<ChildElementTag>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
 }
 
@@ -367,10 +367,10 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useSingleSelectionDeclarative<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     singleSelectionReturn: { changeSingleSelectedIndex },
     singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange }
-}: UseSingleSelectionDeclarativeParameters<ChildElement>) {
+}: UseSingleSelectionDeclarativeParameters<ChildElementTag>) {
     let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef<SingleSelectionChangeEvent | undefined>(undefined);
     useLayoutEffect(() => { changeSingleSelectedIndex(s, reasonRef.current!); }, [s]);
@@ -381,7 +381,7 @@ export function useSingleSelectionDeclarative<ParentOrChildElement extends Eleme
                 reasonRef.current = e;
                 return onSingleSelectedIndexChange?.(e);
             }, [onSingleSelectedIndexChange])
-        } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>["singleSelectionParameters"], "onSingleSelectedIndexChange">
+        } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElementTag, ChildElementTag, UseSingleSelectionChildInfo<ChildElementTag>>["singleSelectionParameters"], "onSingleSelectedIndexChange">
     }
 }
 

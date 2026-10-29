@@ -12,7 +12,7 @@ import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../..
 import { focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { ElementProps, EventType, FocusEventType, KeyboardEventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { ElementProps, EventTypeByTag, FocusEventTypeByTag, KeyboardEventTypeByTag, Nullable, OmitStrong, TargetedOmit, TargetedPick, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 
@@ -30,24 +30,24 @@ import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-ta
 const DUMMY = 0;
 
 
-export type MultiSelectChildChangeHandler<E extends Element> = EnhancedEventHandler<EventType<E, Event>, { multiSelected: boolean; }>;
-export type MultiSelectChildChangeEvent<E extends Element> = TargetedEnhancedEvent<EventType<E, Event>, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeHandler<Tag extends keyof JSX.IntrinsicElements> = EnhancedEventHandler<EventTypeByTag<Tag, Event>, { multiSelected: boolean; }>;
+export type MultiSelectChildChangeEvent<Tag extends keyof JSX.IntrinsicElements> = TargetedEnhancedEvent<EventTypeByTag<Tag, Event>, { multiSelected: boolean; }>;
 
-export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, { selectedPercent: number; selectedIndices: Set<number>; }>;
+export type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventTypeByTag<any, any>, { selectedPercent: number; selectedIndices: Set<number>; }>;
 
 export interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionParametersSelf, "multiSelectionAriaPropName" | "multiSelectionMode"> {
-    notifyParentOfChildSelectChange(event: EventType<any, any>, childIndex: number, selected: boolean | undefined, previous: boolean | undefined): void;
+    notifyParentOfChildSelectChange(event: EventTypeByTag<any, any>, childIndex: number, selected: boolean | undefined, previous: boolean | undefined): void;
     /**
      * When the user presses Shift+Space or Ctrl+Space (depending on selectionMode),
      * all the items since the last selected item are toggled,
      * so the child in question needs to be able to track that.
      */
-    doContiguousSelection(event: EventType<any, any>, endIndex: number): void;
+    doContiguousSelection(event: EventTypeByTag<any, any>, endIndex: number): void;
 
     /**
      * Mostly used for when focus-mode selects something (because by default it deselects everything else)
      */
-    changeAllChildren: (event: EventType<any, any>, shouldBeSelected: (index: number) => boolean) => void;
+    changeAllChildren: (event: EventTypeByTag<any, any>, shouldBeSelected: (index: number) => boolean) => void;
 
     getCtrlKeyDown(): boolean;
     getShiftKeyDown(): boolean;
@@ -58,7 +58,7 @@ export interface UseMultiSelectionContext {
     multiSelectionContext: UseMultiSelectionContextSelf;
 }
 
-export interface UseMultiSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+export interface UseMultiSelectionChildInfo<Tag extends keyof JSX.IntrinsicElements> extends UseRovingTabIndexChildInfo<Tag> {
     /**
      * When the parent changes all children (generally because of CTRL+A, focus-selection mode, etc.)
      * it needs to change all the child checkboxes at once.
@@ -71,7 +71,7 @@ export interface UseMultiSelectionChildInfo<E extends Element> extends UseRoving
      * But that propagates all the way to linear navigation, which is sync... 
      * (and for good reasons, cause navigation shouldn't be slowed down by sending data to a server or something)
      */
-    setSelectedFromParent(event: EventType<any, any>, selected: boolean): void;
+    setSelectedFromParent(event: EventTypeByTag<any, any>, selected: boolean): void;
 
     getMultiSelected(): boolean;
 
@@ -87,11 +87,11 @@ export interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInf
 /* eslint-disable @typescript-eslint/no-empty-interface */
 export interface UseMultiSelectionReturnTypeSelf { }
 
-export interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends
-    TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+export interface UseMultiSelectionReturnType<ParentElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    TargetedPick<UseChildrenHaveFocusParameters<ChildElementTag>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
     context: UseMultiSelectionContext;
     multiSelectionReturn: UseMultiSelectionReturnTypeSelf;
-    propsStable: ElementProps<ParentElement>
+    propsStable: ElementProps<ParentElementTag>
 }
 
 export type UseMultiSelectionChildInfoKeysParameters = "index";
@@ -132,13 +132,13 @@ export interface UseMultiSelectionParametersSelf {
      */
     multiSelectionAriaPropName: Nullable<`aria-${"pressed" | "selected" | "checked"}`>;
 }
-export interface UseMultiSelectionChildParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
+export interface UseMultiSelectionChildParameters<Tag extends keyof JSX.IntrinsicElements, M extends UseMultiSelectionChildInfo<Tag>> extends
     UseGenericChildParameters<UseMultiSelectionContext, Pick<M, UseMultiSelectionChildInfoKeysParameters>> {
 
-    multiSelectionChildParameters: UseMultiSelectionChildParametersSelf<E>;
+    multiSelectionChildParameters: UseMultiSelectionChildParametersSelf<Tag>;
     context: UseMultiSelectionContext;
 }
-export interface UseMultiSelectionChildParametersSelf<E extends Element> {
+export interface UseMultiSelectionChildParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
     /** 
      * Called when the child is requesting to change whether it's selected or not (generally because the user clicked it)
      * 
@@ -149,7 +149,7 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
      * * Call `changeSelected`, if this is imperatively controlled.
      * ```
      */
-    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
+    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent<Tag>) => void>;
 
     initiallyMultiSelected: boolean | null;
 
@@ -160,10 +160,10 @@ export interface UseMultiSelectionChildParametersSelf<E extends Element> {
     multiSelectionDisabled: boolean;
 }
 
-export interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+export interface UseMultiSelectionChildReturnType<Tag extends keyof JSX.IntrinsicElements, M extends UseMultiSelectionChildInfo<Tag>> extends
+    TargetedPick<UseHasCurrentFocusParameters<Tag>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
     multiSelectionChildReturn: UseMultiSelectionChildReturnTypeSelf;
-    props: ElementProps<E>;
+    props: ElementProps<Tag>;
     info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
 }
 
@@ -171,7 +171,7 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
     /**
      * @stable
      */
-    changeMultiSelected(event: EventType<any, any>, selected: boolean): void;
+    changeMultiSelected(event: EventTypeByTag<any, any>, selected: boolean): void;
 
     /**
      * Indicates that this child is selected, according to itself.
@@ -212,13 +212,13 @@ export interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseM
  * 
  * @compositeParams
  */
-export function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useMultiSelection<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 },
     managedChildrenReturn: { getChildren, ...void1 },
     childrenHaveFocusReturn: { getAnyFocused, ...void4 },
     ...void2
-}: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
-    return useMonitoring(function useMultiSelection(): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement> {
+}: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElementTag, ChildElementTag> {
+    return useMonitoring(function useMultiSelection(): UseMultiSelectionReturnType<ParentOrChildElementTag, ChildElementTag> {
         ;
         // By having both we get the total number of children for free, even if there are holes in the array.
         // TODO: useManagedChildren should do that by default??
@@ -239,7 +239,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
         let ctrlKeyHeld = useRef(false);
 
         // When a child changes selection state, it calls this function.
-        const notifyParentOfChildSelectChange = useStableCallback((event: EventType<any, any>, index: number, selected: boolean | undefined, previous: boolean | undefined) => {
+        const notifyParentOfChildSelectChange = useStableCallback((event: EventTypeByTag<any, any>, index: number, selected: boolean | undefined, previous: boolean | undefined) => {
             console.assert(selected != previous);
 
             // The commented-out asserts are don't work for rearranged children,
@@ -283,7 +283,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             onSelectionChange?.(enhanceEvent(event, { selectedPercent, selectedIndices: selectedIndices.current }));
         });
 
-        const changeAllChildren = useStableCallback((event: EventType<any, any>, shouldBeSelected: (index: number) => boolean) => {
+        const changeAllChildren = useStableCallback((event: EventTypeByTag<any, any>, shouldBeSelected: (index: number) => boolean) => {
             getChildren().forEach(child => {
                 if (!child.getMultiSelectionDisabled()) {
                     child.setSelectedFromParent(event, shouldBeSelected(child.index));
@@ -291,7 +291,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             })
         });
 
-        const doContiguousSelection = useStableCallback((event: KeyboardEventType<any>, endIndex: number) => {
+        const doContiguousSelection = useStableCallback((event: KeyboardEventTypeByTag<any>, endIndex: number) => {
             let originalEnd = endIndex;
 
             let temp = 0;
@@ -325,7 +325,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             startOfShiftSelect.current = originalEnd;
         });
 
-        const onCompositeFocusChange = useStableCallback<OnPassiveStateChange<boolean, FocusEventType<ChildElement> | undefined>>((anyFocused, _prevAnyFocused, _event) => {
+        const onCompositeFocusChange = useStableCallback<OnPassiveStateChange<boolean, FocusEventTypeByTag<ChildElementTag> | undefined>>((anyFocused, _prevAnyFocused, _event) => {
             if (!anyFocused) {
                 ctrlKeyHeld.current = shiftKeyHeld.current = false;
             }
@@ -342,7 +342,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
                 if (e.code == "KeyA" && e.ctrlKey && !e.repeat) {
                     // Only perform this logic if multi-selection is enabled
                     if (multiSelectionMode != "disabled") {
-                        changeAllChildren(e, !nextCtrlAIsUndo.current ? returnTrue : returnFalse);
+                        changeAllChildren(e as any, !nextCtrlAIsUndo.current ? returnTrue : returnFalse);
                         e.preventDefault();
                         e.stopPropagation();
 
@@ -375,7 +375,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
             }),
             childrenHaveFocusParameters: { onCompositeFocusChange },
             multiSelectionReturn: {},
-            propsStable: useMemoObject({})
+            propsStable: useMemoObject({}) as ElementProps<ParentOrChildElementTag>
         }
     });
 }
@@ -384,7 +384,7 @@ export function useMultiSelection<ParentOrChildElement extends Element, ChildEle
  * 
  * @compositeParams
  */
-export function useMultiSelectionChild<E extends Element>({
+export function useMultiSelectionChild<Tag extends keyof JSX.IntrinsicElements>({
     info: { index, ...void4 },
     multiSelectionChildParameters: {
         initiallyMultiSelected,
@@ -407,8 +407,8 @@ export function useMultiSelectionChild<E extends Element>({
         ...void3
     },
     ...void2
-}: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
-    return useMonitoring(function useMultiSelectionChild(): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>> {
+}: UseMultiSelectionChildParameters<Tag, UseMultiSelectionChildInfo<Tag>>): UseMultiSelectionChildReturnType<Tag, UseMultiSelectionChildInfo<Tag>> {
+    return useMonitoring(function useMultiSelectionChild(): UseMultiSelectionChildReturnType<Tag, UseMultiSelectionChildInfo<Tag>> {
         // When we're in focus-selection mode, focusing any child deselects everything and selects JUST that child.
         // But that's really annoying for when you tab into the component, so it's only enabled when you're navigating WITHIN the component
         // (e.g. we only do that "reset everything" selection stuff when the component already had focus and that focus simply moved to a different child)
@@ -421,7 +421,7 @@ export function useMultiSelectionChild<E extends Element>({
             if (!multiSelectionDisabled) {
                 if (multiSelectionMode == "activation") {
                     if ((e as KeyboardEvent).shiftKey) {
-                        doContiguousSelection(e, index);
+                        doContiguousSelection(e as any, index);
                     }
                     else {
                         onMultiSelectChange?.(enhanceEvent(e as any, { multiSelected: !getLocalSelected() }));
@@ -442,7 +442,7 @@ export function useMultiSelectionChild<E extends Element>({
 
         const [localSelected, setLocalSelected, getLocalSelected] = useState(initiallyMultiSelected ?? false);
 
-        const changeMultiSelected = useStableCallback((e: EventType<any, any>, selected: boolean) => {
+        const changeMultiSelected = useStableCallback((e: EventTypeByTag<any, any>, selected: boolean) => {
             console.assert(selected != null);
             if (selected)
                 console.assert(!multiSelectionDisabled);
@@ -473,7 +473,7 @@ export function useMultiSelectionChild<E extends Element>({
         assertEmptyObject(void3);
         assertEmptyObject(void4);
         assertEmptyObject(void5);
-        const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, FocusEventType<any> | undefined>>((focused, prev, event) => {
+        const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, FocusEventTypeByTag<any> | undefined>>((focused, prev, event) => {
             if (focused) {
                 if (multiSelectionMode == "focus") {
                     let any = getAnyFocused();
@@ -501,9 +501,9 @@ export function useMultiSelectionChild<E extends Element>({
             pressFreebie.current = false;
         });
 
-        const setSelectedFromParent = useStableCallback((event: EventType<any, any>, multiSelected: boolean) => {
+        const setSelectedFromParent = useStableCallback((event: EventTypeByTag<any, any>, multiSelected: boolean) => {
             console.assert(onMultiSelectChange != null);
-            onMultiSelectChange?.(enhanceEvent(event, { multiSelected }));
+            onMultiSelectChange?.(enhanceEvent(event, { multiSelected }) as any);
         })
 
         return {
@@ -517,7 +517,7 @@ export function useMultiSelectionChild<E extends Element>({
             hasCurrentFocusParameters: {
                 onCurrentFocusedInnerChanged
             },
-            props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled" ? undefined : (localSelected ? "true" : "false") },
+            props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled" ? undefined : (localSelected ? "true" : "false") } as {} as ElementProps<Tag>,
             info: {
                 getMultiSelected: getLocalSelected,
                 setSelectedFromParent,
@@ -527,16 +527,16 @@ export function useMultiSelectionChild<E extends Element>({
     });
 }
 
-export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
+export interface UseMultiSelectionChildDeclarativeReturnType<Tag extends keyof JSX.IntrinsicElements, M extends UseMultiSelectionChildInfo<Tag>> extends
+    TargetedPick<UseMultiSelectionChildParameters<Tag, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
     info: Pick<M, "setSelectedFromParent">;
 }
 
-export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
-    TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
+export interface UseMultiSelectionChildDeclarativeParameters<Tag extends keyof JSX.IntrinsicElements, M extends UseMultiSelectionChildInfo<Tag>> extends
+    TargetedPick<UseMultiSelectionChildReturnType<Tag, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
     multiSelectionChildDeclarativeParameters: {
         multiSelected: boolean | null;
-        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<E>) => void>;
+        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent<Tag>) => void>;
     }
 }
 
@@ -550,12 +550,12 @@ export type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelec
  * 
  * #__NO_SIDE_EFFECTS__
  */
-export function useMultiSelectionChildDeclarative<E extends Element>({
+export function useMultiSelectionChildDeclarative<Tag extends keyof JSX.IntrinsicElements>({
     multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 },
     multiSelectionChildReturn: { changeMultiSelected, ...void2 },
     ...void1
-}: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>> {
-    let reasonRef = useRef<MultiSelectChildChangeEvent<E> | undefined>(undefined);
+}: UseMultiSelectionChildDeclarativeParameters<Tag, UseMultiSelectionChildInfo<Tag>>): UseMultiSelectionChildDeclarativeReturnType<Tag, UseMultiSelectionChildInfo<Tag>> {
+    let reasonRef = useRef<MultiSelectChildChangeEvent<Tag> | undefined>(undefined);
     useLayoutEffect(() => {
         if (multiSelected != null)
             changeMultiSelected(reasonRef.current!, multiSelected);
@@ -573,8 +573,8 @@ export function useMultiSelectionChildDeclarative<E extends Element>({
             })
         },
         info: {
-            setSelectedFromParent: useStableCallback((event: EventType<any, any>, multiSelected: boolean) => {
-                onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }));
+            setSelectedFromParent: useStableCallback((event: EventTypeByTag<any, any>, multiSelected: boolean) => {
+                onMultiSelectedChange?.(enhanceEvent(event, { multiSelected }) as MultiSelectChildChangeEvent<Tag>);
             })
         }
     }

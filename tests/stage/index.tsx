@@ -10,7 +10,7 @@ import { TestBasesRefElement } from "../fixtures/ref-element.stage.js";
 import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
 
 
-declare module globalThis {
+declare namespace globalThis {
     let installTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) => void;
     let _TestingConstants: TestingConstants;
     let getTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2) => TestingConstants[K][K2];

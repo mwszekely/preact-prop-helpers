@@ -3,8 +3,8 @@ import { UseActiveElementParameters } from "../../observers/use-active-element.j
 import { OnPassiveStateChange } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback } from "../../util/lib.js";
-import { FocusEventType, Nullable } from "../../util/types.js";
+import { FocusEventTypeByTag, TargetedPick, useCallback } from "../../util/lib.js";
+import { Nullable, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {
@@ -14,7 +14,7 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    onDismissLostFocus: Nullable<(e: FocusEventType<any>) => void>;
+    onDismissLostFocus: Nullable<(e: FocusEventTypeByTag<any>) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
@@ -22,13 +22,13 @@ export interface UseLostFocusDismissParametersSelf<B extends boolean> {
     dismissLostFocusActive: B | false;
 }
 
-export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> {
+export interface UseLostFocusDismissParameters<SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements, B extends boolean> {
     lostFocusDismissParameters: UseLostFocusDismissParametersSelf<B>;
-    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
+    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElementTag>>["refElementReturn"], "getElement">>;
+    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElementTag>["refElementReturn"], "getElement">;
 }
 
-export interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> extends TargetedPick<UseActiveElementParameters, "activeElementParameters", "onLastActiveElementChange"> {
+export interface UseLostFocusDismissReturnType<_SourceElementTag extends keyof JSX.IntrinsicElements | null, _PopupElementTag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseActiveElementParameters, "activeElementParameters", "onLastActiveElementChange"> {
 }
 
 /**
@@ -38,7 +38,7 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * 
  * @compositeParams 
  */
-export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
+export function useLostFocusDismiss<SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements, B extends boolean>({
     refElementPopupReturn: { getElement: getPopupElement, ...void3 },
     refElementSourceReturn,
     lostFocusDismissParameters: {
@@ -47,8 +47,8 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
         ...void4
     },
     ...void1
-}: UseLostFocusDismissParameters<SourceElement, PopupElement, B>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
-    return useMonitoring(function useLostFocusDismiss(): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
+}: UseLostFocusDismissParameters<SourceElementTag, PopupElementTag, B>): UseLostFocusDismissReturnType<SourceElementTag, PopupElementTag> {
+    return useMonitoring(function useLostFocusDismiss(): UseLostFocusDismissReturnType<SourceElementTag, PopupElementTag> {
         const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
         assertEmptyObject(void1);
@@ -59,14 +59,14 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
         const stableOnClose = useStableGetter(onClose);
         const getOpen = useStableGetter(open);
-        const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEventType<any>>>((newElement, _prevElement, e) => {
+        const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEvent>>((newElement, _prevElement, e) => {
             const open = getOpen();
-            const sourceElement = getSourceElement?.();
+            const sourceElement = getSourceElement?.() as HTMLElement | null | undefined;
             const popupElement = getPopupElement();
             if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
                 if (open) {
                     console.assert(e != null);
-                    stableOnClose()?.(e!);
+                    stableOnClose()?.(e! as any);
                 }
             }
         }, [getSourceElement]);

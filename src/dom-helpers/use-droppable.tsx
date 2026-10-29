@@ -1,17 +1,17 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { DragEventType, useEffect, useRef } from "../util/lib.js";
+import { DragEventTypeByTag, JSX, useEffect, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
-export interface UseDroppableReturnType<E extends Element> {
+export interface UseDroppableReturnType<Tag extends keyof JSX.IntrinsicElements> {
 
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
      * 
      * *Unstable*
      */
-    propsStable: ElementProps<E>;
+    propsStable: ElementProps<Tag>;
 
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.
@@ -77,8 +77,9 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */
-export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
-    return useMonitoring(function useDroppable(): UseDroppableReturnType<E> {
+export function useDroppable<Tag extends keyof JSX.IntrinsicElements>({ effect }: UseDroppableParameters): UseDroppableReturnType<Tag> {
+    
+    return useMonitoring(function useDroppable(): UseDroppableReturnType<Tag> {
         const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
         const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);
 
@@ -142,7 +143,7 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
 
 
         // Handle collecting the current file metadata or MIME types.
-        const onDragEnter = useStableCallback((e: DragEventType<E>) => {
+        const onDragEnter = useStableCallback((e: DragEventTypeByTag<Tag>) => {
             e.preventDefault();
             if (e.dataTransfer) {
 
@@ -170,19 +171,19 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
         });
 
         // Handle resetting the current file metadata or MIME types
-        const onDragLeave = useStableCallback((e: DragEventType<E>) => {
+        const onDragLeave = useStableCallback((e: DragEventTypeByTag<Tag>) => {
             e.preventDefault();
             setFilesForConsideration(null);
             setStringsForConsideration(null);
         });
 
         // Boilerplate, I guess
-        const onDragOver = useStableCallback((e: DragEventType<E>) => {
+        const onDragOver = useStableCallback((e: DragEventTypeByTag<Tag>) => {
             e.preventDefault();
         })
 
         // Handle getting the drop data asynchronously
-        const onDrop = useStableCallback((e: DragEventType<E>) => {
+        const onDrop = useStableCallback((e: DragEventTypeByTag<Tag>) => {
             e.preventDefault();
 
             setFilesForConsideration(null);
@@ -240,10 +241,10 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
             }));
         })
 
-        const propsStable = useRef<ElementProps<E>>({ onDragEnter, onDragLeave, onDragOver, onDrop });
+        const propsStable = useRef({ onDragEnter, onDragLeave, onDragOver, onDrop });
 
         return {
-            propsStable: propsStable.current,
+            propsStable: propsStable.current as ElementProps<Tag>,
             filesForConsideration,
             stringsForConsideration,
             droppedFiles,

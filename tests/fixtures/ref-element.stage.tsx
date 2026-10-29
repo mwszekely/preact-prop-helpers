@@ -26,8 +26,8 @@ export function TestBasesRefElement() {
     const incrementUnmountA = useCallback(() => setUnmountCountA(a => ++a), []);
     const incrementUnmountB = useCallback(() => setUnmountCountB(b => ++b), []);
 
-    const { propsStable: propsA } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: incrementA, onMount: incrementMountA, onUnmount: incrementUnmountA } });
-    const { propsStable: propsB } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: incrementB, onMount: incrementMountB, onUnmount: incrementUnmountB } });
+    const { propsStable: propsA } = useRefElement<'div'>({ refElementParameters: { onElementChange: incrementA, onMount: incrementMountA, onUnmount: incrementUnmountA } });
+    const { propsStable: propsB } = useRefElement<'div'>({ refElementParameters: { onElementChange: incrementB, onMount: incrementMountB, onUnmount: incrementUnmountB } });
 
     const a = aMounted ? <div key="a" {...propsA}>div A</div> : null;
     const b = bMounted ? <div key="b" {...propsB}>div B</div> : null;

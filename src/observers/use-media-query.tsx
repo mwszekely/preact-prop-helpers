@@ -26,7 +26,7 @@ export function useMediaQuery(query: string | null | undefined, defaultGuess?: b
     }
     else {
 
-        const queryList = useRef<MediaQueryList | null>();
+        const queryList = useRef<MediaQueryList | null>(null);
 
         // queryList.current ??= (query == null ? null : matchMedia(query))
         // This ^^^ is not done because it seems to cause reflows at inopportune moments.

@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "../../dist/preact/index.js";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, StateUpdater, TabbableColumnInfo, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, UseCompleteGridNavigationRowsContext, UseCompleteGridNavigationRowsInfo, VNode, focus, useCallback, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useContext, useEffect, useMemo, useMergedProps, useStableCallback, useState } from "preact-prop-helpers/preact";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -9,10 +9,10 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const SortableColumnContext = createContext(null as number | null);
 const SetSortableColumnContext = createContext<StateUpdater<number | null>>(null!);
 const GetSortableColumnContext = createContext<() => number | null>(null!);
-const ListChildrenContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, CustomGridInfo>>(null!);
-const ListChildContext = createContext<UseCompleteGridNavigationRowsContext<HTMLTableRowElement, UseCompleteGridNavigationRowsInfo<HTMLTableRowElement>>>(null!);
+const ListChildrenContext = createContext<CompleteGridNavigationRowContext<'tr', CustomGridInfo>>(null!);
+const ListChildContext = createContext<UseCompleteGridNavigationRowsContext<'tr', UseCompleteGridNavigationRowsInfo<'tr'>>>(null!);
 //const GridRowContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, CustomGridInfo>>(null!);
-const GridCellContext = createContext<CompleteGridNavigationCellContext<HTMLTableCellElement, CustomGridRowInfo>>(null!);
+const GridCellContext = createContext<CompleteGridNavigationCellContext<'th', CustomGridRowInfo>>(null!);
 
 export const DemoUseGrid = memo(() => {
 
@@ -22,7 +22,7 @@ export const DemoUseGrid = memo(() => {
     const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null as number | null);
 
     // Entirely complete, fully spelt-out version:
-    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
+    const allReturnInfo = useCompleteGridNavigationDeclarative<'tbody', 'tr', CustomGridInfo>({
         // `useRovingTabIndex` is a separate hook that you could call with these same parameters:
         rovingTabIndexParameters: {
             // If true, the entire grid is removed from the tab order
@@ -235,12 +235,8 @@ const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndexChildre
     )
 });
 
-interface CustomGridInfo extends UseCompleteGridNavigationRowInfo<HTMLTableRowElement> { foo: "bar" }
-interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<HTMLTableCellElement> { bar: "baz" }
-
-//type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
-//type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
-
+interface CustomGridInfo extends UseCompleteGridNavigationRowInfo<'tr'> { foo: "bar" }
+interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<'td'> { bar: "baz" }
 
 const DemoUseGridRowOuter = memo(function DemoUseRovingTabIndexChildOuter({ index }: { index: number }) {
     const {
@@ -282,7 +278,7 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
 
 
     const contextFromParent = useContext(ListChildrenContext);
-    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+    const ret: UseCompleteGridNavigationRowReturnType<'tr', 'td', CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<'tr', 'td', CustomGridInfo, CustomGridRowInfo>({
 
         context: contextFromParent,
         info: { index, foo: "bar", untabbable: hidden },
@@ -326,13 +322,13 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     let hiddenText = (row === 3) ? " (row hidden)" : ""
 
 
-    const context = useContext(GridCellContext) as CompleteGridNavigationCellContext<HTMLTableCellElement, CustomGridRowInfo>;
+    const context = useContext(GridCellContext) as CompleteGridNavigationCellContext<'td', CustomGridRowInfo>;
 
     const {
         props,
         rovingTabIndexChildReturn: { tabbable },
 
-    } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
+    } = useCompleteGridNavigationCell<'td', CustomGridRowInfo>({
         gridNavigationCellParameters: { colSpan: 1 },
         info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => focus(e)), untabbable: false },
         context,

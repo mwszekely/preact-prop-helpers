@@ -1,6 +1,6 @@
 
 import { useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, focus, useMergedProps, useModal, useStableCallback } from "../../dist/preact/index.js";
+import { DismissListenerTypes, focus, useMergedProps, useModal, useStableCallback } from "preact-prop-helpers/preact";
 
 function getDocument(): Document { return globalThis.document; }
 
@@ -27,7 +27,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         propsStablePopup,
         propsStableSource,
         propsFocusContainer
-    } = useModal<"lost-focus" | "backdrop" | "escape", HTMLDivElement, HTMLButtonElement, HTMLDivElement>({
+    } = useModal<"lost-focus" | "backdrop" | "escape", 'div', 'button', 'div'>({
         focusTrapParameters: {
             trapActive: focusTrapActive,
             onlyMoveFocus: false,

@@ -3,8 +3,8 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
-import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
+import { KeyboardEventTypeByTag, TargetedPick, useCallback, useRef, TagToElement, EventTypeByTag } from "../../util/lib.js";
+import { ElementProps, Nullable, OmitStrong, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";
@@ -20,29 +20,29 @@ export interface LinearNavigationResult {
 /* eslint-disable @typescript-eslint/no-empty-interface */
 export interface UseLinearNavigationReturnTypeSelf { }
 
-export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
+export interface UseLinearNavigationReturnType<ParentOrChildElementTag extends keyof JSX.IntrinsicElements> {
     linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElementTag>;
 }
 
 //export interface UseLinearNavigationChildInfo { }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+export interface UseLinearNavigationParameters<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElementTag, ChildElementTag>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexMangler" | "indexDemangler">,
-    TargetedPick<UsePaginatedChildrenParameters<ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
-    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
+    TargetedPick<UsePaginatedChildrenParameters<ChildElementTag>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+    linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElementTag>;
 }
 
-export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
+export interface UseLinearNavigationParametersSelf<ChildElementTag extends keyof JSX.IntrinsicElements> {
 
     /**
      * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.
      * 
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventTypeByTag<ChildElementTag>) => void>;
 
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
@@ -143,15 +143,15 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * 
  * @compositeParams
  */
-export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useLinearNavigation<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     processedIndexManglerReturn: { indexDemangler, indexMangler, ...void3 },
     ...void1
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
-    return useMonitoring(function useLinearNavigation(): UseLinearNavigationReturnType<ParentOrChildElement> {
-        type R = EventType<any, any>;
+}: UseLinearNavigationParameters<ParentOrChildElementTag, ChildElementTag>): UseLinearNavigationReturnType<ParentOrChildElementTag> {
+    return useMonitoring(function useLinearNavigation(): UseLinearNavigationReturnType<ParentOrChildElementTag> {
+        type R = EventTypeByTag<any, any>;
 
         let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
 
@@ -222,7 +222,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             }
             else {
                 setTabbableIndex(valueDemangled, e, fromUserInteraction);
-                onNavigateLinear?.(valueDemangled!, e as KeyboardEventType<ChildElement>);
+                onNavigateLinear?.(valueDemangled!, e as any);
                 return "stop";
             }
         }, []);
@@ -253,8 +253,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         //const getPageNavigationSize = useStableGetter(pageNavigationSize);
 
 
-        const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
-            onKeyDown: useStableCallback((e) => {
+        const stableProps = useRef(useTagProps({
+            onKeyDown: useStableCallback((e: KeyboardEventTypeByTag<ParentOrChildElementTag>) => {
                 // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
                 // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
                 if (e.metaKey)
@@ -332,7 +332,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
         return {
             linearNavigationReturn: {},
-            propsStable: stableProps.current
+            propsStable: stableProps.current as ElementProps<ParentOrChildElementTag>
         }
     });
 }

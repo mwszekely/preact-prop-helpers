@@ -3,7 +3,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
-import { KeyboardEventType, Nullable, useEffect } from "../../util/lib.js";
+import { KeyboardEventTypeByTag, Nullable, useEffect } from "../../util/lib.js";
+import { JSX, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 
@@ -14,7 +15,7 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
      * 
      * @nonstable
      */
-    onDismissEscape: Nullable<(e: KeyboardEventType<any>) => void>;
+    onDismissEscape: Nullable<(e: KeyboardEventTypeByTag<any>) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
@@ -38,9 +39,9 @@ export interface UseEscapeDismissParametersSelf<B extends boolean> {
     parentDepth: number;
 }
 
-export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> {
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
+export interface UseEscapeDismissParameters<PopupElementTag extends keyof JSX.IntrinsicElements, B extends boolean> {
     escapeDismissParameters: UseEscapeDismissParametersSelf<B>;
+    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElementTag>["refElementReturn"], "getElement">
 }
 
 
@@ -70,7 +71,7 @@ function getElementDepth(element: Element) {
  * 
  * @compositeParams 
  */
-export function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void {
+export function useEscapeDismiss<PopupElementTag extends keyof JSX.IntrinsicElements, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElementTag, B>): void {
     return useMonitoring(function useEscapeDismiss(): void {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -122,7 +123,7 @@ export function useEscapeDismiss<PopupElement extends Element, B extends boolean
 
 
                     // This is what at least one of the elements will call
-                    const onClose2 = () => { stableOnClose()?.(enhanceEvent(e, { reason: "escape" })); };
+                    const onClose2 = () => { stableOnClose()?.(enhanceEvent(e, { reason: "escape" }) as any); };
                     const element = getElement();
                     if (element) {
                         const treeDepth = getElementDepth(element);

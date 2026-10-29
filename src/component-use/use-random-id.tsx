@@ -1,12 +1,12 @@
 
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { useId, useRef } from "../util/lib.js";
+import { JSX, useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
-export interface UseRandomIdReturnType<S extends Element, T extends Element> {
-    propsSource: ElementProps<S>;
-    propsReferencer: ElementProps<T>;
+export interface UseRandomIdReturnType<SourceTag extends keyof JSX.IntrinsicElements, TargetTag extends keyof JSX.IntrinsicElements> {
+    propsSource: ElementProps<SourceTag>;
+    propsReferencer: ElementProps<TargetTag>;
 
     randomIdReturn: UseRandomIdReturnTypeSelf;
 }
@@ -36,19 +36,19 @@ export interface UseRandomIdParameters {
  * 
  * @compositeParams
  */
-export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
-    return useMonitoring(function useRandomId(): UseRandomIdReturnType<S, T> {
+export function useRandomId<SourceTag extends keyof JSX.IntrinsicElements, TargetTag extends keyof JSX.IntrinsicElements>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<SourceTag, TargetTag> {
+    return useMonitoring(function useRandomId(): UseRandomIdReturnType<SourceTag, TargetTag> {
         const id = (prefix + useId());
         useEnsureStability("useRandomId", prefix, id);
 
-        const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-        const sourceElementProps = useRef<ElementProps<S>>({ id });
+        const referencerElementProps = useRef<{}>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+        const sourceElementProps = useRef({ id });
         useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
 
 
         return {
-            propsReferencer: referencerElementProps.current,
-            propsSource: sourceElementProps.current,
+            propsReferencer: referencerElementProps.current as ElementProps<TargetTag>,
+            propsSource: sourceElementProps.current as ElementProps<SourceTag>,
             randomIdReturn: {
                 id: id
             }

@@ -5,7 +5,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
+import { ElementProps, OmitStrong, TargetedPick, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -97,8 +97,8 @@ export interface UseStaggeredChildReturnTypeSelf {
     childUseEffect(): void;
 }
 
-export interface UseStaggeredChildReturnType<ChildElement extends Element> extends TargetedPick<UseRefElementParameters<ChildElement>, "refElementParameters", "onElementChange"> {
-    props: ElementProps<ChildElement>;
+export interface UseStaggeredChildReturnType<ChildElementTag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementParameters<ChildElementTag>, "refElementParameters", "onElementChange"> {
+    props: ElementProps<ChildElementTag>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: OmitStrong<UseStaggeredChildrenInfo, "index">;
 }
@@ -293,12 +293,12 @@ export function useStaggeredChildren({
  * 
  * @compositeParams
  */
-export function useStaggeredChild<ChildElement extends Element, M extends UseStaggeredChildrenInfo>({
+export function useStaggeredChild<ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseStaggeredChildrenInfo>({
     info: { index },
     //refElementReturn: { getElement },
     context: { staggeredChildContext: { parentIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne, getIntersectionObserver, setElementToIndexMap } }
-}: UseStaggeredChildParameters<M>): UseStaggeredChildReturnType<ChildElement> {
-    return useMonitoring(function useStaggeredChild(): UseStaggeredChildReturnType<ChildElement> {
+}: UseStaggeredChildParameters<M>): UseStaggeredChildReturnType<ChildElementTag> {
+    return useMonitoring(function useStaggeredChild(): UseStaggeredChildReturnType<ChildElementTag> {
         const [staggeredVisible, setStaggeredVisible, getStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
         // Controls whether we ask the parent to start mounting children after us.

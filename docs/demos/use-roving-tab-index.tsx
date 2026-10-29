@@ -1,6 +1,6 @@
 
 import { reverse, shuffle } from "lodash-es";
-import { createContext } from "preact";
+import { createContext, createElement } from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import {
     CompleteListNavigationContext,
@@ -24,7 +24,7 @@ import {
     usePress,
     useStableCallback,
     useState
-} from "../../dist/preact/index.js";
+} from "preact-prop-helpers/preact";
 
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -38,8 +38,8 @@ function _getDocument() {
 //const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
 //const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
 const UntabbableContext = createContext(false);
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!);
-const ListChildContext = createContext<NormalListChildContext<HTMLLIElement, any>>(null!);
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<'li', CustomInfoType>>(null!);
+const ListChildContext = createContext<NormalListChildContext<'li', any>>(null!);
 export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [multiSelectPercent, setMultiSelectPercent] = useState(0);
@@ -76,7 +76,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     let sortValues = useRef<number[]>([]);
 
-    const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
+    const r: UseCompleteListNavigationDeclarativeReturnType<'ol', 'li', CustomInfoType> = useCompleteListNavigationDeclarative<'ol', 'li', CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
         singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((e) => { setSingleSelectedIndex(e[EventDetail].selectedIndex) }, []) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
@@ -113,7 +113,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [staggering, setStaggering] = useState(false);
     const [animate, setAnimate] = useState(true);
-
+createElement
     return (
         <div className="demo">
             <h2>Keyboard &amp; List Navigation</h2>
@@ -208,7 +208,7 @@ export const DemoUseRovingTabIndexChildren = memo(function DemoUseRovingTabIndex
     )
 });
 
-interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElement> {
+interface CustomInfoType extends UseCompleteListNavigationChildInfo<'li'> {
     foo: "bar";
 }
 
@@ -224,7 +224,7 @@ const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChild
         props, 
         refElementReturn, 
         staggeredChildReturn 
-    } = useCompleteListNavigationChildOuter<HTMLLIElement, UseCompleteListNavigationChildrenInfo<HTMLLIElement>>({
+    } = useCompleteListNavigationChildOuter<'li', UseCompleteListNavigationChildrenInfo<'li'>>({
         context: useContext(ListChildContext),
         info: { index },
         refElementParameters: {},
@@ -249,7 +249,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
     const [multiSelected, setMultiSelected] = useState(false);
 
     const randomWord = word;// shuffledWords.current[index];
-    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<'li', CustomInfoType>;
     const focusSelf = useCallback((e: HTMLElement) => { focus(e) }, []);
 
     const getSortValue = useStableCallback(() => index);
@@ -266,7 +266,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
         pressParameters: { excludeSpace },
         selectionChildReturn: { firePressSelectionEvent },
         refElementReturn
-    } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
+    } = useCompleteListNavigationChildDeclarative<'li', CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []), onTextContentChange: null },
@@ -277,13 +277,13 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
         multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
-    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync: firePressSelectionEvent, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
+    const { pressReturn, props: p2 } = usePress<'li'>({ pressParameters: { focusSelf, onPressSync: firePressSelectionEvent, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
     const text = `${randomWord} This is item #${index} (#${demangledIndex} to #${mangledIndex}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<HTMLInputElement>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
+        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
     )
 });

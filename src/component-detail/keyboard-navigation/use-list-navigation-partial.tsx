@@ -2,7 +2,7 @@ import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ElementProps, OmitStrong, TargetedPick } from "../../util/types.js";
+import { ElementProps, JSX, OmitStrong, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseProcessedIndexManglerReturnType } from "../processed-children/use-processed-index-mangler.js";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";
@@ -51,19 +51,19 @@ const _dummy: any = null;
 
 
 
-export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> { }
+export interface UseListNavigationChildInfo<TabbableChildElementTag extends keyof JSX.IntrinsicElements> extends UseRovingTabIndexChildInfo<TabbableChildElementTag>, UseTypeaheadNavigationChildInfo<TabbableChildElementTag> { }
 
-export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends
-    OmitStrong<UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>, "processedIndexManglerReturn">,
-    OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
-    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">,
+export interface UseListNavigationParameters<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements, M extends UseListNavigationChildInfo<ChildElementTag>> extends
+    OmitStrong<UseRovingTabIndexParameters<ParentOrChildElementTag, ChildElementTag, M>, "processedIndexManglerReturn">,
+    OmitStrong<UseTypeaheadNavigationParameters<ChildElementTag>, "rovingTabIndexReturn">,
+    OmitStrong<UseLinearNavigationParameters<ParentOrChildElementTag, ChildElementTag>, "rovingTabIndexReturn">,
     TargetedPick<UseProcessedIndexManglerReturnType, "processedIndexManglerReturn", "indexDemangler" | "indexMangler"> { }
 
-export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends
-    OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">,
-    OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">,
-    OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
-    props: ElementProps<ParentOrChildElement>;
+export interface UseListNavigationReturnType<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElementTag, ChildElementTag>, "props">,
+    OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElementTag>, "propsStable">,
+    OmitStrong<UseLinearNavigationReturnType<ParentOrChildElementTag>, "propsStable"> {
+    props: ElementProps<ParentOrChildElementTag>;
     context: UseListNavigationContext;
 }
 
@@ -71,16 +71,16 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends Elemen
 export type UseListNavigationChildInfoKeysParameters = UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters;
 export type UseListNavigationChildInfoKeysReturnType = UseRovingTabIndexChildInfoKeysReturnType | UseTypeaheadNavigationChildInfoKeysReturnType;
 
-export interface UseListNavigationChildParameters<ChildElement extends Element> extends
-    UseGenericChildParameters<UseListNavigationContext, Pick<UseListNavigationChildInfo<ChildElement>, UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters>>,
-    OmitStrong<UseRovingTabIndexChildParameters<ChildElement>, "info" | "context">,
-    OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement>, "info" | "context"> {
+export interface UseListNavigationChildParameters<ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    UseGenericChildParameters<UseListNavigationContext, Pick<UseListNavigationChildInfo<ChildElementTag>, UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters>>,
+    OmitStrong<UseRovingTabIndexChildParameters<ChildElementTag>, "info" | "context">,
+    OmitStrong<UseTypeaheadNavigationChildParameters<ChildElementTag>, "info" | "context"> {
 }
 export interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext { }
-export interface UseListNavigationChildReturnType<ChildElement extends Element> extends
-    UseRovingTabIndexChildReturnType<ChildElement>,
+export interface UseListNavigationChildReturnType<ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    UseRovingTabIndexChildReturnType<ChildElementTag>,
     UseTypeaheadNavigationChildReturnType {
-    info: Pick<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysReturnType>;
+    info: Pick<UseListNavigationChildInfo<ChildElementTag>, UseListNavigationChildInfoKeysReturnType>;
 }
 
 
@@ -95,7 +95,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  * 
  * @compositeParams
  */
-export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useListNavigation<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     linearNavigationParameters,
     typeaheadNavigationParameters,
     rovingTabIndexParameters,
@@ -104,11 +104,11 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     paginatedChildrenParameters,
     processedIndexManglerReturn,
     ...void1
-}: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
-    return useMonitoring(function useListNavigation(): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
-        const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
-        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-        const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
+}: UseListNavigationParameters<ParentOrChildElementTag, ChildElementTag, UseListNavigationChildInfo<ChildElementTag>>): UseListNavigationReturnType<ParentOrChildElementTag, ChildElementTag> {
+    return useMonitoring(function useListNavigation(): UseListNavigationReturnType<ParentOrChildElementTag, ChildElementTag> {
+        const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex<ParentOrChildElementTag, ChildElementTag>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn, processedIndexManglerReturn });
+        const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation<ParentOrChildElementTag, ChildElementTag>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+        const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElementTag, ChildElementTag>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters, processedIndexManglerReturn });
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);
@@ -117,7 +117,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
         // Merge the props while keeping them stable
         // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
-        //const p = useMergedProps<ParentOrChildElement>(propsStableTN, propsStableLN);
+        //const p = useMergedProps(propsStableTN, propsStableLN);
         //const {propsStable} = useRef<ElementProps<ParentOrChildElement>>(p)
 
         return {
@@ -137,15 +137,15 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 /**
  * @compositeParams
  */
-export function useListNavigationChild<ChildElement extends Element>({
+export function useListNavigationChild<ChildElementTag extends keyof JSX.IntrinsicElements>({
     info: { index, untabbable, ...void1 },
     context,
     refElementReturn,
     ...void2
-}: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
-    return useMonitoring(function useListNavigationChild(): UseListNavigationChildReturnType<ChildElement> {
-        const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ context, info: { index, untabbable }, refElementReturn });
-        const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ context, info: { index } });
+}: UseListNavigationChildParameters<ChildElementTag>): UseListNavigationChildReturnType<ChildElementTag> {
+    return useMonitoring(function useListNavigationChild(): UseListNavigationChildReturnType<ChildElementTag> {
+        const { props, ...rticr } = useRovingTabIndexChild<ChildElementTag>({ context, info: { index, untabbable }, refElementReturn });
+        const { ...tncr } = useTypeaheadNavigationChild<ChildElementTag>({ context, info: { index } });
 
         assertEmptyObject(void1);
         assertEmptyObject(void2);

@@ -1,2 +1,0 @@
-export type { CompositionEventType, CSSProperties, DragEventType, EffectCallback, ElementProps, EventType, ExtendMerge, FocusEventType, Fragment, getEventMapping, Inputs, JSX, KeyboardEventType, MouseEventType, MutableRef, Nullable, OmitStrong, PointerEventType, Reducer, Ref, RefCallback, RenderableProps, StateUpdater, TargetedOmit, TargetedPick, TouchEventType, VNode } from "./lib.js";
-//# sourceMappingURL=types.d.ts.map

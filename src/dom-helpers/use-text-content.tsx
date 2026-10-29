@@ -1,17 +1,17 @@
 
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { Nullable, TargetedPick, useEffect } from "../util/lib.js";
+import { JSX, Nullable, TagToElement, TargetedPick, useEffect } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
-export interface UseTextContentParametersSelf<E extends Element> {
+export interface UseTextContentParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
     /**
      * Return the text content of this component. By default, `e => e.textContent` is probably what you want.
      * 
      * @remarks Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such. 
      * `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).
      */
-    getText(e: E | null): string | null;
+    getText(e: TagToElement<Tag> | null): string | null;
 
     /**
      * During `useEffect`, this is called if the text content of the rendered element has changed.
@@ -21,8 +21,8 @@ export interface UseTextContentParametersSelf<E extends Element> {
     onTextContentChange: Nullable<OnPassiveStateChange<string | null, never>>;
 }
 
-export interface UseTextContentParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    textContentParameters: UseTextContentParametersSelf<E>;
+export interface UseTextContentParameters<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
+    textContentParameters: UseTextContentParametersSelf<Tag>;
 }
 
 export interface UseTextContentReturnTypeSelf {
@@ -39,7 +39,7 @@ export interface UseTextContentReturnType {
  * 
  * @compositeParams
  */
-export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
+export function useTextContent<Tag extends keyof JSX.IntrinsicElements>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<Tag>): UseTextContentReturnType {
     return useMonitoring(function useTextContent(): UseTextContentReturnType {
         const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, { debounceRendering: runImmediately, skipMountInitialization: true });
         useEffect(() => {

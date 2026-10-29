@@ -3,12 +3,12 @@ import { UseBlockingElementParameters, useBlockingElement } from "../dom-helpers
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "../util/get-window.js";
-import { TargetedPick, useEffect } from "../util/lib.js";
+import { JSX, TagToElement, TargetedPick, useEffect } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 
-export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
+export interface UseFocusTrapParametersSelf<SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements> {
     /**
      * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
      */
@@ -37,7 +37,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
+    focusPopup(e: TagToElement<PopupElementTag>, findFirstFocusable: () => HTMLOrSVGElement | null): void;
 
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
@@ -49,17 +49,17 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * 
      * @nonstable
      */
-    focusOpener(lastFocused: SourceElement | null): void;
+    focusOpener(lastFocused: TagToElement<NonNullable<SourceElementTag>> | null): void;
 }
 
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends
-    TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">,
-    OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
-    focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
+export interface UseFocusTrapParameters<SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements> extends
+    TargetedPick<UseRefElementReturnType<NonNullable<PopupElementTag>>, "refElementReturn", "getElement">,
+    OmitStrong<UseBlockingElementParameters<NonNullable<SourceElementTag>>, "blockingElementParameters"> {
+    focusTrapParameters: UseFocusTrapParametersSelf<SourceElementTag, PopupElementTag>;
 }
 
-export interface UseFocusTrapReturnType<E extends Element> {
-    props: ElementProps<E>;
+export interface UseFocusTrapReturnType<Tag extends keyof JSX.IntrinsicElements> {
+    props: ElementProps<Tag>;
 }
 
 /**
@@ -70,12 +70,12 @@ export interface UseFocusTrapReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
+export function useFocusTrap<SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementReturn
-}: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
-    return useMonitoring(function useFocusTrap(): UseFocusTrapReturnType<PopupElement> {
+}: UseFocusTrapParameters<SourceElementTag, PopupElementTag>): UseFocusTrapReturnType<PopupElementTag> {
+    return useMonitoring(function useFocusTrap(): UseFocusTrapReturnType<PopupElementTag> {
         const focusSelf = useStableCallback(focusSelfUnstable);
         const focusOpener = useStableCallback(focusOpenerUnstable);
 
@@ -86,13 +86,13 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
                 const lastFocusedInThisComponent = getLastActiveWhenOpen();
 
                 if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
-                    focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
+                    focusSelf(lastFocusedInThisComponent as any as TagToElement<PopupElementTag>, () => lastFocusedInThisComponent);
                 }
                 else {
                     top ??= refElementReturn.getElement() as unknown as HTMLElement;
                     console.assert(!!top);
                     if (top)
-                        focusSelf(top as any as PopupElement, () => findFirstFocusable(top!));
+                        focusSelf(top as any as TagToElement<PopupElementTag>, () => findFirstFocusable(top!));
                 }
             }
             else {
@@ -105,7 +105,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
                 let top = refElementReturn.getElement();
                 if (document && (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus))) {
                     if (lastActive)
-                        focusOpener(lastActive as any as SourceElement);
+                        focusOpener(lastActive as any as TagToElement<NonNullable<SourceElementTag>>);
                 }
             }
         }, [trapActive]);
@@ -122,7 +122,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
 
         return {
-            props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElement>, "data-focus-trap")
+            props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElementTag>, "data-focus-trap")
         };
     });
 }

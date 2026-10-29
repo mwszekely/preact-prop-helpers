@@ -28,8 +28,8 @@ export interface GridNavConstants {
 
 //const ProcessingChildrenContext = createContext<UseProcessedChildrenContext>(null!);
 const ProcessingChildContext = createContext<UseProcessedChildContext<any, any>>(null!);
-const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>>(null!);
-const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const RowContext = createContext<CompleteGridNavigationRowContext<'tr', UseCompleteGridNavigationRowInfo<'tr'>>>(null!);
+const CellContext = createContext<CompleteGridNavigationCellContext<'td', UseCompleteGridNavigationCellInfo<'td'>>>(null!);
 
 export function TestBasesGridNav() {
     const [mounted] = useTestSyncState("GridNav", "setMounted", true, fromStringBoolean);
@@ -121,7 +121,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
         refElementReturn,
 
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
-    } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>({
+    } = useCompleteGridNavigationDeclarative<'table', 'tr', UseCompleteGridNavigationRowInfo<'tr'>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         gridNavigationParameters: {
             onTabbableColumnChange: useStableCallback(({ actual, ideal }) => {
@@ -201,7 +201,7 @@ function Outer({ index }: { index: number }) {
         props,
         paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered }
-    } = useCompleteGridNavigationRowOuter<HTMLTableRowElement, UseCompleteGridNavigationRowsInfo<HTMLTableRowElement>>({
+    } = useCompleteGridNavigationRowOuter<'tr', UseCompleteGridNavigationRowsInfo<'tr'>>({
         context: useContext(ProcessingChildContext),
         info: { index },
         refElementParameters: {},
@@ -247,7 +247,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
         //staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
-    } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
+    } = useCompleteGridNavigationRow<'tr', 'td', UseCompleteGridNavigationRowInfo<'tr'>, UseCompleteGridNavigationCellInfo<'td'>>({
         context: useContext(RowContext),
         info: {
             untabbable: hidden,
@@ -282,7 +282,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                         "data-selected-offset": singleSelectedOffset,
                     } as {},
                     {
-                        onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); }
+                        onFocus: (e: Event) => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); }
                     })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
@@ -320,7 +320,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
         refElementReturn: { getElement },
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         textContentReturn: { getTextContent }
-    } = useCompleteGridNavigationCell<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
+    } = useCompleteGridNavigationCell<'td', UseCompleteGridNavigationCellInfo<'td'>>({
         context: useContext(CellContext),
         gridNavigationCellParameters: { colSpan },
         info: { index, untabbable: hidden, focusSelf: e => focus(e) },

@@ -6,15 +6,15 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument, getWindow } from "../util/get-window.js";
-import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
+import { FocusEventTypeByTag, JSX, KeyboardEventTypeByTag, MouseEventTypeByTag, PointerEventTypeByTag, TagToElement, TargetedPick, TouchEventTypeByTag, onfocusout, useCallback } from "../util/lib.js";
+import { ElementProps, Nullable, OmitStrong, TargetedOmit } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
-export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
-export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
+export type PressEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag>;
+export type PressChangeEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag> | FocusEventTypeByTag<Tag>;
 
-export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
-    pressParameters: UsePressParametersSelf<E>;
+export interface UsePressParameters<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
+    pressParameters: UsePressParametersSelf<Tag>;
 }
 
 function pressLog(...args: any[]) {
@@ -22,9 +22,9 @@ function pressLog(...args: any[]) {
         console.log(...args)
 }
 
-export interface UsePressParametersSelf<E extends EventTarget> {
+export interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
     /**  */
-    onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
+    onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<Tag>>>;
 
     /**
      * What should happen when this widget has been "pressed".
@@ -35,7 +35,7 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
+    onPressSync: Nullable<((e: PressEventReason<Tag>) => void)>;
 
     /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
     excludeSpace: Nullable<() => boolean>;
@@ -52,7 +52,7 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * @nonstable
      */
-    focusSelf(element: E): void;
+    focusSelf(element: TagToElement<Tag>): void;
 
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
@@ -84,10 +84,10 @@ export interface UsePressReturnTypeSelf {
     longPress: boolean | null;
 }
 
-export interface UsePressReturnType<E extends Element> {
+export interface UsePressReturnType<Tag extends keyof JSX.IntrinsicElements> {
     pressReturn: UsePressReturnTypeSelf;
 
-    props: ElementProps<E>;
+    props: ElementProps<Tag>;
 }
 
 function supportsPointerEvents() {
@@ -172,8 +172,8 @@ function ensureManualClickHandlersInstalled() {
  * 
  * @compositeParams
  */
-export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
-    return useMonitoring(function usePress(): UsePressReturnType<E> {
+export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePressParameters<Tag>): UsePressReturnType<Tag> {
+    return useMonitoring(function usePress(): UsePressReturnType<Tag> {
         ensureManualClickHandlersInstalled();
 
         const {
@@ -187,7 +187,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const excludePointer = useStableCallback(ep ?? returnFalse);
         const onPressingChange = useStableCallback(opc ?? noop);
 
-        const [getIsPressing, setIsPressing] = usePassiveState<boolean, PressChangeEventReason<E>>(onPressingChange, returnFalse);
+        const [getIsPressing, setIsPressing] = usePassiveState<boolean, PressChangeEventReason<Tag>>(onPressingChange, returnFalse);
         const hasPressEvent = (onPressSync != null);
 
         /**
@@ -223,7 +223,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
         const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
         const [hovering, setHovering, getHovering] = useState(false);
-        const onTouchStart = useStableCallback((e: TouchEventType<E>) => {
+        const onTouchStart = useStableCallback((e: TouchEventTypeByTag<Tag>) => {
             e.preventDefault();
             e.stopPropagation();
             setIsPressing(true, e);
@@ -235,7 +235,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             if (element)
                 focusSelf(element);
         });
-        const onTouchMove = useCallback((e: TouchEventType<E>) => {
+        const onTouchMove = useCallback((e: TouchEventTypeByTag<Tag>) => {
             pressLog("touchmove", e);
             e.preventDefault();
             e.stopPropagation();
@@ -257,11 +257,11 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
             setHovering(hoveringAtAnyPoint);
         }, []);
-        const preventClickEventsOnIosSafari = useCallback((e: TouchEventType<E>) => {
+        const preventClickEventsOnIosSafari = useCallback((e: TouchEventTypeByTag<Tag>) => {
             e.preventDefault();
             e.stopPropagation();
         }, []);
-        const onTouchEnd = useCallback((e: TouchEventType<E>) => {
+        const onTouchEnd = useCallback((e: TouchEventTypeByTag<Tag>) => {
             pressLog("touchend", e);
             e.preventDefault();
             e.stopPropagation();
@@ -278,7 +278,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             setIsPressing(false, e);
         }, []);
 
-        const onPointerDown = useStableCallback((e: PointerEventType<E>) => {
+        const onPointerDown = useStableCallback((e: PointerEventTypeByTag<Tag>) => {
             pressLog("pointerdown", e);
             if (!excludePointer()) {
                 if ((e.buttons & 1)) {
@@ -295,7 +295,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 }
             }
         });
-        const onPointerMove = useStableCallback((e: PointerEventType<E>) => {
+        const onPointerMove = useStableCallback((e: PointerEventTypeByTag<Tag>) => {
             pressLog("pointermove", e);
             let listeningForPress = getPointerDownStartedHere();
             // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
@@ -315,7 +315,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             }
 
         })
-        const onPointerUp = useCallback((e: PointerEventType<E>) => {
+        const onPointerUp = useCallback((e: PointerEventTypeByTag<Tag>) => {
             pressLog("pointerup", e);
             const hovering = getHovering();
             const pointerDownStartedHere = getPointerDownStartedHere();
@@ -335,11 +335,11 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             setIsPressing(false, e);
 
         }, []);
-        const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
+        const onPointerEnter = useCallback((_e: PointerEventTypeByTag<Tag>) => {
             pressLog("pointerenter", _e);
             setHovering(true);
         }, [])
-        const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
+        const onPointerLeave = useCallback((_e: PointerEventTypeByTag<Tag>) => {
             pressLog("pointerleave", _e);
             setHovering(false);
             setLongPress(false);
@@ -393,7 +393,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 //
                 const element = getElement();
                 if (element)
-                    focusSelf(element as EventTarget as E);
+                    focusSelf(element as EventTarget as TagToElement<Tag>);
 
                 // Whatever the browser was going to do with this event,
                 // forget it. We're turning it into a "press" event.
@@ -420,7 +420,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         });
 
 
-        const onKeyDown = useStableCallback((e: KeyboardEventType<E>) => {
+        const onKeyDown = useStableCallback((e: KeyboardEventTypeByTag<Tag>) => {
             pressLog("keydown", e);
             if (onPressSync) {
                 if (e.key == " " && !excludeSpace()) {
@@ -441,7 +441,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             }
         })
 
-        const onKeyUp = useStableCallback((e: KeyboardEventType<E>) => {
+        const onKeyUp = useStableCallback((e: KeyboardEventTypeByTag<Tag>) => {
             pressLog("keyup", e);
             const waitingForSpaceUp = getWaitingForSpaceUp();
             if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
@@ -450,7 +450,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             }
         })
 
-        const onClick = useStableCallback((e: MouseEventType<E>) => {
+        const onClick = useStableCallback((e: MouseEventTypeByTag<Tag>) => {
             pressLog("click", e);
             // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
             // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
@@ -503,7 +503,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         });
 
 
-        const onFocusOut = useStableCallback((e: FocusEventType<E>) => {
+        const onFocusOut = useStableCallback((e: FocusEventTypeByTag<Tag>) => {
             pressLog("focusout", e);
             setWaitingForSpaceUp(false);
             setIsPressing(false, e);
@@ -534,28 +534,28 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
                 [onfocusout as never]: onFocusOut,
                 onClick
-            },
+            } as {} as ElementProps<Tag>,
         };
     });
 }
 
-export interface UsePressAsyncParameters<E extends Element> extends
-    OmitStrong<UsePressParameters<E>, "pressParameters">,
-    TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
-    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+export interface UsePressAsyncParameters<Tag extends keyof JSX.IntrinsicElements> extends
+    OmitStrong<UsePressParameters<Tag>, "pressParameters">,
+    TargetedOmit<UsePressParameters<Tag>, "pressParameters", "onPressSync"> {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<Tag>, void>, "capture">;
 }
 
-export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
-    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+export interface UsePressAsyncReturnType<Tag extends keyof JSX.IntrinsicElements> extends UsePressReturnType<Tag> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<Tag>, void>;
 }
 
-export function usePressAsync<E extends Element>({
+export function usePressAsync<Tag extends keyof JSX.IntrinsicElements>({
     asyncHandlerParameters: { debounce, throttle, asyncHandler },
     pressParameters,
     refElementReturn
-}: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E> {
-    const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+}: UsePressAsyncParameters<Tag>): UsePressAsyncReturnType<Tag> {
+    const asyncHandlerReturn = useAsyncHandler<PressEventReason<Tag>, void>({ asyncHandler, capture: noop, debounce, throttle });
+    const { pressReturn, props } = usePress<Tag>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
 
     return {
         asyncHandlerReturn,

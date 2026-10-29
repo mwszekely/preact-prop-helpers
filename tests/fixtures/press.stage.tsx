@@ -20,14 +20,14 @@ export function TestBasesButton() {
     )
 }
 
-export function TestBasesButtonImpl<T extends HTMLButtonElement | HTMLDivElement>({ tag }: { tag: T extends HTMLButtonElement ? "button" : "div" }) {
+export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag }: { tag: Tag }) {
     const [,,excludeEnter] = useTestSyncState("Press", "setExcludeEnter", false, fromStringBoolean);
     const [,,excludeSpace] = useTestSyncState("Press", "setExcludeSpace", false, fromStringBoolean);
     const [,,excludePointer] = useTestSyncState("Press", "setExcludePointer", false, fromStringBoolean);
     const [allowRepeatPresses] = useTestSyncState("Press", "setAllowRepeatPresses", false, fromStringBoolean);
 
-    const { refElementReturn } = useRefElement<T>({ refElementParameters: {} });
-    const { pressReturn: { getIsPressing, longPress, pressing }, props } = usePress({
+    const { refElementReturn } = useRefElement<Tag>({ refElementParameters: {} });
+    const { pressReturn: { getIsPressing, longPress, pressing }, props } = usePress<Tag>({
         refElementReturn,
         pressParameters: {
             focusSelf: e => e.focus(),
@@ -44,11 +44,11 @@ export function TestBasesButtonImpl<T extends HTMLButtonElement | HTMLDivElement
     })
 
     return (
-        h(tag as never, useMergedProps({
+        h(tag, useMergedProps({
             "data-pressing": pressing,
             "data-long-press": longPress,
             children: "Pressable " + tag
-        } as {},
+        },
             props,
             // As a div, it needs to be focusable (and also add a role for the selector)
             tag == "button" ? {} : { role: "button", tabIndex: 0 }

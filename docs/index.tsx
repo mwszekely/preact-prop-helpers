@@ -3,7 +3,7 @@
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/preact/index.js";
+import { ElementSize, EventTypeByTag, MouseEventTypeByTag, UseChildrenHaveFocusChildParameters, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "preact-prop-helpers/preact";
 
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -13,9 +13,9 @@ import { DemoUseTimeout } from "./demos/use-timeout.js";
 (window as any)._generate_setState_stacks = false;
 
 const DemoUseDroppable = () => {
-    const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
+    const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<'div'>({ effect: "copy" });
 
-    const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
+    const { ref: _ref } = useMergedProps({}, { ref: useRef<HTMLInputElement>(null!) })
 
     const p = useMergedProps(props, { className: "demo droppable" });
 
@@ -39,7 +39,7 @@ const DemoUseDroppable = () => {
 }
 
 const DemoUseDraggable = () => {
-    const { propsUnstable: props } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." }, dragImage: null, dragImageXOffset: null, dragImageYOffset: null, effectAllowed: null });
+    const { propsUnstable: props } = useDraggable<'div'>({ data: { "text/plain": "This is custom draggable content of type text/plain." }, dragImage: null, dragImageXOffset: null, dragImageYOffset: null, effectAllowed: null });
 
 
     return (
@@ -48,7 +48,7 @@ const DemoUseDraggable = () => {
         </div>)
 }
 
-const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<HTMLDivElement>["context"]>(null!);
+const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<'div'>["context"]>(null!);
 const DemoUseChildrenHaveFocus = () => {
     const [animate, setAnimate] = useState(false);
     const [maxChildCount, setMaxChildCount] = useState(10);
@@ -68,7 +68,7 @@ const DemoUseChildrenHaveFocus = () => {
         interval: 1000
     });
     const [anyFocused, setAnyFocused] = useState(false);
-    const { context } = useChildrenHaveFocus<HTMLDivElement>({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
+    const { context } = useChildrenHaveFocus<'div'>({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
 
 
     return (
@@ -91,8 +91,8 @@ const DemoUseChildrenHaveFocus = () => {
 }
 
 const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ context: useContext(ChildrenHaveFocusContext) });
-    const { refElementReturn, propsStable } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<'div'>({ context: useContext(ChildrenHaveFocusContext) });
+    const { refElementReturn, propsStable } = useRefElement<'div'>({ refElementParameters: {} })
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
     return (
         <div tabIndex={0} {...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable)}>
@@ -116,7 +116,7 @@ const DemoUseElementSizeAnimation = () => {
 
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
-    const { propsStable } = useElementSize<HTMLDivElement>({
+    const { propsStable } = useElementSize<'div'>({
         elementSizeParameters: { onSizeChange: setElementSize, getObserveBox: null },
         refElementParameters: { onElementChange: undefined }
     });
@@ -135,8 +135,8 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
+    const { propsStable, refElementReturn } = useRefElement<'div'>({ refElementParameters: {} })
+    const { props } = useFocusTrap<'div', 'div'>({
         focusTrapParameters: {
             trapActive: active,
             onlyMoveFocus: false,
@@ -184,7 +184,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
-    const asyncOnClick = ((_v: void, _e: MouseEventType<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const asyncOnClick = ((_v: void, _e: MouseEventTypeByTag<'button'>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
@@ -194,7 +194,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<MouseEventType<HTMLButtonElement>, void>({
+    } = useAsyncHandler<MouseEventTypeByTag<'button'>, void>({
         asyncHandler: asyncOnClick,
         capture: () => { },
         debounce: debounce == 0 ? undefined : debounce,
@@ -262,9 +262,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<EventType<HTMLInputElement, Event>, string>({
+    } = useAsyncHandler<EventTypeByTag<'input', Event>, string>({
         asyncHandler: onInputAsync,
-        capture: (e: EventType<HTMLInputElement, Event>) => { e.preventDefault(); return e.currentTarget.value },
+        capture: (e: EventTypeByTag<'input', Event>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });
@@ -320,10 +320,10 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner] = useState(false);
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
-    const { refElementReturn, propsStable: p2 } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: undefined } });
+    const { refElementReturn, propsStable: p2 } = useRefElement<'div'>({ refElementParameters: { onElementChange: undefined } });
     const {
         hasCurrentFocusReturn: { propsStable: p1 }
-    } = useHasCurrentFocus<HTMLDivElement>({
+    } = useHasCurrentFocus<'div'>({
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: useStableCallback((focused: boolean) => {
@@ -338,7 +338,7 @@ const DemoFocus = memo(() => {
             }),
         }
     });
-    useHasLastFocus<HTMLDivElement>({
+    useHasLastFocus<'div'>({
         refElementReturn,
         activeElementParameters: {
             getDocument,
@@ -380,7 +380,7 @@ const DemoFocus = memo(() => {
 
 
 function DemoLabel() {
-    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" as never }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
+    const { propsInput, propsLabel } = useRandomDualIds<'input', 'label'>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" as never }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
     return (
         <div className="demo">
             <h2>Labels</h2>
@@ -393,8 +393,8 @@ function DemoLabel() {
 function DemoPress({ remaining }: { remaining: number }) {
 
     const [count, setCount] = useState<number>(0);
-    const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
+    const { refElementReturn, propsStable: p1 } = useRefElement<'div'>({ refElementParameters: {} })
+    const { props: p2, pressReturn: { pressing, longPress } } = usePress<'div'>({
         pressParameters: {
             focusSelf: e => { focus( e); },
             longPressThreshold: 1000,
@@ -492,7 +492,7 @@ const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ coun
 
 const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
 
-    useGlobalHandler(target, "click", mode == null ? null : (e: MouseEventType<HTMLButtonElement>) => {
+    useGlobalHandler(target, "click", mode == null ? null : (e: MouseEventTypeByTag<'button'>) => {
         if ((e.target as Element | null)?.id != "global-handler-test2")
             return;
         (window as any)._demo_event = ((window as any)._demo_event || 0) + 1

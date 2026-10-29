@@ -1,7 +1,8 @@
 
 
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps, MutableRef, Ref } from "../util/types.js";
+import { TagToElement } from "../util/lib.js";
+import { ElementProps, RefObject, Ref, JSX } from "../util/types.js";
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
@@ -9,7 +10,7 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
         ref(instance);
     }
     else if (ref != null) {
-        (ref as MutableRef<T | null>).current = instance;
+        (ref as RefObject<T | null>).current = instance;
     }
     else {
         /* eslint-disable no-debugger */
@@ -24,10 +25,10 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * 
  * @remarks Or just use {@link useMergedProps}
  */
-export function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
+export function useMergedRefs<Tag extends keyof JSX.IntrinsicElements>(rhs: Ref<TagToElement<Tag>> | null | undefined, lhs: Ref<TagToElement<Tag>> | null | undefined) {
 
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
-    const combined = useStableCallback(function combined(current: E | null) {
+    const combined = useStableCallback(function combined(current: TagToElement<Tag> | null) {
         processRef(current, lhs);
         processRef(current, rhs);
     });

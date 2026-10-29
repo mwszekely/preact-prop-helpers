@@ -6,8 +6,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
+import { KeyboardEventTypeByTag, TargetedPick, useCallback, useLayoutEffect, useRef, TagToElement, CompositionEventTypeByTag } from "../../util/lib.js";
+import { ElementProps, EventTypeByTag, Nullable, JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
@@ -37,7 +37,7 @@ export interface UseTypeaheadNavigationContextSelf {
     insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
 }
 
-export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement extends Element> {
+export interface UseTypeaheadNavigationParametersSelf<TabbableChildElementTag extends keyof JSX.IntrinsicElements> {
 
     /**
      * **Optional**
@@ -46,7 +46,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
+    onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventTypeByTag<TabbableChildElementTag>) => void>;
 
 
     /**
@@ -79,9 +79,9 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
     typeaheadTimeout: number;
 }
 
-export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElementTag extends keyof JSX.IntrinsicElements> {
     typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
-    propsStable: ElementProps<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElementTag>;
     context: UseTypeaheadNavigationContext;
 }
 
@@ -90,19 +90,19 @@ export interface UseTypeaheadNavigationContext {
 }
 
 
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElementTag extends keyof JSX.IntrinsicElements> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElementTag>, "index"> { }
 
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
-    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
+export interface UseTypeaheadNavigationParameters<TabbableChildElementTag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElementTag>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElementTag>;
 }
 
 export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
-    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>/*,
+export interface UseTypeaheadNavigationChildParameters<ChildElementTag extends keyof JSX.IntrinsicElements> extends
+    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElementTag>, UseTypeaheadNavigationChildInfoKeysParameters>>/*,
     //TargetedPick<UseTextContentReturnType, "textContentReturn", "getTextContent">,
     TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement">*/ {
 }
@@ -124,12 +124,12 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+export function useTypeaheadNavigation<ParentOrChildElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements>({
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
-}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
-    return useMonitoring(function useTypeaheadNavigation(): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+}: UseTypeaheadNavigationParameters<ChildElementTag>): UseTypeaheadNavigationReturnType<ParentOrChildElementTag> {
+    return useMonitoring(function useTypeaheadNavigation(): UseTypeaheadNavigationReturnType<ParentOrChildElementTag> {
         assertEmptyObject(void1);
         assertEmptyObject(void2);
         assertEmptyObject(void3);
@@ -138,7 +138,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         // and also clear it every 1000 ms since the last time it changed.
         // Next, keep a mapping of typeahead values to indices for faster searching.
         // And, for the user's sake, let them know when their typeahead can't match anything anymore
-        const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventType<any, any> | undefined>(useStableCallback((currentTypeahead, prev, reason) => {
+        const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventTypeByTag<any, any> | undefined>(useStableCallback((currentTypeahead, prev, reason) => {
             const handle = setTimeout(() => { setCurrentTypeahead(null, undefined); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
             updateBasedOnTypeaheadChange(currentTypeahead, reason!);
             return () => clearTimeout(handle);
@@ -202,8 +202,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         const isDisabled = useStableGetter(noTypeahead);
 
 
-        const propsStable = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
-            onKeyDown: useStableCallback((e) => {
+        const propsStable = useRef(useTagProps({
+            onKeyDown: useStableCallback((e: KeyboardEventTypeByTag<ParentOrChildElementTag>) => {
                 if (isDisabled())
                     return;
 
@@ -250,11 +250,11 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 }
 
             }),
-            onCompositionStart: useStableCallback((e: CompositionEventType<ParentOrChildElement>) => {
+            onCompositionStart: useStableCallback((e: CompositionEventTypeByTag<ParentOrChildElementTag>) => {
                 setNextTypeaheadChar(e.data);
                 setImeActive(false);
             }),
-            onCompositionEnd: useStableCallback((_e: CompositionEventType<ParentOrChildElement>) => { setImeActive(true) }),
+            onCompositionEnd: useStableCallback((_e: CompositionEventTypeByTag<ParentOrChildElementTag>) => { setImeActive(true) }),
         }, "data-typeahead-navigation"));
 
         const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
@@ -272,7 +272,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 getCurrentTypeahead,
                 typeaheadStatus
             },
-            propsStable: propsStable.current
+            propsStable: propsStable.current as ElementProps<ParentOrChildElementTag>
         }
 
 
@@ -280,7 +280,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
 
-        function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventType<any, any>) {
+        function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventTypeByTag<any, any>) {
             if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
                 const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
@@ -363,7 +363,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
                     if (toSet != null) {
                         setIndex(toSet, reason, true);
-                        onNavigateTypeahead?.(toSet, reason as KeyboardEventType<any>);
+                        onNavigateTypeahead?.(toSet, reason as any);
                     }
                     else {
                         // We get here if the only matching child we found was untabbable/missing
@@ -379,12 +379,12 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigationChild<ChildElement extends Element>({
+export function useTypeaheadNavigationChild<ChildElementTag extends keyof JSX.IntrinsicElements>({
     info: { index, ...void1 },
     //textContentReturn: { getTextContent, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     ...void4
-}: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
+}: UseTypeaheadNavigationChildParameters<ChildElementTag>): UseTypeaheadNavigationChildReturnType {
     return useMonitoring(function useTypeaheadNavigationChild(): UseTypeaheadNavigationChildReturnType {
         assertEmptyObject(void1);
         assertEmptyObject(void2);

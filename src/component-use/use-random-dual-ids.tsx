@@ -1,5 +1,5 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, JSX } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseRandomIdParameters, UseRandomIdReturnType, useRandomId } from "./use-random-id.js";
 
@@ -9,11 +9,11 @@ export interface UseRandomDualIdsParameters {
     randomIdLabelParameters: UseRandomIdParameters["randomIdParameters"];
 }
 
-export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelElement extends Element> {
-    propsInput: ElementProps<InputElement>;
-    propsLabel: ElementProps<LabelElement>;
-    randomIdInputReturn: UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];
-    randomIdLabelReturn: UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];
+export interface UseRandomDualIdsReturnType<InputElementTag extends keyof JSX.IntrinsicElements, LabelElementTag extends keyof JSX.IntrinsicElements> {
+    propsInput: ElementProps<InputElementTag>;
+    propsLabel: ElementProps<LabelElementTag>;
+    randomIdInputReturn: UseRandomIdReturnType<InputElementTag, LabelElementTag>["randomIdReturn"];
+    randomIdLabelReturn: UseRandomIdReturnType<LabelElementTag, InputElementTag>["randomIdReturn"];
 }
 
 /**
@@ -21,17 +21,17 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
  * 
  * @compositeParams
  */
-export function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
+export function useRandomDualIds<InputElementTag extends keyof JSX.IntrinsicElements, LabelElementTag extends keyof JSX.IntrinsicElements>({
     randomIdInputParameters,
     randomIdLabelParameters,
-}: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {
-    return useMonitoring(function useRandomDualIds(): UseRandomDualIdsReturnType<InputElement, LabelElement> {
-        const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
-        const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });
+}: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElementTag, LabelElementTag> {
+    return useMonitoring(function useRandomDualIds(): UseRandomDualIdsReturnType<InputElementTag, LabelElementTag> {
+        const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElementTag, LabelElementTag>({ randomIdParameters: randomIdInputParameters });
+        const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElementTag, InputElementTag>({ randomIdParameters: randomIdLabelParameters });
 
         return {
-            propsLabel: useMergedProps<LabelElement>(propsLabelAsReferencer, propsLabelAsSource),
-            propsInput: useMergedProps<InputElement>(propsInputAsReferencer, propsInputAsSource),
+            propsLabel: useMergedProps(propsLabelAsReferencer, propsLabelAsSource),
+            propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
             randomIdInputReturn,
             randomIdLabelReturn
         }

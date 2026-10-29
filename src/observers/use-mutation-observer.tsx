@@ -1,10 +1,10 @@
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useCallback, useEffect } from "../util/lib.js";
+import { JSX, TagToElement, useCallback, useEffect } from "../util/lib.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
-export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
+export interface UseMutationObserverParametersSelf<Tag extends keyof JSX.IntrinsicElements> extends UseRefElementParameters<Tag> {
     onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
     onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
     onCharacterData: null | ((info: MutationRecord) => void);
@@ -15,11 +15,11 @@ export interface UseMutationObserverParametersSelf<E extends Element> extends Us
 }
 
 
-export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
-    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
+export interface UseMutationObserverParameters<Tag extends keyof JSX.IntrinsicElements> extends UseRefElementParameters<Tag> {
+    mutationObserverParameters: UseMutationObserverParametersSelf<Tag>;
 }
 
-export interface UseMutationObserverReturnType<E extends Element> extends UseRefElementReturnType<E> {
+export interface UseMutationObserverReturnType<Tag extends keyof JSX.IntrinsicElements> extends UseRefElementReturnType<Tag> {
 
 }
 
@@ -28,12 +28,12 @@ export interface UseMutationObserverReturnType<E extends Element> extends UseRef
  * 
  * @compositeParams
  */
-export function useMutationObserver<E extends Element>({
+export function useMutationObserver<Tag extends keyof JSX.IntrinsicElements>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
-}: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
+}: UseMutationObserverParameters<Tag>): UseMutationObserverReturnType<Tag> {
 
-    return useMonitoring(function useMutationObserver(): UseMutationObserverReturnType<E> {
+    return useMonitoring(function useMutationObserver(): UseMutationObserverReturnType<Tag> {
 
         const { onElementChange, ...rest } = (refElementParameters || {})
 
@@ -67,7 +67,7 @@ export function useMutationObserver<E extends Element>({
             }
         }), returnNull, { debounceRendering: runImmediately, skipMountInitialization: true })
 
-        const onNeedMutationObserverReset = useCallback((element: E | null) => {
+        const onNeedMutationObserverReset = useCallback((element: TagToElement<Tag> | null) => {
             if (element) {
                 queueMicrotask(() => {
                     setMo(new MutationObserver((a) => {
@@ -95,9 +95,9 @@ export function useMutationObserver<E extends Element>({
             onNeedMutationObserverReset(getElement());
         }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-        const { refElementReturn, propsStable } = useRefElement<E>({
+        const { refElementReturn, propsStable } = useRefElement<Tag>({
             refElementParameters: {
-                onElementChange: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
+                onElementChange: useStableCallback((e: TagToElement<Tag> | null, p: TagToElement<Tag> | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
                 ...rest
             }
         });

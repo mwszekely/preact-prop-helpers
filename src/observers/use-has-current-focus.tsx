@@ -1,11 +1,11 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
-import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
+import { FocusEventTypeByTag, TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
+import { ElementProps, Nullable, JSX } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
-export interface UseHasCurrentFocusParametersSelf<T extends Node> {
+export interface UseHasCurrentFocusParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
 
     /**
      * Whether the element itself currently has focus.
@@ -14,7 +14,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventTypeByTag<Tag> | undefined>>;
 
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
@@ -23,15 +23,15 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
+    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventTypeByTag<Tag> | undefined>>;
 }
 
-export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
-    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
+export interface UseHasCurrentFocusParameters<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
+    hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<Tag>;
 }
 
-export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
-    propsStable: ElementProps<E>
+export interface UseHasCurrentFocusReturnTypeSelf<Tag extends keyof JSX.IntrinsicElements> {
+    propsStable: ElementProps<Tag>
     /**
      * Modifies the element to be able to track its own focus state
      */
@@ -43,8 +43,8 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     getCurrentFocusedInner(): boolean;
 }
 
-export interface UseHasCurrentFocusReturnType<E extends Element> {
-    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<E>;
+export interface UseHasCurrentFocusReturnType<Tag extends keyof JSX.IntrinsicElements> {
+    hasCurrentFocusReturn: UseHasCurrentFocusReturnTypeSelf<Tag>;
 }
 
 /**
@@ -54,8 +54,8 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
  * 
  * @compositeParams
  */
-export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
-    return useMonitoring(function useHasCurrentFocus(): UseHasCurrentFocusReturnType<T> {
+export function useHasCurrentFocus<Tag extends keyof JSX.IntrinsicElements>(args: UseHasCurrentFocusParameters<Tag>): UseHasCurrentFocusReturnType<Tag> {
+    return useMonitoring(function useHasCurrentFocus(): UseHasCurrentFocusReturnType<Tag> {
         const {
             hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged },
             refElementReturn: { getElement }
@@ -64,15 +64,15 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
 
         useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
 
-        const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
-        const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getFocused, setFocused] = usePassiveState<boolean, FocusEventTypeByTag<Tag> | undefined>(onCurrentFocusedChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
+        const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventTypeByTag<Tag> | undefined>(onCurrentFocusedInnerChanged, returnFalse, { debounceRendering: runImmediately, skipMountInitialization: true });
 
-        const onFocusIn = useCallback((e: FocusEventType<T>) => {
+        const onFocusIn = useCallback((e: FocusEventTypeByTag<Tag>) => {
             setFocusedInner(true, e);
             setFocused(e.target == getElement(), e)
         }, []);
 
-        const onFocusOut = useCallback((e: FocusEventType<T>) => {
+        const onFocusOut = useCallback((e: FocusEventTypeByTag<Tag>) => {
             // Even if we're focusOut-ing to another inner element,
             // that'll be caught during onFocusIn,
             // so just set everything to false and let that revert things back to true if necessary.
@@ -87,14 +87,14 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
             }
         }, []);
 
-        const propsStable = useRef<ElementProps<T>>({
-            [onfocusin as never]: onFocusIn,
-            [onfocusout as never]: onFocusOut
+        const propsStable = useRef<{}>({
+            [onfocusin]: onFocusIn,
+            [onfocusout]: onFocusOut,
         });
 
         return {
             hasCurrentFocusReturn: {
-                propsStable: propsStable.current,
+                propsStable: propsStable.current as ElementProps<Tag>,
                 getCurrentFocused: getFocused,
                 getCurrentFocusedInner: getFocusedInner,
             }

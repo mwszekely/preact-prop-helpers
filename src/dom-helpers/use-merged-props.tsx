@@ -1,5 +1,5 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, JSX } from "../util/types.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
@@ -15,6 +15,9 @@ let log = console.warn;
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
+
+export type MergedProps<P extends unknown[]> = P extends [infer P1, ...infer P2]? P1 & Omit<MergedProps<P2>, keyof P1> : P extends [infer P1]? P1 : {};
+
 
 
 /**
@@ -35,11 +38,11 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * 
  * @returns A single object with all the provided props merged into one.
  */
-export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
+export function useMergedProps<P extends {}[]>(...allProps: P): MergedProps<P> {
     useEnsureStability("useMergedProps", allProps.length);
-    let ret: ElementProps<E> = {};
+    let ret: any = {};
     for (let nextProps of allProps) {
-        useMergedPropsHelper<E>(ret, nextProps);
+        useMergedPropsHelper<any>(ret, nextProps);
     }
 
     return ret;
@@ -89,26 +92,26 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedPropsHelper<E extends EventTarget>(target: ElementProps<E>, mods: ElementProps<E>): void {
+function useMergedPropsHelper<Tag extends keyof JSX.IntrinsicElements>(target: any, mods: any): void {
 
 
-    target.ref = useMergedRefs<E>(target.ref, mods.ref);
+    target.ref = useMergedRefs<Tag>(target.ref, mods.ref);
     target.style = useMergedStyles(target.style, mods.style);
-    target.className = useMergedClasses(target["class" as keyof ElementProps<E>], target.className, mods["class" as keyof ElementProps<E>], mods.className);
+    target.className = useMergedClasses(target["class" as keyof ElementProps<'div'>], target.className, mods["class" as keyof ElementProps<'div'>], mods.className);
     target.children = useMergedChildren(target.children, mods.children);
 
 
     if (target.ref === undefined) delete target.ref;
     if (target.style === undefined) delete target.style;
     if (target.className === undefined) delete target.className;
-    if (target["class" as keyof ElementProps<E>] === undefined) delete target["class" as keyof ElementProps<E>];
+    if (target["class" as keyof ElementProps<'div'>] === undefined) delete target["class" as keyof ElementProps<'div'>];
     if (target.children === undefined) delete target.children;
 
     for (const rhsKeyU in mods) {
         const rhsKey = rhsKeyU as keyof typeof mods;
-        if (knowns.has(rhsKey))
+        if (knowns.has(rhsKey as string))
             continue;
-        target[rhsKey] = mergeUnknown(rhsKey, target[rhsKey], mods[rhsKey]);
+        target[rhsKey] = mergeUnknown(rhsKey as string, target[rhsKey], mods[rhsKey]);
     }
 
 }

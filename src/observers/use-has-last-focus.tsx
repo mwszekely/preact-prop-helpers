@@ -3,7 +3,7 @@ import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { TargetedPick, useCallback, useEffect } from "../util/lib.js";
+import { JSX, TargetedPick, useCallback, useEffect } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
@@ -27,7 +27,7 @@ export interface UseHasLastFocusParametersSelf {
 }
 
 
-export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
+export interface UseHasLastFocusParameters<Tag extends keyof JSX.IntrinsicElements> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
     hasLastFocusParameters: UseHasLastFocusParametersSelf;
 }
 
@@ -49,7 +49,7 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
+export function useHasLastFocus<Tag extends keyof JSX.IntrinsicElements>(args: UseHasLastFocusParameters<Tag>): UseHasLastFocusReturnType {
     return useMonitoring(function useHasLastFocus(): UseHasLastFocusReturnType {
         const {
             refElementReturn: { getElement },

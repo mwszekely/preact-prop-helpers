@@ -1,5 +1,5 @@
 import { useState } from "../preact-extensions/use-state.js";
-import { DragEventType, ElementProps, Nullable } from "../util/types.js";
+import { DragEventTypeByTag, ElementProps, JSX, Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 /*
@@ -7,9 +7,9 @@ export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnTy
     return [r.propsUnstable, ...otherProps];
 }*/
 
-export interface UseDraggableReturnType<E extends EventTarget> {
+export interface UseDraggableReturnType<Tag extends keyof JSX.IntrinsicElements> {
     /** *Unstable* */
-    propsUnstable: ElementProps<E>;
+    propsUnstable: ElementProps<Tag>;
 
     /**
      * Returns true if the element in question is currently being dragged
@@ -63,12 +63,12 @@ export interface UseDraggableParameters {
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */
-export function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
-    return useMonitoring(function useDraggable(): UseDraggableReturnType<E> {
+export function useDraggable<Tag extends keyof JSX.IntrinsicElements>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<Tag> {
+    return useMonitoring(function useDraggable(): UseDraggableReturnType<Tag> {
         const [dragging, setDragging, getDragging] = useState(false);
         const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
 
-        const onDragStart = (e: DragEventType<E>) => {
+        const onDragStart = (e: DragEventTypeByTag<Tag>) => {
             //e.preventDefault();
             setDragging(true);
             if (e.dataTransfer) {
@@ -84,7 +84,7 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
         }
 
 
-        const onDragEnd = (e: DragEventType<E>) => {
+        const onDragEnd = (e: DragEventTypeByTag<Tag>) => {
             e.preventDefault();
             setDragging(false);
             if (e.dataTransfer) {
@@ -99,12 +99,12 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
 
         // Return both the element and the hook that modifies 
         // the props and allows us to actually find the element
-        const ret: UseDraggableReturnType<E> = {
+        const ret: UseDraggableReturnType<Tag> = {
             propsUnstable: {
                 draggable: true,
                 onDragStart,
                 onDragEnd
-            },
+            } as ElementProps<Tag>,
             dragging,
             getDragging,
             lastDropEffect,
