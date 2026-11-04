@@ -64,6 +64,7 @@ export type DragEventTypeByTag<Tag extends keyof JSX.IntrinsicElements> = preact
 export type CSSProperties = preact.CSSProperties;
 export type VNode = JSX.Element;
 
+export type AriaRole = preact.AriaRole;
 
 
 export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {

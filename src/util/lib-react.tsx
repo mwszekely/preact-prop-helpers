@@ -38,6 +38,7 @@ export type DragEventTypeByTag<Tag extends keyof JSX.IntrinsicElements> = DragEv
 export type CSSProperties = react_CSSProperties;
 export type VNode = JSX.Element;
 
+export type AriaRole = JSX.IntrinsicElements["button"]["role"];
 
 export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
     return {
