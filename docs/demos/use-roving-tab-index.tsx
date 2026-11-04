@@ -1,7 +1,6 @@
 
 import { reverse, shuffle } from "lodash-es";
 import { createContext, createElement } from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import {
     CompleteListNavigationContext,
     EventDetail,
@@ -25,6 +24,7 @@ import {
     useStableCallback,
     useState
 } from "preact-prop-helpers/preact";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 
 const RandomWords2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -113,7 +113,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
 
     const [staggering, setStaggering] = useState(false);
     const [animate, setAnimate] = useState(true);
-createElement
+    createElement
     return (
         <div className="demo">
             <h2>Keyboard &amp; List Navigation</h2>
@@ -216,14 +216,14 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
 const DemoUseRovingTabIndexChildOuter = memo(function DemoUseRovingTabIndexChildOuter({ index, word, mangledIndex, demangledIndex }: { index: number, word: string, mangledIndex?: number, demangledIndex?: number }) {
-    
-    const { 
-        hide, 
-        managedChildReturn, 
-        paginatedChildReturn, 
-        props, 
-        refElementReturn, 
-        staggeredChildReturn 
+
+    const {
+        hide,
+        managedChildReturn,
+        paginatedChildReturn,
+        props,
+        refElementReturn,
+        staggeredChildReturn
     } = useCompleteListNavigationChildOuter<'li', UseCompleteListNavigationChildrenInfo<'li'>>({
         context: useContext(ListChildContext),
         info: { index },

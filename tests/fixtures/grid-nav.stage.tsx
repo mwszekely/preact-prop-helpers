@@ -55,7 +55,7 @@ export function TestBasesGridNav() {
     const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, singleSelectionMode }
 
     useEffect(() => { installTestingHandler("GridNav", "setSingleSelectedIndex", setSingleSelectedIndex); }, []);
-    
+
     if (!mounted)
         return <div />;
 
@@ -173,7 +173,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
             animate: false
         },
         managedChildrenParameters: {},
-        staggeredChildrenParameters: { staggered,disableIntersectionObserver: true },
+        staggeredChildrenParameters: { staggered, disableIntersectionObserver: true },
     });
 
     return (

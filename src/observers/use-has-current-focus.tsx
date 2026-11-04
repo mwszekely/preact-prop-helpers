@@ -2,7 +2,7 @@ import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { FocusEventTypeByTag, TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
-import { ElementProps, Nullable, JSX } from "../util/types.js";
+import { ElementProps, JSX, Nullable } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParametersSelf<Tag extends keyof JSX.IntrinsicElements> {

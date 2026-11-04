@@ -1,6 +1,6 @@
 import { h } from "preact";
+import { useHasCurrentFocus, useMergedProps, useRefElement, useStableCallback } from "preact-prop-helpers/preact";
 import { useState } from "preact/hooks";
-import { useHasCurrentFocus, useMergedProps, useRefElement, useStableCallback } from "preact-prop-helpers";
 
 export interface FocusConstants {
     /*onPress(e: Event): (void | Promise<void>);

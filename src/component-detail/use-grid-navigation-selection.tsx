@@ -3,7 +3,7 @@ import { UseGenericChildParameters } from "../preact-extensions/use-managed-chil
 import { useStableMergedCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ExtendMerge, OmitStrong, TargetedOmit, JSX } from "../util/types.js";
+import { ExtendMerge, JSX, OmitStrong, TargetedOmit } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./keyboard-navigation/use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./keyboard-navigation/use-list-navigation-partial.js";

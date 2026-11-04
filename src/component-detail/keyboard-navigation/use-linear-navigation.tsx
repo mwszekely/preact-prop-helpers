@@ -3,8 +3,8 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { KeyboardEventTypeByTag, TargetedPick, useCallback, useRef, TagToElement, EventTypeByTag } from "../../util/lib.js";
-import { ElementProps, Nullable, OmitStrong, JSX } from "../../util/types.js";
+import { EventTypeByTag, KeyboardEventTypeByTag, TargetedPick, useCallback, useRef } from "../../util/lib.js";
+import { ElementProps, JSX, Nullable, OmitStrong } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../processed-children/use-paginated-children.js";

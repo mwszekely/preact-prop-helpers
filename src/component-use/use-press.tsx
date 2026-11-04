@@ -592,10 +592,10 @@ function _nodeSelectedTextLength(element: Node | null | undefined) {
 }
 
 let pulseOverride: (() => void) | null = null;
-function pulse() { 
+function pulse() {
     if (pulseOverride != null)
         pulseOverride();
-    else if (("navigator" in globalThis) && ("vibrate" in navigator) && (navigator.vibrate instanceof Function)) 
+    else if (("navigator" in globalThis) && ("vibrate" in navigator) && (navigator.vibrate instanceof Function))
         navigator.vibrate(10);
 }
 

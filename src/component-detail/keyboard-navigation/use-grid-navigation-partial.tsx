@@ -6,12 +6,12 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
-import { Nullable, OmitStrong, TargetedOmit, TargetedPick, JSX } from "../../util/types.js";
+import { EventTypeByTag, FocusEventTypeByTag, MouseEventTypeByTag, TagToElement } from "../../util/lib.js";
+import { JSX, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
-import { EventTypeByTag, FocusEventTypeByTag, MouseEventTypeByTag, TagToElement } from "../../util/lib.js";
 
 export interface GridChildRowInfo<RowElementTag extends keyof JSX.IntrinsicElements> extends UseListNavigationChildInfo<RowElementTag> { }
 export interface GridChildCellInfo<CellElementTag extends keyof JSX.IntrinsicElements> extends UseListNavigationChildInfo<CellElementTag> { }

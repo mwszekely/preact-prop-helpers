@@ -21,9 +21,9 @@ export function TestBasesButton() {
 }
 
 export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag }: { tag: Tag }) {
-    const [,,excludeEnter] = useTestSyncState("Press", "setExcludeEnter", false, fromStringBoolean);
-    const [,,excludeSpace] = useTestSyncState("Press", "setExcludeSpace", false, fromStringBoolean);
-    const [,,excludePointer] = useTestSyncState("Press", "setExcludePointer", false, fromStringBoolean);
+    const [, , excludeEnter] = useTestSyncState("Press", "setExcludeEnter", false, fromStringBoolean);
+    const [, , excludeSpace] = useTestSyncState("Press", "setExcludeSpace", false, fromStringBoolean);
+    const [, , excludePointer] = useTestSyncState("Press", "setExcludePointer", false, fromStringBoolean);
     const [allowRepeatPresses] = useTestSyncState("Press", "setAllowRepeatPresses", false, fromStringBoolean);
 
     const { refElementReturn } = useRefElement<Tag>({ refElementParameters: {} });

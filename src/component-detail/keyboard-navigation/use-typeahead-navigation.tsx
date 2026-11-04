@@ -6,8 +6,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { KeyboardEventTypeByTag, TargetedPick, useCallback, useLayoutEffect, useRef, TagToElement, CompositionEventTypeByTag } from "../../util/lib.js";
-import { ElementProps, EventTypeByTag, Nullable, JSX } from "../../util/types.js";
+import { CompositionEventTypeByTag, KeyboardEventTypeByTag, TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { ElementProps, EventTypeByTag, JSX, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";

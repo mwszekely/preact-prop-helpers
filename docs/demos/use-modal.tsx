@@ -1,6 +1,6 @@
 
-import { useRef, useState } from "preact/hooks";
 import { DismissListenerTypes, focus, useMergedProps, useModal, useStableCallback } from "preact-prop-helpers/preact";
+import { useRef, useState } from "preact/hooks";
 
 function getDocument(): Document { return globalThis.document; }
 

@@ -3,7 +3,7 @@ import { UseGenericChildParameters } from "../../preact-extensions/use-managed-c
 import { useStableMergedCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ExtendMerge, OmitStrong, TargetedOmit, JSX } from "../../util/types.js";
+import { ExtendMerge, JSX, OmitStrong, TargetedOmit } from "../../util/types.js";
 import { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildReturnType, UseMultiSelectionContext, UseMultiSelectionParameters, UseMultiSelectionReturnType, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./use-multi-selection.js";
 import { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./use-single-selection.js";
 
@@ -36,7 +36,7 @@ export interface UseSelectionParameters<ParentOrChildElementTag extends keyof JS
 
 export interface UseSelectionReturnType<ParentElementTag extends keyof JSX.IntrinsicElements, ChildElementTag extends keyof JSX.IntrinsicElements> extends
     ExtendMerge<UseSingleSelectionReturnType<ParentElementTag>,
-    UseMultiSelectionReturnType<ParentElementTag, ChildElementTag>> {
+        UseMultiSelectionReturnType<ParentElementTag, ChildElementTag>> {
     context: UseSelectionContext;
 }
 
@@ -52,7 +52,7 @@ export interface UseSelectionChildReturnType<ChildElementTag extends keyof JSX.I
         OmitStrong<UseSingleSelectionChildReturnType<ChildElementTag, M>, "singleSelectionChildReturn">>,
     TargetedOmit<UseMultiSelectionChildReturnType<ChildElementTag, M>, "multiSelectionChildReturn", "firePressSelectionEvent">,
     TargetedOmit<UseSingleSelectionChildReturnType<ChildElementTag, M>, "singleSelectionChildReturn", "firePressSelectionEvent"> {
-        selectionChildReturn: UseSelectionChildReturnTypeSelf;
+    selectionChildReturn: UseSelectionChildReturnTypeSelf;
 }
 
 /**

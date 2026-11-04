@@ -5,7 +5,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../../util/lib.js";
-import { ElementProps, OmitStrong, TargetedPick, JSX } from "../../util/types.js";
+import { ElementProps, JSX, OmitStrong, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";

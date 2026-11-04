@@ -4,7 +4,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { getWindow } from "../../util/get-window.js";
 import { MouseEventTypeByTag, Nullable, useCallback } from "../../util/lib.js";
-import { JSX, TargetedPick } from "../../util/types.js";
+import { JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf<B extends boolean> {

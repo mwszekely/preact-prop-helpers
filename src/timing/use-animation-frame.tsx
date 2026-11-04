@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { createContext, createElement, useCallback, useContext, useEffect, useRef, ComponentChildren } from "../util/lib.js";
-import { ElementProps, Nullable } from "../util/types.js";
+import { ComponentChildren, createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
+import { Nullable } from "../util/types.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 

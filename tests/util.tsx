@@ -17,10 +17,10 @@ export interface TestingConstants {
 type TCP<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]> = TestingConstants[K][K2] extends (...args: any[]) => any ? Parameters<TestingConstants[K][K2]>[0] : never;
 export type TestingConstantsParameter<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]> = TestingConstants[K][K2] extends (...args: any[]) => any ? Parameters<TestingConstants[K][K2]>[0] : never;
 
-export function fromStringBoolean(s: string | null) { return s == null? null : (s != "false") }
-export function fromStringNumber(s: string | null) { return s == null || s == "null"? null : +s; }
-export function fromStringString(s: string | null) { return s == null || s == "null"? null : s as never; }
-export function fromStringArray<S>(fromStringElement: (s: string) => S) { return function (s: string) { return s == null || s == "null"? null : s.split(",").map(fromStringElement) as [...never] } }
+export function fromStringBoolean(s: string | null) { return s == null ? null : (s != "false") }
+export function fromStringNumber(s: string | null) { return s == null || s == "null" ? null : +s; }
+export function fromStringString(s: string | null) { return s == null || s == "null" ? null : s as never; }
+export function fromStringArray<S>(fromStringElement: (s: string) => S) { return function (s: string) { return s == null || s == "null" ? null : s.split(",").map(fromStringElement) as [...never] } }
 
 export function useTestSyncState<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, key2: K2, initialState: TCP<K, K2>, fromString: (str: string) => TCP<K, K2> | null) {
     type S = TCP<K, K2>;

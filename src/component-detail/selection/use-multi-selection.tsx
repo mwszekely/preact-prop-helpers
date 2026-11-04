@@ -12,7 +12,7 @@ import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../..
 import { focus } from "../../util/focus.js";
 import { getDocument } from "../../util/get-window.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { ElementProps, EventTypeByTag, FocusEventTypeByTag, KeyboardEventTypeByTag, Nullable, OmitStrong, TargetedOmit, TargetedPick, JSX } from "../../util/types.js";
+import { ElementProps, EventTypeByTag, FocusEventTypeByTag, JSX, KeyboardEventTypeByTag, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "../keyboard-navigation/use-roving-tabindex.js";
 

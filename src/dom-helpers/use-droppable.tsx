@@ -78,7 +78,7 @@ export class DroppableFileError extends Error {
  * {@include } {@link UseDroppableReturnType}
  */
 export function useDroppable<Tag extends keyof JSX.IntrinsicElements>({ effect }: UseDroppableParameters): UseDroppableReturnType<Tag> {
-    
+
     return useMonitoring(function useDroppable(): UseDroppableReturnType<Tag> {
         const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
         const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);

@@ -28,7 +28,7 @@ let i = 0;
  * than the function itself.
  */
 export function useMonitoring<T extends (...args: any[]) => any>(originalHook: T) {
-    const impl = (((process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration)? useMonitoringImpl : dontUseMonitoringImpl) as typeof dontUseMonitoringImpl);
+    const impl = (((process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration) ? useMonitoringImpl : dontUseMonitoringImpl) as typeof dontUseMonitoringImpl);
     return impl(originalHook);
 }
 
@@ -44,7 +44,7 @@ function dontUseMonitoringImpl<T extends (...args: any[]) => any>(t: T): ReturnT
  */
 function useMonitoringImpl<T extends (...args: any[]) => any>(originalHook: T): ReturnType<T> {
     let wrappedHook: T = originalHook;
-    
+
     if (process.env.NODE_ENV === 'development' && (globalThis as any)._monitor_call_duration) {
         wrappedHook = (function (...args: Parameters<((...args: any) => any)>): ReturnType<T & ((...args: any) => any)> {
             const r = useRef(++i);

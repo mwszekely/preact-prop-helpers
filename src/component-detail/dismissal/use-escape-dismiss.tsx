@@ -4,7 +4,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { KeyboardEventTypeByTag, Nullable, useEffect } from "../../util/lib.js";
-import { JSX, TargetedPick } from "../../util/types.js";
+import { JSX } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 

@@ -4,7 +4,7 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { TagToElement, useCallback, useLayoutEffect, useMemo, useRef, useState } from "../../util/lib.js";
-import { Nullable, TargetedPick, VNode, JSX } from "../../util/types.js";
+import { JSX, Nullable, TargetedPick, VNode } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 

@@ -4,7 +4,7 @@ import { OnPassiveStateChange } from "../../preact-extensions/use-passive-state.
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { FocusEventTypeByTag, TargetedPick, useCallback } from "../../util/lib.js";
-import { Nullable, JSX } from "../../util/types.js";
+import { JSX, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf<B extends boolean> {

@@ -2,7 +2,7 @@
 
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { TagToElement } from "../util/lib.js";
-import { ElementProps, RefObject, Ref, JSX } from "../util/types.js";
+import { JSX, Ref, RefObject } from "../util/types.js";
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {

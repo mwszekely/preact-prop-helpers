@@ -16,7 +16,7 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
 
-export type MergedProps<P extends unknown[]> = P extends [infer P1, ...infer P2]? P1 & Omit<MergedProps<P2>, keyof P1> : P extends [infer P1]? P1 : {};
+export type MergedProps<P extends unknown[]> = P extends [infer P1, ...infer P2] ? P1 & Omit<MergedProps<P2>, keyof P1> : P extends [infer P1] ? P1 : {};
 
 
 

@@ -104,7 +104,7 @@ export const ImperativeElement = /* @__PURE__ */ memo( /* @__PURE__ */ forwardRe
  * @compositeParams
  */
 export function useImperativeProps<Tag extends keyof JSX.IntrinsicElements>({ refElementReturn: { getElement } }: UseImperativePropsParameters<Tag>): UseImperativePropsReturnType<Tag> {
-    
+
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<Tag> }>({ className: new Set(), style: {}, children: null, html: null, others: {} as any });
 
 

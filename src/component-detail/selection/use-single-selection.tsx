@@ -11,7 +11,7 @@ import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../..
 import { focus } from "../../util/focus.js";
 import { RequiredN, TargetedOmit } from "../../util/lib-shared.js";
 import { EventTypeByTag, TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { ElementProps, Nullable, JSX } from "../../util/types.js";
+import { ElementProps, JSX, Nullable } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "../keyboard-navigation/use-roving-tabindex.js";
@@ -93,7 +93,7 @@ export interface UseSingleSelectionParametersSelf {
     /**
      * What property will be used to mark this item as selected.
      * 
-     * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+     * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
      * 
      * This is ignored if `selectionMode` is set to `"disabled"`.
      */

@@ -1,16 +1,16 @@
-import { h, options, PreactConsumer, Ref, RefCallback, RefObject } from "preact";
+import { options, Ref } from "preact";
 import { Dispatch, Inputs, StateUpdater as SU, useCallback as ucb } from "preact/hooks";
 import type { JSX } from "preact/jsx-runtime";
 import { getEventMapping as gem } from "./lib-shared.js";
 
 
+export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 export { cloneElement, createContext, createElement, Fragment, type ComponentChildren, type ComponentType, type Context } from "preact";
-export type { Ref, RefCallback, RenderableProps, RefObject } from "preact";
+export type { Ref, RefCallback, RefObject, RenderableProps } from "preact";
 export { createPortal, forwardRef, memo, useEffectEvent } from "preact/compat";
 export { useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 export type { EffectCallback, Inputs, Reducer } from "preact/hooks";
 export type { JSX } from "preact/jsx-runtime";
-export type { ExtendMerge, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "./lib-shared.js";
 
 
 // Patch the type (only the type) of useCallback to allow for nullable functions
@@ -48,7 +48,7 @@ type Bar4 = ElementProps<HTMLOListElement>;*/
 
 export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Pick<JSX.IntrinsicElements, Tag>[Tag];
 
-export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = (Exclude<Pick<ElementProps<Tag>, "ref">["ref"], null | undefined> extends Ref<infer K>? K : never) & HTMLElement;
+export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = (Exclude<Pick<ElementProps<Tag>, "ref">["ref"], null | undefined> extends Ref<infer K> ? K : never) & HTMLElement;
 //export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = HTMLElementTagNameMap[Tag];
 
 //export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Pick<JSX.IntrinsicElements, Tag>[Tag];

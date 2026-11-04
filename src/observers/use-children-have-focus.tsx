@@ -2,7 +2,7 @@ import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnZero, run
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { FocusEventTypeByTag } from "../util/lib.js";
-import { TargetedPick, JSX } from "../util/types.js";
+import { JSX, TargetedPick } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 

@@ -57,7 +57,7 @@ export interface LogicalElementSize {
 export function useLogicalDirection({ ...void1 }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
     return useMonitoring(function useLogicalDirection(): UseLogicalDirectionReturnType {
         assertEmptyObject(void1);
-        
+
         // Helper for extracting info from "ltr", "ttb", etc.
         const M = {
             t: "top",

@@ -1,8 +1,8 @@
-import { useCallback } from "preact/hooks";
 import { useActiveElement, useState } from "preact-prop-helpers/preact";
+import { useCallback } from "preact/hooks";
 
 export function UseActiveElementDemo() {
-    
+
     const getDocument = useCallback(() => { return globalThis.document }, []);
 
     const [activeElement, setActiveElement] = useState<Element | null>(null);

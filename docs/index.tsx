@@ -1,14 +1,11 @@
 //import "preact/debug";
 
 import { createContext, render } from "preact";
+import { ElementSize, EventTypeByTag, MouseEventTypeByTag, UseChildrenHaveFocusChildParameters, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "preact-prop-helpers/preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventTypeByTag, MouseEventTypeByTag, UseChildrenHaveFocusChildParameters, focus, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "preact-prop-helpers/preact";
 
-import { DemoUseGrid } from "./demos/use-grid.js";
-import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
-import { DemoUseTimeout } from "./demos/use-timeout.js";
 
 (window as any)._generate_setState_stacks = false;
 
@@ -140,7 +137,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
         focusTrapParameters: {
             trapActive: active,
             onlyMoveFocus: false,
-            focusOpener: e =>focus( e),
+            focusOpener: e => focus(e),
             focusPopup: (e, f) => focus(f() as HTMLElement),
         },
         activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
@@ -396,7 +393,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     const { refElementReturn, propsStable: p1 } = useRefElement<'div'>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<'div'>({
         pressParameters: {
-            focusSelf: e => { focus( e); },
+            focusSelf: e => { focus(e); },
             longPressThreshold: 1000,
             onPressSync: () => {
                 /*setTimeout(() => {
@@ -579,7 +576,7 @@ const Component = () => {
         <hr />
 
 
-       {/*  <DemoUseFocusTrap />
+        {/*  <DemoUseFocusTrap />
         <hr />
         <DemoUseAsyncHandler1 />
         <hr />
