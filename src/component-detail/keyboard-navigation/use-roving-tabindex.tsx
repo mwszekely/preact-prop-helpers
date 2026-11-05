@@ -35,6 +35,9 @@ export interface UseRovingTabIndexParametersSelf<ParentElementTag extends keyof 
      * When true, none of the children will be tabbable, as if the entire component is hidden.
      * 
      * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
+     * 
+     * Also keep in mind that just because something's untabbable doesn't mean it's inaccessible. Some ATs may still be able
+     * to discover things that are untabble. Consider making it inert *in addition* to making it untabbable.
      */
     untabbable: boolean;
 

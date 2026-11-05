@@ -911,7 +911,7 @@ function focus(e) {
 * 
 * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
 * 
-* **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
+* **important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
 */
 function findBackupFocus(unmountingElement) {
 	if (unmountingElement == null) return globalThis.document.body;
@@ -2552,7 +2552,7 @@ function useStaggeredChild({ info: { index }, context: { staggeredChildContext: 
 /**
 * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
 * 
-* @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation), 
+* @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation`), 
 * but takes advantage of its flexibility (especially with its allowing for "holes" of missing children) 
 * to prevent all children from rendering at once on mount.
 * 
@@ -2692,11 +2692,29 @@ function useProcessedChild({ context, info: { index, getElement, ...uinfo }, rea
 }
 // src/component-detail/processed-children/use-processed-index-mangler.tsx
 /**
+* ...how to explain this one.
+* 
+* When we rearrange children, we need to have mappings from "original position" to "new position" and vice-versa
+* because children often need to be able to answer questions like "which sibling is VISUALLY above/below me right now"
+* for things like keyboard navigation.
+* 
+* In this library, this process is called "index mangling" and "index demangling".
+* 
+* When you have a component like `<Row index={5} />`, 5 is the "unmangled" index. It represents the index
+* that the child programmatically was assigned.
+* 
+* When child rows are sorted, that `<Row index={5} />` child might end up being repositioned to the
+* spot where the `<Row index={23} />` child was. We'd call 23 its "mangled" index.
+* 
+* When the user presses the Down arrow key to navigate away from `<Row index={5} />`, we *mangle* its
+* index to get 23, add 1 to get 24, then *demangle* 24 to get some new index, which is where the
+* user would want to navigate to.
+* 
 * @compositeParams
 */
 function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }) {
 	return useMonitoring(function useProcessedIndexMangler() {
-		useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
+		useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue, compare);
 		const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
 		const indexDemangler = useCallback((n) => mangler.map(n, "mangled", "demangled") ?? n, []);
 		const indexMangler = useCallback((n) => mangler.map(n, "demangled", "mangled") ?? n, []);
@@ -4748,9 +4766,12 @@ function pressLog(...args) {
 function supportsPointerEvents() {
 	return "onpointerup" in globalThis;
 }
+let installedManualClickHandlers = false;
 let justHandledManualClickEvent = false;
 let onHandledManualClickEvent;
 function ensureManualClickHandlersInstalled() {
+	if (installedManualClickHandlers) return;
+	installedManualClickHandlers = true;
 	let manualClickTimeout1 = null;
 	let manualClickTimeout2 = null;
 	onHandledManualClickEvent = function onHandledManualClickEvent() {

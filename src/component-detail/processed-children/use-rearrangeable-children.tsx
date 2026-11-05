@@ -8,15 +8,7 @@ import { JSX, Nullable, TargetedPick, VNode } from "../../util/types.js";
 import { useMonitoring } from "../../util/use-call-count.js";
 import { UseProcessedIndexManglerContext, UseProcessedIndexManglerParameters } from "./use-processed-index-mangler.js";
 
-// TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
-
-
-
-
-
-
 export interface UseRearrangedChildrenContextSelf {
-    //provideManglers(mangler: ProcessedIndexMangler): void;
 }
 
 /**
@@ -24,40 +16,9 @@ export interface UseRearrangedChildrenContextSelf {
  * but from parent to a different parent.
  */
 export interface UseRearrangedChildrenContext extends UseProcessedIndexManglerContext {
-    //rearrangeableChildrenContext: UseRearrangedChildrenContextSelf;
 }
 
 
-/**
- * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
- * 
- * @returns 
- */
-/*export function useCreateProcessedChildrenContext(): OmitStrong<UseRearrangeableChildrenReturnTypeSelf<any>, "children"> & { context: UseRearrangedChildrenContext } {
-    const sortRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["sort"]>(null);
-    const shuffleRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["shuffle"]>(null);
-    const reverseRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["reverse"]>(null);
-    const rearrangeRef = useRef<null | UseRearrangeableChildrenReturnTypeSelf<any>["rearrange"]>(null);
-    const indexManglerRef = useRef<null | ((n: number) => number)>(null);
-    const indexDemanglerRef = useRef<null | ((n: number) => number)>(null);
-    const indexMangler = useStableCallback((i: number) => { return (indexManglerRef.current ?? identity)(i)! }, []);
-    const indexDemangler = useStableCallback((i: number) => { return (indexDemanglerRef.current ?? identity)(i)! }, []);
-    const sort = useStableCallback<(typeof sortRef)["current"]>((i) => { return (sortRef.current ?? identity)(i)! }, []);
-    const shuffle = useStableCallback<(typeof shuffleRef)["current"]>(() => { return (shuffleRef.current ?? identity)()! }, []);
-    const reverse = useStableCallback<(typeof reverseRef)["current"]>(() => { return (reverseRef.current ?? identity)()! }, []);
-    const rearrange = useStableCallback<(typeof rearrangeRef)["current"]>((original, ordered) => { (rearrangeRef.current ?? noop)(original, ordered)! }, []);*/
-/*const manglerRef = useRef<null | ProcessedIndexMangler>(null);
-
-const provideManglers = useStableCallback<UseRearrangedChildrenContextSelf["provideManglers"]>((mangler) => { manglerRef.current = mangler; });
-
-const rearrangeableChildrenContext = useMemoObject<UseRearrangedChildrenContextSelf>({ provideManglers });
-const context = useMemoObject<UseRearrangedChildrenContext>({ rearrangeableChildrenContext });
-
-return {
-    context,
-    mangler: manglerRef.current
-}
-}*/
 
 
 type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "width" | "height">;
@@ -117,63 +78,15 @@ export interface UseRearrangeableChildrenContextSelf {
 
 export interface UseRearrangeableChildrenReturnTypeSelf {
 
-    refresh(): void;
-
     /**
-     * Pass an array of not-sorted child information to this function
-     * and the children will re-arrange themselves to match.
-     * 
-     * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
-     *  
-     * @stable
+     * Call whenever the sort values of the children change. This will manually re-arrange them.
      */
-    //rearrange: (phase: 'render' | 'async', originalRows: M["index"][], rowsInOrder: M["index"][]) => void;
-
-    /** 
-     * Arranges the children in a random order.
-     * 
-     * @stable 
-     */
-    //shuffle: () => Promise<void> | void;
-
-    /** 
-     * Reverses the order of the children
-     * 
-     * @stable 
-     */
-    //reverse: () => Promise<void> | void;
-
-    /** 
-     * @stable
-     *
-     * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
-     * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
-     *  
-     * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
-     */
-    //indexMangler: (n: number) => number;
-    /** @stable */
-    //indexDemangler: (n: number) => number;
+    refresh(): void;
 
     /**
      * The transformed (i.e. rearranged) children to render.
      */
     children: (VNode | null)[];
-
-    /** 
-     * @stable
-     * 
-     * Call to rearrange the children in ascending or descending order according to `compare`.
-     * 
-     * Note: `descending` simply inverts the value returned by `compare`.
-     * 
-     */
-    //sort: (direction: "ascending" | "descending") => void;
-
-    /**
-     * Returns an array of each cell's `getSortValue()` result.
-     */
-    //toJsonArray(transform?: (info: M) => object): object;
 
 }
 

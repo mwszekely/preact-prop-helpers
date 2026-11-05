@@ -10,13 +10,38 @@ export type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 export type GetIndex = (row: VNode) => (number | undefined);
 
 export interface UseProcessedIndexManglerParametersSelf {
-    /**
-     * The sorted children to render.
-     */
-    //children: (VNode | null)[];
 
+    /**
+     * Given a VNode, returns the index for that child.
+     * 
+     * In general, this is simply `vnode => vnode.props.index`. If you 
+     * want to call the `index` prop something different, like `row`
+     * or something, provide that function here.
+     * 
+     * @stable
+     */
     getIndex: GetIndex;
+
+    /**
+     * Function that returns the sort value for a given child.
+     * 
+     * The sort value is what is used when rearranging children; children
+     * are sorted by whatever this returns relative to the `compare` function.
+     * 
+     * This can return any arbitrary value; it's assumed that `compare` knows
+     * what to do with whatever's returned.
+     * 
+     * @stable
+     */
     getSortValueAt: (index: number) => unknown;
+
+    /**
+     * Compares the values returned by `getSortValueAt`. 
+     * 
+     * Should return -1, 0, or 1.
+     * 
+     * @stable
+     */
     compare: Nullable<Compare<unknown>>;
 }
 
@@ -53,11 +78,29 @@ export interface UseProcessedIndexManglerContextSelf {
 export interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf { }
 
 /**
+ * ...how to explain this one.
+ * 
+ * When we rearrange children, we need to have mappings from "original position" to "new position" and vice-versa
+ * because children often need to be able to answer questions like "which sibling is VISUALLY above/below me right now"
+ * for things like keyboard navigation.
+ * 
+ * In this library, this process is called "index mangling" and "index demangling".
+ * 
+ * When you have a component like `<Row index={5} />`, 5 is the "unmangled" index. It represents the index
+ * that the child programmatically was assigned.
+ * 
+ * When child rows are sorted, that `<Row index={5} />` child might end up being repositioned to the
+ * spot where the `<Row index={23} />` child was. We'd call 23 its "mangled" index.
+ * 
+ * When the user presses the Down arrow key to navigate away from `<Row index={5} />`, we *mangle* its
+ * index to get 23, add 1 to get 24, then *demangle* 24 to get some new index, which is where the
+ * user would want to navigate to.
+ * 
  * @compositeParams
  */
 export function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType {
     return useMonitoring(function useProcessedIndexMangler(): UseProcessedIndexManglerReturnType {
-        useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue);
+        useEnsureStability("useProcessedIndexMangler", getIndex, getSortValue, compare);
 
         const mangler = useMemo(() => new ProcessedIndexMangler(getIndex, getSortValue, compare ?? defaultCompare), [getIndex, getSortValue]);
 
@@ -93,26 +136,16 @@ export class ProcessedIndexMangler {
             return undefined;
 
         switch (from) {
-            /*case 'processed': {
-                //let unmangledIndex = this.getIndex(this._originalChildren[index]);
-                switch (to) {
-                    case 'processed': return index;
-                    case 'demangled': return this._processedToDemangled.get(index); //return unmangledIndex;
-                    case 'mangled': return this._processedToMangled.get(index); //return unmangledIndex == undefined ? undefined : this._unmangledToMangled.get(unmangledIndex);
-                }
-            }*/
             case 'demangled': {
                 switch (to) {
                     case 'demangled': return index;
                     case 'mangled': return this._demangledToMangled.get(index);
-                    //case 'processed': return this._demangledToProcessed.get(index);
                 }
             }
             case 'mangled': {
                 switch (to) {
                     case 'mangled': return index;
                     case 'demangled': return this._mangledToDemangled.get(index);
-                    //case 'processed': return this._mangledToProcessed.get(index);
                 }
             }
         }
@@ -122,18 +155,10 @@ export class ProcessedIndexMangler {
     public sortedChildren: (VNode | null)[] = [];
     private _mangledToDemangled = new Map<number, number>();
     private _demangledToMangled = new Map<number, number>();
-    //private _demangledToProcessed = new Map<number, number>();
-    //private _mangledToProcessed = new Map<number, number>();
-    //private _processedToDemangled = new Map<number, number>();
-    //private _processedToMangled = new Map<number, number>();
 
     setChildren(children: (VNode | null)[]) {
         this._mangledToDemangled.clear();
         this._demangledToMangled.clear();
-        //this._processedToDemangled.clear();
-        //this._processedToMangled.clear();
-        //this._demangledToProcessed.clear();
-        //this._mangledToProcessed.clear();
 
         this._originalChildren = children.slice();
         this.sortedChildren = [];
@@ -195,16 +220,13 @@ export class ProcessedIndexMangler {
 
                 this._mangledToDemangled.set(originalIndex, sortedIndex);
                 this._demangledToMangled.set(sortedIndex, originalIndex);
-                //this._processedToMangled.set(processedOriginalIndex, sortedIndex);
-                //this._processedToDemangled.set(processedOriginalIndex, originalIndex);
-                //this._mangledToProcessed.set(sortedIndex, processedOriginalIndex);
-                //this._demangledToProcessed.set(originalIndex, processedOriginalIndex);
+
                 this.sortedChildren[i] = createElement(sortedChild.vnode!.type as any, {
                     ...sortedChild.vnode!.props,
                     mangledIndex: sortedIndex,
                     demangledIndex: originalIndex,
                     key: originalIndex
-                }); //sortedChild.vnode;
+                });
 
                 ++i;
                 ++j;

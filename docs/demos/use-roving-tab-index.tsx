@@ -149,7 +149,7 @@ export const DemoUseRovingTabIndex = memo(function DemoUseRovingTabIndex() {
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
-            <label>Animate reorderings: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>
+            <label>Animate reorderings: <input type="checkbox" checked={animate} onInput={e => { e.preventDefault(); setAnimate(e.currentTarget.checked); }} /></label>
             <label>Single-Selection mode:
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setSingleSelectionMode("disabled"); }} /> Off</label>
                 <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setSingleSelectionMode("focus"); }} /> On focus</label>

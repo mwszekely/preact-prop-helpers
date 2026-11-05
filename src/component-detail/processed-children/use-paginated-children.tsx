@@ -46,13 +46,6 @@ export interface UsePaginatedChildrenReturnTypeSelf {
      * @stable
      */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
-
-    /**
-     * **importANT**: This is only tracked when pagination is enabled.
-     * 
-     * If pagination is not enabled, this is either `null` or some undefined previous number.
-     */
-    //childCount: Nullable<number>;
 }
 
 export interface UsePaginatedChildrenReturnType /*extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters", "onChildrenCountChange">*/ {

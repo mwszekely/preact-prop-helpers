@@ -568,10 +568,34 @@ type Compare<T extends unknown> = (lhs: T, rhs: T) => number;
 type GetIndex = (row: VNode) => (number | undefined);
 interface UseProcessedIndexManglerParametersSelf {
   /**
-   * The sorted children to render.
+   * Given a VNode, returns the index for that child.
+   *
+   * In general, this is simply `vnode => vnode.props.index`. If you
+   * want to call the `index` prop something different, like `row`
+   * or something, provide that function here.
+   *
+   * @stable
    */
   getIndex: GetIndex;
+  /**
+   * Function that returns the sort value for a given child.
+   *
+   * The sort value is what is used when rearranging children; children
+   * are sorted by whatever this returns relative to the `compare` function.
+   *
+   * This can return any arbitrary value; it's assumed that `compare` knows
+   * what to do with whatever's returned.
+   *
+   * @stable
+   */
   getSortValueAt: (index: number) => unknown;
+  /**
+   * Compares the values returned by `getSortValueAt`.
+   *
+   * Should return -1, 0, or 1.
+   *
+   * @stable
+   */
   compare: Nullable<Compare<unknown>>;
 }
 interface UseProcessedIndexManglerParameters {
@@ -600,6 +624,24 @@ interface UseProcessedIndexManglerContextSelf {
 }
 interface UseProcessedIndexManglerReturnTypeSelf extends UseProcessedIndexManglerContextSelf {}
 /**
+ * ...how to explain this one.
+ *
+ * When we rearrange children, we need to have mappings from "original position" to "new position" and vice-versa
+ * because children often need to be able to answer questions like "which sibling is VISUALLY above/below me right now"
+ * for things like keyboard navigation.
+ *
+ * In this library, this process is called "index mangling" and "index demangling".
+ *
+ * When you have a component like `<Row index={5} />`, 5 is the "unmangled" index. It represents the index
+ * that the child programmatically was assigned.
+ *
+ * When child rows are sorted, that `<Row index={5} />` child might end up being repositioned to the
+ * spot where the `<Row index={23} />` child was. We'd call 23 its "mangled" index.
+ *
+ * When the user presses the Down arrow key to navigate away from `<Row index={5} />`, we *mangle* its
+ * index to get 23, add 1 to get 24, then *demangle* 24 to get some new index, which is where the
+ * user would want to navigate to.
+ *
  * @compositeParams
  */
 export declare function useProcessedIndexMangler({ processedIndexManglerParameters: { getIndex, getSortValueAt: getSortValue, compare } }: UseProcessedIndexManglerParameters): UseProcessedIndexManglerReturnType;
@@ -722,6 +764,9 @@ interface UseRovingTabIndexParametersSelf<ParentElementTag extends keyof JSX.Int
    * When true, none of the children will be tabbable, as if the entire component is hidden.
    *
    * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
+   *
+   * Also keep in mind that just because something's untabbable doesn't mean it's inaccessible. Some ATs may still be able
+   * to discover things that are untabble. Consider making it inert *in addition* to making it untabbable.
    */
   untabbable: boolean;
   /**
@@ -1753,11 +1798,6 @@ interface UseRearrangedChildrenContextSelf {}
  * but from parent to a different parent.
  */
 interface UseRearrangedChildrenContext extends UseProcessedIndexManglerContext {}
-/**
- * A parent can call this to provide useRearrangeableChildren with the `context` it expects.
- *
- * @returns
- */
 type RearrangeableChildPositionInfo = Pick<DOMRectReadOnly, "left" | "top" | "width" | "height">;
 interface UseRearrangeableChildInfo<ChildElementTag extends keyof JSX.IntrinsicElements> extends ManagedChildInfo<number> {
   getElement(): TagToElement<ChildElementTag> | null;
@@ -1799,34 +1839,10 @@ interface UseRearrangeableChildrenContextSelf {
   animate: boolean;
 }
 interface UseRearrangeableChildrenReturnTypeSelf {
+  /**
+   * Call whenever the sort values of the children change. This will manually re-arrange them.
+   */
   refresh(): void;
-  /**
-   * Pass an array of not-sorted child information to this function
-   * and the children will re-arrange themselves to match.
-   *
-   * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
-   *
-   * @stable
-   */
-  /**
-   * Arranges the children in a random order.
-   *
-   * @stable
-   */
-  /**
-   * Reverses the order of the children
-   *
-   * @stable
-   */
-  /**
-   * @stable
-   *
-   * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
-   * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
-   *
-   * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
-   */
-  /** @stable */
   /**
    * The transformed (i.e. rearranged) children to render.
    */
@@ -1992,7 +2008,7 @@ interface UseProcessedChildrenParameters<TabbableChildElementTag extends keyof J
 /**
  * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
  *
- * @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation),
+ * @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation`),
  * but takes advantage of its flexibility (especially with its allowing for "holes" of missing children)
  * to prevent all children from rendering at once on mount.
  *
@@ -2279,7 +2295,7 @@ interface UseSingleSelectionParametersSelf {
   /**
    * What property will be used to mark this item as selected.
    *
-   * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+   * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
    *
    * This is ignored if `selectionMode` is set to `"disabled"`.
    */
@@ -3856,7 +3872,7 @@ export declare function focus(e: Element | null): void;
  *
  * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
  *
- * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
+ * **important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
  */
 export declare function findBackupFocus(unmountingElement: Element | null | undefined): HTMLElement;
 export declare function getWindow(element?: Node | null | undefined): Window | undefined;

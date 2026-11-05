@@ -72,7 +72,7 @@ export interface UseProcessedChildrenParameters<TabbableChildElementTag extends 
 /**
  * Hook that allows for optimization (staggering, pagination) and rearranging (sorting, shuffling, etc.) of large arrays of children.
  * 
- * @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation), 
+ * @remarks This is separate from `useManagedChildren` (and its descendants, like `useListNavigation`), 
  * but takes advantage of its flexibility (especially with its allowing for "holes" of missing children) 
  * to prevent all children from rendering at once on mount.
  * 
