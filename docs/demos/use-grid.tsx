@@ -301,7 +301,7 @@ const DemoUseGridRow = memo((({ index, childUseEffect, ...props2 }: { index: num
     } = ret;
 
     return (
-        <tr {...useMergedProps(props, props2)} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
+        <tr {...useMergedProps<'tr'>(props, props2)} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
             <GridCellContext.Provider value={contextToChild}>
                 <td>{_tabbableColumn}, {tabbable.toString()}</td>
                 {Array.from((function* () {

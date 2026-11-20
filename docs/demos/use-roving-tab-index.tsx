@@ -250,7 +250,7 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
 
     const randomWord = word;// shuffledWords.current[index];
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<'li', CustomInfoType>;
-    const focusSelf = useCallback((e: HTMLElement) => { focus(e) }, []);
+    const focusSelf = useCallback(() => { focus(refElementReturn.getElement()!) }, []);
 
     const getSortValue = useStableCallback(() => index);
 
@@ -277,13 +277,25 @@ const DemoUseRovingTabIndexChild = memo(function DemoUseRovingTabIndexChild({ in
         multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
-    const { pressReturn, props: p2 } = usePress<'li'>({ pressParameters: { focusSelf, onPressSync: firePressSelectionEvent, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
+    const { pressReturn, props: p2 } = usePress<'li'>({
+        pressParameters: {
+            focusSelf,
+            onPressSync: firePressSelectionEvent,
+            excludeSpace,
+            allowRepeatPresses: false,
+            excludeEnter: null,
+            excludePointer: null,
+            longPressThreshold: null,
+            onPressingChange: null,
+            elementIsContained: e => refElementReturn.getElement()!.contains(e)
+        }
+    })
 
     let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
 
     const text = `${randomWord} This is item #${index} (#${demangledIndex} to #${mangledIndex}). Offset: ${singleSelected}. ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <span {...useMergedProps(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
+        <span {...useMergedProps<'span'>(propsChild, propsTabbable, p2)}>{text}<input {...useMergedProps<'input'>(propsTabbable, { type: "number" } as any)} style={{ width: "5ch" }} /></span>
     )
 });

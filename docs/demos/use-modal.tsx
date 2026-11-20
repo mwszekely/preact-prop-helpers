@@ -59,7 +59,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             </div>
             <div>Last reason for closing: {closeReason ?? "(hasn't been closed yet)"}</div>
             <button {...propsStableSource} onClick={() => setOpen(true)}>Open Modal</button>
-            <div {...useMergedProps(propsFocusContainer, propsStablePopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
+            <div {...useMergedProps<'div'>(propsFocusContainer, propsStablePopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
                 <div style={{ display: open ? "flex" : "none", flexDirection: "column" }}>
                     <div>Modal element at depth {depth} with {hasChild ? "a" : "no"} child</div>
                     <label><input type="checkbox" checked={hasChild} onInput={e => setHasChild(e.currentTarget.checked)} ref={buttonRef} /> Add a child modal</label>

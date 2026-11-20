@@ -1425,7 +1425,7 @@ interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncRetu
 export declare function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType>;
 type PressEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag>;
 type PressChangeEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag> | FocusEventTypeByTag<Tag>;
-interface UsePressParameters<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
+interface UsePressParameters<Tag extends keyof JSX.IntrinsicElements> {
   pressParameters: UsePressParametersSelf<Tag>;
 }
 interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
@@ -1451,11 +1451,11 @@ interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
    * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
    *
    * Generally, this should just be `e => e.focus()`
-   * @param element - The element that is (presumably) about to receive focus
+   * @param element - The event's `currentTarget`. Occasionally undefined (so ideally you should keep track of what to focus separately).
    *
    * @nonstable
    */
-  focusSelf(element: TagToElement<Tag>): void;
+  focusSelf(instigator?: TagToElement<Tag>): void;
   /**
    * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
    */
@@ -1465,6 +1465,14 @@ interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements> {
    * and the user's actions will not fire an actual press event.
    */
   longPressThreshold: Nullable<number>;
+  /**
+   * Will be passed an element during `pointermove` events.
+   *
+   * Must return true if the element counts as being "within" the pressable widget.
+   *
+   * `element.contains()` is useful here. This can also be used for situations where multiple, disparate `HTMLElement`s can cause the same press event (e.g. with inputs and their labels)
+   */
+  elementIsContained: (e: Element) => boolean;
 }
 interface UsePressReturnTypeSelf {
   /**
@@ -1517,7 +1525,7 @@ interface UsePressAsyncParameters<Tag extends keyof JSX.IntrinsicElements> exten
 interface UsePressAsyncReturnType<Tag extends keyof JSX.IntrinsicElements> extends UsePressReturnType<Tag> {
   asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<Tag>, void>;
 }
-export declare function usePressAsync<Tag extends keyof JSX.IntrinsicElements>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<Tag>): UsePressAsyncReturnType<Tag>;
+export declare function usePressAsync<Tag extends keyof JSX.IntrinsicElements>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters }: UsePressAsyncParameters<Tag>): UsePressAsyncReturnType<Tag>;
 /**
  * This function can be used to enable/disable button vibration pulses on an app-wide scale. `null` enables the default browser behavior; pass a noop (e.g. `() => {}`) to disable.
  *

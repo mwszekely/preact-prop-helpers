@@ -1,19 +1,18 @@
 import { noop } from "lodash-es";
 import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { getDocument, getWindow } from "../util/get-window.js";
-import { FocusEventTypeByTag, JSX, KeyboardEventTypeByTag, MouseEventTypeByTag, PointerEventTypeByTag, TagToElement, TargetedPick, TouchEventTypeByTag, onfocusout, useCallback } from "../util/lib.js";
+import { FocusEventTypeByTag, JSX, KeyboardEventTypeByTag, MouseEventTypeByTag, PointerEventTypeByTag, TagToElement, TouchEventTypeByTag, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, Nullable, OmitStrong, TargetedOmit } from "../util/types.js";
 import { useMonitoring } from "../util/use-call-count.js";
 
 export type PressEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag>;
 export type PressChangeEventReason<Tag extends keyof JSX.IntrinsicElements> = MouseEventTypeByTag<Tag> | KeyboardEventTypeByTag<Tag> | TouchEventTypeByTag<Tag> | PointerEventTypeByTag<Tag> | FocusEventTypeByTag<Tag>;
 
-export interface UsePressParameters<Tag extends keyof JSX.IntrinsicElements> extends TargetedPick<UseRefElementReturnType<Tag>, "refElementReturn", "getElement"> {
+export interface UsePressParameters<Tag extends keyof JSX.IntrinsicElements> {
     pressParameters: UsePressParametersSelf<Tag>;
 }
 
@@ -48,11 +47,11 @@ export interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements>
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
      * 
      * Generally, this should just be `e => e.focus()`
-     * @param element - The element that is (presumably) about to receive focus
+     * @param element - The event's `currentTarget`. Occasionally undefined (so ideally you should keep track of what to focus separately).
      * 
      * @nonstable
      */
-    focusSelf(element: TagToElement<Tag>): void;
+    focusSelf(instigator?: TagToElement<Tag>): void;
 
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
@@ -64,6 +63,15 @@ export interface UsePressParametersSelf<Tag extends keyof JSX.IntrinsicElements>
      * and the user's actions will not fire an actual press event.
      */
     longPressThreshold: Nullable<number>;
+
+    /**
+     * Will be passed an element during `pointermove` events.
+     * 
+     * Must return true if the element counts as being "within" the pressable widget.
+     * 
+     * `element.contains()` is useful here. This can also be used for situations where multiple, disparate `HTMLElement`s can cause the same press event (e.g. with inputs and their labels) 
+     */
+    elementIsContained: (e: Element) => boolean
 }
 
 export interface UsePressReturnTypeSelf {
@@ -178,11 +186,11 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
         ensureManualClickHandlersInstalled();
 
         const {
-            refElementReturn: { getElement },
-            pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
+            pressParameters: { elementIsContained: eic, focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc }
         } = args;
 
 
+        const elementIsContained = useStableCallback(eic ?? returnFalse);
         const excludeEnter = useStableCallback(ee ?? returnFalse);
         const excludeSpace = useStableCallback(es ?? returnFalse);
         const excludePointer = useStableCallback(ep ?? returnFalse);
@@ -232,15 +240,13 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
             setHovering(true);
             setLongPress(false);
 
-            const element = getElement();
-            if (element)
-                focusSelf(element);
+            focusSelf(e.currentTarget);
         });
         const onTouchMove = useCallback((e: TouchEventTypeByTag<Tag>) => {
             pressLog("touchmove", e);
             e.preventDefault();
             e.stopPropagation();
-            const element = getElement();
+
             const touch = e.touches[0];
             // Be as generous as possible with touch events by checking all four corners of the radius too
             const offsets = [
@@ -253,7 +259,7 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
             let hoveringAtAnyPoint = false;
             for (const [x, y] of offsets) {
                 const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-                hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false)
+                hoveringAtAnyPoint ||= !!elementAtTouch && (elementIsContained(elementAtTouch) ?? false)
             }
             setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
             setHovering(hoveringAtAnyPoint);
@@ -290,9 +296,7 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
                     setHovering(true);
                     setLongPress(false);
 
-                    const element = getElement();
-                    if (element)
-                        focusSelf(element);
+                    focusSelf(e.currentTarget);
                 }
             }
         });
@@ -306,11 +310,11 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
 
 
             if (listeningForPress) {
-                const element = getElement();
+
                 // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
                 // so we only test for hovering while actively attempting to detect a press
                 const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
-                const hovering = element == elementAtPointer || (!!elementAtPointer && element?.contains(elementAtPointer)) || false;
+                const hovering = elementAtPointer ? elementIsContained(elementAtPointer) : false;
                 setHovering(hovering);
                 setIsPressing(hovering && getPointerDownStartedHere(), e);
             }
@@ -348,10 +352,9 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
 
         useTimeout({
             callback: () => {
-                const element = getElement();
                 setLongPress(pointerDownStartedHere && getHovering());
-                if (element && pointerDownStartedHere && getHovering()) {
-                    focusSelf(element);
+                if (pointerDownStartedHere && getHovering()) {
+                    focusSelf();
 
 
                     if (longPressThreshold) {
@@ -392,9 +395,7 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
                 //
                 // For iOS Safari.
                 //
-                const element = getElement();
-                if (element)
-                    focusSelf(element as EventTarget as TagToElement<Tag>);
+                focusSelf(e.currentTarget);
 
                 // Whatever the browser was going to do with this event,
                 // forget it. We're turning it into a "press" event.
@@ -455,7 +456,7 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
             pressLog("click", e);
             // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
             // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
-            const element = getElement();
+
             if (onPressSync) {
                 if (e.detail > 1) {
                     if ("stopImmediatePropagation" in e)
@@ -474,7 +475,7 @@ export function usePress<Tag extends keyof JSX.IntrinsicElements>(args: UsePress
 
                         // Ignore stray click events that were't fired ON OR WITHIN on this element
                         // ("on or within" because sometimes a button's got a label that's a different element than the button)
-                        if ((e.target && element?.contains(e.target as Node))) {
+                        if ((e.target && elementIsContained(e.target as Element))) {
 
                             if (getHovering()) {
                                 // Okay, I guess the browser decided the click event is happening *now*,
@@ -552,11 +553,10 @@ export interface UsePressAsyncReturnType<Tag extends keyof JSX.IntrinsicElements
 
 export function usePressAsync<Tag extends keyof JSX.IntrinsicElements>({
     asyncHandlerParameters: { debounce, throttle, asyncHandler },
-    pressParameters,
-    refElementReturn
+    pressParameters
 }: UsePressAsyncParameters<Tag>): UsePressAsyncReturnType<Tag> {
     const asyncHandlerReturn = useAsyncHandler<PressEventReason<Tag>, void>({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress<Tag>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+    const { pressReturn, props } = usePress<Tag>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters } });
 
     return {
         asyncHandlerReturn,

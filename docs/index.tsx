@@ -14,7 +14,7 @@ const DemoUseDroppable = () => {
 
     const { ref: _ref } = useMergedProps({}, { ref: useRef<HTMLInputElement>(null!) })
 
-    const p = useMergedProps(props, { className: "demo droppable" });
+    const p = useMergedProps<'div'>(props, { className: "demo droppable" });
 
     return (
         <div {...p}>
@@ -40,7 +40,7 @@ const DemoUseDraggable = () => {
 
 
     return (
-        <div {...useMergedProps(props, { className: "demo" })}>
+        <div {...useMergedProps<'div'>(props, { className: "demo" })}>
             Draggable content
         </div>)
 }
@@ -69,7 +69,7 @@ const DemoUseChildrenHaveFocus = () => {
 
 
     return (
-        <div {...useMergedProps({}, { className: "demo" })}>
+        <div {...useMergedProps<'div'>({}, { className: "demo" })}>
             <h2>useChildrenHaveFocus</h2>
             <p>If you want to see if any of your children have focus, the easiest way is to just attach a <code>focusIn</code> handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route.</p>
             <div><label><input type="number" min={0} value={minChildCount} onInput={e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber) }} /> Min # of children</label></div>
@@ -92,7 +92,7 @@ const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
     const { refElementReturn, propsStable } = useRefElement<'div'>({ refElementParameters: {} })
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
     return (
-        <div tabIndex={0} {...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable)}>
+        <div tabIndex={0} {...useMergedProps<'div'>(propsStable, hasCurrentFocusReturn.propsStable)}>
             Focusable child #{index}
             <input />
             <input />
@@ -120,7 +120,7 @@ const DemoUseElementSizeAnimation = () => {
 
     return (
         <div style="height: 300px; width: 300px; contain: strict;">
-            <div {...useMergedProps(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
+            <div {...useMergedProps<'div'>(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
                 <pre>{JSON.stringify(elementSize, null, 2)}</pre>
             </div>
         </div>
@@ -145,7 +145,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
-    const divProps = useMergedProps(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
+    const divProps = useMergedProps<'div'>(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
     if (depth == 2)
         return <div />;
 
@@ -357,7 +357,7 @@ const DemoFocus = memo(() => {
                 <li>Regardless of if focus was lost because the <code>body</code> was clicked, was this element (or, optionally, any element within it), the last to be actually focused?</li>
                 <li>Does the window have focus?</li>
             </ul>
-            <div {...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 }))}><span>Outer element</span><input /><input />
+            <div {...(useMergedProps<'div'>(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 }))}><span>Outer element</span><input /><input />
                 <div tabIndex={0} style={{ border: "1px solid black" }}><span>Inner element</span><input /><input /></div>
             </div>
             <div>
@@ -393,7 +393,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     const { refElementReturn, propsStable: p1 } = useRefElement<'div'>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<'div'>({
         pressParameters: {
-            focusSelf: e => { focus(e); },
+            focusSelf: () => { focus(refElementReturn.getElement()!); },
             longPressThreshold: 1000,
             onPressSync: () => {
                 /*setTimeout(() => {
@@ -404,13 +404,13 @@ function DemoPress({ remaining }: { remaining: number }) {
                  });*/
                 setCount((c: number) => ++c);
             },
+            elementIsContained: (e) => refElementReturn.getElement()!.contains(e),
             allowRepeatPresses: false,
             excludeEnter: null,
             excludePointer: null,
             excludeSpace: null,
             onPressingChange: null
-        },
-        refElementReturn
+        }
     })
     return (
         <div className="demo">
@@ -418,7 +418,7 @@ function DemoPress({ remaining }: { remaining: number }) {
             <div>Press count: {count}</div>
             <div>Active: {pressing.toString()}</div>
             <div>Long press: {(longPress ?? "null").toString()}</div>
-            <div style={{ border: "1px solid black", touchAction: "none" }} tabIndex={0} {...useMergedProps(p1, p2)}>
+            <div style={{ border: "1px solid black", touchAction: "none" }} tabIndex={0} {...useMergedProps<'div'>(p1, p2)}>
                 <div>This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child.</div>
                 <div>
                     {remaining > 0 && <DemoPress remaining={remaining - 1} />}

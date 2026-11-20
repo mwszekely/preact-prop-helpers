@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useMergedProps, usePress, useRefElement } from "preact-prop-helpers/preact";
+import { useMergedProps, usePress, useRefElement, useState } from "preact-prop-helpers/preact";
 import { fromStringBoolean, useTestSyncState } from "../util.js";
 
 export interface PressConstants {
@@ -12,32 +12,35 @@ export interface PressConstants {
 }
 
 export function TestBasesButton() {
+    const [count, setCount] = useState(0);
     return (
-        <>
-            <TestBasesButtonImpl tag="button" />
-            <TestBasesButtonImpl tag="div" />
-        </>
+        <div>
+            <div>Times pressed: <output>{count}</output></div>
+            <TestBasesButtonImpl tag="button" onPress={() => { setCount(p => p + 1) }} />
+            <TestBasesButtonImpl tag="div" onPress={() => { setCount(p => p + 1) }} />
+        </div>
     )
 }
 
-export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag }: { tag: Tag }) {
+export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag, onPress }: { tag: Tag, onPress: () => void }) {
     const [, , excludeEnter] = useTestSyncState("Press", "setExcludeEnter", false, fromStringBoolean);
     const [, , excludeSpace] = useTestSyncState("Press", "setExcludeSpace", false, fromStringBoolean);
     const [, , excludePointer] = useTestSyncState("Press", "setExcludePointer", false, fromStringBoolean);
     const [allowRepeatPresses] = useTestSyncState("Press", "setAllowRepeatPresses", false, fromStringBoolean);
 
-    const { refElementReturn } = useRefElement<Tag>({ refElementParameters: {} });
+    const { refElementReturn, propsStable } = useRefElement<Tag>({ refElementParameters: {} });
     const { pressReturn: { getIsPressing, longPress, pressing }, props } = usePress<Tag>({
-        refElementReturn,
         pressParameters: {
-            focusSelf: e => e.focus(),
+            focusSelf: () => refElementReturn.getElement()!.focus(),
             excludeEnter,
             excludePointer,
             excludeSpace,
             onPressingChange: null,
             allowRepeatPresses,
             longPressThreshold: 1000,
+            elementIsContained: (e) => refElementReturn.getElement()!.contains(e),
             onPressSync: (e) => {
+                onPress();
                 return getTestingHandler("Press", "onPress")?.(e);
             }
         }
@@ -49,7 +52,7 @@ export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag }: { tag
             "data-long-press": longPress,
             children: "Pressable " + tag
         },
-            props,
+            useMergedProps(propsStable, props),
             // As a div, it needs to be focusable (and also add a role for the selector)
             tag == "button" ? {} : { role: "button", tabIndex: 0 }
         ))

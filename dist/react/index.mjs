@@ -4843,7 +4843,8 @@ function ensureManualClickHandlersInstalled() {
 function usePress(args) {
 	return useMonitoring(function usePress() {
 		ensureManualClickHandlersInstalled();
-		const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
+		const { pressParameters: { elementIsContained: eic, focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
+		const elementIsContained = useStableCallback(eic ?? returnFalse);
 		const excludeEnter = useStableCallback(ee ?? returnFalse);
 		const excludeSpace = useStableCallback(es ?? returnFalse);
 		const excludePointer = useStableCallback(ep ?? returnFalse);
@@ -4887,14 +4888,12 @@ function usePress(args) {
 			setPointerDownStartedHere(true);
 			setHovering(true);
 			setLongPress(false);
-			const element = getElement();
-			if (element) focusSelf(element);
+			focusSelf(e.currentTarget);
 		});
 		const onTouchMove = useCallback((e) => {
 			pressLog("touchmove", e);
 			e.preventDefault();
 			e.stopPropagation();
-			const element = getElement();
 			const touch = e.touches[0];
 			const offsets = [
 				[0, 0],
@@ -4906,7 +4905,7 @@ function usePress(args) {
 			let hoveringAtAnyPoint = false;
 			for (const [x, y] of offsets) {
 				const elementAtTouch = getDocument()?.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
-				hoveringAtAnyPoint ||= !!elementAtTouch && (element?.contains(elementAtTouch) ?? false);
+				hoveringAtAnyPoint ||= !!elementAtTouch && (elementIsContained(elementAtTouch) ?? false);
 			}
 			setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
 			setHovering(hoveringAtAnyPoint);
@@ -4939,8 +4938,7 @@ function usePress(args) {
 					setPointerDownStartedHere(true);
 					setHovering(true);
 					setLongPress(false);
-					const element = getElement();
-					if (element) focusSelf(element);
+					focusSelf(e.currentTarget);
 				}
 			}
 		});
@@ -4949,9 +4947,8 @@ function usePress(args) {
 			let listeningForPress = getPointerDownStartedHere();
 			if (!(e.buttons & 1)) setPointerDownStartedHere(listeningForPress = false);
 			if (listeningForPress) {
-				const element = getElement();
 				const elementAtPointer = getDocument()?.elementFromPoint(e.clientX, e.clientY);
-				const hovering = element == elementAtPointer || !!elementAtPointer && element?.contains(elementAtPointer) || false;
+				const hovering = elementAtPointer ? elementIsContained(elementAtPointer) : false;
 				setHovering(hovering);
 				setIsPressing(hovering && getPointerDownStartedHere(), e);
 			}
@@ -4985,10 +4982,9 @@ function usePress(args) {
 		}, []);
 		useTimeout({
 			callback: () => {
-				const element = getElement();
 				setLongPress(pointerDownStartedHere && getHovering());
-				if (element && pointerDownStartedHere && getHovering()) {
-					focusSelf(element);
+				if (pointerDownStartedHere && getHovering()) {
+					focusSelf();
 					if (longPressThreshold) {
 						setWaitingForSpaceUp(false);
 						setHovering(false);
@@ -5006,8 +5002,7 @@ function usePress(args) {
 			setPointerDownStartedHere(false);
 			setLongPress(null);
 			if (onPressSync) {
-				const element = getElement();
-				if (element) focusSelf(element);
+				focusSelf(e.currentTarget);
 				e.preventDefault();
 				e.stopPropagation();
 				try {
@@ -5043,7 +5038,6 @@ function usePress(args) {
 		});
 		const onClick = useStableCallback((e) => {
 			pressLog("click", e);
-			const element = getElement();
 			if (onPressSync) {
 				if (e.detail > 1) {
 					if ("stopImmediatePropagation" in e) e.stopImmediatePropagation();
@@ -5051,7 +5045,7 @@ function usePress(args) {
 				} else if (justHandledManualClickEvent) justHandledManualClickEvent = false;
 				else {
 					console.assert(justHandledManualClickEvent == false, "Logic???");
-					if (e.target && element?.contains(e.target)) {
+					if (e.target && elementIsContained(e.target)) {
 						if (getHovering()) {} else {
 							debugger;
 							console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
@@ -5097,20 +5091,17 @@ function usePress(args) {
 		};
 	});
 }
-function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
+function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters }) {
 	const asyncHandlerReturn = useAsyncHandler({
 		asyncHandler,
 		capture: noop,
 		debounce,
 		throttle
 	});
-	const { pressReturn, props } = usePress({
-		pressParameters: {
-			onPressSync: asyncHandlerReturn.syncHandler,
-			...pressParameters
-		},
-		refElementReturn
-	});
+	const { pressReturn, props } = usePress({ pressParameters: {
+		onPressSync: asyncHandlerReturn.syncHandler,
+		...pressParameters
+	} });
 	return {
 		asyncHandlerReturn,
 		pressReturn,

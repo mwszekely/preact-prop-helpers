@@ -10,7 +10,7 @@ test.describe("Press events", () => {
 
     // We're testing presses on <button>s and <div>s
     for (const buttonType of buttonTypes) {
-        
+
         // First, test clicking in detail.
         test(`Clicking must release over the ${buttonType} itself`, async ({ page, press, shared: { getCounter, install, run, locator, resetCounter } }) => {
             await install("Press", "onPress", (e) => { window.increment?.(); });
@@ -29,6 +29,24 @@ test.describe("Press events", () => {
             expect.poll(() => getCounter()).toBe(1);
             await page.mouse.move(500, 500, { steps: 10 });
             await button.hover();
+            await page.mouse.up();
+            expect.poll(() => getCounter()).toBe(1);
+        });
+
+
+        test(`Clicking must work even if the mouse moves within the element's bounds for ${buttonType} buttons`, async ({ page, press, shared: { getCounter, install, run, locator, resetCounter } }) => {
+            await install("Press", "onPress", (e) => { window.increment?.(); });
+            const button = press[buttonType];
+
+            // Hover the mouse, mousedown, move, mouseup.
+            // This should count as a press.
+            await button.hover();
+            await page.mouse.down();
+            expect.poll(() => getCounter()).toBe(0);
+            await page.mouse.move(10, 0, { steps: 10 });
+            expect.poll(() => getCounter()).toBe(0);
+            await page.mouse.move(10, 0, { steps: 10 });
+            expect.poll(() => getCounter()).toBe(0);
             await page.mouse.up();
             expect.poll(() => getCounter()).toBe(1);
         });
@@ -75,7 +93,7 @@ test.describe("Press events", () => {
 });
 
 test.describe("Pressing and long pressing", () => {
-    
+
     for (const buttonType of buttonTypes) {
         test(`A ${buttonType} can be "being pressed"`, async ({ page, press, shared: { getCounter, resetCounter, install, generateText, locator, run } }) => {
             resetCounter();

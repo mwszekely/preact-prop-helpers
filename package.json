@@ -23,6 +23,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "check": "tsc",
     "watch": "tsdown --watch",
     "test": "playwright test",
     "test-ui": "playwright test --ui",
