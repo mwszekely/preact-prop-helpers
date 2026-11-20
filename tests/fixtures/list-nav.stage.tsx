@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildrenInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteListNavigationContext, EventDetail, Nullable, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildrenInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers/preact";
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -234,7 +234,7 @@ function TestBasesListNavImpl({ sortValues, setRefresh, singleSelectionAriaPropN
     return (
         <Context1.Provider value={contextFromList}>
             <Context3.Provider value={contextFromProcessing}>
-                <ol {...useMergedProps(props, p1, {
+                <ol {...useMergedProps<'ol'>(props, p1, {
                     role: "toolbar",
                     "data-still-staggering": stillStaggering,
                     "data-typeahead-status": typeaheadStatus
@@ -362,7 +362,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-selected-offset={singleSelectedOffset}
                 data-hide-because-paginated="false"
                 data-hide-because-staggered="false"
-                {...useMergedProps(propsChild, propsTabbable, propsPressStable, p1, p2)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
+                {...useMergedProps<'li'>(propsChild, propsTabbable, propsPressStable, p1, p2)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )
 }

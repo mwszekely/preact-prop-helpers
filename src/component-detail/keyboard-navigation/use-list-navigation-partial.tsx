@@ -129,7 +129,7 @@ export function useListNavigation<ParentOrChildElementTag extends keyof JSX.Intr
                 ...contextTypeahead
             }),
             linearNavigationReturn,
-            props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
+            props: useMergedProps<ParentOrChildElementTag>(propsStableLN, propsStableTN, propsRTI)
         }
     });
 }

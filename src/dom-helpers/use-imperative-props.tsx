@@ -220,7 +220,7 @@ export function useImperativeProps<Tag extends keyof JSX.IntrinsicElements>({ re
             dangerouslySetInnerHTML,
             dangerouslyAppendHTML
         }).current,
-        props: useMergedProps(
+        props: useMergedProps<Tag>(
             {
                 className: [...currentImperativeProps.current.className].join(" "),
                 style: { ...currentImperativeProps.current.style }, // React freezes any style object it sees (I don't know why), so we copy it each time.
@@ -237,7 +237,7 @@ function ImperativeElementU<Tag extends keyof JSX.IntrinsicElements>({ tag: Tag,
     const { propsStable, refElementReturn } = useRefElement<Tag>({ refElementParameters: {} })
     const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps<Tag>({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
-    return (createElement(Tag as any, useMergedProps(propsStable as any, imperativeProps as any, props as any, { ref } as any) as any));
+    return (createElement(Tag as any, useMergedProps<Tag>(propsStable as any, imperativeProps as any, props as any, { ref } as any) as any));
 }
 
 

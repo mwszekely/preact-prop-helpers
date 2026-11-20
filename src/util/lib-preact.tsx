@@ -46,7 +46,7 @@ type Bar3 = ElementToTag<HTMLDivElement>;
 export type ElementProps<E extends EventTarget> = Partial<preact.HTMLAttributes & JSX.IntrinsicElements[ElementToTag<E>]>;
 type Bar4 = ElementProps<HTMLOListElement>;*/
 
-export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Pick<JSX.IntrinsicElements, Tag>[Tag];
+export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Partial<Pick<JSX.IntrinsicElements, Tag>[Tag]>;
 
 export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = (Exclude<Pick<ElementProps<Tag>, "ref">["ref"], null | undefined> extends Ref<infer K> ? K : never) & HTMLElement;
 //export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = HTMLElementTagNameMap[Tag];
@@ -69,16 +69,16 @@ export type AriaRole = preact.AriaRole;
 
 export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
     return {
-        beforetoggle: null!,
-        beforematch: null!,
-        pointerrawupdate: null!,
+        beforetoggle: "onBeforeToggle",
+        beforematch: "onBeforeMatch" as never,
+        pointerrawupdate: "onPointerRawUpdate" as never,
         dblclick: "onDblClick",
         focusin: "onFocusIn",
         focusout: "onFocusOut",
         formdata: "onFormData",
         toggle: "onToggle",
-        contextlost: null!,
-        contextrestored: null!,
+        contextlost: "onContextLost" as never,
+        contextrestored: "onContextRestored" as never,
         ...gem()
     };
 }

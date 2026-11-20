@@ -1,5 +1,5 @@
-import { defineConfig } from 'tsdown';
 import { replacePlugin } from 'rolldown/plugins';
+import { defineConfig } from 'tsdown';
 
 const BaseConfig = defineConfig({
     entry: "src/index.tsx",
@@ -8,7 +8,8 @@ const BaseConfig = defineConfig({
     deps: {
         neverBundle: true
     },
-    treeshake: true
+    treeshake: true,
+    attw: true,
 })
 
 export default defineConfig([

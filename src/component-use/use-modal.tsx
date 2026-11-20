@@ -29,7 +29,7 @@ export interface UseModalReturnType<FocusContainerElementTag extends keyof JSX.I
  * 
  * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself. 
  * 
- * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
+ * @deprecated Prefer native HTML popover and dialog nowadays
  * 
  * @compositeParams
  */
@@ -68,7 +68,7 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
         assertEmptyObject(void8);
 
         return {
-            propsFocusContainer: useMergedProps(propsStable, props),
+            propsFocusContainer: useMergedProps<NonNullable<FocusContainerElementTag>>(propsStable, props),
             refElementPopupReturn,
             refElementSourceReturn,
             propsStablePopup,

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useMergedProps, usePress, useRefElement } from "preact-prop-helpers";
+import { useMergedProps, usePress, useRefElement } from "preact-prop-helpers/preact";
 import { fromStringBoolean, useTestSyncState } from "../util.js";
 
 export interface PressConstants {
@@ -44,7 +44,7 @@ export function TestBasesButtonImpl<Tag extends 'div' | 'button'>({ tag }: { tag
     })
 
     return (
-        h(tag, useMergedProps({
+        h(tag, useMergedProps<Tag>({
             "data-pressing": pressing,
             "data-long-press": longPress,
             children: "Pressable " + tag

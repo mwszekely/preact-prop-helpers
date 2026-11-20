@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers";
+import { useGlobalHandler, useInterval, useSearchParamStateDeclarative, useState } from "preact-prop-helpers/preact";
 import { useEffect, useRef } from "preact/hooks";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
@@ -98,7 +98,7 @@ const TestBases = {
 
 export type TestBases = keyof typeof TestBases;
 
-declare module "preact-prop-helpers" {
+declare module "preact-prop-helpers/preact" {
     export interface SearchParamStates {
         "test-base": string;
         "test-bool": boolean | null;

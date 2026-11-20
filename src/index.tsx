@@ -335,6 +335,7 @@ export { useListNavigationSelection, useListNavigationSelectionChild, type UseLi
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, type CompleteGridNavigationCellContext, type CompleteGridNavigationRowContext, type UseCompleteGridNavigationCellInfo, type UseCompleteGridNavigationCellInfoKeysParameters, type UseCompleteGridNavigationCellParameters, type UseCompleteGridNavigationCellReturnType, type UseCompleteGridNavigationContextSelf, type UseCompleteGridNavigationDeclarativeParameters, type UseCompleteGridNavigationDeclarativeReturnType, type UseCompleteGridNavigationParameters, type UseCompleteGridNavigationParametersSelf, type UseCompleteGridNavigationReturnType, type UseCompleteGridNavigationReturnTypeSelf, type UseCompleteGridNavigationRowDeclarativeParameters, type UseCompleteGridNavigationRowInfo, type UseCompleteGridNavigationRowInfoKeysParameters, type UseCompleteGridNavigationRowOuterParameters, type UseCompleteGridNavigationRowOuterReturnType, type UseCompleteGridNavigationRowParameters, type UseCompleteGridNavigationRowReturnType, type UseCompleteGridNavigationRowsContext, type UseCompleteGridNavigationRowsInfo, type UseCompleteGridNavigationRowsParameters, type UseCompleteGridNavigationRowsReturnType } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, type CompleteListNavigationContext, type UseCompleteListNavigationChildDeclarativeParameters, type UseCompleteListNavigationChildDeclarativeReturnType, type UseCompleteListNavigationChildInfo, type UseCompleteListNavigationChildInfoKeysParameters, type UseCompleteListNavigationChildOuterParameters, type UseCompleteListNavigationChildOuterReturnType, type UseCompleteListNavigationChildParameters, type UseCompleteListNavigationChildReturnType, type UseCompleteListNavigationChildrenContext, type UseCompleteListNavigationChildrenInfo, type UseCompleteListNavigationChildrenParameters, type UseCompleteListNavigationChildrenReturnType, type UseCompleteListNavigationContextSelf, type UseCompleteListNavigationDeclarativeParameters, type UseCompleteListNavigationDeclarativeReturnType, type UseCompleteListNavigationParameters, type UseCompleteListNavigationParametersSelf, type UseCompleteListNavigationReturnType, type UseCompleteListNavigationReturnTypeSelf } from "./component-use/use-list-navigation-complete.js";
 export { useModal, type UseModalParameters, type UseModalParametersSelf, type UseModalReturnType } from "./component-use/use-modal.js";
+export { usePopover, type UsePopoverParameters, type UsePopoverParametersSelf, type UsePopoverReturnType, type UsePopoverReturnTypeSelf } from "./component-use/use-popover.js";
 export { setPressVibrate, usePress, usePressAsync, type PressChangeEventReason, type PressEventReason, type UsePressAsyncParameters, type UsePressAsyncReturnType, type UsePressParameters, type UsePressParametersSelf, type UsePressReturnType, type UsePressReturnTypeSelf } from "./component-use/use-press.js";
 export { useRandomDualIds, type UseRandomDualIdsParameters, type UseRandomDualIdsReturnType } from "./component-use/use-random-dual-ids.js";
 export { useRandomId, type UseRandomIdParameters, type UseRandomIdParametersSelf, type UseRandomIdReturnType, type UseRandomIdReturnTypeSelf } from "./component-use/use-random-id.js";
@@ -389,5 +390,60 @@ export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, useMonitoring } from "./util/use-call-count.js";
 
 // Export the Preact/React interop this library uses for others to use
-export { Fragment, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, getEventMapping, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useEffectEvent, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic, type AriaRole, type CSSProperties, type ComponentChildren, type ComponentType, type CompositionEventTypeByTag, type Context, type DragEventTypeByTag, type EffectCallback, type ElementProps, type EventTypeByTag, type ExtendMerge, type FocusEventTypeByTag, type Inputs, type JSX, type KeyboardEventTypeByTag, type MouseEventTypeByTag, type Nullable, type OmitStrong, type PointerEventTypeByTag, type Reducer, type Ref, type RefCallback, type RefObject, type RenderableProps, type StateUpdater, type TagToElement, type TargetedOmit, type TargetedPick, type TouchEventTypeByTag, type VNode } from "./util/lib.js";
+export {
+    Fragment,
+    cloneElement,
+    createContext,
+    createElement,
+    createPortal,
+    debounceRendering,
+    forwardRef,
+    getEventMapping,
+    memo,
+    onfocusin,
+    onfocusout,
+    useBeforeLayoutEffect,
+    useCallback,
+    useContext,
+    useDebugValue,
+    useEffect,
+    useEffectEvent,
+    useId,
+    useImperativeHandle,
+    useLayoutEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState as useStateBasic,
+    type AriaRole,
+    type CSSProperties,
+    type ComponentChildren,
+    type ComponentType,
+    type CompositionEventTypeByTag,
+    type Context,
+    type DragEventTypeByTag,
+    type EffectCallback,
+    type ElementProps,
+    type EventTypeByTag,
+    type ExtendMerge,
+    type FocusEventTypeByTag,
+    type Inputs,
+    type JSX,
+    type KeyboardEventTypeByTag,
+    type MouseEventTypeByTag,
+    type Nullable,
+    type OmitStrong,
+    type PointerEventTypeByTag,
+    type Reducer,
+    type Ref,
+    type RefCallback,
+    type RefObject,
+    type RenderableProps,
+    type StateUpdater,
+    type TagToElement,
+    type TargetedOmit,
+    type TargetedPick,
+    type TouchEventTypeByTag,
+    type VNode
+} from "./util/lib.js";
 

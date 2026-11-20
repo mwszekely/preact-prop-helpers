@@ -127,7 +127,7 @@ export function useSelectionChild<ChildElementTag extends keyof JSX.IntrinsicEle
         singleSelectionChildReturn,
         multiSelectionChildReturn,
         selectionChildReturn: { firePressSelectionEvent: useStableMergedCallback(singleSelectionChildReturn.firePressSelectionEvent, multiSelectionChildReturn.firePressSelectionEvent) },
-        props: useMergedProps(p1, p2)
+        props: useMergedProps<ChildElementTag>(p1, p2)
     }
 }
 

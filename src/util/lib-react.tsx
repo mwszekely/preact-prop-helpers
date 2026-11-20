@@ -42,16 +42,16 @@ export type AriaRole = JSX.IntrinsicElements["button"]["role"];
 
 export function getEventMapping(): { [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) } {
     return {
-        beforetoggle: null!,
-        beforematch: null!,
-        pointerrawupdate: null!,
+        beforetoggle: "onBeforeToggle",
+        beforematch: "onBeforeMatch" as never,
+        pointerrawupdate: "onPointerRawUpdate" as never,
         dblclick: "onDoubleClick",
         focusin: "onFocus",
         focusout: "onBlur",
-        formdata: null!,
-        toggle: null!,
-        contextlost: null!,
-        contextrestored: null!,
+        formdata: "onFormData" as never,
+        toggle: "onToggle" as never,
+        contextlost: "onContextLost" as never,
+        contextrestored: "onContextRestored" as never,
         ...gem(),
     }
 }

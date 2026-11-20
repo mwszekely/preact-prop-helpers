@@ -117,16 +117,16 @@ const onfocusin = "onFocus";
 const onfocusout = "onBlur";
 function getEventMapping() {
 	return {
-		beforetoggle: null,
-		beforematch: null,
-		pointerrawupdate: null,
+		beforetoggle: "onBeforeToggle",
+		beforematch: "onBeforeMatch",
+		pointerrawupdate: "onPointerRawUpdate",
 		dblclick: "onDoubleClick",
 		focusin: "onFocus",
 		focusout: "onBlur",
-		formdata: null,
-		toggle: null,
-		contextlost: null,
-		contextrestored: null,
+		formdata: "onFormData",
+		toggle: "onToggle",
+		contextlost: "onContextLost",
+		contextrestored: "onContextRestored",
 		...getEventMapping$1()
 	};
 }
@@ -3338,6 +3338,8 @@ function useActiveElement({ activeElementParameters: { onActiveElementChange, on
 /**
 * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
 * 
+* @deprecated Use native HTML popups and dialogs these days
+* 
 * @compositeParams
 */
 function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
@@ -4466,7 +4468,7 @@ function useCompleteListNavigationChildDeclarative({ multiSelectionChildParamete
 * 
 * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself. 
 * 
-* TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
+* @deprecated Prefer native HTML popover and dialog nowadays
 * 
 * @compositeParams
 */
@@ -4523,6 +4525,71 @@ function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, e
 			propsStableSource
 		};
 	});
+}
+// src/component-use/use-random-id.tsx
+/**
+* Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
+* 
+* @compositeParams
+*/
+function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
+	return useMonitoring(function useRandomId() {
+		const id = prefix + useId();
+		useEnsureStability("useRandomId", prefix, id);
+		const referencerElementProps = useRef(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+		const sourceElementProps = useRef({ id });
+		useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
+		return {
+			propsReferencer: referencerElementProps.current,
+			propsSource: sourceElementProps.current,
+			randomIdReturn: { id }
+		};
+	});
+}
+// src/component-use/use-popover.tsx
+/**
+* Creates a popover and associates an element with it.
+* 
+* If `type="manual"`, you can either control the state declaratively via the `open` prop, or manually via the returned `showPopover`/`hidePopover` functions.
+* 
+* Among other things, ensures you don't need to remember whether to attach event handles to the popover or the invoker (it's always the popover, by the way).
+* 
+* @compositeParams
+*/
+function usePopover({ popoverParameters, randomIdParameters }) {
+	const onBeforeToggle = useCallback((e) => {
+		if (popoverParameters.disabled && e.newState == "open") e.preventDefault();
+		else if (e.newState != e.oldState) popoverParameters.onToggleChange(e.newState == "open", e);
+	}, [popoverParameters.disabled, popoverParameters.onToggleChange]);
+	const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
+	const hidePopover = useCallback(() => {
+		refElementReturn.getElement()?.hidePopover();
+	}, []);
+	const showPopover = useCallback(() => {
+		refElementReturn.getElement()?.showPopover();
+	}, []);
+	const { propsReferencer, propsSource: popoverIdProps, randomIdReturn } = useRandomId({ randomIdParameters });
+	const popoverId = randomIdReturn.id;
+	const propsSource = useMergedProps(propsReferencer, { popoverTarget: popoverId });
+	const propsPopover = useMergedProps(popoverIdProps, propsStable, {
+		onBeforeToggle,
+		popover: popoverParameters.type
+	});
+	useEffect(() => {
+		if (popoverParameters.open === true) showPopover();
+		else if (popoverParameters.open === false) hidePopover();
+	}, [popoverParameters.open]);
+	useEffect(() => {
+		if (popoverParameters.disabled) hidePopover();
+	}, [popoverParameters.disabled, hidePopover]);
+	return {
+		propsSource,
+		propsPopover,
+		popoverReturn: {
+			hidePopover,
+			showPopover
+		}
+	};
 }
 // src/preact-extensions/use-async.tsx
 function identityCapture(...t) {
@@ -5063,26 +5130,6 @@ function pulse() {
 */
 function setPressVibrate(func) {
 	pulseOverride = func;
-}
-// src/component-use/use-random-id.tsx
-/**
-* Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
-* 
-* @compositeParams
-*/
-function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
-	return useMonitoring(function useRandomId() {
-		const id = prefix + useId();
-		useEnsureStability("useRandomId", prefix, id);
-		const referencerElementProps = useRef(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-		const sourceElementProps = useRef({ id });
-		useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
-		return {
-			propsReferencer: referencerElementProps.current,
-			propsSource: sourceElementProps.current,
-			randomIdReturn: { id }
-		};
-	});
 }
 // src/component-use/use-random-dual-ids.tsx
 /**
@@ -6527,6 +6574,6 @@ function useInterval({ interval, callback, noRisingEdge }) {
 		return () => clearInterval(handle);
 	}, [enabled]);
 }
-export { EventDetail, Fragment, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, cloneElement, createContext, createElement, createPortal, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, forwardRef, generateRandomId, generateStack, getDocument, getEventDetail, getEventMapping, getFromLocalStorage, getTopElement, getWindow, hideCallCount, identity, memo, mergeFunctions, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBeforeLayoutEffect, useBlockingElement, useCallback, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useContext, useDebugValue, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffect, useEffectDebug, useEffectEvent, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useId, useImperativeHandle, useImperativeProps, useInterval, useLayoutEffect, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemo, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMonitoring, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, useProcessedIndexMangler, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChild, useRearrangeableChildren, useReducer, useRef, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useState$1 as useStateBasic, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { EventDetail, Fragment, ImperativeElement, PersistentStates, ProvideBatchedAnimationFrames, SearchParamStates, assertEmptyObject, binarySearch, cloneElement, createContext, createElement, createPortal, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, forwardRef, generateRandomId, generateStack, getDocument, getEventDetail, getEventMapping, getFromLocalStorage, getTopElement, getWindow, hideCallCount, identity, memo, mergeFunctions, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBeforeLayoutEffect, useBlockingElement, useCallback, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowDeclarative, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationChildOuter, useCompleteListNavigationChildren, useCompleteListNavigationDeclarative, useContext, useDebugValue, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffect, useEffectDebug, useEffectEvent, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useId, useImperativeHandle, useImperativeProps, useInterval, useLayoutEffect, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSelection, useListNavigationSelectionChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemo, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMonitoring, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePopover, usePortalChildren, usePress, usePressAsync, useProcessedChild, useProcessedChildren, useProcessedIndexMangler, usePropsOnChildren, useRandomDualIds, useRandomId, useRearrangeableChild, useRearrangeableChildren, useReducer, useRef, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useStableCallback, useStableGetter, useStableMergedCallback, useStack, useStaggeredChild, useStaggeredChildren, useState, useState$1 as useStateBasic, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 
 //# sourceMappingURL=index.mjs.map

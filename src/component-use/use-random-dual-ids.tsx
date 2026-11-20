@@ -30,8 +30,8 @@ export function useRandomDualIds<InputElementTag extends keyof JSX.IntrinsicElem
         const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElementTag, InputElementTag>({ randomIdParameters: randomIdLabelParameters });
 
         return {
-            propsLabel: useMergedProps(propsLabelAsReferencer, propsLabelAsSource),
-            propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
+            propsLabel: useMergedProps<LabelElementTag>(propsLabelAsReferencer, propsLabelAsSource),
+            propsInput: useMergedProps<InputElementTag>(propsInputAsReferencer, propsInputAsSource),
             randomIdInputReturn,
             randomIdLabelReturn
         }

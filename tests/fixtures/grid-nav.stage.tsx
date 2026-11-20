@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowsInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers";
+import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowsInfo, UseProcessedChildContext, UseSingleSelectionParameters, focus, identity, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteGridNavigationRowOuter, useCompleteGridNavigationRows, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "preact-prop-helpers/preact";
 import { useCallback, useContext, useEffect, useMemo, useState } from "preact/hooks";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
@@ -179,7 +179,7 @@ function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex
     return (
         <ProcessingChildContext.Provider value={contextFromProcessing}>
             <RowContext.Provider value={contextFromGrid}>
-                <table {...useMergedProps(props, p1, {
+                <table {...useMergedProps<'table'>(props, p1, {
                     "data-grid-nav": true,
                     border: 1,
                     role: "grid",
@@ -232,7 +232,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <tr data-grid-nav-row  {...useMergedProps(p1, p2)}><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
+        return <tr data-grid-nav-row  {...useMergedProps<'tr'>(p1, p2)}><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -272,7 +272,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         <CellContext.Provider value={context}>
             <tr
 
-                {...useMergedProps(props, p1, p2,
+                {...useMergedProps<'tr'>(props, p1, p2,
                     {
                         role: "row",
                         "data-grid-nav-row": true,
@@ -310,7 +310,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <td data-grid-nav-cell colSpan={colSpan} {...useMergedProps(p1, p2)}>(The #{index}-th item is missing)</td>;
+        return <td data-grid-nav-cell colSpan={colSpan} {...useMergedProps<'td'>(p1, p2)}>(The #{index}-th item is missing)</td>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -331,7 +331,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
         <>
             <td
 
-                {...useMergedProps(props, p1, p2, {
+                {...useMergedProps<'td'>(props, p1, p2, {
                     "data-grid-nav-cell": true,
                     colSpan,
                     role: "cell",

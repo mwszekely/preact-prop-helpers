@@ -1,4 +1,4 @@
-import { useRefElement } from "preact-prop-helpers";
+import { useRefElement } from "preact-prop-helpers/preact";
 import { useCallback, useState } from "preact/hooks";
 import { fromStringBoolean, useTestSyncState } from "../util.js";
 

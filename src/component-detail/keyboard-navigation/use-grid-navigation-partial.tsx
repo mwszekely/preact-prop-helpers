@@ -325,7 +325,7 @@ export function useGridNavigationRow<RowElementTag extends keyof JSX.IntrinsicEl
         // These will often have conflicting values, but we always use -1 for rows no matter what,
         // so instead of negotiating a resolution we can just give a straight answer.
         propsLN.tabIndex = propsLNC.tabIndex = -1;
-        const props = useMergedProps(propsLN, propsLNC, {
+        const props = useMergedProps<RowElementTag>(propsLN, propsLNC, {
             // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
             onFocus: useStableCallback((e: FocusEventTypeByTag<RowElementTag>) => whenThisRowIsFocused(e.currentTarget))
         });
@@ -405,7 +405,7 @@ export function useGridNavigationCell<CellElementTag extends keyof JSX.Intrinsic
 
         return {
             info: infoLs,
-            props: useMergedProps(props, {
+            props: useMergedProps<CellElementTag>(props, {
                 onClick: (e: MouseEventTypeByTag<CellElementTag>) => {
                     setTabbableColumn(prev => {
                         return ({ ideal: index, actual: index });

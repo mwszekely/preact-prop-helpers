@@ -90,6 +90,8 @@ export interface UseDismissReturnType<SourceElementTag extends keyof JSX.Intrins
 /**
  * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  * 
+ * @deprecated Use native HTML popups and dialogs these days
+ * 
  * @compositeParams
  */
 export function useDismiss<Listeners extends DismissListenerTypes, SourceElementTag extends keyof JSX.IntrinsicElements | null, PopupElementTag extends keyof JSX.IntrinsicElements>({

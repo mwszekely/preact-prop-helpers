@@ -38,7 +38,7 @@ export type MergedProps<P extends unknown[]> = P extends [infer P1, ...infer P2]
  * 
  * @returns A single object with all the provided props merged into one.
  */
-export function useMergedProps<P extends {}[]>(...allProps: P): MergedProps<P> {
+export function useMergedProps<Tag extends keyof JSX.IntrinsicElements>(...allProps: {}[]): ElementProps<Tag> {
     useEnsureStability("useMergedProps", allProps.length);
     let ret: any = {};
     for (let nextProps of allProps) {

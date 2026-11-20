@@ -105,7 +105,7 @@ function supportsPointerEvents() {
 // Now there's a new button underneath the user's finger
 // And it receives a click event just cause.
 // ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
-// But TODO because it doesn't work well it this library is used multiple times on the same page.
+// But TODO because if this library is used multiple times on the same page it doesn't work well.
 let installedManualClickHandlers = false;
 let justHandledManualClickEvent = false;
 let onHandledManualClickEvent: () => void;

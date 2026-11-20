@@ -37,5 +37,5 @@ function Impl({ tag, tabIndex, children }: { tag: string, tabIndex: number, chil
     console.assert(getCurrentFocused() == focus);
     console.assert(getCurrentFocusedInner() == focusInner);
 
-    return h(tag as never, useMergedProps({ tabIndex, "data-focused": focus, "data-focus-inner": focusInner } as {}, propsStable, p2), children);
+    return h(tag as never, useMergedProps<any>({ tabIndex, "data-focused": focus, "data-focus-inner": focusInner } as {}, propsStable, p2), children);
 }

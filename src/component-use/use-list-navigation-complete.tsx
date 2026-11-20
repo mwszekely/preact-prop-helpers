@@ -241,7 +241,7 @@ export function useCompleteListNavigation<ParentElementTag extends keyof JSX.Int
 
         return {
             context,
-            props: useMergedProps(props, propsRef),
+            props: useMergedProps<ParentElementTag>(props, propsRef),
             managedChildrenReturn,
             linearNavigationReturn,
             rovingTabIndexReturn,
@@ -358,7 +358,7 @@ export function useCompleteListNavigationChildOuter<RowElementTag extends keyof 
 
         return {
             ...processedChildReturn,
-            props: useMergedProps(props, propsStable),
+            props: useMergedProps<RowElementTag>(props, propsStable),
 
             refElementReturn,
             hide: processedChildReturn.paginatedChildReturn.hideBecausePaginated || processedChildReturn.staggeredChildReturn.hideBecauseStaggered
@@ -424,7 +424,7 @@ export function useCompleteListNavigationChild<ChildElementTag extends keyof JSX
         });
 
 
-        const props = useMergedProps(
+        const props = useMergedProps<ChildElementTag>(
             propsStable,
             hasCurrentFocusReturn.propsStable,
             propsChild

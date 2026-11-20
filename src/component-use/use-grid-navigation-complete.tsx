@@ -299,7 +299,7 @@ export function useCompleteGridNavigation<ParentOrRowElementTag extends keyof JS
 
         return {
             context,
-            props: useMergedProps(props, propsStable),
+            props: useMergedProps<ParentOrRowElementTag>(props, propsStable),
             refElementReturn,
 
             managedChildrenReturn,
@@ -411,7 +411,7 @@ export function useCompleteGridNavigationRowOuter<RowElementTag extends keyof JS
 
         return {
             ...processedChildReturn,
-            props: useMergedProps(props, propsStable),
+            props: useMergedProps<RowElementTag>(props, propsStable),
 
             refElementReturn,
             hide: processedChildReturn.paginatedChildReturn.hideBecausePaginated || processedChildReturn.staggeredChildReturn.hideBecauseStaggered
@@ -520,7 +520,7 @@ export function useCompleteGridNavigationRow<RowElementTag extends keyof JSX.Int
             }
         });
 
-        const props = useMergedProps(
+        const props = useMergedProps<RowElementTag>(
             propsStable,
             p3,
             hasCurrentFocusReturn.propsStable,
@@ -607,11 +607,11 @@ export function useCompleteGridNavigationCell<CellElementTag extends keyof JSX.I
 
         const { managedChildReturn } = useManagedChild<CM>({ context, info: { ...baseInfo, ...customUserInfo } as CM })
 
-        const props = useMergedProps(
+        const props = useMergedProps<CellElementTag>(
             propsStable,
             propsRti,
             hasCurrentFocusReturn.propsStable
-        ) as ElementProps<CellElementTag>;
+        );
 
         return {
             props,

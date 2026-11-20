@@ -217,7 +217,7 @@ export function useProcessedChild<TabbableChildElementTag extends keyof JSX.Intr
 
         assertEmptyObject(void1);
 
-        const propsRet = useMergedProps(propsStaggered, propsPaginated);
+        const propsRet = useMergedProps<TabbableChildElementTag>(propsStaggered, propsPaginated);
 
         return {
             props: propsRet,

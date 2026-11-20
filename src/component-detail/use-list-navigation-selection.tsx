@@ -89,7 +89,7 @@ export function useListNavigationSelection<ParentOrChildElementTag extends keyof
                 ...contextLN,
                 ...contextSS
             }),
-            props: useMergedProps(props, propsStable)
+            props: useMergedProps<ParentOrChildElementTag>(props, propsStable)
         }
     });
 }
