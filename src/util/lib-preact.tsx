@@ -46,7 +46,7 @@ type Bar3 = ElementToTag<HTMLDivElement>;
 export type ElementProps<E extends EventTarget> = Partial<preact.HTMLAttributes & JSX.IntrinsicElements[ElementToTag<E>]>;
 type Bar4 = ElementProps<HTMLOListElement>;*/
 
-export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Partial<Pick<JSX.IntrinsicElements, Tag>[Tag]>;
+export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[Tag];
 
 export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = (Exclude<Pick<ElementProps<Tag>, "ref">["ref"], null | undefined> extends Ref<infer K> ? K : never) & HTMLElement;
 //export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = HTMLElementTagNameMap[Tag];

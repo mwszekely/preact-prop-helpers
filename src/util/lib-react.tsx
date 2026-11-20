@@ -25,7 +25,7 @@ export const onfocusout = "onBlur" satisfies keyof ElementProps<any>;
 /// @ts-expect-error
 import { CompositionEvent, Dispatch, DragEvent, FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, PropsWithChildren, PropsWithRef, SetStateAction, SyntheticEvent, TouchEvent, CSSProperties as react_CSSProperties } from "react";
 
-export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = Pick<JSX.IntrinsicElements, Tag>[Tag];
+export type ElementProps<Tag extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[Tag];
 export type TagToElement<Tag extends keyof JSX.IntrinsicElements> = Exclude<ElementProps<Tag>["ref"], null | undefined> extends Ref<infer K> ? K : never;
 export type EventTypeByTag<Tag extends keyof JSX.IntrinsicElements, E extends Event> = SyntheticEvent<TagToElement<Tag>, E>;
 export type FocusEventTypeByTag<Tag extends keyof JSX.IntrinsicElements> = FocusEvent<TagToElement<Tag>>;
